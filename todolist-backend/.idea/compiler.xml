@@ -8,14 +8,14 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="api-gateway" />
-        <module name="news-service" />
         <module name="auth-service" />
-        <module name="order-service" />
         <module name="user-service" />
-        <module name="catalog-service" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="catalog-service" target="21" />
+      <module name="news-service" target="21" />
+      <module name="order-service" target="21" />
       <module name="todolist-backend" target="21" />
     </bytecodeTargetLevel>
   </component>

@@ -19,39 +19,6 @@ spring:
                                                         allowedHeaders: "*"
                                                         allowCredentials: true
 
-                                -       id: catalog-service
-                                        uri: http://localhost:8082
-                                        predicates:
-                                                - Path=/api/catalog/**
-                                        metadata:
-                                                cors:
-                                                        allowedOrigins: "http://localhost:4200"
-                                                        allowedMethods: "*"
-                                                        allowedHeaders: "*"
-                                                        allowCredentials: true
-
-                                -       id: order-service
-                                        uri: http://localhost:8083
-                                        predicates:
-                                                - Path=/api/order/**
-                                        metadata:
-                                                cors:
-                                                        allowedOrigins: "http://localhost:4200"
-                                                        allowedMethods: "*"
-                                                        allowedHeaders: "*"
-                                                        allowCredentials: true
-
-                                -       id: news-service
-                                        uri: http://localhost:8084
-                                        predicates:
-                                                - Path=/api/news/**
-                                        metadata:
-                                                cors:
-                                                        allowedOrigins: "http://localhost:4200"
-                                                        allowedMethods: "*"
-                                                        allowedHeaders: "*"
-                                                        allowCredentials: true
-
 management:
         endpoints:
                 web:

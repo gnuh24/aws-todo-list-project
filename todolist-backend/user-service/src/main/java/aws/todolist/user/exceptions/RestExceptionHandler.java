@@ -3,7 +3,6 @@ package aws.todolist.user.exceptions;
 import aws.todolist.user.aop.AppLogger;
 import aws.todolist.user.exceptions.AuthException.StepUpAuthenticationException;
 import aws.todolist.user.exceptions.JwtException.*;
-import com.ec.user.exceptions.JwtException.*;
 import aws.todolist.user.exceptions.errorCode.SystemErrorCode;
 import aws.todolist.user.exceptions.otpException.OtpNotFoundException;
 import aws.todolist.user.utils.EnvironmentUtils;
