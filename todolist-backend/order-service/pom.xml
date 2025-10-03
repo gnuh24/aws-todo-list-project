@@ -1,0 +1,191 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<!-- Kế thừa Spring Boot Parent để tự động quản lý dependency -->
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.4.0</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+
+	<groupId>com.ec.order</groupId>
+	<artifactId>order-service</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>order-service</name>
+	<description>order-service</description>
+
+	<properties>
+		<!-- Định nghĩa phiên bản Java sử dụng -->
+		<java.version>21</java.version>
+	</properties>
+
+	<dependencies>
+		<!-- Spring Boot Web Starter (dùng cho API REST) -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<!-- Spring Boot Starter Test (dành cho unit test) -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Spring Boot JPA Starter (dùng để làm việc với ORM và SQL database) -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+
+		<!-- MySQL Connector (Driver kết nối với MySQL) -->
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>8.0.33</version>
+		</dependency>
+
+		<!-- Spring Boot DevTools (Hỗ trợ reload nóng khi phát triển) -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>
+
+		<!-- Lombok (Giúp giảm boilerplate code, như getter/setter) -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+
+		<!-- ModelMapper (Dùng để ánh xạ DTO <-> Entity) -->
+		<dependency>
+			<groupId>org.modelmapper</groupId>
+			<artifactId>modelmapper</artifactId>
+			<version>3.1.1</version>
+		</dependency>
+
+		<!-- Spring Boot Validation (Dùng để validate dữ liệu đầu vào) -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
+
+
+
+		<!-- Spring Boot Security (Dùng để bảo mật API) -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+
+
+
+		<!-- JSON Web Token (JWT) để xác thực API -->
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-impl</artifactId>
+			<version>0.12.3</version>
+			<scope>runtime</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-api</artifactId>
+			<version>0.12.3</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-jackson</artifactId>
+			<version>0.12.3</version>
+			<scope>runtime</scope>
+		</dependency>
+
+
+
+		<!-- Spring Boot Mail (Dùng để gửi email) -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+
+
+
+		<!-- Cloudinary SDK (Dùng để upload ảnh lên Cloudinary) -->
+		<dependency>
+			<groupId>com.cloudinary</groupId>
+			<artifactId>cloudinary-http44</artifactId>
+			<version>1.38.0</version>
+		</dependency>
+
+
+
+
+		<!-- SpringDoc OpenAPI (Dùng để tạo tài liệu API Swagger) -->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>2.2.0</version>
+		</dependency>
+
+
+
+<!--		&lt;!&ndash; https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-dependencies &ndash;&gt;-->
+<!--		<dependency>-->
+<!--			<groupId>org.springframework.cloud</groupId>-->
+<!--			<artifactId>spring-cloud-dependencies</artifactId>-->
+<!--			<version>2024.0.0</version>-->
+<!--			<type>pom</type>-->
+<!--			<scope>import</scope>-->
+<!--		</dependency>-->
+
+
+<!--		&lt;!&ndash; https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-openfeign &ndash;&gt;-->
+<!--		<dependency>-->
+<!--			<groupId>org.springframework.cloud</groupId>-->
+<!--			<artifactId>spring-cloud-starter-openfeign</artifactId>-->
+<!--			<version>4.2.0</version>-->
+<!--		</dependency>-->
+
+
+                <!-- pom.xml -->
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-actuator</artifactId>
+                </dependency>
+
+                <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-redis -->
+                <dependency>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-starter-data-redis</artifactId>
+                        <version>3.5.0</version>
+                </dependency>
+
+                <dependency>
+                        <groupId>org.springframework.kafka</groupId>
+                        <artifactId>spring-kafka</artifactId>
+                </dependency>
+
+
+
+        </dependencies>
+
+	<build>
+		<plugins>
+			<!-- Spring Boot Maven Plugin (Hỗ trợ build và chạy ứng dụng Spring Boot) -->
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

@@ -7,7 +7,7 @@ CREATE TABLE `account` (
     `email`             VARCHAR(255) UNIQUE NOT NULL,       
     `password`          VARCHAR(255) NOT NULL,           
     `avatar`            VARCHAR(512),                       
-    `display_name`      VARCHAR(255) NOT NULL,       
+    `display_name`      VARCHAR(255) ,       
     `role`              ENUM('ADMIN', 'USER') NOT NULL,
     `status`            ENUM('ACTIVE', 'INACTIVE', 'BANNED') NOT NULL,
     
@@ -113,9 +113,9 @@ CREATE TABLE `comment_attachment` (
 -- 1. Dữ liệu mẫu cho bảng `account`
 INSERT INTO `account` (`id`, `email`, `password`, `avatar`, `display_name`, `role`, `status`, `created_at`, `updated_at`, `deleted_at`, `is_deleted`)
 VALUES
-('11111111-1111-1111-1111-111111111111', 'admin@gmail.com', 'admin_password', NULL, 'Admin User', 'ADMIN', 'ACTIVE', NOW(), NOW(), NULL, FALSE),
-('22222222-2222-2222-2222-222222222222', 'user1@gmail.com', 'user1_password', NULL, 'User One', 'USER', 'ACTIVE', NOW(), NOW(), NULL, FALSE),
-('33333333-3333-3333-3333-333333333333', 'user2@gmail.com', 'user2_password', NULL, 'User Two', 'USER', 'ACTIVE', NOW(), NOW(), NULL, FALSE);
+('11111111-1111-1111-1111-111111111111', 'admin@gmail.com', '$2a$10$W2neF9.6Agi6kAKVq8q3fec5dHW8KUA.b0VSIGdIZyUravfLpyIFi', NULL, 'Admin User', 'ADMIN', 'ACTIVE', NOW(), NOW(), NULL, FALSE),
+('22222222-2222-2222-2222-222222222222', 'user1@gmail.com', '$2a$10$W2neF9.6Agi6kAKVq8q3fec5dHW8KUA.b0VSIGdIZyUravfLpyIFi', NULL, 'User One', 'USER', 'ACTIVE', NOW(), NOW(), NULL, FALSE),
+('33333333-3333-3333-3333-333333333333', 'user2@gmail.com', '$2a$10$W2neF9.6Agi6kAKVq8q3fec5dHW8KUA.b0VSIGdIZyUravfLpyIFi', NULL, 'User Two', 'USER', 'ACTIVE', NOW(), NOW(), NULL, FALSE);
 
 -- 2. Dữ liệu mẫu cho bảng `project`
 INSERT INTO `project` (`id`, `name`, `is_archived`, `created_at`, `updated_at`, `deleted_at`, `is_deleted`)
