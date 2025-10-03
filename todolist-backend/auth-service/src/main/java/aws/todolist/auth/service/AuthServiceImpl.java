@@ -194,8 +194,7 @@ public class AuthServiceImpl implements AuthService {
 			throw new StepUpAuthenticationException("Mật khẩu hiện không đúng !!");
 		}
 		
-		String newPassword = passwordEncoder.encode(form.getNewPassword());
-		return accountService.updatePassword(account, newPassword);
+		return accountService.updatePassword(account, form.getNewPassword());
 		
 	}
 	
@@ -230,10 +229,6 @@ public class AuthServiceImpl implements AuthService {
 		redisService.set(RedisConstants.EMAIL_EXIST + ":" + form.getNewEmail(), "true");
 		
 		accountService.updateEmail(account, form.getNewEmail());
-		
-//		redisService.set(RedisConstants.BANLIST_ACCESS_TOKEN + ":" + form.getAccessToken(), "true",15, TimeUnit.MINUTES);
-//		redisService.set(RedisConstants.BANLIST_REFRESH_TOKEN + ":" + form.getRefreshToken(), "true",7, TimeUnit.DAYS);
-//
 		return account;
 	}
 	
