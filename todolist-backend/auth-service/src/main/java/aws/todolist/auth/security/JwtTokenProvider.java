@@ -27,9 +27,9 @@ public class JwtTokenProvider {
 //	private static final long EXPIRATION_TIME_FOR_TOKEN = 0;
 //	private static final long EXPIRATION_TIME_FOR_REFRESH_TOKEN = 0;
 	
-	
 	private static final long EXPIRATION_TIME_FOR_TOKEN = 30L * 24 * 60 * 60 * 1000;
 	private static final long EXPIRATION_TIME_FOR_REFRESH_TOKEN = 30L * 24 * 60 * 60 * 1000;
+	private static final long INTERNAL_EXPIRATION_TIME = 30L * 24 * 60 * 60 * 1000;
 	
 	@PostConstruct
 	public void init() {
@@ -45,6 +45,10 @@ public class JwtTokenProvider {
 		Map<String, Object> claims = new HashMap<>();
 		claims.put("typ", "access");  // Mark this as access token
 		
+		if (userDetails.getAuthorities() != null && !userDetails.getAuthorities().isEmpty()) {
+			claims.put("role", userDetails.getAuthorities().iterator().next().getAuthority());
+		}
+		
 		return Jwts.builder()
 		    .setClaims(claims)
 		    .setSubject(userDetails.getUsername())
@@ -54,10 +58,30 @@ public class JwtTokenProvider {
 		    .compact();
 	}
 	
+	// ✅ Generate Internal Token
+	public String generateInternalToken(String serviceName) {
+		Map<String, Object> claims = new HashMap<>();
+		claims.put("typ", "internal");   // Mark this as internal token
+		claims.put("service", serviceName); // Ai đã generate (ví dụ: "auth-service")
+		
+		return Jwts.builder()
+		    .setClaims(claims)
+		    .setSubject("internal-token") // Subject cố định, không gắn với user
+		    .setIssuedAt(new Date(System.currentTimeMillis()))
+		    .setExpiration(new Date(System.currentTimeMillis() + INTERNAL_EXPIRATION_TIME)) // thời gian sống có thể ngắn hơn
+		    .signWith(secretKey)
+		    .compact();
+	}
+	
+	
 	// ✅ Generate Refresh Token
 	public String generateRefreshToken(UserDetails userDetails) {
 		Map<String, Object> claims = new HashMap<>();
 		claims.put("typ", "refresh");  // Mark this as refresh token
+		
+		if (userDetails.getAuthorities() != null && !userDetails.getAuthorities().isEmpty()) {
+			claims.put("role", userDetails.getAuthorities().iterator().next().getAuthority());
+		}
 		
 		return Jwts.builder()
 		    .setClaims(claims)

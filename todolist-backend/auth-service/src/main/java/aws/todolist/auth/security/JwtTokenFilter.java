@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Collections;
 
 @Component
 public class JwtTokenFilter extends OncePerRequestFilter {
@@ -72,7 +73,17 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 			try {
 				String typeToken = jwtTokenProvider.getTokenType(jwtToken);
 				if (typeToken == null || !typeToken.equals("access")) {
+					if (typeToken.equals("internal")){
+						UsernamePasswordAuthenticationToken auth =
+						    new UsernamePasswordAuthenticationToken("internal-service", null, Collections.emptyList());
+						SecurityContextHolder.getContext().setAuthentication(auth);
+						
+						filterChain.doFilter(request, response);
+						return;
+					}
+					
 					throw new InvalidTokenTypeException("Access token có type không hợp lệ.");
+					
 				}
 				
 				userEmail = jwtTokenProvider.getUsername(jwtToken);

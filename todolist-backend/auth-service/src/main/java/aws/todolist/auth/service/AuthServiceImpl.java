@@ -23,10 +23,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -317,5 +321,9 @@ public class AuthServiceImpl implements AuthService {
 		return response;
 	}
 	
-	
+	@Override
+	public UserDetails getUserDetailByJwtToken(String jwtToken) {
+			String userEmail = jwtTokenProvider.getUsername(jwtToken);
+			return accountService.loadUserByUsername(userEmail);
+	}
 }

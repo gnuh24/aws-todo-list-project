@@ -5,6 +5,7 @@ import aws.todolist.auth.dto.account.AccountRedisDTO;
 import aws.todolist.auth.dto.auth.*;
 import aws.todolist.auth.entity.Account;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.security.core.userdetails.UserDetails;
 
 public interface AuthService {
 	
@@ -28,5 +29,7 @@ public interface AuthService {
 	
 	Account updateEmail(UpdateEmailForm form);
 	AuthResponseDTO refreshToken(HttpServletRequest request);
+	UserDetails getUserDetailByJwtToken(String jwtToken);
+	
 	
 }

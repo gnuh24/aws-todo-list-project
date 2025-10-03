@@ -1,6 +1,7 @@
 package aws.todolist.auth.exceptions;
 
 import aws.todolist.auth.aop.AppLogger;
+import aws.todolist.auth.exceptions.AuthException.HmacVerificationException;
 import aws.todolist.auth.exceptions.AuthException.StepUpAuthenticationException;
 import aws.todolist.auth.exceptions.JwtException.*;
 import aws.todolist.auth.exceptions.errorCode.SystemErrorCode;
@@ -133,8 +134,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 	
 			code = SystemErrorCode.AUTH_REFRESH_TOKEN_INVALID_TYP;
 			message = "Token chứa type không hợp lệ.";
-	
-		
+			
 		return buildErrorResponse(request, HttpStatus.UNAUTHORIZED, code, message, ex, null);
 	}
 	
@@ -178,6 +178,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 		} else if (ex instanceof InvalidJWTSignatureException) {
 			code = SystemErrorCode.AUTH_REFRESH_TOKEN_INVALID_SIGNATURE;
 			message = "Token có chữ ký không hợp lệ.";
+		}else if (ex instanceof HmacVerificationException) {
+			code = SystemErrorCode.AUTH_HMAC_MISMATCH;
+			message = "Hmac Token không hợp lệ.";
 		}
 		
 		return buildErrorResponse(request, HttpStatus.UNAUTHORIZED, code, message, ex, null);

@@ -4,8 +4,17 @@ import aws.todolist.auth.api.ApiResponse;
 import aws.todolist.auth.dto.account.AccountRedisDTO;
 import aws.todolist.auth.dto.auth.*;
 import aws.todolist.auth.entity.Account;
+import aws.todolist.auth.exceptions.AuthException.HmacVerificationException;
+import aws.todolist.auth.exceptions.JwtException.InvalidJWTSignatureException;
+import aws.todolist.auth.exceptions.JwtException.InvalidTokenTypeException;
+import aws.todolist.auth.exceptions.JwtException.TokenExpiredException;
+import aws.todolist.auth.exceptions.JwtException.UsernameNotFound;
+import aws.todolist.auth.security.JwtTokenProvider;
 import aws.todolist.auth.service.AccountService;
 import aws.todolist.auth.service.AuthService;
+import aws.todolist.auth.utils.HmacUtil;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -14,8 +23,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.internal.bytebuddy.asm.Advice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -31,6 +47,9 @@ public class AuthController {
 	
 	@Autowired
 	private ModelMapper modelMapper;
+	
+	@Autowired
+	private JwtTokenProvider jwtTokenProvider;
 	
 	/**
 	 * 📌 Kiểm tra email đã tồn tại chưa
@@ -192,7 +211,7 @@ public class AuthController {
 //		cookie.setHttpOnly(true);
 //		cookie.setSecure(false);
 //
-//		cookie.setPath("/api/user/auth/");
+//		cookie.setPath("/api/auth/");
 //
 ////		cookie.setPath("/api/user/auth/refresh-token");
 ////		System.err.println(ApiPath.REFRESH_TOKEN);
@@ -201,5 +220,43 @@ public class AuthController {
 //
 //		response.addCookie(cookie);
 //	}
+
+	@Operation(summary = "Lấy thông tin user từ token (Nội bộ)",
+	    description = "API nội bộ: AuthService trả về thông tin user tương ứng với JWT token. Chỉ cho phép gọi khi kèm X-Internal-Secret hợp lệ.")
+	@GetMapping("/get-user-detail-by-token")
+	public ResponseEntity<ApiResponse<UserDetails>> getUserByToken(@RequestParam String hmacToken, @RequestParam String jwtToken) throws Exception {
+		
+		if(!HmacUtil.verifyHMAC(jwtToken, hmacToken)){
+			throw new HmacVerificationException("hmacToken có dấu hiệu gian lận");
+		}
+		
+		// Gọi service để xử lý refresh token và nhận AuthResponseDTO
+		UserDetails userDetails = authService.getUserDetailByJwtToken(jwtToken);
+		
+		return ResponseEntity.ok(new ApiResponse<>(
+		    200,
+		    "Lấy UserDetail thành công",
+		    userDetails
+		));
+	}
+	
+	@Operation(summary = "Sinh Internal Token (Nội bộ)",
+	    description = "API nội bộ: Sinh Internal Token dựa trên HMAC. Chỉ cho phép gọi khi kèm X-Internal-Secret hợp lệ.")
+	@GetMapping("/get-internal-token")
+	public ResponseEntity<ApiResponse<String>> generateInternalToken(@RequestParam String hmacToken, @RequestParam String serviceName) throws Exception {
+		
+		if (!HmacUtil.verifyHMAC(serviceName, hmacToken)) {
+			throw new HmacVerificationException("hmacToken có dấu hiệu gian lận");
+		}
+		
+		String internalToken = jwtTokenProvider.generateInternalToken(serviceName);
+		
+		return ResponseEntity.ok(new ApiResponse<>(
+		    200,
+		    "Sinh Internal Token thành công",
+		    internalToken
+		));
+	}
+	
 	
 }

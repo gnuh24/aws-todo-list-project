@@ -46,6 +46,7 @@ public final class SystemErrorCode {
 	// ==== AUTHENTICATION / TWO FACTOR ====
 	public static final String AUTH_2FA_REQUIRED                   				= "SYS-AUTH-029"; // Yêu cầu xác thực hai bước
 	public static final String AUTH_2FA_FAILED                    					= "SYS-AUTH-030"; // Xác thực hai bước thất bại
+	public static final String AUTH_HMAC_MISMATCH               = "SYS-AUTH-031"; // HMAC không khớp khi xác minh
 	
 	// ==== SYSTEM ====
 	public static final String SYSTEM_UNKNOWN_ERROR 					= "SYS-SYSTEM-000"; // Lỗi không xác định trong hệ thống

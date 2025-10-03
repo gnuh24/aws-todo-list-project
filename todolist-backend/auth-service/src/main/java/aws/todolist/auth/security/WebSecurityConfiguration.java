@@ -94,35 +94,23 @@ public class WebSecurityConfiguration {
 //			.requestMatchers(HttpMethod.PATCH, "/auth/{id}/update-status")                              .hasAnyAuthority("ADMIN")
 			    
 			    // PermitAll cho các API public
-			    .requestMatchers(HttpMethod.GET, "/auth/check-username").permitAll()
-			    .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-			    .requestMatchers(HttpMethod.POST, "/auth/staff-login").permitAll()
-			    .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
-			    .requestMatchers(HttpMethod.POST, "/auth/active-account").permitAll()
+			    .requestMatchers(HttpMethod.GET, "/v1/check-username").permitAll()
+			    .requestMatchers(HttpMethod.POST, "/v1/login").permitAll()
+			    .requestMatchers(HttpMethod.POST, "/v1/staff-login").permitAll()
+			    .requestMatchers(HttpMethod.POST, "/v1/register").permitAll()
+			    .requestMatchers(HttpMethod.POST, "/v1/active-account").permitAll()
 			    
-			    .requestMatchers(HttpMethod.POST, "/auth/send-reset-password-otp/{username}").permitAll()
-			    .requestMatchers(HttpMethod.PATCH, "/auth/reset-password/{username}").permitAll()
+			    .requestMatchers(HttpMethod.POST, "/v1/send-reset-password-otp/{username}").permitAll()
+			    .requestMatchers(HttpMethod.PATCH, "/v1/reset-password/{username}").permitAll()
 			    
-			    .requestMatchers(HttpMethod.POST, "/auth/send-update-email-otp/{username}").hasAnyAuthority("USER")
-			    .requestMatchers(HttpMethod.PATCH, "/auth/update-email").hasAnyAuthority("USER")
+			    .requestMatchers(HttpMethod.POST, "/v1/send-update-email-otp/{username}").hasAnyAuthority("USER")
+			    .requestMatchers(HttpMethod.PATCH, "/v1/update-email").hasAnyAuthority("USER")
+//			    .requestMatchers(HttpMethod.GET, "/auth/update-email").hasAnyAuthority("USER")
 			    
 			    
-			    .requestMatchers(HttpMethod.PATCH, "/auth/update-password").hasAnyAuthority("USER")
-			    .requestMatchers(HttpMethod.POST, "/auth/refresh-token").permitAll()
-			    
+			    .requestMatchers(HttpMethod.PATCH, "/v1/update-password").hasAnyAuthority("USER")
+			    .requestMatchers(HttpMethod.POST, "/v1/refresh-token").permitAll()
 			
-			
-			
-			    .requestMatchers(HttpMethod.GET, "/profiles/me").hasAnyAuthority("USER")
-			    .requestMatchers(HttpMethod.PATCH, "/profiles/me").hasAnyAuthority("USER")
-			    
-			    
-			    .requestMatchers(HttpMethod.GET, "/addresses/me").hasAnyAuthority("USER")
-			    .requestMatchers(HttpMethod.POST, "/addresses/me").hasAnyAuthority("USER")
-			
-			    .requestMatchers(HttpMethod.PATCH, "/addresses/{addressId}").hasAnyAuthority("USER")
-			    .requestMatchers(HttpMethod.PATCH, "/addresses/{addressId}/set-default").hasAnyAuthority("USER")
-			    .requestMatchers(HttpMethod.DELETE, "/addresses/{addressId}").hasAnyAuthority("USER")
 			    
 			    // Còn lại cần xác thực
 //			    .anyRequest().authenticated()
