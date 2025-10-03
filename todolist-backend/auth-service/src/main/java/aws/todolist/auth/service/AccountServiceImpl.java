@@ -100,6 +100,7 @@ public class AccountServiceImpl implements AccountService {
 	
 	@Override
 	public Account updateEmail(Account account, String newEmail) {
+		account.setEmail(newEmail);
 		return accountRepository.save(account);
 	}
 	

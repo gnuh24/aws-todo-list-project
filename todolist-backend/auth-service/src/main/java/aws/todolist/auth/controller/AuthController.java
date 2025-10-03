@@ -139,11 +139,11 @@ public class AuthController {
 	}
 	
 	
-	@PostMapping("/send-update-email-otp/{email}")
-	public ResponseEntity<ApiResponse<String>> sendOtpForUpdateEmail(@PathVariable String email) {
-		authService.sendOtpUpdateEmail(email);
+	@PostMapping("/send-update-email-otp/{newEmail}")
+	public ResponseEntity<ApiResponse<String>> sendOtpForUpdateEmail(@PathVariable String newEmail) {
+		authService.sendOtpUpdateEmail(newEmail);
 		return ResponseEntity.ok(
-		    new ApiResponse<>(200, "Hệ thống đã gửi OTP sang email " + email + ". Bạn có 3 phút để kiểm tra nhé", null)
+		    new ApiResponse<>(200, "Hệ thống đã gửi OTP sang email " + newEmail + ". Bạn có 3 phút để kiểm tra nhé", null)
 		);
 	}
 
@@ -153,7 +153,7 @@ public class AuthController {
 		
 		authService.updateEmail(form);
 		
-		return ResponseEntity.ok(new ApiResponse<>(200, "Password updated successfully", null));
+		return ResponseEntity.ok(new ApiResponse<>(200, "Email updated successfully", null));
 	}
 	
 	@PatchMapping("/reset-password/{username}")

@@ -110,6 +110,9 @@ public class WebSecurityConfiguration {
 			    .requestMatchers(HttpMethod.PATCH, "/auth/update-password").hasAnyAuthority("USER")
 			    .requestMatchers(HttpMethod.POST, "/auth/refresh-token").permitAll()
 			    
+			
+			
+			
 			    .requestMatchers(HttpMethod.GET, "/profiles/me").hasAnyAuthority("USER")
 			    .requestMatchers(HttpMethod.PATCH, "/profiles/me").hasAnyAuthority("USER")
 			    

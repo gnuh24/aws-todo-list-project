@@ -200,11 +200,11 @@ public class AuthServiceImpl implements AuthService {
 	}
 	
 	@Override
-	public void sendOtpUpdateEmail(String username) {
-		redisService.delete(RedisConstants.OTP_CHANGE_EMAIL + ":" + username);
+	public void sendOtpUpdateEmail(String newEmail) {
+		redisService.delete(RedisConstants.OTP_CHANGE_EMAIL + ":" + newEmail);
 		String otp = IdGenerator.generateOTP();
-		redisService.set(RedisConstants.OTP_CHANGE_EMAIL + ":" + username, otp, 3, TimeUnit.MINUTES);
-		emailService.sendUpdateEmailOtp(username, otp);
+		redisService.set(RedisConstants.OTP_CHANGE_EMAIL + ":" + newEmail, otp, 3, TimeUnit.MINUTES);
+		emailService.sendUpdateEmailOtp(newEmail, otp);
 	}
 	
 	@Override
@@ -227,9 +227,10 @@ public class AuthServiceImpl implements AuthService {
 		
 		String currentEmail = account.getUsername();
 		redisService.delete(RedisConstants.EMAIL_EXIST + ":" + currentEmail);
+		redisService.set(RedisConstants.EMAIL_EXIST + ":" + form.getNewEmail(), "true");
 		
 		accountService.updateEmail(account, form.getNewEmail());
-
+		
 //		redisService.set(RedisConstants.BANLIST_ACCESS_TOKEN + ":" + form.getAccessToken(), "true",15, TimeUnit.MINUTES);
 //		redisService.set(RedisConstants.BANLIST_REFRESH_TOKEN + ":" + form.getRefreshToken(), "true",7, TimeUnit.DAYS);
 //
