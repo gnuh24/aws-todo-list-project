@@ -10,6 +10,7 @@
         <module name="api-gateway" />
         <module name="auth-service" />
         <module name="user-service" />
+        <module name="taskflow-service" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -26,6 +27,7 @@
       <module name="catalog-service" options="-parameters" />
       <module name="news-service" options="-parameters" />
       <module name="order-service" options="-parameters" />
+      <module name="taskflow-service" options="-parameters" />
       <module name="user-service" options="-parameters" />
     </option>
   </component>
