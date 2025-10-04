@@ -28,16 +28,21 @@ Tạo container MySQL + Redis mới.
 Init dữ liệu tự động chạy.
 
 
-### **Trường hợp 2: Reset lại setup (Container + volumes đã tồn tại)**
+### **Trường hợp 2: Reset lại setup (Container + Volumes đã tồn tại)**
 
-> **Lưu ý:** Trên Windows, hãy chắc chắn file script sử dụng **LF** (mặc định Linux/macOS) thay vì **CRLF** (mặc định Windows) để tránh lỗi khi chạy shell.  
-> Hình minh họa: ![LF vs CRLF](./setup/todo1.jpeg)
+> **Lưu ý:**  
+> Trên Windows, hãy chắc chắn file script `redis-init.sh` sử dụng **LF** (mặc định Linux/macOS) thay vì **CRLF** (mặc định Windows) để tránh lỗi khi chạy shell.  
+> Hình minh họa:  
+> ![LF vs CRLF](./setup/todo1.jpeg)
+
+---
 
 Sau khi đã chắc chắn sử dụng **LF**, thực hiện các lệnh sau để reset toàn bộ setup:
-```bash
-docker-compose down
-docker volume rm aws-todo-list-project_mysql_data
-docker volume rm aws-todo-list-project_redis_data
-docker-compose up -d
 
+```bash
+# Dừng tất cả container và xóa volumes để reset dữ liệu
+docker compose down -v
+
+# Chạy lại toàn bộ container theo docker-compose.yml
+docker compose up -d
 ```
