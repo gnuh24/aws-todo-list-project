@@ -2,19 +2,19 @@ package aws.todolist.taskflow.controller;
 
 
 import aws.todolist.taskflow.api.ApiResponse;
+import aws.todolist.taskflow.dto.project.ProjectCreateRequestDTO;
 import aws.todolist.taskflow.dto.project.ProjectDetailResponseDTO;
 import aws.todolist.taskflow.dto.project.ProjectResponseDTO;
+import aws.todolist.taskflow.dto.project.ProjectUpdateRequestDTO;
 import aws.todolist.taskflow.entity.Account;
 import aws.todolist.taskflow.service.ProjectServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -41,8 +41,8 @@ public class ProjectController {
 
 
     @Operation(summary = "Lấy thông tin chi tiết của project", description = "Lấy toàn bộ thông tin chi tiết của project")
-    @GetMapping("/projects/{id-project}")
-    public ResponseEntity<ApiResponse<ProjectDetailResponseDTO>> GetProjectByID(@PathVariable("id-project") String projectID) {
+    @GetMapping("/projects/{id}")
+    public ResponseEntity<ApiResponse<ProjectDetailResponseDTO>> GetProjectByID(@PathVariable("id") String projectID) {
 
         ProjectDetailResponseDTO project = projectService.getProjectById(projectID);
 
@@ -50,4 +50,49 @@ public class ProjectController {
 
         return ResponseEntity.ok(response);
     }
+
+    @Operation(summary = "Tạo một project mới", description = "Thực hiện khởi tạo một project mới")
+    @PostMapping("/projects")
+    // @Valid là annotation dùng để kích hoạt validation trên các đối tượng (DTO, entity…) khi được truyền vào controller.
+    public ResponseEntity<ApiResponse<ProjectResponseDTO>> addNewProject(@RequestBody @Valid ProjectCreateRequestDTO request, @AuthenticationPrincipal Account account) {
+        ProjectResponseDTO project = projectService.addProject(request, account);
+
+        ApiResponse<ProjectResponseDTO> response = new ApiResponse<>(200, "new project was created completely", project);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Chỉnh sửa project", description = "Chỉnh sửa thông tin project bao gồm name và isArchived")
+    @PatchMapping("/projects/{id}")
+    public ResponseEntity<ApiResponse<ProjectResponseDTO>> updateProject(@PathVariable("id") String projectID, @RequestBody ProjectUpdateRequestDTO request) {
+        ProjectResponseDTO project = projectService.updateProject(projectID, request);
+
+        ApiResponse<ProjectResponseDTO> response = new ApiResponse<>(200, "project was updated completely", project);
+
+        return ResponseEntity.ok(response);
+
+    }
+
+    @Operation(summary = "Xóa project", description = "Chuyển trạng thái project về đã xóa")
+    @DeleteMapping("/projects/{id}")
+    public ResponseEntity<ApiResponse<ProjectResponseDTO>> removeProject(@PathVariable("id") String projectID) {
+        ProjectResponseDTO project = projectService.removeProject(projectID);
+
+        ApiResponse<ProjectResponseDTO> response = new ApiResponse<>(200, "project was updated to is_Deleted completely", project);
+
+        return ResponseEntity.ok(response);
+
+    }
+
+    @Operation(summary = "Phục hồi project đã xóa", description = "Chuyển trạng thái project đã xóa về như cũ")
+    @PatchMapping("/projects/{id}/restore")
+    public ResponseEntity<ApiResponse<ProjectResponseDTO>> restoreProject(@PathVariable("id") String projectID) {
+        ProjectResponseDTO project = projectService.restoreProject(projectID);
+
+        ApiResponse<ProjectResponseDTO> response = new ApiResponse<>(200, "project was updated to is_Deleted completely", project);
+
+        return ResponseEntity.ok(response);
+
+    }
+
 }

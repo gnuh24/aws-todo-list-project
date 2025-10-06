@@ -41,9 +41,11 @@ public class Task implements Serializable {
     private String description;
 
     @Column(name = "is_archived", nullable = false)
+    @Builder.Default
     private Boolean isArchived = false;
 
     @Column(name = "is_pinned", nullable = false)
+    @Builder.Default
     private Boolean isPinned = false;
 
     @Enumerated(EnumType.STRING)
@@ -75,6 +77,7 @@ public class Task implements Serializable {
     private LocalDateTime deletedAt;
 
     @Column(name = "is_deleted", nullable = false)
+    @Builder.Default
     private Boolean isDeleted = false;
 
     @ManyToOne
@@ -82,10 +85,27 @@ public class Task implements Serializable {
     private Task taskFather;
 
     @OneToMany(mappedBy = "taskFather", cascade = CascadeType.ALL)
+    @Builder.Default
     private List<Task> taskChild = new ArrayList<>();
+
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<TaskComment> taskComments = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "section_id")
     private Section section;
+
+    // Soft delete method
+    public void softDelete() {
+        this.isDeleted = true;
+        this.deletedAt = LocalDateTime.now();
+    }
+
+    // Restore method
+    public void restore() {
+        this.isDeleted = false;
+        this.deletedAt = null;
+    }
 
 }

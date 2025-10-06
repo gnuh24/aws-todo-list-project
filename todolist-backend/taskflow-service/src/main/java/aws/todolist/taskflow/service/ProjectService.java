@@ -1,9 +1,11 @@
 package aws.todolist.taskflow.service;
 
 
+import aws.todolist.taskflow.dto.project.ProjectCreateRequestDTO;
 import aws.todolist.taskflow.dto.project.ProjectDetailResponseDTO;
 import aws.todolist.taskflow.dto.project.ProjectResponseDTO;
-import aws.todolist.taskflow.entity.Project;
+import aws.todolist.taskflow.dto.project.ProjectUpdateRequestDTO;
+import aws.todolist.taskflow.entity.Account;
 
 import java.util.List;
 
@@ -13,9 +15,11 @@ public interface ProjectService {
 
     ProjectDetailResponseDTO getProjectById(String id);
 
-    Project addProject(Project project);
+    ProjectResponseDTO addProject(ProjectCreateRequestDTO projectCreateRequestDTO, Account account);
 
-    Project updateProject(String id, Project updateProject);
+    ProjectResponseDTO updateProject(String id, ProjectUpdateRequestDTO projectUpdateRequestDTO);
 
-    Project removeProject(String id);
+    ProjectResponseDTO removeProject(String id);
+
+    ProjectResponseDTO restoreProject(String id);
 }

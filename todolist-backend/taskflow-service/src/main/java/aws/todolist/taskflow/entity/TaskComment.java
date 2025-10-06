@@ -1,6 +1,5 @@
 package aws.todolist.taskflow.entity;
 
-import aws.todolist.taskflow.enums.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,39 +9,35 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "member")
+@Table(name = "task_comment")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class Member implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class TaskComment {
 
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid2")
-    @Column(name = "id", length = 36, updatable = false, nullable = false)
+    @Column(name = "id", length = 36)
     private String id;
 
-    @ManyToOne()
-    @JoinColumn(name = "project_id", nullable = false)
-    private Project project;
+    @ManyToOne
+    @JoinColumn(name = "task_id")
+    private Task task;
 
-    @ManyToOne()
-    @JoinColumn(name = "account_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "account_id")
     private Account account;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false)
-    private Role role;
+    @Column(name = "comment", columnDefinition = "TEXT", nullable = false)
+    private String comment;
 
     @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
@@ -52,10 +47,9 @@ public class Member implements Serializable {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    @Builder.Default
     @Column(name = "is_deleted", nullable = false)
+    @Builder.Default
     private Boolean isDeleted = false;
-
 
     // Soft delete method
     public void softDelete() {
