@@ -1,5 +1,6 @@
 package aws.todolist.taskflow.service;
 
+import aws.todolist.taskflow.dto.project.ProjectDetailResponseDTO;
 import aws.todolist.taskflow.dto.project.ProjectResponseDTO;
 import aws.todolist.taskflow.entity.Project;
 import aws.todolist.taskflow.mapper.ProjectMapper;
@@ -27,8 +28,11 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Project getProjectById(String id) {
-        return null;
+    public ProjectDetailResponseDTO getProjectById(String id) {
+
+        Project project = projectRepository.getReferenceById(id);
+
+        return projectMapper.ResponseDTODetail(project);
     }
 
     @Override

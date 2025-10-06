@@ -60,7 +60,7 @@ public class Task implements Serializable {
     @Column(name = "start_time")
     private LocalDateTime startTime;
 
-    @Column(name = "completedAt")
+    @Column(name = "completed_at")
     private LocalDateTime completedAt;
 
     @CreationTimestamp

@@ -1,6 +1,7 @@
 package aws.todolist.taskflow.service;
 
 
+import aws.todolist.taskflow.dto.project.ProjectDetailResponseDTO;
 import aws.todolist.taskflow.dto.project.ProjectResponseDTO;
 import aws.todolist.taskflow.entity.Project;
 
@@ -10,7 +11,7 @@ public interface ProjectService {
 
     List<ProjectResponseDTO> getAllProject(String AccountID);
 
-    Project getProjectById(String id);
+    ProjectDetailResponseDTO getProjectById(String id);
 
     Project addProject(Project project);
 
