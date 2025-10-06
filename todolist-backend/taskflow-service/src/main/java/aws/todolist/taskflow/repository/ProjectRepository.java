@@ -1,0 +1,23 @@
+package aws.todolist.taskflow.repository;
+
+
+import aws.todolist.taskflow.entity.Project;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
+
+public interface ProjectRepository extends JpaRepository<Project, String>, JpaSpecificationExecutor<Project> {
+    @Query("""
+                SELECT DISTINCT p 
+                FROM Project p 
+                JOIN p.members m 
+                WHERE m.account.id = :accountId
+                  AND (m.isDeleted = false OR m.isDeleted IS NULL)
+            """)
+    List<Project> findAllByAccountId(@Param("accountId") String accountId);
+
+
+}
