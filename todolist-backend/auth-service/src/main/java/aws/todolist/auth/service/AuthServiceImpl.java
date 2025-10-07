@@ -104,9 +104,9 @@ public class AuthServiceImpl implements AuthService {
 			throw new BadCredentialsException("Email hoặc mật khẩu không đúng!");
 		}
 		
-		if (user.getRole() != Account.Role.USER) {
-			throw new BadCredentialsException("Email hoặc mật khẩu không đúng!");
-		}
+//		if (user.getRole() != Account.Role.USER) {
+//			throw new BadCredentialsException("Email hoặc mật khẩu không đúng!");
+//		}
 		
 		if (user.getStatus().toString().equals("INACTIVE")) {
 			throw new DisabledException("Tài khoản của bạn chưa được kích hoạt, hãy kiểm tra email " + request.getEmail());
