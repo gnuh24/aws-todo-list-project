@@ -4,15 +4,13 @@ import aws.todolist.taskflow.dto.project.ProjectCreateRequestDTO;
 import aws.todolist.taskflow.dto.project.ProjectDetailResponseDTO;
 import aws.todolist.taskflow.dto.project.ProjectResponseDTO;
 import aws.todolist.taskflow.dto.project.ProjectUpdateRequestDTO;
-import aws.todolist.taskflow.entity.Account;
-import aws.todolist.taskflow.entity.Member;
-import aws.todolist.taskflow.entity.Project;
-import aws.todolist.taskflow.entity.TaskComment;
+import aws.todolist.taskflow.entity.*;
 import aws.todolist.taskflow.enums.Role;
 import aws.todolist.taskflow.exceptions.ProjectException.BadRequestException;
 import aws.todolist.taskflow.mapper.ProjectMapper;
 import aws.todolist.taskflow.repository.MemberRepository;
 import aws.todolist.taskflow.repository.ProjectRepository;
+import aws.todolist.taskflow.repository.SectionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +29,9 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Autowired
     private MemberRepository memberRepository;
+
+    @Autowired
+    private SectionRepository sectionRepository;
 
     @Override
     public List<ProjectResponseDTO> getAllProject(String accountID) {
@@ -70,9 +71,15 @@ public class ProjectServiceImpl implements ProjectService {
 
         Member member = Member.builder().account(account).project(saved).role(Role.OWNER).build();
 
+        Section section = Section.builder().project(saved).name("Section default").position(1).build();
+
         memberRepository.save(member);
 
+        sectionRepository.save(section);
+
         saved.getMembers().add(member);
+
+        saved.getSections().add(section);
 
         return projectMapper.ResponseDTO(saved);
     }
@@ -118,6 +125,7 @@ public class ProjectServiceImpl implements ProjectService {
             throw new BadRequestException("Project không tồn tại hoặc đã bị xóa");
         }
 
+        // Chạy vòng lặp để cập nhật các section, task, taskcomment của project về trạng thái deleted
         project.getSections().forEach(section -> {
             section.softDelete();
             section.getTasks().forEach(task -> {
@@ -125,6 +133,9 @@ public class ProjectServiceImpl implements ProjectService {
                 task.getTaskComments().forEach(TaskComment::softDelete);
             });
         });
+
+        // Cập nhật các member về deleted
+        project.getMembers().forEach(Member::softDelete);
 
         project.softDelete();
 

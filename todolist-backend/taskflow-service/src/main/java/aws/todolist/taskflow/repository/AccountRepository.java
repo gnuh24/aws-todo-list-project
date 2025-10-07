@@ -7,8 +7,11 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import java.util.Optional;
 
 public interface AccountRepository extends JpaRepository<Account, String>, JpaSpecificationExecutor<Account> {
-	
-	boolean existsByEmail(String email);
-	Optional<Account> findByEmail(String email);
+
+    boolean existsByEmail(String email);
+
+    Optional<Account> findByEmail(String email);
+
+    Optional<Account> findByIdAndIsDeletedFalse(String id);
 }
 
