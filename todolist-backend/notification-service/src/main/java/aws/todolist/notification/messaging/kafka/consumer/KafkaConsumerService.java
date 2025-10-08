@@ -19,7 +19,6 @@ public class KafkaConsumerService {
 			ObjectMapper mapper = new ObjectMapper();
 			RegisterEmailPayload payload = mapper.readValue(message, RegisterEmailPayload.class);
 			emailService.sendRegistrationUserConfirm(payload.getEmail(), payload.getOtp());
-			System.err.println("Đã )gửi)");
 		} catch (Exception e) {
 			System.err.println("Failed to parse register email message: " + e.getMessage());
 		}
