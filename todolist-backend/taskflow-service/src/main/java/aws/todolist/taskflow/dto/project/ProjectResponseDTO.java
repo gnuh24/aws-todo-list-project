@@ -29,4 +29,7 @@ public class ProjectResponseDTO {
 
     @Schema(description = "Thời điểm cập nhật dự án", example = "2025-10-06T09:30:00")
     private LocalDateTime updatedAt;
+
+    @Schema(description = "Project có phải dự án mặc định không")
+    private Boolean isDefault;
 }

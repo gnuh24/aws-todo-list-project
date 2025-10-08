@@ -19,7 +19,7 @@ public interface ProjectService {
 
     ProjectResponseDTO updateProject(String id, ProjectUpdateRequestDTO projectUpdateRequestDTO);
 
-    ProjectResponseDTO removeProject(String id);
+    ProjectResponseDTO removeProject(String id, Account account);
 
     ProjectResponseDTO restoreProject(String id);
 }

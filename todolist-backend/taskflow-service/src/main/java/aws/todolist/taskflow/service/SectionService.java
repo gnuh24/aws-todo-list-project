@@ -1,19 +1,22 @@
 package aws.todolist.taskflow.service;
 
 
-import java.util.List;
+import aws.todolist.taskflow.dto.section.SectionCreateRequestDTO;
+import aws.todolist.taskflow.dto.section.SectionDeleteAndMigrateDTO;
+import aws.todolist.taskflow.dto.section.SectionResponseDTO;
+import aws.todolist.taskflow.dto.section.SectionUpdateRequestDTO;
 
-import aws.todolist.taskflow.entity.Section;
+import java.util.List;
 
 public interface SectionService {
 
-    List<Section> getAllSection();
+    List<SectionResponseDTO> getAllSection(String idProject);
 
-    Section getSectionById(String id);
+    SectionResponseDTO addSection(String idProject, SectionCreateRequestDTO requestDTO);
 
-    Section addSection(Section section);
+    SectionResponseDTO updateSection(String idSection, SectionUpdateRequestDTO requestDTO);
 
-    Section updateSection(String id, Section updateSection);
+    SectionResponseDTO removeSection(String idSection);
 
-    Section removeSection(String id);
+    SectionResponseDTO removeSectionAndMigrate(SectionDeleteAndMigrateDTO requestDTO);
 }

@@ -22,4 +22,17 @@ public interface ProjectRepository extends JpaRepository<Project, String>, JpaSp
     List<Project> findAllByAccountId(@Param("accountId") String accountId);
 
     Optional<Project> findByIdAndIsDeletedFalse(String id);
+
+
+    @Query("""
+                SELECT DISTINCT p 
+                FROM Project p 
+                JOIN FETCH p.members m 
+                WHERE m.account.id = :accountId
+                  AND (p.isDeleted = false OR p.isDeleted IS NULL)
+                  AND p.isDefault = true
+            """)
+    Project findProjectIsDefault(@Param("accountId") String accountId);
+
+
 }

@@ -21,6 +21,7 @@ public class ProjectMapper {
                 .isArchived(project.getIsArchived())
                 .createdAt(project.getCreatedAt())
                 .updatedAt(project.getUpdatedAt())
+                .isDefault(project.getIsDefault())
                 .build();
     }
 
@@ -37,6 +38,7 @@ public class ProjectMapper {
                 .isArchived(project.getIsArchived())
                 .createdAt(project.getCreatedAt())
                 .updatedAt(project.getUpdatedAt())
+                .isDefault(project.getIsDefault())
                 .sections(sectionMapper.ResponseDTOList(project.getSections()))
                 .build();
 

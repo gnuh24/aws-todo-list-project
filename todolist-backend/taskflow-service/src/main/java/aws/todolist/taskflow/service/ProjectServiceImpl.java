@@ -11,6 +11,7 @@ import aws.todolist.taskflow.mapper.ProjectMapper;
 import aws.todolist.taskflow.repository.MemberRepository;
 import aws.todolist.taskflow.repository.ProjectRepository;
 import aws.todolist.taskflow.repository.SectionRepository;
+import aws.todolist.taskflow.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+// TODO: quyền OWNER thêm, sửa, xóa. Quyền khác là xem
 public class ProjectServiceImpl implements ProjectService {
 
     @Autowired
@@ -32,6 +34,9 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Autowired
     private SectionRepository sectionRepository;
+
+    @Autowired
+    private TaskRepository taskRepository;
 
     @Override
     public List<ProjectResponseDTO> getAllProject(String accountID) {
@@ -51,7 +56,7 @@ public class ProjectServiceImpl implements ProjectService {
         if (optProject.isPresent()) {
             project = optProject.get();
         } else {
-            throw new BadRequestException("Project không tồn tại hoặc đã bị xóa");
+            throw new BadRequestException("Project does not exist or has been deleted.");
         }
 
         return projectMapper.ResponseDTODetail(project);
@@ -62,10 +67,20 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public ProjectResponseDTO addProject(ProjectCreateRequestDTO projectCreateRequestDTO, Account account) {
 
+        Project OptProjectDefault = projectRepository.findProjectIsDefault(account.getId());
+
+        // Kiểm tra dự án default
+        if (projectCreateRequestDTO.getIsDefault() && OptProjectDefault != null) {
+            throw new BadRequestException("Account has default project");
+        }
+
+
         Project project = Project.builder()
                 .name(projectCreateRequestDTO.getName())
                 .isArchived(projectCreateRequestDTO.getIsArchived() != null ? projectCreateRequestDTO.getIsArchived() : false)
+                .isDefault(projectCreateRequestDTO.getIsDefault() != null ? projectCreateRequestDTO.getIsDefault() : false)
                 .build();
+
 
         Project saved = projectRepository.saveAndFlush(project);
 
@@ -95,7 +110,7 @@ public class ProjectServiceImpl implements ProjectService {
         if (optProject.isPresent()) {
             project = optProject.get();
         } else {
-            throw new BadRequestException("Project không tồn tại hoặc đã bị xóa");
+            throw new BadRequestException("Project does not exist or has been deleted.");
         }
 
         if (projectUpdateRequestDTO.getName() != null) {
@@ -113,7 +128,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Transactional
     @Override
-    public ProjectResponseDTO removeProject(String id) {
+    public ProjectResponseDTO removeProject(String id, Account account) {
 
         Optional<Project> optProject = projectRepository.findByIdAndIsDeletedFalse(id);
 
@@ -122,15 +137,29 @@ public class ProjectServiceImpl implements ProjectService {
         if (optProject.isPresent()) {
             project = optProject.get();
         } else {
-            throw new BadRequestException("Project không tồn tại hoặc đã bị xóa");
+            throw new BadRequestException("Project does not exist or has been deleted.");
         }
 
-        // Chạy vòng lặp để cập nhật các section, task, taskcomment của project về trạng thái deleted
+        // Kiểm tra project có phải là default không
+        if (project.getIsDefault()) {
+            throw new BadRequestException("Can't delete: This project is default project");
+        }
+
+
+        // Chạy vòng lặp để cập nhật các section thành deleted và chuyển task về project default
+
+        Project defaultProject = projectRepository.findProjectIsDefault(account.getId());
+
+        if (defaultProject == null) {
+            throw new BadRequestException("This account doesn't have default project");
+        }
+
         project.getSections().forEach(section -> {
             section.softDelete();
+
             section.getTasks().forEach(task -> {
-                task.softDelete();
-                task.getTaskComments().forEach(TaskComment::softDelete);
+                task.setSection(defaultProject.getSections().getFirst());
+                taskRepository.save(task);
             });
         });
 
