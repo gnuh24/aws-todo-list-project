@@ -10,6 +10,7 @@
         <module name="api-gateway" />
         <module name="auth-service" />
         <module name="user-service" />
+        <module name="notification-service" />
         <module name="taskflow-service" />
       </profile>
     </annotationProcessing>
@@ -26,6 +27,7 @@
       <module name="auth-service" options="-parameters" />
       <module name="catalog-service" options="-parameters" />
       <module name="news-service" options="-parameters" />
+      <module name="notification-service" options="-parameters" />
       <module name="order-service" options="-parameters" />
       <module name="taskflow-service" options="-parameters" />
       <module name="user-service" options="-parameters" />

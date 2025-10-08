@@ -11,6 +11,7 @@ import aws.todolist.auth.exceptions.AuthException.StepUpAuthenticationException;
 import aws.todolist.auth.exceptions.otpException.OtpNotFoundException;
 import aws.todolist.auth.integration.redis.RedisConstants;
 import aws.todolist.auth.integration.redis.RedisService;
+import aws.todolist.auth.messaging.kafka.consumer.KafkaProducerService;
 import aws.todolist.auth.security.JwtTokenProvider;
 import aws.todolist.auth.utils.EnvironmentUtils;
 import aws.todolist.auth.utils.IdGenerator;
@@ -67,6 +68,8 @@ public class AuthServiceImpl implements AuthService {
 	@Autowired
 	private RedisService redisService;
 	
+	@Autowired
+	private KafkaProducerService kafkaProducerService;
 	
 	
 	@Override
@@ -164,7 +167,8 @@ public class AuthServiceImpl implements AuthService {
 		String otp = IdGenerator.generateOTP();
 		redisService.setObjectWithTTL(RedisConstants.OTP_VERIFY_ACCOUNT + ":" + otp, account, 5, TimeUnit.MINUTES);
 		
-		emailService.sendRegistrationUserConfirm(userRegistrationForm.getEmail(), otp);
+		kafkaProducerService.sendRegisterEmail(userRegistrationForm.getEmail(), otp);
+//		emailService.sendRegistrationUserConfirm(userRegistrationForm.getEmail(), otp);
 		return account;
 	}
 	
