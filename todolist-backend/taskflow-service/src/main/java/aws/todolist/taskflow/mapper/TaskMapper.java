@@ -1,13 +1,18 @@
 package aws.todolist.taskflow.mapper;
 
+import aws.todolist.taskflow.dto.task.TaskDetailResponseDTO;
 import aws.todolist.taskflow.dto.task.TaskResponseDTO;
 import aws.todolist.taskflow.entity.Task;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
 public class TaskMapper {
+
+    @Autowired
+    private TaskCommentMapper taskCommentMapper;
 
     public TaskResponseDTO ResponseDTO(Task task) {
         return TaskResponseDTO.builder()
@@ -20,6 +25,28 @@ public class TaskMapper {
                 .createdAt(task.getCreatedAt())
                 .updatedAt(task.getUpdatedAt())
                 .taskChild(this.ResponseDTOListTaskChild(task.getTaskChild()))
+                .idTaskCha(task.getTaskFather() != null ? task.getTaskFather().getId() : null)
+                .build();
+    }
+
+    public TaskDetailResponseDTO ResponseDetailDTO(Task task) {
+        if (task == null) return null;
+
+        return TaskDetailResponseDTO.builder()
+                .id(task.getId())
+                .title(task.getTitle())
+                .description(task.getDescription())
+                .isArchived(task.getIsArchived())
+                .isPinned(task.getIsPinned())
+                .status(task.getStatus())
+                .priority(task.getPriority())
+                .deadline(task.getDeadline())
+                .startTime(task.getStartTime())
+                .completedAt(task.getCompletedAt())
+                .createdAt(task.getCreatedAt())
+                .updatedAt(task.getUpdatedAt())
+                .taskChild(this.ResponseDTOListTaskChild(task.getTaskChild()))
+                .comments(taskCommentMapper.toResponseList(task.getTaskComments()))
                 .build();
     }
 
@@ -30,6 +57,8 @@ public class TaskMapper {
                 .toList();
     }
 
+
+    // Chuyển danh sách task con thành danh sách DTO
     public List<TaskResponseDTO> ResponseDTOListTaskChild(List<Task> tasks) {
         return tasks.stream()
                 .filter(task -> !task.getIsDeleted())

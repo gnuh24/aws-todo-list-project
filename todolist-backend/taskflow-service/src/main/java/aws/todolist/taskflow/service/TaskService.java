@@ -1,17 +1,15 @@
 package aws.todolist.taskflow.service;
 
-import aws.todolist.taskflow.entity.Task;
-
-import java.util.List;
+import aws.todolist.taskflow.dto.task.TaskCreateRequestDTO;
+import aws.todolist.taskflow.dto.task.TaskDetailResponseDTO;
+import aws.todolist.taskflow.dto.task.TaskResponseDTO;
+import aws.todolist.taskflow.dto.task.TaskUpdatePriorityRequestDTO;
 
 public interface TaskService {
-    List<Task> getAllTask();
 
-    Task getTaskById(String id);
+    TaskDetailResponseDTO getTaskById(String idTask);
 
-    Task addTask(Task task);
+    TaskResponseDTO addTask(TaskCreateRequestDTO requestDTO);
 
-    Task updateTask(String id, Task updateTask);
-
-    Task removeTask(String id);
+    TaskResponseDTO updatePriority(String idTask, TaskUpdatePriorityRequestDTO requestDTO);
 }

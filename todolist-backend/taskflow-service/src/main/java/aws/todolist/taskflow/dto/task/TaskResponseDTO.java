@@ -44,4 +44,7 @@ public class TaskResponseDTO {
 
     @Schema(description = "Danh sách sub-task")
     private List<TaskResponseDTO> taskChild;
+
+    @Schema(description = "Task cha")
+    private String idTaskCha;
 }

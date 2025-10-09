@@ -1,35 +1,94 @@
 package aws.todolist.taskflow.service;
 
 
+import aws.todolist.taskflow.dto.task.TaskCreateRequestDTO;
+import aws.todolist.taskflow.dto.task.TaskDetailResponseDTO;
+import aws.todolist.taskflow.dto.task.TaskResponseDTO;
+import aws.todolist.taskflow.dto.task.TaskUpdatePriorityRequestDTO;
+import aws.todolist.taskflow.entity.Section;
 import aws.todolist.taskflow.entity.Task;
+import aws.todolist.taskflow.exceptions.ProjectException.BadRequestException;
+import aws.todolist.taskflow.mapper.TaskMapper;
+import aws.todolist.taskflow.repository.SectionRepository;
+import aws.todolist.taskflow.repository.TaskRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class TaskServiceImpl implements TaskService {
+
+    @Autowired
+    private TaskRepository taskRepository;
+
+    @Autowired
+    private SectionRepository sectionRepository;
+
+    @Autowired
+    private TaskMapper taskMapper;
+
+
     @Override
-    public List<Task> getAllTask() {
-        return List.of();
+    public TaskDetailResponseDTO getTaskById(String idTask) {
+
+        Task task = taskRepository.findByIdAndIsDeletedFalse(idTask);
+
+        if (task == null) {
+            throw new BadRequestException("Task doesn't exist or has been deleted");
+        }
+
+        return taskMapper.ResponseDetailDTO(task);
     }
 
     @Override
-    public Task getTaskById(String id) {
-        return null;
+    public TaskResponseDTO addTask(TaskCreateRequestDTO requestDTO) {
+
+        Task taskFather = null;
+
+        Section section = sectionRepository.findByIdAndIsDeletedFalse(requestDTO.getSectionId());
+
+        if (section == null) {
+            throw new BadRequestException("Section doesn't exist or has been deleted");
+        }
+
+        if (requestDTO.getTaskFatherId() != null) {
+            taskFather = taskRepository.findByIdAndIsDeletedFalse(requestDTO.getTaskFatherId());
+            if (taskFather == null) {
+                throw new BadRequestException("Task Father doesn't exist or has been deleted");
+            }
+        }
+
+        Task task = Task.builder()
+                .title(requestDTO.getTitle())
+                .description(requestDTO.getDescription())
+                .priority(requestDTO.getPriority() != null ? requestDTO.getPriority() : null)
+                .deadline(requestDTO.getDeadline())
+                .startTime(requestDTO.getStartTime())
+                .isPinned(requestDTO.getIsPinned() != null ? requestDTO.getIsPinned() : false)
+                .isArchived(requestDTO.getIsArchived() != null ? requestDTO.getIsArchived() : false)
+                .taskFather(taskFather)
+                .section(section)
+                .build();
+
+        task = taskRepository.save(task);
+
+        return taskMapper.ResponseDTO(task);
     }
 
     @Override
-    public Task addTask(Task task) {
-        return null;
+    public TaskResponseDTO updatePriority(String idTask, TaskUpdatePriorityRequestDTO requestDTO) {
+
+        Task task = taskRepository.findByIdAndIsDeletedFalse(idTask);
+
+        if (task == null) {
+            throw new BadCredentialsException("Task doesn't exist or has been deleted");
+        }
+
+        task.setPriority(requestDTO.getPriority());
+
+        task = taskRepository.save(task);
+
+        return taskMapper.ResponseDTO(task);
     }
 
-    @Override
-    public Task updateTask(String id, Task updateTask) {
-        return null;
-    }
-
-    @Override
-    public Task removeTask(String id) {
-        return null;
-    }
 }

@@ -46,7 +46,8 @@ public class Project implements Serializable {
     private LocalDateTime updatedAt;
 
     @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
+    @Builder.Default
+    private LocalDateTime deletedAt = null;
 
     @Builder.Default
     @Column(name = "is_deleted", nullable = false)

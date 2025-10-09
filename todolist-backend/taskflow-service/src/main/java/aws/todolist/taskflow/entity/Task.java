@@ -50,7 +50,8 @@ public class Task implements Serializable {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 20)
-    private Status status;
+    @Builder.Default
+    private Status status = Status.PENDING;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "priority", length = 10)
@@ -63,7 +64,8 @@ public class Task implements Serializable {
     private LocalDateTime startTime;
 
     @Column(name = "completed_at")
-    private LocalDateTime completedAt;
+    @Builder.Default
+    private LocalDateTime completedAt = null;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -74,7 +76,8 @@ public class Task implements Serializable {
     private LocalDateTime updatedAt;
 
     @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
+    @Builder.Default
+    private LocalDateTime deletedAt = null;
 
     @Column(name = "is_deleted", nullable = false)
     @Builder.Default

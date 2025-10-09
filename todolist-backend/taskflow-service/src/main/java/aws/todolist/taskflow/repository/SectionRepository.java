@@ -12,6 +12,8 @@ import java.util.List;
 public interface SectionRepository extends JpaRepository<Section, String>, JpaSpecificationExecutor<Section> {
     List<Section> findByProjectIdAndIsDeletedFalseOrderByPositionAsc(String idProject);
 
+    Section findByIdAndIsDeletedFalse(String id);
+
     @Query("SELECT MAX(s.position) FROM Section s WHERE s.project.id = :projectId AND s.isDeleted = false")
     Integer findMaxPositionByProjectId(@Param("projectId") String projectId);
 
