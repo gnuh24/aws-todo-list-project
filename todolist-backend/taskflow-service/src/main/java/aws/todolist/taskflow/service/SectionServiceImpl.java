@@ -8,6 +8,8 @@ import aws.todolist.taskflow.entity.Project;
 import aws.todolist.taskflow.entity.Section;
 import aws.todolist.taskflow.entity.TaskComment;
 import aws.todolist.taskflow.exceptions.ProjectException.BadRequestException;
+import aws.todolist.taskflow.exceptions.ProjectException.ResourceNotFoundException;
+import aws.todolist.taskflow.exceptions.errorCode.SystemErrorCode;
 import aws.todolist.taskflow.mapper.SectionMapper;
 import aws.todolist.taskflow.repository.ProjectRepository;
 import aws.todolist.taskflow.repository.SectionRepository;
@@ -54,7 +56,7 @@ public class SectionServiceImpl implements SectionService {
         if (optProject.isPresent()) {
             project = optProject.get();
         } else {
-            throw new BadRequestException("Project does not exist or has been deleted.");
+            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Project does not exist or has been deleted.");
         }
 
         Integer nextPosition = sectionRepository.findMaxPositionByProjectId(project.getId()) + 1;
@@ -70,7 +72,7 @@ public class SectionServiceImpl implements SectionService {
     @Transactional
     public SectionResponseDTO updateSection(String idSection, SectionUpdateRequestDTO requestDTO) {
         Section section = sectionRepository.findById(idSection)
-                .orElseThrow(() -> new BadRequestException("Section doesn't exist or has been deleted"));
+                .orElseThrow(() -> new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Section doesn't exist or has been deleted"));
         int oldPosition = section.getPosition();
         int newPosition = requestDTO.getPosition();
         if (newPosition < oldPosition) {
@@ -88,7 +90,7 @@ public class SectionServiceImpl implements SectionService {
     @Transactional
     public SectionResponseDTO removeSection(String idSection) {
         Section section = sectionRepository.findById(idSection)
-                .orElseThrow(() -> new BadRequestException("Section doesn't exist or has been deleted"));
+                .orElseThrow(() -> new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Section doesn't exist or has been deleted"));
 
         // Xóa các task của section
 
@@ -113,10 +115,10 @@ public class SectionServiceImpl implements SectionService {
 
         // Tìm 2 section đích và nguồn
         Section sectionSource = sectionRepository.findById(requestDTO.getIdSectionSource())
-                .orElseThrow(() -> new BadRequestException("Section resource doesn't exist or has been deleted"));
+                .orElseThrow(() -> new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Section resource doesn't exist or has been deleted"));
 
         Section sectionDestination = sectionRepository.findById(requestDTO.getIdSectionDestination())
-                .orElseThrow(() -> new BadRequestException("Section destination doesn't exist or has been deleted"));
+                .orElseThrow(() -> new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Section destination doesn't exist or has been deleted"));
 
         // Chuyển task của section nguồn sang section đích
         sectionSource.getTasks().forEach(task -> {

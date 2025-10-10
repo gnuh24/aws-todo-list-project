@@ -7,12 +7,12 @@ import aws.todolist.taskflow.dto.task.TaskResponseDTO;
 import aws.todolist.taskflow.dto.task.TaskUpdatePriorityRequestDTO;
 import aws.todolist.taskflow.entity.Section;
 import aws.todolist.taskflow.entity.Task;
-import aws.todolist.taskflow.exceptions.ProjectException.BadRequestException;
+import aws.todolist.taskflow.exceptions.ProjectException.ResourceNotFoundException;
+import aws.todolist.taskflow.exceptions.errorCode.SystemErrorCode;
 import aws.todolist.taskflow.mapper.TaskMapper;
 import aws.todolist.taskflow.repository.SectionRepository;
 import aws.todolist.taskflow.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -34,7 +34,7 @@ public class TaskServiceImpl implements TaskService {
         Task task = taskRepository.findByIdAndIsDeletedFalse(idTask);
 
         if (task == null) {
-            throw new BadRequestException("Task doesn't exist or has been deleted");
+            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Task doesn't exist or has been deleted");
         }
 
         return taskMapper.ResponseDetailDTO(task);
@@ -48,13 +48,13 @@ public class TaskServiceImpl implements TaskService {
         Section section = sectionRepository.findByIdAndIsDeletedFalse(requestDTO.getSectionId());
 
         if (section == null) {
-            throw new BadRequestException("Section doesn't exist or has been deleted");
+            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Section doesn't exist or has been deleted");
         }
 
         if (requestDTO.getTaskFatherId() != null) {
             taskFather = taskRepository.findByIdAndIsDeletedFalse(requestDTO.getTaskFatherId());
             if (taskFather == null) {
-                throw new BadRequestException("Task Father doesn't exist or has been deleted");
+                throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Task Father doesn't exist or has been deleted");
             }
         }
 
@@ -81,7 +81,7 @@ public class TaskServiceImpl implements TaskService {
         Task task = taskRepository.findByIdAndIsDeletedFalse(idTask);
 
         if (task == null) {
-            throw new BadCredentialsException("Task doesn't exist or has been deleted");
+            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Task doesn't exist or has been deleted");
         }
 
         task.setPriority(requestDTO.getPriority());

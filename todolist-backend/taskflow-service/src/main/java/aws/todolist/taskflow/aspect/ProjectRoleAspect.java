@@ -4,12 +4,13 @@ import aws.todolist.taskflow.annotation.RequireProjectRole;
 import aws.todolist.taskflow.entity.Account;
 import aws.todolist.taskflow.entity.Member;
 import aws.todolist.taskflow.enums.Role;
+import aws.todolist.taskflow.exceptions.ProjectException.ForbiddenException;
+import aws.todolist.taskflow.exceptions.errorCode.SystemErrorCode;
 import aws.todolist.taskflow.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -45,14 +46,14 @@ public class ProjectRoleAspect {
         if (Optmember.isPresent()) {
             member = Optmember.get();
         } else {
-            throw new AccessDeniedException("You are not a member of this project");
+            throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED, "You are not a member of this project");
         }
 
         // Lấy danh sách role được phép
         List<Role> allowedRoles = Arrays.asList(requireProjectRole.value());
 
         if (!allowedRoles.contains(member.getRole())) {
-            throw new AccessDeniedException("You do not have permission to access this resource");
+            throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED, "You do not have permission to access this resource");
         }
     }
 }

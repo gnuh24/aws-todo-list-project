@@ -7,6 +7,8 @@ import aws.todolist.taskflow.dto.project.ProjectUpdateRequestDTO;
 import aws.todolist.taskflow.entity.*;
 import aws.todolist.taskflow.enums.Role;
 import aws.todolist.taskflow.exceptions.ProjectException.BadRequestException;
+import aws.todolist.taskflow.exceptions.ProjectException.ResourceNotFoundException;
+import aws.todolist.taskflow.exceptions.errorCode.SystemErrorCode;
 import aws.todolist.taskflow.mapper.ProjectMapper;
 import aws.todolist.taskflow.repository.MemberRepository;
 import aws.todolist.taskflow.repository.ProjectRepository;
@@ -56,7 +58,7 @@ public class ProjectServiceImpl implements ProjectService {
         if (optProject.isPresent()) {
             project = optProject.get();
         } else {
-            throw new BadRequestException("Project does not exist or has been deleted.");
+            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Project does not exist or has been deleted.");
         }
 
         return projectMapper.ResponseDTODetail(project);
@@ -71,7 +73,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         // Kiểm tra dự án default
         if (projectCreateRequestDTO.getIsDefault() && OptProjectDefault != null) {
-            throw new BadRequestException("Account has default project");
+            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Account has default project");
         }
 
 
@@ -110,7 +112,7 @@ public class ProjectServiceImpl implements ProjectService {
         if (optProject.isPresent()) {
             project = optProject.get();
         } else {
-            throw new BadRequestException("Project does not exist or has been deleted.");
+            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Project does not exist or has been deleted.");
         }
 
         if (projectUpdateRequestDTO.getName() != null) {
@@ -137,12 +139,12 @@ public class ProjectServiceImpl implements ProjectService {
         if (optProject.isPresent()) {
             project = optProject.get();
         } else {
-            throw new BadRequestException("Project does not exist or has been deleted.");
+            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Project does not exist or has been deleted.");
         }
 
         // Kiểm tra project có phải là default không
         if (project.getIsDefault()) {
-            throw new BadRequestException("Can't delete: This project is default project");
+            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Can't delete: This project is default project");
         }
 
 
@@ -151,7 +153,7 @@ public class ProjectServiceImpl implements ProjectService {
         Project defaultProject = projectRepository.findProjectIsDefault(account.getId());
 
         if (defaultProject == null) {
-            throw new BadRequestException("This account doesn't have default project");
+            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "This account doesn't have default project");
         }
 
         project.getSections().forEach(section -> {
@@ -183,7 +185,7 @@ public class ProjectServiceImpl implements ProjectService {
         if (optProject.isPresent()) {
             project = optProject.get();
         } else {
-            throw new BadRequestException("Project không tồn tại");
+            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Project không tồn tại");
         }
 
         project.getSections().forEach(section -> {
