@@ -95,6 +95,10 @@ public class Task implements Serializable {
     @Builder.Default
     private List<TaskComment> taskComments = new ArrayList<>();
 
+    @ManyToOne()
+    @JoinColumn(name = "account_id")
+    private Account accountAssign;
+
     @ManyToOne
     @JoinColumn(name = "section_id")
     private Section section;

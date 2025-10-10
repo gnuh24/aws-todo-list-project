@@ -73,6 +73,10 @@ public class Account implements Serializable, UserDetails {
     @Builder.Default
     private List<TaskComment> taskComments = new ArrayList<>();
 
+    @OneToMany(mappedBy = "accountAssign", cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<Task> tasks = new ArrayList<>();
+
     // --- UserDetails implementation ---
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
