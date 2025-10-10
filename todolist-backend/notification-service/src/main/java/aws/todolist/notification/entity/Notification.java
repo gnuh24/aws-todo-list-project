@@ -11,60 +11,79 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class Notification {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    // Nội dung hiển thị cho người dùng
-    @Column(nullable = false, length = 512)
-    private String message;
-
-    // Loại thông báo
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 50)
-    private NotificationType type;
-
-    // Người nhận
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "receiver_id", nullable = false)
-    private Account receiver;
-
-    // Người gửi (có thể null, ví dụ hệ thống tự tạo)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sender_id")
-    private Account sender;
-
-    // Tham chiếu tới project hoặc task liên quan
-    @Column(name = "reference_id")
-    private String referenceId;
-
-    // Thời gian tạo
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
-
-    // Đánh dấu đã đọc
-    @Column(name = "is_read", nullable = false)
-    private boolean isRead = false;
-
-    // ==== ENUM LOẠI THÔNG BÁO ====
-    public enum NotificationType {
-
-        PROJECT_MEMBER_JOINED,   // Khi có thành viên mới join project
-        PROJECT_MEMBER_ADDED,    // Khi user được add vào project
-
-        TASK_ASSIGNED,           // Khi task được giao cho mình
-        TASK_COMMENTED,          // Khi có ai đó comment vào task mình liên quan
-        TASK_UPDATED,            // Khi task được cập nhật
-        TASK_COMPLETED,          // Khi task hoàn thành
-        TASK_REOPENED,           // Khi task bị reopen
-
-        TASK_DUE_SOON,           // Khi task sắp tới hạn
-        TASK_OVERDUE,            // Khi task quá hạn
-
-        PROJECT_UPDATED,         // Khi project được cập nhật
-        PROJECT_DELETED,         // Khi project bị xóa
-
-        MENTION_IN_COMMENT       // Khi mình bị tag/mention trong comment
-    }
+	
+	@Id
+	@Column(length = 36) // CHAR(36) in SQL
+	private String id;
+	
+	// Người nhận thông báo (receiver_id) - Gán thẳng Account theo yêu cầu
+	// FOREIGN KEY (`receiver_id`) REFERENCES `account`(`id`)
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "receiver_id", nullable = false)
+	private Account receiver;
+	
+	// Người thực hiện hành động (actor_id) - Gán thẳng Account theo yêu cầu
+	// FOREIGN KEY (`actor_id`) REFERENCES `account`(`id`)
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "actor_id")
+	private Account actor;
+	
+	// Nếu thông báo liên quan tới project (Giữ lại ID vì thuộc service khác)
+	@Column(name = "project_id", length = 36)
+	private String projectId;
+	
+	// Nếu liên quan tới task (Giữ lại ID vì thuộc service khác)
+	@Column(name = "task_id", length = 36)
+	private String taskId;
+	
+	// Loại thông báo
+	@Enumerated(EnumType.STRING)
+	@Column(name = "type", nullable = false, length = 50)
+	private NotificationType type;
+	
+	// Tiêu đề thông báo
+	@Column(name = "title", nullable = false, length = 255)
+	private String title;
+	
+	// Nội dung thông báo
+	@Lob // Maps to TEXT in SQL
+	@Column(name = "content", nullable = false)
+	private String content;
+	
+	// Đã đọc chưa
+	@Column(name = "is_read", nullable = false)
+	private boolean isRead = false;
+	
+	// Thời gian tạo (Sử dụng @CreationTimestamp nếu cần tự động)
+	@Column(name = "created_at", nullable = false)
+	private LocalDateTime createdAt = LocalDateTime.now();
+	
+	// Thời gian đọc
+	@Column(name = "read_at")
+	private LocalDateTime readAt;
+	
+	// Thời gian xóa (Soft Delete)
+	@Column(name = "deleted_at")
+	private LocalDateTime deletedAt;
+	
+	// Đã xóa (Soft Delete flag)
+	@Column(name = "is_deleted", nullable = false)
+	private boolean isDeleted = false;
+	
+	// ==== ENUM LOẠI THÔNG BÁO ====
+	// Có thể đặt trong file riêng hoặc giữ lại như sau:
+	public enum NotificationType {
+		PROJECT_MEMBER_JOINED,
+		PROJECT_MEMBER_ADDED,
+		TASK_ASSIGNED,
+		TASK_COMMENTED,
+		TASK_UPDATED,
+		TASK_COMPLETED,
+		TASK_REOPENED,
+		TASK_DUE_SOON,
+		TASK_OVERDUE,
+		PROJECT_UPDATED,
+		PROJECT_DELETED,
+		MENTION_IN_COMMENT
+	}
 }

@@ -156,3 +156,71 @@ INSERT INTO `comment_attachment` (`id`, `task_comment_id`, `attachment_url`, `cr
 VALUES
 ('99999999-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '77777777-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'https://example.com/db_schema.png', NOW()),
 ('aaaaaaaa-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '88888888-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'https://example.com/api_test.json', NOW());
+
+
+-- ==========================================
+-- BẢNG NOTIFICATION
+-- ==========================================
+CREATE TABLE `notification` (
+    `id`                CHAR(36) PRIMARY KEY,
+    `receiver_id`       CHAR(36) NOT NULL,         -- người nhận thông báo
+    `actor_id`          CHAR(36),                  -- người thực hiện hành động
+    `project_id`        CHAR(36),                  -- nếu thông báo liên quan tới project
+    `task_id`           CHAR(36),                  -- nếu liên quan tới task
+    `type`              ENUM(
+                            'PROJECT_MEMBER_JOINED',
+                            'PROJECT_MEMBER_ADDED',
+                            'TASK_ASSIGNED',
+                            'TASK_COMMENTED',
+                            'TASK_UPDATED',
+                            'TASK_COMPLETED',
+                            'TASK_REOPENED',
+                            'TASK_DUE_SOON',
+                            'TASK_OVERDUE',
+                            'PROJECT_UPDATED',
+                            'PROJECT_DELETED',
+                            'MENTION_IN_COMMENT'
+                        ) NOT NULL,
+    `title`             VARCHAR(255) NOT NULL,
+    `content`           TEXT NOT NULL,
+    `is_read`           BOOLEAN NOT NULL DEFAULT FALSE,
+    `read_at`           TIMESTAMP NULL,
+
+    
+    `created_at`        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deleted_at`        TIMESTAMP NULL,
+    `is_deleted`        BOOLEAN NOT NULL DEFAULT FALSE,
+
+    FOREIGN KEY (`receiver_id`) REFERENCES `account`(`id`),
+    FOREIGN KEY (`actor_id`) REFERENCES `account`(`id`),
+    FOREIGN KEY (`project_id`) REFERENCES `project`(`id`),
+    FOREIGN KEY (`task_id`) REFERENCES `task`(`id`)
+);
+
+
+-- Khi User One được add vào Project Alpha
+INSERT INTO `notification`
+(`id`, `receiver_id`, `actor_id`, `project_id`, `type`, `title`, `content`, `is_read`, `created_at`, `is_deleted`)
+VALUES
+('aaaa1111-1111-1111-1111-111111111111', 
+ '22222222-2222-2222-2222-222222222222', 
+ '11111111-1111-1111-1111-111111111111',
+ 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+ 'PROJECT_MEMBER_ADDED',
+ 'Bạn được thêm vào Project Alpha',
+ 'Admin User đã thêm bạn vào Project Alpha với vai trò MEMBER.',
+ FALSE, NOW(), FALSE);
+
+-- Khi Admin comment vào task
+INSERT INTO `notification`
+(`id`, `receiver_id`, `actor_id`, `project_id`, `task_id`, `type`, `title`, `content`, `is_read`, `created_at`, `is_deleted`)
+VALUES
+('bbbb2222-2222-2222-2222-222222222222',
+ '22222222-2222-2222-2222-222222222222',
+ '11111111-1111-1111-1111-111111111111',
+ 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+ '44444444-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+ 'TASK_COMMENTED',
+ 'Bình luận mới trên task “Setup Database”',
+ 'Admin User đã bình luận: "Database đã tạo xong, kiểm tra lại đi."',
+ FALSE, NOW(), FALSE);
