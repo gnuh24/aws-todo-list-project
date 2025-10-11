@@ -51,4 +51,8 @@ public interface SectionRepository extends JpaRepository<Section, String>, JpaSp
     void shiftPositionsAfterDelete(@Param("projectId") String projectId,
                                    @Param("deletedPosition") int deletedPosition);
 
+
+    Section findTopByProjectIdAndIsDeletedFalseOrderByPositionAsc(String idProject);
+
+
 }

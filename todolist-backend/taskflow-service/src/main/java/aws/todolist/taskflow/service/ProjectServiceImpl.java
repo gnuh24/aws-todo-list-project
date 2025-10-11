@@ -4,7 +4,10 @@ import aws.todolist.taskflow.dto.project.ProjectCreateRequestDTO;
 import aws.todolist.taskflow.dto.project.ProjectDetailResponseDTO;
 import aws.todolist.taskflow.dto.project.ProjectResponseDTO;
 import aws.todolist.taskflow.dto.project.ProjectUpdateRequestDTO;
-import aws.todolist.taskflow.entity.*;
+import aws.todolist.taskflow.entity.Account;
+import aws.todolist.taskflow.entity.Member;
+import aws.todolist.taskflow.entity.Project;
+import aws.todolist.taskflow.entity.Section;
 import aws.todolist.taskflow.enums.Role;
 import aws.todolist.taskflow.exceptions.ProjectException.BadRequestException;
 import aws.todolist.taskflow.exceptions.ProjectException.ResourceNotFoundException;
@@ -39,6 +42,9 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Autowired
     private TaskRepository taskRepository;
+
+    @Autowired
+    private TaskServiceImpl taskService;
 
     @Override
     public List<ProjectResponseDTO> getAllProject(String accountID) {
@@ -156,11 +162,14 @@ public class ProjectServiceImpl implements ProjectService {
             throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "This account doesn't have default project");
         }
 
+        Section sectionDefault = defaultProject.getSections().getFirst();
+
         project.getSections().forEach(section -> {
             section.softDelete();
 
             section.getTasks().forEach(task -> {
-                task.setSection(defaultProject.getSections().getFirst());
+                taskService.applyRecursive(task, t -> t.setSection(sectionDefault), c -> {
+                });
                 taskRepository.save(task);
             });
         });
@@ -174,32 +183,32 @@ public class ProjectServiceImpl implements ProjectService {
         return projectMapper.ResponseDTO(saved);
     }
 
-    @Transactional
-    @Override
-    public ProjectResponseDTO restoreProject(String id) {
-
-        Optional<Project> optProject = projectRepository.findById(id);
-
-        Project project;
-
-        if (optProject.isPresent()) {
-            project = optProject.get();
-        } else {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Project không tồn tại");
-        }
-
-        project.getSections().forEach(section -> {
-            section.restore();
-            section.getTasks().forEach(task -> {
-                task.restore();
-                task.getTaskComments().forEach(TaskComment::restore);
-            });
-        });
-
-        project.restore();
-
-        Project saved = projectRepository.saveAndFlush(project);
-        return projectMapper.ResponseDTO(saved);
-
-    }
+//    @Transactional
+//    @Override
+//    public ProjectResponseDTO restoreProject(String id) {
+//
+//        Optional<Project> optProject = projectRepository.findById(id);
+//
+//        Project project;
+//
+//        if (optProject.isPresent()) {
+//            project = optProject.get();
+//        } else {
+//            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Project không tồn tại");
+//        }
+//
+//        project.getSections().forEach(section -> {
+//            section.restore();
+//            section.getTasks().forEach(task -> {
+//                task.restore();
+//                task.getTaskComments().forEach(TaskComment::restore);
+//            });
+//        });
+//
+//        project.restore();
+//
+//        Project saved = projectRepository.saveAndFlush(project);
+//        return projectMapper.ResponseDTO(saved);
+//
+//    }
 }

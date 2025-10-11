@@ -18,4 +18,12 @@ public interface TaskService {
     TaskResponseDTO assignTask(String idTask, String idProject, TaskAssignRequestDTO requestDTO);
 
     TaskResponseDTO updateSectionForTask(String idTask, String idProject, TaskUpdateSectionRequestDTO requestDTO);
+
+    TaskResponseDTO updateTask(String idTask, TaskUpdateRequestDTO requestDTO);
+
+    TaskResponseDTO archiveTask(String idTask, TaskArchivedRequestDTO requestDTO);
+
+    TaskResponseDTO deleteTask(String idTask);
+
+    TaskResponseDTO restore(String idTask, String idProject);
 }

@@ -22,6 +22,7 @@ public class TaskMapper {
                 .status(task.getStatus())
                 .priority(task.getPriority())
                 .deadline(task.getDeadline())
+                .startTime(task.getStartTime())
                 .createdAt(task.getCreatedAt())
                 .updatedAt(task.getUpdatedAt())
                 .taskChild(this.ResponseDTOListTaskChild(task.getTaskChild()))
@@ -52,7 +53,10 @@ public class TaskMapper {
 
     public List<TaskResponseDTO> ResponseDTOList(List<Task> tasks) {
         return tasks.stream()
-                .filter(task -> !task.getIsDeleted() && task.getTaskFather() == null)
+                .filter(task ->
+                        !task.getIsDeleted() &&
+                                (task.getTaskFather() == null || task.getTaskFather().getIsDeleted())
+                )
                 .map(this::ResponseDTO)
                 .toList();
     }

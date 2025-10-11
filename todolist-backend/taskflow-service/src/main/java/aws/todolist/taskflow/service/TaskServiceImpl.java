@@ -2,10 +2,8 @@ package aws.todolist.taskflow.service;
 
 
 import aws.todolist.taskflow.dto.task.*;
-import aws.todolist.taskflow.entity.Account;
-import aws.todolist.taskflow.entity.Member;
-import aws.todolist.taskflow.entity.Section;
-import aws.todolist.taskflow.entity.Task;
+import aws.todolist.taskflow.entity.*;
+import aws.todolist.taskflow.enums.Priority;
 import aws.todolist.taskflow.enums.Role;
 import aws.todolist.taskflow.enums.Status;
 import aws.todolist.taskflow.exceptions.ProjectException.BadRequestException;
@@ -20,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.function.Consumer;
 
 @Service
 public class TaskServiceImpl implements TaskService {
@@ -66,28 +65,41 @@ public class TaskServiceImpl implements TaskService {
         }
 
         if (requestDTO.getTaskFatherId() != null) {
-            taskFather = taskRepository.findByIdAndIsDeletedFalse(requestDTO.getTaskFatherId());
-            if (taskFather == null) {
-                throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Task Father doesn't exist or has been deleted");
-            }
+            taskFather = getTaskAndCheck(requestDTO.getTaskFatherId());
 
             // Kiểm tra xem 2 task có cùng section không
             if (taskFather.getSection() != section) {
                 throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "The two tasks are not in the same section — please move the task to the correct section first.");
             }
+
+            if (taskFather.getIsArchived()) {
+                throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Cannot update task because its parent is archived.");
+            }
         }
 
 
         // TODO: KHÔNG CHO PHÉP ĐẶT THỜI GIAN Ở QUÁ KHỨ
+        LocalDateTime now = LocalDateTime.now();
 
+        if (requestDTO.getStartTime() != null) {
+            if (requestDTO.getStartTime().isBefore(now)) {
+                throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Start time must be in the future.");
+            }
+        }
 
-        // Kiểm tra thời gian bắt đầu có bị lớn hơn thời gian kết thúc không
-        if (requestDTO.getStartTime() != null && requestDTO.getDeadline() != null) {
-            if (requestDTO.getStartTime().isAfter(requestDTO.getDeadline())) {
-                throw new BadRequestException(
-                        SystemErrorCode.API_BAD_REQUEST,
-                        "Start time cannot be after the deadline."
-                );
+        // Cập nhật deadline nếu có
+        if (requestDTO.getDeadline() != null) {
+            LocalDateTime referenceTime = requestDTO.getStartTime(); // ưu tiên startTime mới nếu đã cập nhật
+            if (referenceTime != null) {
+                // Nếu có startTime, deadline phải sau startTime
+                if (!requestDTO.getDeadline().isAfter(referenceTime)) {
+                    throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Deadline must be after start time.");
+                }
+            } else {
+                // Nếu không có startTime, deadline phải sau hiện tại
+                if (requestDTO.getDeadline().isBefore(now)) {
+                    throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Deadline must be in the future.");
+                }
             }
         }
 
@@ -111,11 +123,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskResponseDTO updatePriority(String idTask, TaskUpdatePriorityRequestDTO requestDTO) {
 
-        Task task = taskRepository.findByIdAndIsDeletedFalse(idTask);
-
-        if (task == null) {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Task doesn't exist or has been deleted");
-        }
+        Task task = this.getTaskAndCheck(idTask);
 
         task.setPriority(requestDTO.getPriority());
 
@@ -127,19 +135,11 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskResponseDTO updateRelationship(String idTask, TaskUpdateRelationshipRequestDTO requestDTO) {
 
-        Task task = taskRepository.findByIdAndIsDeletedFalse(idTask);
-
-        if (task == null) {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Task doesn't exist or has been deleted");
-        }
+        Task task = this.getTaskAndCheck(idTask);
 
         // Kiểm tra xem người dùng muốn xóa task cha hay thêm task cha
         if (requestDTO.getIdTaskFather() != null) {
-            Task taskFather = taskRepository.findByIdAndIsDeletedFalse(requestDTO.getIdTaskFather());
-
-            if (taskFather == null) {
-                throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Task father doesn't exist or has been deleted");
-            }
+            Task taskFather = getTaskAndCheck(requestDTO.getIdTaskFather());
 
             // Kiểm tra xem 2 task cha và task con có cùng section không
 
@@ -168,11 +168,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskResponseDTO updateStatus(String idTask, TaskUpdateStatusRequestDTO requestDTO, Account account) {
 
-        Task task = taskRepository.findByIdAndIsDeletedFalse(idTask);
-
-        if (task == null) {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Task doesn't exist or has been deleted");
-        }
+        Task task = this.getTaskAndCheck(idTask);
 
         // Kiểm tra xem task có được phân công chưa nếu có thì kiểm tra xem tài khoản đang thực thi có phải người được phân công không
         if (task.getAccountAssign() != null && !task.getAccountAssign().getId().equals(account.getId())) {
@@ -213,11 +209,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskResponseDTO assignTask(String idTask, String idProject, TaskAssignRequestDTO requestDTO) {
 
-        Task task = taskRepository.findByIdAndIsDeletedFalse(idTask);
-
-        if (task == null) {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Task doesn't exist or has been deleted");
-        }
+        Task task = this.getTaskAndCheck(idTask);
 
         // Kiểm tra xem tài khoản có phải member của project và có vai trò gì
 
@@ -249,18 +241,17 @@ public class TaskServiceImpl implements TaskService {
             throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Section isn't belong to this project");
         }
 
-        Task task = taskRepository.findByIdAndIsDeletedFalse(idTask);
-
-        if (task == null) {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Task doesn't exist or has been deleted");
-        }
+        Task task = this.getTaskAndCheck(idTask);
 
         // Hủy mối quan hệ cha con của task khi chuyển section (Sẽ bao phủ được 2 trường hợp là task con và task cha)
         task.setTaskFather(null);
 
         // Chuyển section cho task con của task hiện tại nếu có
         task.getTaskChild().forEach(taskChild -> {
-            taskChild.setSection(section);
+            this.applyRecursive(taskChild, t -> {
+                t.setSection(section);
+            }, c -> {
+            });
             taskRepository.save(taskChild);
         });
 
@@ -272,5 +263,171 @@ public class TaskServiceImpl implements TaskService {
         return taskMapper.ResponseDTO(task);
     }
 
+    @Override
+    public TaskResponseDTO updateTask(String idTask, TaskUpdateRequestDTO requestDTO) {
+
+        Task task = this.getTaskAndCheck(idTask);
+
+        if (requestDTO.getTitle() != null) {
+            task.setTitle(requestDTO.getTitle());
+        }
+
+        if (requestDTO.getDescription() != null) {
+            task.setDescription(requestDTO.getDescription());
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+
+        if (requestDTO.isStartTimeSent()) {
+            LocalDateTime newStart = requestDTO.getStartTime(); // có thể null
+            if (newStart != null && newStart.isBefore(now)) {
+                throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Start time must be in the future.");
+            }
+            task.setStartTime(newStart);
+        }
+
+        updateDeadline(task, requestDTO);
+
+
+        if (requestDTO.getPriority() != null) {
+            task.setPriority(Priority.valueOf(requestDTO.getPriority()));
+        }
+
+        if (requestDTO.getIsPinned() != null) {
+            task.setIsPinned(requestDTO.getIsPinned());
+        }
+
+
+        task = taskRepository.save(task);
+
+
+        return taskMapper.ResponseDTO(task);
+    }
+
+    @Override
+    public TaskResponseDTO archiveTask(String idTask, TaskArchivedRequestDTO requestDTO) {
+
+        Task task = taskRepository.findByIdAndIsDeletedFalse(idTask);
+
+        if (task == null) {
+            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Task doesn't exist or has been deleted");
+        }
+
+        task.setIsArchived(requestDTO.getIsArchived());
+
+        task.getTaskChild().forEach(taskChild -> {
+            this.applyRecursive(taskChild, t -> {
+                t.setIsArchived(requestDTO.getIsArchived());
+            }, c -> {
+            });
+        });
+
+
+        task = taskRepository.save(task);
+
+        return taskMapper.ResponseDTO(task);
+    }
+
+    @Override
+    public TaskResponseDTO deleteTask(String idTask) {
+
+        Task task = getTaskAndCheck(idTask);
+
+        task.softDelete();
+
+        task.getTaskComments().forEach(TaskComment::softDelete);
+
+        task.getTaskChild().forEach(TaskChild -> {
+            this.applyRecursive(TaskChild, Task::softDelete, TaskComment::softDelete);
+        });
+
+        task = taskRepository.save(task);
+
+        return taskMapper.ResponseDTO(task);
+    }
+
+    @Override
+    public TaskResponseDTO restore(String idTask, String idProject) {
+
+        Task task = taskRepository.findByIdAndIsDeletedTrue(idTask);
+
+        if (task == null) {
+            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Task doesn't exist");
+        }
+
+        // Kiểm tra lại section của task hiện tại xem còn không nếu không còn thì lấy 1 section trong project
+
+        if (task.getSection().getIsDeleted()) {
+            Section newSection = sectionRepository.findTopByProjectIdAndIsDeletedFalseOrderByPositionAsc(idProject);
+            task.setSection(newSection);
+            task.getTaskChild().forEach(TaskChild -> {
+                this.applyRecursive(TaskChild, t -> {
+                    t.setSection(newSection);
+                }, c -> {
+                });
+            });
+        }
+
+        task.restore();
+
+        task.getTaskChild().forEach(TaskChild -> {
+            this.applyRecursive(TaskChild, Task::restore, TaskComment::restore);
+        });
+
+        task = taskRepository.save(task);
+
+        return taskMapper.ResponseDTO(task);
+    }
+
+
+    private void updateDeadline(Task task, TaskUpdateRequestDTO requestDTO) {
+        if (!requestDTO.isDeadlineSent()) {
+            return; // client không gửi → không update
+        }
+
+        LocalDateTime newDeadline = requestDTO.getDeadline(); // có thể null
+        LocalDateTime startTime = task.getStartTime();
+        LocalDateTime now = LocalDateTime.now();
+
+        // chỉ validate khi newDeadline != null
+        if (newDeadline != null) {
+            if (startTime != null && !newDeadline.isAfter(startTime)) {
+                throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST,
+                        "Deadline must be after start time.");
+            }
+            if (startTime == null && newDeadline.isBefore(now)) {
+                throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST,
+                        "Deadline must be in the future.");
+            }
+        }
+
+        // set deadline (có thể null → hủy bỏ)
+        task.setDeadline(newDeadline);
+    }
+
+    private Task getTaskAndCheck(String idTask) {
+        Task task = taskRepository.findByIdAndIsDeletedFalse(idTask);
+
+        if (task == null) {
+            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Task doesn't exist or has been deleted");
+        }
+
+        if (task.getIsArchived()) {
+            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Cannot update task because its parent is archived.");
+        }
+
+        return task;
+    }
+
+    public void applyRecursive(Task task, Consumer<Task> taskAction, Consumer<TaskComment> commentAction) {
+        // Áp dụng hành động lên task
+        taskAction.accept(task);
+
+        // Áp dụng hành động lên tất cả comment của task
+        task.getTaskComments().forEach(commentAction);
+
+        // Đệ quy xuống các child
+        task.getTaskChild().forEach(child -> applyRecursive(child, taskAction, commentAction));
+    }
 
 }

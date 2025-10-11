@@ -110,4 +110,53 @@ public class TaskController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Cập nhật thông tin chung cho task", description = "Thay đổi một số thông tin không ảnh hưởng tới logic code cho task")
+    @PatchMapping("/{idProject}/tasks/{idTask}")
+    @RequireProjectRole({Role.OWNER, Role.MEMBER})
+    public ResponseEntity<ApiResponse<TaskResponseDTO>> updateTask(@PathVariable("idProject") String idProject, @PathVariable("idTask") String idTask, @RequestBody @Valid TaskUpdateRequestDTO requestDTO) {
+
+        TaskResponseDTO taskResponseDTO = taskService.updateTask(idTask, requestDTO);
+
+        ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Task has been updated successfully", taskResponseDTO);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Đánh dấu lưu task", description = "Cập nhật trạng thái isArchived cho task")
+    @PatchMapping("/{idProject}/tasks/{idTask}/archive")
+    @RequireProjectRole({Role.OWNER, Role.MEMBER})
+    public ResponseEntity<ApiResponse<TaskResponseDTO>> archiveTask(@PathVariable("idProject") String idProject, @PathVariable("idTask") String idTask, @RequestBody @Valid TaskArchivedRequestDTO requestDTO) {
+
+        TaskResponseDTO taskResponseDTO = taskService.archiveTask(idTask, requestDTO);
+
+        ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Task has been archived successfully", taskResponseDTO);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Xóa task", description = "Cập nhật trạng thái task về đã xóa")
+    @DeleteMapping("/{idProject}/tasks/{idTask}")
+    @RequireProjectRole({Role.OWNER, Role.MEMBER})
+    public ResponseEntity<ApiResponse<TaskResponseDTO>> deleteTask(@PathVariable("idProject") String idProject, @PathVariable("idTask") String idTask) {
+
+        TaskResponseDTO taskResponseDTO = taskService.deleteTask(idTask);
+
+        ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Task has been deleted successfully", taskResponseDTO);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Phục hồi task đã xóa", description = "Cập nhật trạng thái ")
+    @PatchMapping("/{idProject}/tasks/{idTask}/restore")
+    @RequireProjectRole({Role.OWNER, Role.MEMBER})
+    public ResponseEntity<ApiResponse<TaskResponseDTO>> restoreTask(@PathVariable("idProject") String idProject, @PathVariable("idTask") String idTask) {
+
+        TaskResponseDTO taskResponseDTO = taskService.restore(idTask, idProject);
+
+        ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Task has been restored successfully", taskResponseDTO);
+
+        return ResponseEntity.ok(response);
+    }
+
+
 }

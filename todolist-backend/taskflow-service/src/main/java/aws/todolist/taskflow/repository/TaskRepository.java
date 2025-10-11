@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 public interface TaskRepository extends JpaRepository<Task, String>, JpaSpecificationExecutor<Task> {
 
     Task findByIdAndIsDeletedFalse(String id);
+
+    Task findByIdAndIsDeletedTrue(String id);
 }

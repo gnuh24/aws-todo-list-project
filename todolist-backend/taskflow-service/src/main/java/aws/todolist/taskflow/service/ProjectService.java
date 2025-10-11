@@ -21,5 +21,5 @@ public interface ProjectService {
 
     ProjectResponseDTO removeProject(String id, Account account);
 
-    ProjectResponseDTO restoreProject(String id);
+    // ProjectResponseDTO restoreProject(String id);
 }

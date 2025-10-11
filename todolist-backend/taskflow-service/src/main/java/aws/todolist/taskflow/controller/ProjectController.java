@@ -89,16 +89,16 @@ public class ProjectController {
 
     }
 
-    @Operation(summary = "Phục hồi project đã xóa", description = "Chuyển trạng thái project đã xóa về như cũ")
-    @PatchMapping("/projects/{id}/restore")
-    @RequireProjectRole({Role.OWNER})
-    public ResponseEntity<ApiResponse<ProjectResponseDTO>> restoreProject(@PathVariable("id") String projectID) {
-        ProjectResponseDTO project = projectService.restoreProject(projectID);
-
-        ApiResponse<ProjectResponseDTO> response = new ApiResponse<>(200, "project was updated to is_Deleted completely", project);
-
-        return ResponseEntity.ok(response);
-
-    }
+//    @Operation(summary = "Phục hồi project đã xóa", description = "Chuyển trạng thái project đã xóa về như cũ")
+//    @PatchMapping("/projects/{id}/restore")
+//    @RequireProjectRole({Role.OWNER})
+//    public ResponseEntity<ApiResponse<ProjectResponseDTO>> restoreProject(@PathVariable("id") String projectID) {
+//        ProjectResponseDTO project = projectService.restoreProject(projectID);
+//
+//        ApiResponse<ProjectResponseDTO> response = new ApiResponse<>(200, "project was updated to is_Deleted completely", project);
+//
+//        return ResponseEntity.ok(response);
+//
+//    }
 
 }
