@@ -177,9 +177,8 @@ CREATE TABLE `notification` (
                             'TASK_REOPENED',
                             'TASK_DUE_SOON',
                             'TASK_OVERDUE',
-                            'PROJECT_UPDATED',
                             'PROJECT_DELETED',
-                            'MENTION_IN_COMMENT'
+                            'NEW_COMMENT'
                         ) NOT NULL,
     `title`             VARCHAR(255) NOT NULL,
     `content`           TEXT NOT NULL,
