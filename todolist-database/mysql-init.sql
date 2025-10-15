@@ -161,41 +161,41 @@ VALUES
 
 
 -- ==========================================
--- BẢNG NOTIFICATION
+-- BẢNG NOTIFICATION (ĐÃ ĐỒNG BỘ ENUM)
 -- ==========================================
 CREATE TABLE `notification` (
-    `id`                CHAR(36) PRIMARY KEY,
-    `receiver_id`       CHAR(36) NOT NULL,         -- người nhận thông báo
-    `actor_id`          CHAR(36),                  -- người thực hiện hành động
-    `project_id`        CHAR(36),                  -- nếu thông báo liên quan tới project
-    `task_id`           CHAR(36),                  -- nếu liên quan tới task
-    `type`              ENUM(
-                            'PROJECT_MEMBER_JOINED',
-                            'PROJECT_MEMBER_ADDED',
-                            'TASK_ASSIGNED',
-                            'TASK_COMMENTED',
-                            'TASK_UPDATED',
-                            'TASK_COMPLETED',
-                            'TASK_REOPENED',
-                            'TASK_DUE_SOON',
-                            'TASK_OVERDUE',
-                            'PROJECT_DELETED',
-                            'NEW_COMMENT'
-                        ) NOT NULL,
-    `title`             VARCHAR(255) NOT NULL,
-    `content`           TEXT NOT NULL,
-    `is_read`           BOOLEAN NOT NULL DEFAULT FALSE,
-    `read_at`           TIMESTAMP NULL,
-
-    
-    `created_at`        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `deleted_at`        TIMESTAMP NULL,
-    `is_deleted`        BOOLEAN NOT NULL DEFAULT FALSE,
-
-    FOREIGN KEY (`receiver_id`) REFERENCES `account`(`id`),
-    FOREIGN KEY (`actor_id`) REFERENCES `account`(`id`),
-    FOREIGN KEY (`project_id`) REFERENCES `project`(`id`),
-    FOREIGN KEY (`task_id`) REFERENCES `task`(`id`)
+ 	`id` 			 CHAR(36) PRIMARY KEY,
+ 	`receiver_id` 	 CHAR(36) NOT NULL, 		-- người nhận thông báo
+ 	`actor_id` 		 CHAR(36), 				    -- người thực hiện hành động
+ 	`project_id` 	 CHAR(36), 				    -- nếu thông báo liên quan tới project
+ 	`task_id` 		 CHAR(36), 				    -- nếu liên quan tới task
+ 	`type` ENUM(
+		'PROJECT_MEMBER_ADDED',
+		'PROJECT_MEMBER_ROLE_UPDATED', -- Thay thế cho PROJECT_MEMBER_JOINED/ADDED cũ
+        
+		'TASK_ASSIGNED',
+		'TASK_COMMENTED',
+		'TASK_UPDATED',
+		'TASK_COMPLETED',
+		'TASK_REOPENED',
+		'TASK_DUE_SOON',
+		'TASK_OVERDUE',
+        
+		'PROJECT_DELETED'
+	) NOT NULL,
+ 	`title` 		 VARCHAR(255) NOT NULL,
+ 	`content` 		 TEXT NOT NULL,
+ 	`is_read` 		 BOOLEAN NOT NULL DEFAULT FALSE,
+ 	`read_at` 		 TIMESTAMP NULL,
+ 
+ 	`created_at` 	 TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ 	`deleted_at` 	 TIMESTAMP NULL,
+ 	`is_deleted` 	 BOOLEAN NOT NULL DEFAULT FALSE,
+ 
+ 	FOREIGN KEY (`receiver_id`) REFERENCES `account`(`id`),
+ 	FOREIGN KEY (`actor_id`) REFERENCES `account`(`id`),
+ 	FOREIGN KEY (`project_id`) REFERENCES `project`(`id`),
+ 	FOREIGN KEY (`task_id`) REFERENCES `task`(`id`)
 );
 
 
@@ -207,21 +207,21 @@ VALUES
  '22222222-2222-2222-2222-222222222222', 
  '11111111-1111-1111-1111-111111111111',
  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
- 'PROJECT_MEMBER_ADDED',
+ 'PROJECT_MEMBER_ADDED', -- Đã đồng bộ
  'Bạn được thêm vào Project Alpha',
  'Admin User đã thêm bạn vào Project Alpha với vai trò MEMBER.',
  FALSE, NOW(), FALSE);
 
 -- Khi Admin comment vào task
+-- Khi quyền của User Three được CẬP NHẬT trong Project Alpha
 INSERT INTO `notification`
-(`id`, `receiver_id`, `actor_id`, `project_id`, `task_id`, `type`, `title`, `content`, `is_read`, `created_at`, `is_deleted`)
+(`id`, `receiver_id`, `actor_id`, `project_id`, `type`, `title`, `content`, `is_read`, `created_at`, `is_deleted`)
 VALUES
-('bbbb2222-2222-2222-2222-222222222222',
- '22222222-2222-2222-2222-222222222222',
- '11111111-1111-1111-1111-111111111111',
+('cccc3333-3333-3333-3333-333333333333', 
+ '33333333-3333-3333-3333-333333333333', -- User Three là người nhận
+ '11111111-1111-1111-1111-111111111111', -- Admin là người thực hiện
  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
- '44444444-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
- 'TASK_COMMENTED',
- 'Bình luận mới trên task “Setup Database”',
- 'Admin User đã bình luận: "Database đã tạo xong, kiểm tra lại đi."',
+ 'PROJECT_MEMBER_ROLE_UPDATED', -- ENUM mới
+ 'Quyền của bạn đã được cập nhật',
+ 'Admin User vừa cập nhật quyền của bạn thành QUẢN LÝ trong Project Alpha.',
  FALSE, NOW(), FALSE);

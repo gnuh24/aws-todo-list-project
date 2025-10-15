@@ -1,27 +1,36 @@
 package aws.todolist.notification.service;
 
 
+import aws.todolist.notification.aop.AppLogger;
 import aws.todolist.notification.dto.notification.NotificationCreateForm;
+import aws.todolist.notification.entity.Account;
 import aws.todolist.notification.entity.Notification;
 import aws.todolist.notification.entity.Notification.NotificationType; // Cần thêm import này
+import aws.todolist.notification.messaging.kafka.message.NotificationMessage;
+import aws.todolist.notification.repository.AccountRepository;
 import aws.todolist.notification.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections; // Cần thêm import này
-import java.util.List;
-import java.util.UUID; // Cần thêm import này
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors; // Cần thêm import này
 
 @Service
 @RequiredArgsConstructor
-public class NotificationServiceImpl implements INotificationService {
+public class NotificationServiceImpl implements NotificationService {
 	
 	private final NotificationRepository notificationRepository;
+	
+	@Autowired
+	private AccountRepository accountRepository;
+	
+	@Autowired
+	private AppLogger appLogger;
 	
 	// GIẢ ĐỊNH: Các service cần thiết để truy vấn dữ liệu nghiệp vụ
 	// @Autowired private TaskService taskService;
@@ -41,45 +50,43 @@ public class NotificationServiceImpl implements INotificationService {
 	}
 	
 	
-//	@Override
-//	@Transactional
-//	public int createNotification(NotificationCreateForm form) {
-//		// 1. PHÂN TÍCH BUSINESS LOGIC (BLA)
-//		List<String> receiverIds = analyzeReceivers(form);
-//
-//		if (receiverIds.isEmpty()) {
-//			return 0; // Không có người nhận
-//		}
-//
-//		// 2. TẠO VÀ LƯU BẢN GHI CHO TỪNG NGƯỜI NHẬN
-//		List<Notification> newNotifications = new ArrayList<>();
-//
-//		for (String receiverId : receiverIds) {
-//			// Tránh gửi thông báo cho chính người thực hiện hành động, trừ phi là thông báo hệ thống
-//			if (form.getActorId() != null && form.getActorId().equals(receiverId) &&
-//			    !isSystemNotification(form.getType())) {
-//				continue;
-//			}
-//
-//			Notification notification = Notification.builder()
-//			    .id(UUID.randomUUID().toString())
-//			    .receiverId(receiverId)
-//			    .actorId(form.getActorId())
-//			    .projectId(form.getProjectId())
-//			    .taskId(form.getTaskId())
-//			    .type(form.getType())
-//			    .title(form.getTitle())
-//			    .content(form.getContent())
-//			    .isRead(false)
-//			    .isDeleted(false)
-//			    .build();
-//
-//			newNotifications.add(notification);
-//		}
-//
-//		notificationRepository.saveAll(newNotifications);
-//		return newNotifications.size();
-//	}
+	@Override
+	public void create(NotificationMessage msg) {
+		try {
+			// Tìm actor và receiver trong DB
+			Optional<Account> receiverOpt = accountRepository.findById(msg.getReceiverId());
+			Optional<Account> actorOpt = accountRepository.findById(msg.getActorId());
+			
+			if (receiverOpt.isEmpty()) {
+				System.err.println("⚠️ Receiver " + msg.getReceiverId() + " không tồn tại, bỏ qua");
+				return;
+			}
+			
+			Notification notification = Notification.builder()
+			    .id(UUID.randomUUID().toString())
+			    .receiver(receiverOpt.get())
+			    .actor(actorOpt.orElse(null))
+			    .projectId(msg.getProjectId())
+			    .taskId(msg.getTaskId())
+			    .type(msg.getType())
+			    .title(msg.getTitle())
+			    .content(msg.getContent())
+			    .isRead(false)
+			    .createdAt(LocalDateTime.now())
+			    .isDeleted(false)
+			    .build();
+			
+			notificationRepository.save(notification);
+			
+			System.err.println("💾 [NotificationService] Saved notification "
+			    + msg.getType() + " for receiver " + msg.getReceiverId());
+			
+		} catch (Exception e) {
+			System.err.println("❌ Lỗi khi tạo Notification: " + e.getMessage());
+			e.printStackTrace();
+		}
+	}
 	
-
+	
+	
 }

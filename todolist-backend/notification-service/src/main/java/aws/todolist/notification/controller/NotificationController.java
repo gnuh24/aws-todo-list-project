@@ -6,7 +6,7 @@ import aws.todolist.notification.dto.notification.NotificationResponse;
 import aws.todolist.notification.dto.notification.UpdateReadStatusRequest;
 import aws.todolist.notification.entity.Account;
 import aws.todolist.notification.entity.Notification;
-import aws.todolist.notification.service.INotificationService;
+import aws.todolist.notification.service.NotificationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class NotificationController {
 
-    private final INotificationService notificationService;
+    private final NotificationService notificationService;
 	
 	// Phương thức Helper để ánh xạ Entity sang DTO
 	private NotificationResponse mapToResponse(Notification notification) {
@@ -109,4 +109,7 @@ public class NotificationController {
 		);
 		return new ResponseEntity<>(response, status);
 	}
+	
+
+	
 }

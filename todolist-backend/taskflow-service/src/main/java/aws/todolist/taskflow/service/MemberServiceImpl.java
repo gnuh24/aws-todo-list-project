@@ -11,10 +11,15 @@ import aws.todolist.taskflow.exceptions.ProjectException.BadRequestException;
 import aws.todolist.taskflow.exceptions.ProjectException.ResourceNotFoundException;
 import aws.todolist.taskflow.exceptions.errorCode.SystemErrorCode;
 import aws.todolist.taskflow.mapper.MemberMapper;
+import aws.todolist.taskflow.messaging.kafka.message.NotificationMessage;
+import aws.todolist.taskflow.messaging.kafka.message.NotificationType;
+import aws.todolist.taskflow.messaging.kafka.producer.KafkaNotificationProducer;
 import aws.todolist.taskflow.repository.AccountRepository;
 import aws.todolist.taskflow.repository.MemberRepository;
 import aws.todolist.taskflow.repository.ProjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +40,9 @@ public class MemberServiceImpl implements MemberService {
 
     @Autowired
     private AccountRepository accountRepository;
+    
+    @Autowired
+    private KafkaNotificationProducer kafkaNotificationProducer;
 
 
     @Override
@@ -86,6 +94,27 @@ public class MemberServiceImpl implements MemberService {
         Member member = Member.builder().account(account).project(project).role(requestDTO.getRole()).build();
 
         Member member_saved = memberRepository.saveAndFlush(member);
+	    
+	    // =============================
+	    // 🔔 GỬI KAFKA NOTIFICATION
+	    // =============================
+	    
+	    NotificationMessage message = NotificationMessage.builder()
+		.receiverId(account.getId())                          // Người nhận: account vừa được thêm
+		.actorId(getCurrentActorId()) // Người thực hiện (lấy từ Auth)
+		.projectId(project.getId())                            // Dự án liên quan
+		.type(NotificationType.PROJECT_MEMBER_ADDED)           // Loại thông báo
+		.title("Bạn đã được thêm vào dự án mới!")              // Tiêu đề thông báo
+		.content(String.format(
+		    "Bạn đã được thêm vào dự án '%s' với vai trò %s.",
+		    project.getName(),
+		    requestDTO.getRole().name()
+		))
+		.build();
+	    
+	    kafkaNotificationProducer.sendProjectMemberAdded(message);
+	    
+	    // =============================
 
         return memberMapper.ResponseDTO(member_saved);
     }
@@ -113,7 +142,30 @@ public class MemberServiceImpl implements MemberService {
         member.setRole(requestDTO.getRole());
 
         Member member_saved = memberRepository.saveAndFlush(member);
-
+	    
+	    // =============================
+	    // 🔔 Gửi Kafka Notification
+	    // =============================
+	    
+	    try {
+		    NotificationMessage message = NotificationMessage.builder()
+			.receiverId(member_saved.getAccount().getId())              // người được cập nhật quyền
+			.actorId(getCurrentActorId()) // Người thực hiện (lấy từ Auth)
+			.projectId(member_saved.getProject().getId())
+			.type(NotificationType.PROJECT_MEMBER_ROLE_UPDATED)
+			.title("Vai trò của bạn trong dự án đã được cập nhật")
+			.content("Vai trò mới của bạn trong dự án \""
+			    + member_saved.getProject().getName()
+			    + "\" là: " + member_saved.getRole().name())
+			.build();
+		    
+		    kafkaNotificationProducer.sendProjectMemberRoleUpdated(message);
+		    
+		    System.out.println("📤 [Kafka] Sent PROJECT_MEMBER_ROLE_UPDATED for member " + member_saved.getAccount().getEmail());
+	    } catch (Exception e) {
+		    System.err.println("❌ Gửi notification PROJECT_MEMBER_ROLE_UPDATED thất bại: " + e.getMessage());
+	    }
+	
         return memberMapper.ResponseDTO(member_saved);
     }
 
@@ -139,4 +191,18 @@ public class MemberServiceImpl implements MemberService {
 
         return memberMapper.ResponseDTO(member_saved);
     }
+	
+	private String getCurrentActorId() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication == null || !authentication.isAuthenticated()) {
+			throw new RuntimeException("User not authenticated");
+		}
+		
+		Object principal = authentication.getPrincipal();
+		if (principal instanceof Account account) {
+			return account.getId();
+		}
+		
+		throw new RuntimeException("Invalid principal type");
+	}
 }
