@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @Aspect // class này chứa logic chặn/trước/sau method.
 @Component
@@ -26,6 +29,11 @@ public class ProjectRoleAspect {
 
 
     private final MemberRepository memberRepository;
+
+    private final Integer DEFAULT_TTL = 30 * 60;
+
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
 
     // Chạy trước method có @RequireProjectRole và có projectId là param
     @Before("@annotation(requireProjectRole)")
@@ -38,22 +46,36 @@ public class ProjectRoleAspect {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Account account = (Account) authentication.getPrincipal();
 
-        // Tìm member trong project
-        Optional<Member> Optmember = memberRepository.findFirstByAccountIdAndProjectIdAndIsDeletedFalse(account.getId(), actualProjectId);
 
-        Member member;
+        // TODO: Tìm trong redis nếu có thì dùng không thì tìm trong db
 
-        if (Optmember.isPresent()) {
-            member = Optmember.get();
+        String key = "user:" + account.getId() + ":project:" + actualProjectId + ":permissions";
+        // Lấy từ Redis
+        Object item = redisTemplate.opsForValue().get(key);
+
+        Role role = null;
+
+        if (item != null) {
+            String value = item.toString();
+            if (!"NONE".equals(value)) { // chỉ parse khi khác "NONE"
+                role = Role.valueOf(value);
+            }
         } else {
-            throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED, "You are not a member of this project");
+            Optional<Member> optMember = memberRepository.findFirstByAccountIdAndProjectIdAndIsDeletedFalse(account.getId(), actualProjectId);
+            if (optMember.isPresent()) {
+                role = optMember.get().getRole();
+                redisTemplate.opsForValue().set(key, role.name(), DEFAULT_TTL, TimeUnit.SECONDS);
+            } else {
+                // cache "NONE" thay cho role rỗng
+                redisTemplate.opsForValue().set(key, "NONE", DEFAULT_TTL, TimeUnit.SECONDS);
+            }
         }
 
-        // Lấy danh sách role được phép
+        // kiểm tra quyền
         List<Role> allowedRoles = Arrays.asList(requireProjectRole.value());
-
-        if (!allowedRoles.contains(member.getRole())) {
-            throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED, "You do not have permission to access this resource");
+        if (role == null || !allowedRoles.contains(role)) {
+            throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED,
+                    "You do not have permission to access this resource");
         }
     }
 }

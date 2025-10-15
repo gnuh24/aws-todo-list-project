@@ -15,6 +15,7 @@ import aws.todolist.taskflow.repository.AccountRepository;
 import aws.todolist.taskflow.repository.MemberRepository;
 import aws.todolist.taskflow.repository.ProjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +37,8 @@ public class MemberServiceImpl implements MemberService {
     @Autowired
     private AccountRepository accountRepository;
 
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
 
     @Override
     public List<MemberResponseDTO> getAllMember(String idProject) {
@@ -114,6 +117,12 @@ public class MemberServiceImpl implements MemberService {
 
         Member member_saved = memberRepository.saveAndFlush(member);
 
+        // Sau khi lưu xong thì xóa cache
+
+        String key = "user:" + member.getAccount().getId() + ":project:" + member.getProject().getId() + ":permissions";
+
+        redisTemplate.delete(key);
+
         return memberMapper.ResponseDTO(member_saved);
     }
 
@@ -136,6 +145,12 @@ public class MemberServiceImpl implements MemberService {
         member.softDelete();
 
         Member member_saved = memberRepository.saveAndFlush(member);
+
+        // Sau khi lưu xong thì xóa cache
+
+        String key = "user:" + member.getAccount().getId() + ":project:" + member.getProject().getId() + ":permissions";
+
+        redisTemplate.delete(key);
 
         return memberMapper.ResponseDTO(member_saved);
     }

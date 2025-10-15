@@ -413,7 +413,7 @@ public class TaskServiceImpl implements TaskService {
         }
 
         if (task.getIsArchived()) {
-            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Cannot update task because its parent is archived.");
+            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Cannot update task because it is archived.");
         }
 
         return task;
