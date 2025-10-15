@@ -18,6 +18,7 @@ public class SectionMapper {
                 .id(section.getId())
                 .name(section.getName())
                 .isArchived(section.getIsArchived())
+                .position(section.getPosition())
                 .createdAt(section.getCreatedAt())
                 .updatedAt(section.getUpdatedAt())
                 .tasks(taskMapper.ResponseDTOList(section.getTasks()))

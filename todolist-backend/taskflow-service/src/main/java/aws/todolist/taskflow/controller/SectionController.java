@@ -1,0 +1,86 @@
+package aws.todolist.taskflow.controller;
+
+
+import aws.todolist.taskflow.annotation.RequireProjectRole;
+import aws.todolist.taskflow.api.ApiResponse;
+import aws.todolist.taskflow.dto.section.SectionCreateRequestDTO;
+import aws.todolist.taskflow.dto.section.SectionDeleteAndMigrateDTO;
+import aws.todolist.taskflow.dto.section.SectionResponseDTO;
+import aws.todolist.taskflow.dto.section.SectionUpdateRequestDTO;
+import aws.todolist.taskflow.enums.Role;
+import aws.todolist.taskflow.service.SectionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/v1/projects")
+@Tag(name = "Section API", description = "CRUD của section")
+// TODO: OWNER, MEMBER quyền post, patch, delete
+public class SectionController {
+
+    @Autowired
+    private SectionService sectionService;
+
+    @Operation(summary = "Lấy danh sách section của project", description = "Dùng id client cung cấp để lấy danh sách section")
+    @GetMapping("/{idProject}/sections")
+    @RequireProjectRole({Role.OWNER, Role.ADMIN, Role.MEMBER, Role.VIEWER})
+    public ResponseEntity<ApiResponse<List<SectionResponseDTO>>> getSectionByIdProject(@PathVariable("idProject") String id) {
+        List<SectionResponseDTO> sections = sectionService.getAllSection(id);
+
+        ApiResponse<List<SectionResponseDTO>> response = new ApiResponse<>(200, "List of sections has been fetched successfully.", sections);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Thêm mới một section cho project", description = "Tạo mới một section trong project của user")
+    @PostMapping("/{idProject}/sections")
+    @RequireProjectRole({Role.OWNER, Role.MEMBER})
+    public ResponseEntity<ApiResponse<SectionResponseDTO>> addNewSection(@PathVariable("idProject") String id, @RequestBody @Valid SectionCreateRequestDTO requestDTO) {
+        SectionResponseDTO section = sectionService.addSection(id, requestDTO);
+
+        ApiResponse<SectionResponseDTO> response = new ApiResponse<>(200, "new section has been created successfully", section);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Cập nhật ví trị section", description = "Đổi vị trí khác cho section")
+    @PatchMapping("/{idProject}/sections/{idSection}")
+    @RequireProjectRole({Role.OWNER, Role.MEMBER})
+    public ResponseEntity<ApiResponse<SectionResponseDTO>> updateSection(@PathVariable("idProject") String idProject, @PathVariable("idSection") String id, @RequestBody @Valid SectionUpdateRequestDTO requestDTO) {
+        SectionResponseDTO section = sectionService.updateSection(id, requestDTO);
+
+        ApiResponse<SectionResponseDTO> response = new ApiResponse<>(200, "this section has been updated successfully", section);
+
+        return ResponseEntity.ok(response);
+
+    }
+
+    @Operation(summary = "Xóa section", description = "Xóa section và các task trong section")
+    @DeleteMapping("/{idProject}/sections/{idSection}")
+    @RequireProjectRole({Role.OWNER, Role.MEMBER})
+    public ResponseEntity<ApiResponse<SectionResponseDTO>> deleteSection(@PathVariable("idProject") String idProject, @PathVariable("idSection") String id) {
+        SectionResponseDTO section = sectionService.removeSection(id);
+
+        ApiResponse<SectionResponseDTO> response = new ApiResponse<>(200, "this section has been deleted successfully", section);
+
+        return ResponseEntity.ok(response);
+
+    }
+
+    @Operation(summary = "Xóa section và di cư task", description = "Thực hiện xóa section đồng thời, di cư task qua section khác")
+    @DeleteMapping("/{idProject}/sections")
+    @RequireProjectRole({Role.OWNER, Role.MEMBER})
+    public ResponseEntity<ApiResponse<SectionResponseDTO>> deleteSectionAndMigrateTask(@PathVariable("idProject") String idProject, @RequestBody @Valid SectionDeleteAndMigrateDTO requestDTO) {
+        SectionResponseDTO section = sectionService.removeSectionAndMigrate(requestDTO);
+
+        ApiResponse<SectionResponseDTO> response = new ApiResponse<>(200, "this section has been deleted successfully", section);
+
+        return ResponseEntity.ok(response);
+    }
+}

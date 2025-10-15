@@ -4,13 +4,19 @@ import aws.todolist.taskflow.dto.project.ProjectCreateRequestDTO;
 import aws.todolist.taskflow.dto.project.ProjectDetailResponseDTO;
 import aws.todolist.taskflow.dto.project.ProjectResponseDTO;
 import aws.todolist.taskflow.dto.project.ProjectUpdateRequestDTO;
-import aws.todolist.taskflow.entity.*;
+import aws.todolist.taskflow.entity.Account;
+import aws.todolist.taskflow.entity.Member;
+import aws.todolist.taskflow.entity.Project;
+import aws.todolist.taskflow.entity.Section;
 import aws.todolist.taskflow.enums.Role;
 import aws.todolist.taskflow.exceptions.ProjectException.BadRequestException;
+import aws.todolist.taskflow.exceptions.ProjectException.ResourceNotFoundException;
+import aws.todolist.taskflow.exceptions.errorCode.SystemErrorCode;
 import aws.todolist.taskflow.mapper.ProjectMapper;
 import aws.todolist.taskflow.repository.MemberRepository;
 import aws.todolist.taskflow.repository.ProjectRepository;
 import aws.todolist.taskflow.repository.SectionRepository;
+import aws.todolist.taskflow.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+// TODO: quyền OWNER thêm, sửa, xóa. Quyền khác là xem
 public class ProjectServiceImpl implements ProjectService {
 
     @Autowired
@@ -32,6 +39,12 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Autowired
     private SectionRepository sectionRepository;
+
+    @Autowired
+    private TaskRepository taskRepository;
+
+    @Autowired
+    private TaskServiceImpl taskService;
 
     @Override
     public List<ProjectResponseDTO> getAllProject(String accountID) {
@@ -51,7 +64,7 @@ public class ProjectServiceImpl implements ProjectService {
         if (optProject.isPresent()) {
             project = optProject.get();
         } else {
-            throw new BadRequestException("Project không tồn tại hoặc đã bị xóa");
+            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Project does not exist or has been deleted.");
         }
 
         return projectMapper.ResponseDTODetail(project);
@@ -62,10 +75,20 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public ProjectResponseDTO addProject(ProjectCreateRequestDTO projectCreateRequestDTO, Account account) {
 
+        Project OptProjectDefault = projectRepository.findProjectIsDefault(account.getId());
+
+        // Kiểm tra dự án default
+        if (projectCreateRequestDTO.getIsDefault() && OptProjectDefault != null) {
+            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Account has default project");
+        }
+
+
         Project project = Project.builder()
                 .name(projectCreateRequestDTO.getName())
                 .isArchived(projectCreateRequestDTO.getIsArchived() != null ? projectCreateRequestDTO.getIsArchived() : false)
+                .isDefault(projectCreateRequestDTO.getIsDefault() != null ? projectCreateRequestDTO.getIsDefault() : false)
                 .build();
+
 
         Project saved = projectRepository.saveAndFlush(project);
 
@@ -95,7 +118,7 @@ public class ProjectServiceImpl implements ProjectService {
         if (optProject.isPresent()) {
             project = optProject.get();
         } else {
-            throw new BadRequestException("Project không tồn tại hoặc đã bị xóa");
+            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Project does not exist or has been deleted.");
         }
 
         if (projectUpdateRequestDTO.getName() != null) {
@@ -113,7 +136,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Transactional
     @Override
-    public ProjectResponseDTO removeProject(String id) {
+    public ProjectResponseDTO removeProject(String id, Account account) {
 
         Optional<Project> optProject = projectRepository.findByIdAndIsDeletedFalse(id);
 
@@ -122,15 +145,32 @@ public class ProjectServiceImpl implements ProjectService {
         if (optProject.isPresent()) {
             project = optProject.get();
         } else {
-            throw new BadRequestException("Project không tồn tại hoặc đã bị xóa");
+            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Project does not exist or has been deleted.");
         }
 
-        // Chạy vòng lặp để cập nhật các section, task, taskcomment của project về trạng thái deleted
+        // Kiểm tra project có phải là default không
+        if (project.getIsDefault()) {
+            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Can't delete: This project is default project");
+        }
+
+
+        // Chạy vòng lặp để cập nhật các section thành deleted và chuyển task về project default
+
+        Project defaultProject = projectRepository.findProjectIsDefault(account.getId());
+
+        if (defaultProject == null) {
+            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "This account doesn't have default project");
+        }
+
+        Section sectionDefault = defaultProject.getSections().getFirst();
+
         project.getSections().forEach(section -> {
             section.softDelete();
+
             section.getTasks().forEach(task -> {
-                task.softDelete();
-                task.getTaskComments().forEach(TaskComment::softDelete);
+                taskService.applyRecursive(task, t -> t.setSection(sectionDefault), c -> {
+                });
+                taskRepository.save(task);
             });
         });
 
@@ -143,32 +183,32 @@ public class ProjectServiceImpl implements ProjectService {
         return projectMapper.ResponseDTO(saved);
     }
 
-    @Transactional
-    @Override
-    public ProjectResponseDTO restoreProject(String id) {
-
-        Optional<Project> optProject = projectRepository.findById(id);
-
-        Project project;
-
-        if (optProject.isPresent()) {
-            project = optProject.get();
-        } else {
-            throw new BadRequestException("Project không tồn tại");
-        }
-
-        project.getSections().forEach(section -> {
-            section.restore();
-            section.getTasks().forEach(task -> {
-                task.restore();
-                task.getTaskComments().forEach(TaskComment::restore);
-            });
-        });
-
-        project.restore();
-
-        Project saved = projectRepository.saveAndFlush(project);
-        return projectMapper.ResponseDTO(saved);
-
-    }
+//    @Transactional
+//    @Override
+//    public ProjectResponseDTO restoreProject(String id) {
+//
+//        Optional<Project> optProject = projectRepository.findById(id);
+//
+//        Project project;
+//
+//        if (optProject.isPresent()) {
+//            project = optProject.get();
+//        } else {
+//            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Project không tồn tại");
+//        }
+//
+//        project.getSections().forEach(section -> {
+//            section.restore();
+//            section.getTasks().forEach(task -> {
+//                task.restore();
+//                task.getTaskComments().forEach(TaskComment::restore);
+//            });
+//        });
+//
+//        project.restore();
+//
+//        Project saved = projectRepository.saveAndFlush(project);
+//        return projectMapper.ResponseDTO(saved);
+//
+//    }
 }

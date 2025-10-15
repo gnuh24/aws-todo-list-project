@@ -16,4 +16,6 @@ public class ProjectCreateRequestDTO {
     private String name;
 
     private Boolean isArchived = false; // default false
+
+    private Boolean isDefault = false;
 }

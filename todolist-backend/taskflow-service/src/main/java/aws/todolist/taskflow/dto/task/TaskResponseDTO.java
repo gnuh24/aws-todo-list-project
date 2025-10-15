@@ -36,6 +36,9 @@ public class TaskResponseDTO {
     @Schema(description = "Thời hạn hoàn thành Task")
     private LocalDateTime deadline;
 
+    @Schema(description = "Thời gian bắt đầu task")
+    private LocalDateTime startTime;
+
     @Schema(description = "Thời điểm tạo Task")
     private LocalDateTime createdAt;
 
@@ -44,4 +47,7 @@ public class TaskResponseDTO {
 
     @Schema(description = "Danh sách sub-task")
     private List<TaskResponseDTO> taskChild;
+
+    @Schema(description = "Task cha")
+    private String idTaskCha;
 }

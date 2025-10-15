@@ -34,4 +34,7 @@ public class ProjectDetailResponseDTO {
 
     @Schema(description = "Danh sách section của dự án")
     private List<SectionResponseDTO> sections;
+
+    @Schema(description = "Project có phải dự án mặc định không")
+    private Boolean isDefault;
 }

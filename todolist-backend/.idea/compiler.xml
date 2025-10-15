@@ -17,6 +17,7 @@
     <bytecodeTargetLevel>
       <module name="catalog-service" target="21" />
       <module name="news-service" target="21" />
+      <module name="notification-service" target="21" />
       <module name="order-service" target="21" />
       <module name="todolist-backend" target="21" />
     </bytecodeTargetLevel>

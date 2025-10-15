@@ -1,17 +1,29 @@
 package aws.todolist.taskflow.service;
 
-import aws.todolist.taskflow.entity.Task;
-
-import java.util.List;
+import aws.todolist.taskflow.dto.task.*;
+import aws.todolist.taskflow.entity.Account;
 
 public interface TaskService {
-    List<Task> getAllTask();
 
-    Task getTaskById(String id);
+    TaskDetailResponseDTO getTaskById(String idTask);
 
-    Task addTask(Task task);
+    TaskResponseDTO addTask(String idProject, TaskCreateRequestDTO requestDTO);
 
-    Task updateTask(String id, Task updateTask);
+    TaskResponseDTO updatePriority(String idTask, TaskUpdatePriorityRequestDTO requestDTO);
 
-    Task removeTask(String id);
+    TaskResponseDTO updateRelationship(String idTask, TaskUpdateRelationshipRequestDTO requestDTO);
+
+    TaskResponseDTO updateStatus(String idTask, TaskUpdateStatusRequestDTO requestDTO, Account account);
+
+    TaskResponseDTO assignTask(String idTask, String idProject, TaskAssignRequestDTO requestDTO);
+
+    TaskResponseDTO updateSectionForTask(String idTask, String idProject, TaskUpdateSectionRequestDTO requestDTO);
+
+    TaskResponseDTO updateTask(String idTask, TaskUpdateRequestDTO requestDTO);
+
+    TaskResponseDTO archiveTask(String idTask, TaskArchivedRequestDTO requestDTO);
+
+    TaskResponseDTO deleteTask(String idTask);
+
+    TaskResponseDTO restore(String idTask, String idProject);
 }
