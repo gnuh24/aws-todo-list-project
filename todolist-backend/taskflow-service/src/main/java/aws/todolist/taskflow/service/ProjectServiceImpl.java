@@ -9,6 +9,7 @@ import aws.todolist.taskflow.entity.Member;
 import aws.todolist.taskflow.entity.Project;
 import aws.todolist.taskflow.entity.Section;
 import aws.todolist.taskflow.enums.Role;
+import aws.todolist.taskflow.enums.StatusMember;
 import aws.todolist.taskflow.exceptions.ProjectException.BadRequestException;
 import aws.todolist.taskflow.exceptions.ProjectException.ResourceNotFoundException;
 import aws.todolist.taskflow.exceptions.errorCode.SystemErrorCode;
@@ -92,7 +93,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         Project saved = projectRepository.saveAndFlush(project);
 
-        Member member = Member.builder().account(account).project(saved).role(Role.OWNER).build();
+        Member member = Member.builder().account(account).project(saved).role(Role.OWNER).status(StatusMember.ACCEPTED).build();
 
         Section section = Section.builder().project(saved).name("Section default").position(1).build();
 

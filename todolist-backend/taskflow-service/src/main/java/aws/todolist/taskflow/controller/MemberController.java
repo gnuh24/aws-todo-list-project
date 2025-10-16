@@ -4,14 +4,18 @@ import aws.todolist.taskflow.annotation.RequireProjectRole;
 import aws.todolist.taskflow.api.ApiResponse;
 import aws.todolist.taskflow.dto.member.MemberCreateRequestDTO;
 import aws.todolist.taskflow.dto.member.MemberResponseDTO;
-import aws.todolist.taskflow.dto.member.MemberUpdateRequestDTO;
+import aws.todolist.taskflow.dto.member.MemberUpdateRoleRequestDTO;
+import aws.todolist.taskflow.dto.member.MemberUpdateStatusRequestDTO;
+import aws.todolist.taskflow.entity.Account;
 import aws.todolist.taskflow.enums.Role;
+import aws.todolist.taskflow.enums.StatusMember;
 import aws.todolist.taskflow.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -51,7 +55,7 @@ public class MemberController {
     @Operation(summary = "Thay đổi vai trò", description = "Thay đổi vai trò của member")
     @PatchMapping("/{idProject}/members/{idMember}")
     @RequireProjectRole({Role.ADMIN, Role.OWNER})
-    public ResponseEntity<ApiResponse<MemberResponseDTO>> updateMember(@PathVariable("idProject") String id, @PathVariable("idMember") String idMember, @RequestBody @Valid MemberUpdateRequestDTO request) {
+    public ResponseEntity<ApiResponse<MemberResponseDTO>> updateMember(@PathVariable("idProject") String id, @PathVariable("idMember") String idMember, @RequestBody @Valid MemberUpdateRoleRequestDTO request) {
 
         MemberResponseDTO memberResponseDTO = memberService.updateRoleMember(idMember, request);
 
@@ -59,6 +63,26 @@ public class MemberController {
 
         return ResponseEntity.ok(response);
     }
+
+    @Operation(summary = "Cập nhật trạng thái member", description = "Chuyển trạng thái cho member")
+    @PatchMapping("/{idProject}/members/response")
+    public ResponseEntity<ApiResponse<MemberResponseDTO>> updateStatusMember(@PathVariable("idProject") String id, @RequestBody @Valid MemberUpdateStatusRequestDTO request, @AuthenticationPrincipal Account account) {
+
+        MemberResponseDTO memberResponseDTO = memberService.responseRequestMember(id, request, account);
+
+        String message;
+
+        if (memberResponseDTO.getStatus() == StatusMember.ACCEPTED) {
+            message = "You have accepted the invitation to join this project.";
+        } else {
+            message = "You have declined the invitation to join this project.";
+        }
+
+        ApiResponse<MemberResponseDTO> response = new ApiResponse<>(200, message, memberResponseDTO);
+
+        return ResponseEntity.ok(response);
+    }
+
 
     @Operation(summary = "Xóa member", description = "Cập nhật member về trạng thái đã xóa")
     @DeleteMapping("/{idProject}/members/{idMember}")

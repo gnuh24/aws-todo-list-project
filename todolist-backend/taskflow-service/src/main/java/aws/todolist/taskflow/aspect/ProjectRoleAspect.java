@@ -4,6 +4,7 @@ import aws.todolist.taskflow.annotation.RequireProjectRole;
 import aws.todolist.taskflow.entity.Account;
 import aws.todolist.taskflow.entity.Member;
 import aws.todolist.taskflow.enums.Role;
+import aws.todolist.taskflow.enums.StatusMember;
 import aws.todolist.taskflow.exceptions.ProjectException.ForbiddenException;
 import aws.todolist.taskflow.exceptions.errorCode.SystemErrorCode;
 import aws.todolist.taskflow.repository.MemberRepository;
@@ -61,7 +62,7 @@ public class ProjectRoleAspect {
                 role = Role.valueOf(value);
             }
         } else {
-            Optional<Member> optMember = memberRepository.findFirstByAccountIdAndProjectIdAndIsDeletedFalse(account.getId(), actualProjectId);
+            Optional<Member> optMember = memberRepository.findFirstByAccountIdAndProjectIdAndStatusAndIsDeletedFalse(account.getId(), actualProjectId, StatusMember.ACCEPTED);
             if (optMember.isPresent()) {
                 role = optMember.get().getRole();
                 redisTemplate.opsForValue().set(key, role.name(), DEFAULT_TTL, TimeUnit.SECONDS);

@@ -6,6 +6,7 @@ import aws.todolist.taskflow.entity.*;
 import aws.todolist.taskflow.enums.Priority;
 import aws.todolist.taskflow.enums.Role;
 import aws.todolist.taskflow.enums.Status;
+import aws.todolist.taskflow.enums.StatusMember;
 import aws.todolist.taskflow.exceptions.ProjectException.BadRequestException;
 import aws.todolist.taskflow.exceptions.ProjectException.ForbiddenException;
 import aws.todolist.taskflow.exceptions.ProjectException.ResourceNotFoundException;
@@ -111,6 +112,10 @@ public class TaskServiceImpl implements TaskService {
 
         if (requestDTO.getIdAccountAssign() != null) {
             member = memberRepository.findFirstByAccountIdAndProjectIdAndIsDeletedFalse(requestDTO.getIdAccountAssign(), idProject).orElseThrow(() -> new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Account is not a member of this project"));
+
+            if (member.getStatus() != StatusMember.ACCEPTED) {
+                throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED, "The account has not accepted the invitation to join this project");
+            }
 
             // Kiểm tra quyền của account
             if (member.getRole() == Role.ADMIN || member.getRole() == Role.VIEWER) {
@@ -236,6 +241,10 @@ public class TaskServiceImpl implements TaskService {
         // Kiểm tra xem tài khoản có phải member của project và có vai trò gì
 
         Member member = memberRepository.findFirstByAccountIdAndProjectIdAndIsDeletedFalse(requestDTO.getIdAccount(), idProject).orElseThrow(() -> new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Account is not a member of this project"));
+
+        if (member.getStatus() != StatusMember.ACCEPTED) {
+            throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED, "The account has not accepted the invitation to join this project");
+        }
 
         // Kiểm tra quyền của account
         if (member.getRole() == Role.ADMIN || member.getRole() == Role.VIEWER) {

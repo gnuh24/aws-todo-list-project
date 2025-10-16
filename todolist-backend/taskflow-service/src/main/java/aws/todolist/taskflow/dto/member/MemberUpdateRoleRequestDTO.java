@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MemberUpdateRequestDTO {
+public class MemberUpdateRoleRequestDTO {
     @NotNull(message = "Không để trống vai trò")
     private Role role;
 }

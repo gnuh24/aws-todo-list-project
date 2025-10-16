@@ -1,6 +1,7 @@
 package aws.todolist.taskflow.dto.member;
 
 import aws.todolist.taskflow.enums.Role;
+import aws.todolist.taskflow.enums.StatusMember;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,6 +30,9 @@ public class MemberResponseDTO {
 
     @Schema(description = "Role của member trong project", example = "OWNER")
     private Role role;
+
+    @Schema(description = "Trạng thái của member trong project", example = "OWNER")
+    private StatusMember status;
 
     @Schema(description = "Ngày tạo member", example = "2025-10-06T10:00:00")
     private LocalDateTime createdAt;

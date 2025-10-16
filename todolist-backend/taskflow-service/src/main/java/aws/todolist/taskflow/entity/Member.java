@@ -1,6 +1,7 @@
 package aws.todolist.taskflow.entity;
 
 import aws.todolist.taskflow.enums.Role;
+import aws.todolist.taskflow.enums.StatusMember;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,6 +41,10 @@ public class Member implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private Role role;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private StatusMember status;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

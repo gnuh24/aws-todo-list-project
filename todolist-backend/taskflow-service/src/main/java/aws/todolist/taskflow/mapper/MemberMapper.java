@@ -16,6 +16,7 @@ public class MemberMapper {
                 .displayName(member.getAccount().getDisplayName())
                 .avatar(member.getAccount().getAvatar())
                 .role(member.getRole())
+                .status(member.getStatus())
                 .createdAt(member.getCreatedAt())
                 .updatedAt(member.getUpdatedAt())
                 .build();

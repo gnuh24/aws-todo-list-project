@@ -2,12 +2,15 @@ package aws.todolist.taskflow.service;
 
 import aws.todolist.taskflow.dto.member.MemberCreateRequestDTO;
 import aws.todolist.taskflow.dto.member.MemberResponseDTO;
-import aws.todolist.taskflow.dto.member.MemberUpdateRequestDTO;
+import aws.todolist.taskflow.dto.member.MemberUpdateRoleRequestDTO;
+import aws.todolist.taskflow.dto.member.MemberUpdateStatusRequestDTO;
 import aws.todolist.taskflow.entity.Account;
 import aws.todolist.taskflow.entity.Member;
 import aws.todolist.taskflow.entity.Project;
 import aws.todolist.taskflow.enums.Role;
+import aws.todolist.taskflow.enums.StatusMember;
 import aws.todolist.taskflow.exceptions.ProjectException.BadRequestException;
+import aws.todolist.taskflow.exceptions.ProjectException.ForbiddenException;
 import aws.todolist.taskflow.exceptions.ProjectException.ResourceNotFoundException;
 import aws.todolist.taskflow.exceptions.errorCode.SystemErrorCode;
 import aws.todolist.taskflow.mapper.MemberMapper;
@@ -19,6 +22,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -86,7 +90,7 @@ public class MemberServiceImpl implements MemberService {
             throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Cannot assign OWNER role to a member.");
         }
 
-        Member member = Member.builder().account(account).project(project).role(requestDTO.getRole()).build();
+        Member member = Member.builder().account(account).project(project).role(requestDTO.getRole()).status(StatusMember.PENDING).build();
 
         Member member_saved = memberRepository.saveAndFlush(member);
 
@@ -94,7 +98,8 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public MemberResponseDTO updateRoleMember(String idMember, MemberUpdateRequestDTO requestDTO) {
+    @Transactional
+    public MemberResponseDTO updateRoleMember(String idMember, MemberUpdateRoleRequestDTO requestDTO) {
         Optional<Member> OptMember = memberRepository.findFirstByIdAndIsDeletedFalse(idMember);
 
         Member member;
@@ -127,6 +132,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Transactional
     public MemberResponseDTO deleteMember(String idMember) {
         Optional<Member> OptMember = memberRepository.findFirstByIdAndIsDeletedFalse(idMember);
 
@@ -153,5 +159,49 @@ public class MemberServiceImpl implements MemberService {
         redisTemplate.delete(key);
 
         return memberMapper.ResponseDTO(member_saved);
+    }
+
+    @Override
+    public MemberResponseDTO responseRequestMember(String idProject, MemberUpdateStatusRequestDTO requestDTO, Account account) {
+
+        Optional<Member> optMember = memberRepository.findFirstByAccountIdAndProjectIdAndIsDeletedFalse(account.getId(), idProject);
+
+        if (optMember.isEmpty()) {
+            throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED,
+                    "You are not invited to this project.");
+        }
+
+        Member member = optMember.get();
+
+        if (member.getStatus() != StatusMember.PENDING) {
+            throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED,
+                    "You have already responded to this request.");
+        }
+
+
+        // Kiểm tra thời hạn xem còn cập nhật trạng thái được không
+        LocalDateTime expireTime = member.getCreatedAt().plusDays(5);
+        if (LocalDateTime.now().isAfter(expireTime)) {
+            member.softDelete();
+            memberRepository.save(member);
+            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "This task invitation has expired. Please contact the admin to be invited again.");
+        }
+
+        if (member.getStatus() == StatusMember.PENDING) {
+            member.setStatus(requestDTO.getStatus());
+            if (member.getStatus() == StatusMember.DECLINED) {
+                member.softDelete();
+            }
+        } else {
+            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Only update the status for members who are pending.");
+        }
+
+        member = memberRepository.save(member);
+
+        String key = "user:" + member.getAccount().getId() + ":project:" + member.getProject().getId() + ":permissions";
+
+        redisTemplate.delete(key);
+
+        return memberMapper.ResponseDTO(member);
     }
 }

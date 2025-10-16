@@ -1,6 +1,7 @@
 package aws.todolist.taskflow.repository;
 
 import aws.todolist.taskflow.entity.Member;
+import aws.todolist.taskflow.enums.StatusMember;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -25,6 +26,12 @@ public interface MemberRepository extends JpaRepository<Member, String>, JpaSpec
     Optional<Member> findFirstByAccountIdAndProjectIdAndIsDeletedFalse(
             String accountId,
             String projectId
+    );
+
+    Optional<Member> findFirstByAccountIdAndProjectIdAndStatusAndIsDeletedFalse(
+            String accountId,
+            String projectId,
+            StatusMember status
     );
 
 
