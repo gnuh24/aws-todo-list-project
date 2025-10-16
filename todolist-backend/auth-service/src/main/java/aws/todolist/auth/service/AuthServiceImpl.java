@@ -11,6 +11,7 @@ import aws.todolist.auth.exceptions.AuthException.StepUpAuthenticationException;
 import aws.todolist.auth.exceptions.otpException.OtpNotFoundException;
 import aws.todolist.auth.integration.redis.RedisConstants;
 import aws.todolist.auth.integration.redis.RedisService;
+import aws.todolist.auth.messaging.kafka.producer.KafkaProducerService;
 import aws.todolist.auth.security.JwtTokenProvider;
 import aws.todolist.auth.utils.EnvironmentUtils;
 import aws.todolist.auth.utils.IdGenerator;
@@ -23,14 +24,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,6 +65,8 @@ public class AuthServiceImpl implements AuthService {
 	@Autowired
 	private RedisService redisService;
 	
+	@Autowired
+	private KafkaProducerService kafkaProducerService;
 	
 	
 	@Override
@@ -164,16 +164,19 @@ public class AuthServiceImpl implements AuthService {
 		String otp = IdGenerator.generateOTP();
 		redisService.setObjectWithTTL(RedisConstants.OTP_VERIFY_ACCOUNT + ":" + otp, account, 5, TimeUnit.MINUTES);
 		
-		emailService.sendRegistrationUserConfirm(userRegistrationForm.getEmail(), otp);
+		kafkaProducerService.sendRegisterEmail(userRegistrationForm.getEmail(), otp);
+//		emailService.sendRegistrationUserConfirm(userRegistrationForm.getEmail(), otp);
 		return account;
 	}
 	
 	@Override
-	public void sendOtpResetPassword(String username) {
-		redisService.delete(RedisConstants.OTP_FORGOT_PASSWORD + ":" + username);
+	public void sendOtpResetPassword(String email) {
+		redisService.delete(RedisConstants.OTP_FORGOT_PASSWORD + ":" + email);
 		String otp = IdGenerator.generateOTP();
-		redisService.set(RedisConstants.OTP_FORGOT_PASSWORD + ":" + username, otp, 3, TimeUnit.MINUTES);
-		emailService.sendResetPasswordUserConfirm(username, otp);
+		redisService.set(RedisConstants.OTP_FORGOT_PASSWORD + ":" + email, otp, 3, TimeUnit.MINUTES);
+		kafkaProducerService.sendResetPasswordEmail(email, otp);
+
+//		emailService.sendResetPasswordUserConfirm(username, otp);
 	}
 	
 	@Override
@@ -207,7 +210,8 @@ public class AuthServiceImpl implements AuthService {
 		redisService.delete(RedisConstants.OTP_CHANGE_EMAIL + ":" + newEmail);
 		String otp = IdGenerator.generateOTP();
 		redisService.set(RedisConstants.OTP_CHANGE_EMAIL + ":" + newEmail, otp, 3, TimeUnit.MINUTES);
-		emailService.sendUpdateEmailOtp(newEmail, otp);
+		kafkaProducerService.sendUpdateEmail(newEmail, otp);
+//		emailService.sendUpdateEmailOtp(newEmail, otp);
 	}
 	
 	@Override
