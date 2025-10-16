@@ -20,7 +20,7 @@ public class EmailServiceImpl implements EmailService {
 	
 	@Override
 	public void sendRegistrationUserConfirm(String email, String otp) {
-		String confirmationUrl = "http://localhost:3307/auth/verify-account?otp=" + otp;
+		String confirmationUrl = "http://localhost:3000/auth/verify-account?otp=" + otp;
 		
 		String subject = "Xác Nhận Đăng Ký Tài khoản";
 		String content = getEmailContentForRegistration(confirmationUrl);
