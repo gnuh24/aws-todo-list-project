@@ -34,12 +34,13 @@ CREATE TABLE `member` (
     `project_id`        CHAR(36) NOT NULL,
     `account_id`        CHAR(36) NOT NULL,
     `role`              ENUM('OWNER', 'ADMIN', 'MEMBER', 'VIEWER') NOT NULL,
-    
+
     `created_at`        TIMESTAMP NOT NULL,
     `updated_at`        TIMESTAMP NOT NULL,
     `deleted_at`        TIMESTAMP,
     `is_deleted`        BOOLEAN NOT NULL,
-    
+    `status`            ENUM('PENDING','ACCEPTED','DECLINED') NOT NULL,
+
     FOREIGN KEY (`project_id`) REFERENCES `project`(`id`),
     FOREIGN KEY (`account_id`) REFERENCES `account`(`id`)
 );
@@ -79,10 +80,12 @@ CREATE TABLE `task` (
     `updated_at`        TIMESTAMP NOT NULL,
     `deleted_at`        TIMESTAMP,
     `is_deleted`        BOOLEAN NOT NULL,
-    
+    `created_by`        CHAR(36),  
+
     FOREIGN KEY (`section_id`) REFERENCES `section`(`id`),
     FOREIGN KEY (`task_father_id`) REFERENCES `task`(`id`),
-    FOREIGN KEY (`account_id`) REFERENCES `account`(`id`)
+    FOREIGN KEY (`account_id`) REFERENCES `account`(`id`),
+    FOREIGN KEY (`created_by`) REFERENCES `account`(`id`)
 );
 
 -- 1. Bảng task_comment
@@ -126,12 +129,12 @@ VALUES
 ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Project Beta', FALSE, NOW(), NOW(), NULL, FALSE, FALSE);
 
 -- 3. Dữ liệu mẫu cho bảng `member`
-INSERT INTO `member` (`id`, `project_id`, `account_id`, `role`, `created_at`, `updated_at`, `deleted_at`, `is_deleted`)
+INSERT INTO `member` (`id`, `project_id`, `account_id`, `role`, `created_at`, `updated_at`, `deleted_at`, `is_deleted`,`status`)
 VALUES
-('cccccccc-cccc-cccc-cccc-cccccccccccc', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', 'OWNER', NOW(), NOW(), NULL, FALSE),
-('dddddddd-dddd-dddd-dddd-dddddddddddd', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '22222222-2222-2222-2222-222222222222', 'MEMBER', NOW(), NOW(), NULL, FALSE),
-('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '11111111-1111-1111-1111-111111111111', 'OWNER', NOW(), NOW(), NULL, FALSE),
-('ffffffff-ffff-ffff-ffff-ffffffffffff', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '33333333-3333-3333-3333-333333333333', 'MEMBER', NOW(), NOW(), NULL, FALSE);
+('cccccccc-cccc-cccc-cccc-cccccccccccc', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', 'OWNER', NOW(), NOW(), NULL, FALSE,'ACCEPTED'),
+('dddddddd-dddd-dddd-dddd-dddddddddddd', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '22222222-2222-2222-2222-222222222222', 'MEMBER', NOW(), NOW(), NULL, FALSE,'ACCEPTED'),
+('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '11111111-1111-1111-1111-111111111111', 'OWNER', NOW(), NOW(), NULL, FALSE,'ACCEPTED'),
+('ffffffff-ffff-ffff-ffff-ffffffffffff', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '33333333-3333-3333-3333-333333333333', 'MEMBER', NOW(), NOW(), NULL, FALSE,'ACCEPTED');
 
 -- 4. Dữ liệu mẫu cho bảng `section`
 INSERT INTO `section` (`id`, `project_id`, `name`, `position`, `is_archived`, `created_at`, `updated_at`, `deleted_at`, `is_deleted`)
@@ -141,11 +144,11 @@ VALUES
 ('33333333-cccc-cccc-cccc-cccccccccccc', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Backlog', 1, FALSE, NOW(), NOW(), NULL, FALSE);
 
 -- 5. Dữ liệu mẫu cho bảng `task`
-INSERT INTO `task` (`id`, `section_id`, `title`, `description`, `is_archived`, `is_pinned`, `status`, `priority`, `deadline`, `start_time`, `completed_at`, `task_father_id`, `created_at`, `updated_at`, `deleted_at`, `is_deleted`, `account_id`)
+INSERT INTO `task` (`id`, `section_id`, `title`, `description`, `is_archived`, `is_pinned`, `status`, `priority`, `deadline`, `start_time`, `completed_at`, `task_father_id`, `created_at`, `updated_at`, `deleted_at`, `is_deleted`, `account_id`, `created_by`)
 VALUES
-('44444444-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Setup Database', 'Thiết lập cơ sở dữ liệu cho project', FALSE, FALSE, 'PENDING', 'HIGH', '2025-09-30 23:59:59', NULL, NULL, NULL, NOW(), NOW(), NULL, FALSE, NULL),
-('55555555-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '11111111-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Design Schema', 'Thiết kế các bảng cho hệ thống', FALSE, FALSE, 'READY', 'MEDIUM', '2025-10-05 23:59:59', NULL, NULL, NULL, NOW(), NOW(), NULL, FALSE, NULL),
-('66666666-cccc-cccc-cccc-cccccccccccc', '22222222-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Implement API', 'Tạo API cho module project', FALSE, TRUE, 'IN_PROGRESS', 'HIGH', '2025-10-10 23:59:59', NOW(), NULL, NULL, NOW(), NOW(), NULL, FALSE, NULL);
+('44444444-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Setup Database', 'Thiết lập cơ sở dữ liệu cho project', FALSE, FALSE, 'PENDING', 'HIGH', '2025-09-30 23:59:59', NULL, NULL, NULL, NOW(), NOW(), NULL, FALSE, NULL, '11111111-1111-1111-1111-111111111111'),
+('55555555-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '11111111-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Design Schema', 'Thiết kế các bảng cho hệ thống', FALSE, FALSE, 'READY', 'MEDIUM', '2025-10-05 23:59:59', NULL, NULL, NULL, NOW(), NOW(), NULL, FALSE, NULL, '11111111-1111-1111-1111-111111111111'),
+('66666666-cccc-cccc-cccc-cccccccccccc', '22222222-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Implement API', 'Tạo API cho module project', FALSE, TRUE, 'IN_PROGRESS', 'HIGH', '2025-10-10 23:59:59', NOW(), NULL, NULL, NOW(), NOW(), NULL, FALSE, NULL, '11111111-1111-1111-1111-111111111111');
 
 -- 6. Dữ liệu mẫu cho bảng `task_comment`
 INSERT INTO `task_comment` (`id`, `task_id`, `account_id`, `comment`, `created_at`, `updated_at`, `deleted_at`, `is_deleted`)
