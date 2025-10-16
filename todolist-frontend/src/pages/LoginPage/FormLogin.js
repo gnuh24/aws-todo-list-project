@@ -1,7 +1,70 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, Navigate } from "react-router-dom";
+import { Button, Checkbox, Form, Input, message } from "antd";
 import { Helmet } from "react-helmet";
+import axios from "axios";
+
+import FacebookLoginButton from "./FacebookLoginButton";
+import GoogleLoginButton from "./GoogleLoginButton";
+import { https } from "../../service/api";
 export default function FormLogin() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await https.post("/api/auth/v1/login", {
+        email,
+        password,
+      });
+
+      if (response.status === 200) {
+        console.log("✅ Login success:", response.data);
+
+        const userData = response.data.data;
+
+        // 👉 Lưu toàn bộ thông tin người dùng + token vào localStorage
+        localStorage.setItem("USER_INFO", JSON.stringify(userData));
+
+        alert("Đăng nhập thành công!");
+        // Chuyển hướng hoặc cập nhật state ứng dụng
+        window.location.href = "/task";
+      }
+    } catch (error) {
+      console.error("❌ Login failed:", error.response?.data || error.message);
+      alert(error.response?.data?.message || "Login failed!");
+    }
+  };
+
+  const handleLogin = () => {
+    window.FB.login(
+      (response) => {
+        if (response.authResponse) {
+          console.log("✅ Logged in:", response);
+
+          // Gọi API Graph để lấy thông tin user
+          window.FB.api(
+            "/me",
+            { fields: "name,email,picture" },
+            function (userInfo) {
+              console.log("👤 User info:", userInfo);
+              // bạn có thể destructure ra
+              const { name, email, picture } = userInfo;
+              console.log("Name:", name);
+              console.log("Email:", email);
+              console.log("Avatar URL:", picture?.data?.url);
+            }
+          );
+        } else {
+          console.log("❌ Login failed or cancelled");
+        }
+      },
+      { scope: "public_profile,email" } // cần 'email' để lấy email
+    );
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-white">
       <div className="flex w-full max-w-4xl  rounded-lg overflow-hidden">
@@ -54,23 +117,18 @@ export default function FormLogin() {
 
           {/* Social Buttons */}
           <div className="space-y-3 mb-6">
-            <button className="w-full flex items-center justify-center border rounded-md py-2 hover:bg-gray-50">
+            {/* <button className="w-full flex items-center justify-center border rounded-md py-2 hover:bg-gray-50">
               <img
                 src="https://www.svgrepo.com/show/475656/google-color.svg"
                 alt="Google"
                 className="h-5 w-5 mr-2"
               />
               Continue with Google
-            </button>
-
-            <button className="w-full flex items-center justify-center border rounded-md py-2 hover:bg-gray-50">
-              <img
-                src="https://www.svgrepo.com/show/448224/facebook.svg"
-                alt="Facebook"
-                className="h-5 w-5 mr-2"
-              />
-              Continue with Facebook
-            </button>
+            </button> */}
+            <GoogleLoginButton></GoogleLoginButton>
+            <FacebookLoginButton
+              handleLogin={handleLogin}
+            ></FacebookLoginButton>
 
             <button className="w-full flex items-center justify-center border rounded-md py-2 hover:bg-gray-50">
               <img
@@ -87,6 +145,8 @@ export default function FormLogin() {
             <div>
               <label className="block text-sm mb-1">Email</label>
               <input
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 type="email"
                 placeholder="Enter your email..."
                 className="w-full border rounded-md px-3 py-2 focus:ring focus:ring-red-200"
@@ -95,6 +155,8 @@ export default function FormLogin() {
             <div>
               <label className="block text-sm mb-1">Password</label>
               <input
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 type="password"
                 placeholder="Enter your password..."
                 className="w-full border rounded-md px-3 py-2 focus:ring focus:ring-red-200"
@@ -102,6 +164,7 @@ export default function FormLogin() {
             </div>
 
             <button
+              onClick={handleSubmit}
               type="submit"
               className="w-full bg-red-600 text-white py-2 rounded-md hover:bg-red-700"
             >

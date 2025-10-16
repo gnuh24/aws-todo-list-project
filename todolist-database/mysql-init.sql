@@ -81,11 +81,7 @@ CREATE TABLE `task` (
     `deleted_at`        TIMESTAMP,
     `is_deleted`        BOOLEAN NOT NULL,
     `created_by`        CHAR(36),  
-<<<<<<< HEAD
-    
-=======
 
->>>>>>> feature/notification-module
     FOREIGN KEY (`section_id`) REFERENCES `section`(`id`),
     FOREIGN KEY (`task_father_id`) REFERENCES `task`(`id`),
     FOREIGN KEY (`account_id`) REFERENCES `account`(`id`),

@@ -1,8 +1,71 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { https } from "../../service/api";
+import FacebookLoginButton from "../LoginPage/FacebookLoginButton";
+import GoogleLoginButton from "../LoginPage/GoogleLoginButton";
 import "./RegisterPage.css";
 
 export default function FormRegister() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await https.post("/api/auth/v1/register", {
+        email,
+        password,
+      });
+
+      if (response.status === 200) {
+        console.log("✅ Register success:", response.data);
+
+        const userData = response.data.data;
+
+        // 👉 Lưu thông tin user (nếu cần)
+        localStorage.setItem("USER_REGISTER", JSON.stringify(userData));
+
+        alert("🎉 Đăng ký thành công! Hãy đăng nhập để tiếp tục.");
+        // 👉 Chuyển hướng sang trang login
+        window.location.href = "/login";
+      }
+    } catch (error) {
+      console.error(
+        "❌ Register failed:",
+        error.response?.data || error.message
+      );
+      alert(error.response?.data?.message || "Đăng ký thất bại!");
+    }
+  };
+
+  const handleLogin = () => {
+    window.FB.login(
+      (response) => {
+        if (response.authResponse) {
+          console.log("✅ Logged in:", response);
+
+          // Gọi API Graph để lấy thông tin user
+          window.FB.api(
+            "/me",
+            { fields: "name,email,picture" },
+            function (userInfo) {
+              console.log("👤 User info:", userInfo);
+              // bạn có thể destructure ra
+              const { name, email, picture } = userInfo;
+              console.log("Name:", name);
+              console.log("Email:", email);
+              console.log("Avatar URL:", picture?.data?.url);
+            }
+          );
+        } else {
+          console.log("❌ Login failed or cancelled");
+        }
+      },
+      { scope: "public_profile,email" } // cần 'email' để lấy email
+    );
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-white">
       <div className="flex w-full max-w-4xl rounded-lg overflow-hidden">
@@ -56,23 +119,10 @@ export default function FormRegister() {
 
           {/* Social Buttons */}
           <div className="space-y-3 mb-6">
-            <button className="w-full flex items-center justify-center border rounded-md py-2 hover:bg-gray-50">
-              <img
-                src="https://www.svgrepo.com/show/475656/google-color.svg"
-                alt="Google"
-                className="h-5 w-5 mr-2"
-              />
-              Continue with Google
-            </button>
-
-            <button className="w-full flex items-center justify-center border rounded-md py-2 hover:bg-gray-50">
-              <img
-                src="https://www.svgrepo.com/show/448224/facebook.svg"
-                alt="Facebook"
-                className="h-5 w-5 mr-2"
-              />
-              Continue with Facebook
-            </button>
+            <GoogleLoginButton></GoogleLoginButton>
+            <FacebookLoginButton
+              handleLogin={handleLogin}
+            ></FacebookLoginButton>
 
             <button className="w-full flex items-center justify-center border rounded-md py-2 hover:bg-gray-50">
               <img
@@ -89,6 +139,10 @@ export default function FormRegister() {
             <div>
               <label className="block text-sm mb-1">Email</label>
               <input
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                }}
                 type="email"
                 placeholder="Enter your personal or work email..."
                 className="w-full border rounded-md px-3 py-2 focus:ring focus:ring-red-200"
@@ -97,6 +151,8 @@ export default function FormRegister() {
             <div>
               <label className="block text-sm mb-1">Password</label>
               <input
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 type="password"
                 placeholder="Enter your password..."
                 className="w-full border rounded-md px-3 py-2 focus:ring focus:ring-red-200"
@@ -104,6 +160,7 @@ export default function FormRegister() {
             </div>
 
             <button
+              onClick={handleSubmit}
               type="submit"
               className="w-full bg-red-600 text-white py-2 rounded-md hover:bg-red-700"
             >
