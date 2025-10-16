@@ -44,4 +44,7 @@ public class TaskCreateRequestDTO {
 
     @Schema(description = "Task có được lưu trữ hay không", example = "false")
     private Boolean isArchived;
+
+    @Schema(description = "Phân công task cho member", example = "id của account")
+    private String idAccountAssign;
 }

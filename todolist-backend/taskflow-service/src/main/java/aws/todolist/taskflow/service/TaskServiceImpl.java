@@ -16,6 +16,7 @@ import aws.todolist.taskflow.repository.SectionRepository;
 import aws.todolist.taskflow.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.function.Consumer;
@@ -49,7 +50,8 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public TaskResponseDTO addTask(String idProject, TaskCreateRequestDTO requestDTO) {
+    @Transactional
+    public TaskResponseDTO addTask(String idProject, TaskCreateRequestDTO requestDTO, Account account) {
 
         Task taskFather = null;
 
@@ -103,6 +105,20 @@ public class TaskServiceImpl implements TaskService {
             }
         }
 
+        // Kiểm tra xem người dùng có phân công task luôn không
+
+        Member member = null;
+
+        if (requestDTO.getIdAccountAssign() != null) {
+            member = memberRepository.findFirstByAccountIdAndProjectIdAndIsDeletedFalse(requestDTO.getIdAccountAssign(), idProject).orElseThrow(() -> new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Account is not a member of this project"));
+
+            // Kiểm tra quyền của account
+            if (member.getRole() == Role.ADMIN || member.getRole() == Role.VIEWER) {
+                throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED, "Account do not have permission to complete this task");
+            }
+
+        }
+
         Task task = Task.builder()
                 .title(requestDTO.getTitle())
                 .description(requestDTO.getDescription())
@@ -112,6 +128,8 @@ public class TaskServiceImpl implements TaskService {
                 .isPinned(requestDTO.getIsPinned() != null ? requestDTO.getIsPinned() : false)
                 .isArchived(requestDTO.getIsArchived() != null ? requestDTO.getIsArchived() : false)
                 .taskFather(taskFather)
+                .createdByAccount(account)
+                .accountAssign(member != null ? member.getAccount() : null)
                 .section(section)
                 .build();
 
@@ -121,6 +139,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @Transactional
     public TaskResponseDTO updatePriority(String idTask, TaskUpdatePriorityRequestDTO requestDTO) {
 
         Task task = this.getTaskAndCheck(idTask);
@@ -133,6 +152,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @Transactional
     public TaskResponseDTO updateRelationship(String idTask, TaskUpdateRelationshipRequestDTO requestDTO) {
 
         Task task = this.getTaskAndCheck(idTask);
@@ -166,6 +186,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @Transactional
     public TaskResponseDTO updateStatus(String idTask, TaskUpdateStatusRequestDTO requestDTO, Account account) {
 
         Task task = this.getTaskAndCheck(idTask);
@@ -207,6 +228,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @Transactional
     public TaskResponseDTO assignTask(String idTask, String idProject, TaskAssignRequestDTO requestDTO) {
 
         Task task = this.getTaskAndCheck(idTask);
@@ -228,6 +250,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @Transactional
     public TaskResponseDTO updateSectionForTask(String idTask, String idProject, TaskUpdateSectionRequestDTO requestDTO) {
 
         Section section = sectionRepository.findByIdAndIsDeletedFalse(requestDTO.getIdSection());
@@ -264,6 +287,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @Transactional
     public TaskResponseDTO updateTask(String idTask, TaskUpdateRequestDTO requestDTO) {
 
         Task task = this.getTaskAndCheck(idTask);
@@ -305,6 +329,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @Transactional
     public TaskResponseDTO archiveTask(String idTask, TaskArchivedRequestDTO requestDTO) {
 
         Task task = taskRepository.findByIdAndIsDeletedFalse(idTask);
@@ -329,6 +354,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @Transactional
     public TaskResponseDTO deleteTask(String idTask) {
 
         Task task = getTaskAndCheck(idTask);
@@ -347,6 +373,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @Transactional
     public TaskResponseDTO restore(String idTask, String idProject) {
 
         Task task = taskRepository.findByIdAndIsDeletedTrue(idTask);

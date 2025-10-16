@@ -7,7 +7,7 @@ public interface TaskService {
 
     TaskDetailResponseDTO getTaskById(String idTask);
 
-    TaskResponseDTO addTask(String idProject, TaskCreateRequestDTO requestDTO);
+    TaskResponseDTO addTask(String idProject, TaskCreateRequestDTO requestDTO, Account account);
 
     TaskResponseDTO updatePriority(String idTask, TaskUpdatePriorityRequestDTO requestDTO);
 

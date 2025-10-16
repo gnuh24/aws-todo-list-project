@@ -40,9 +40,11 @@ public class TaskController {
     @Operation(summary = "Tạo task mới", description = "Tạo thêm một task mới")
     @PostMapping("/{idProject}/tasks")
     @RequireProjectRole({Role.OWNER, Role.MEMBER})
-    public ResponseEntity<ApiResponse<TaskResponseDTO>> addNewTask(@PathVariable("idProject") String idProject, @RequestBody @Valid TaskCreateRequestDTO requestDTO) {
+    public ResponseEntity<ApiResponse<TaskResponseDTO>> addNewTask(@PathVariable("idProject") String idProject, @RequestBody @Valid TaskCreateRequestDTO requestDTO, @AuthenticationPrincipal Account account) {
 
-        TaskResponseDTO taskResponseDTO = taskService.addTask(idProject, requestDTO);
+        TaskResponseDTO taskResponseDTO = taskService.addTask(idProject, requestDTO, account);
+
+        System.out.println(taskResponseDTO.getIdAccountAssigned());
 
         ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Task has been created successfully", taskResponseDTO);
 

@@ -50,4 +50,10 @@ public class TaskResponseDTO {
 
     @Schema(description = "Task cha")
     private String idTaskCha;
+
+    @Schema(description = "id người tạo", example = "")
+    private String idAccountCreate;
+
+    @Schema(description = "id người được phân công", example = "")
+    private String idAccountAssigned;
 }

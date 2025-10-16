@@ -27,6 +27,8 @@ public class TaskMapper {
                 .updatedAt(task.getUpdatedAt())
                 .taskChild(this.ResponseDTOListTaskChild(task.getTaskChild()))
                 .idTaskCha(task.getTaskFather() != null ? task.getTaskFather().getId() : null)
+                .idAccountCreate(task.getCreatedByAccount().getId())
+                .idAccountAssigned(task.getAccountAssign() != null ? task.getAccountAssign().getId() : null)
                 .build();
     }
 
@@ -48,6 +50,8 @@ public class TaskMapper {
                 .updatedAt(task.getUpdatedAt())
                 .taskChild(this.ResponseDTOListTaskChild(task.getTaskChild()))
                 .comments(taskCommentMapper.toResponseList(task.getTaskComments()))
+                .idAccountAssigned(task.getAccountAssign() != null ? task.getAccountAssign().getId() : null)
+                .idAccountCreate(task.getCreatedByAccount().getId())
                 .build();
     }
 

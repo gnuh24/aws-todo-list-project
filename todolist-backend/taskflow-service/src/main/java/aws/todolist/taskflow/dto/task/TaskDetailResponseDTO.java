@@ -56,6 +56,12 @@ public class TaskDetailResponseDTO {
     @Schema(description = "Thời điểm Task được cập nhật gần nhất", example = "2025-10-09T10:00:00")
     private LocalDateTime updatedAt;
 
+    @Schema(description = "id người tạo", example = "")
+    private String idAccountCreate;
+
+    @Schema(description = "id người được phân công", example = "")
+    private String idAccountAssigned;
+
     @Schema(description = "Danh sách các Task con")
     private List<TaskResponseDTO> taskChild;
 

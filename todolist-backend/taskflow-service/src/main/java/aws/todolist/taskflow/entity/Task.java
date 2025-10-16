@@ -103,6 +103,10 @@ public class Task implements Serializable {
     @JoinColumn(name = "section_id")
     private Section section;
 
+    @ManyToOne()
+    @JoinColumn(name = "created_by")
+    private Account createdByAccount;
+
     // Soft delete method
     public void softDelete() {
         this.isDeleted = true;
