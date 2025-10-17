@@ -41,7 +41,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Autowired
     private TaskMapper taskMapper;
-    
+
     @Autowired
     private KafkaNotificationProducer kafkaNotificationProducer;
 
@@ -239,92 +239,66 @@ public class TaskServiceImpl implements TaskService {
 
         return taskMapper.ResponseDTO(task);
     }
-	
-	@Override
-	public TaskResponseDTO assignTask(String idTask, String idProject, TaskAssignRequestDTO requestDTO) {
-		
-		// ====== Lấy task ======
-		Task task = this.getTaskAndCheck(idTask);
-		
-		// ====== Kiểm tra membership ======
-		Member member = memberRepository
-		    .findFirstByAccountIdAndProjectIdAndIsDeletedFalse(requestDTO.getIdAccount(), idProject)
-		    .orElseThrow(() -> new ResourceNotFoundException(
-			SystemErrorCode.SYS_OBJECT_NOT_FOUND,
-			"Account is not a member of this project"
-		    ));
-		
-		// ====== Kiểm tra quyền ======
-		if (member.getRole() == Role.ADMIN || member.getRole() == Role.VIEWER) {
-			throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED,
-			    "Account does not have permission to complete this task");
-		}
-		
-		// ====== Cập nhật người được giao ======
-		task.setAccountAssign(member.getAccount());
-		task = taskRepository.save(task);
-		
-		// ====== Lấy thông tin người thực hiện (actor) ======
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		Object principal = authentication.getPrincipal();
-		
-		String actorId = null;
-		if (principal instanceof Account) {
-			actorId = ((Account) principal).getId();
-		} else {
-			throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED,
-			    "User not authenticated or invalid principal");
-		}
-		
-		System.err.println("Check");
-		// ====== Gửi Kafka Notification ======
-		try {
-			NotificationMessage message = NotificationMessage.builder()
-			    .receiverId(member.getAccount().getId())   // người được giao task
-			    .actorId(actorId)                          // người giao task
-			    .projectId(idProject)
-			    .type(NotificationType.TASK_ASSIGNED)
-			    .title("Bạn vừa được giao một nhiệm vụ mới!")
-			    .content(String.format(
-				"Nhiệm vụ \"%s\" trong dự án \"%s\" đã được giao cho bạn.",
-				task.getTitle(),
-				task.getSection().getProject().getName()
-			    ))
-			    .build();
-			
-			kafkaNotificationProducer.sendTaskAssigned(message);
-			
-			System.out.printf("📤 [Kafka] Sent TASK_ASSIGNED for task '%s' to account '%s'%n",
-			    task.getTitle(), member.getAccount().getEmail());
-		} catch (Exception e) {
-			System.err.println("❌ Gửi notification TASK_ASSIGNED thất bại: " + e.getMessage());
-		}
-		
-		return taskMapper.ResponseDTO(task);
-	}
 
     @Override
-    @Transactional
     public TaskResponseDTO assignTask(String idTask, String idProject, TaskAssignRequestDTO requestDTO) {
 
+        // ====== Lấy task ======
         Task task = this.getTaskAndCheck(idTask);
 
-        // Kiểm tra xem tài khoản có phải member của project và có vai trò gì
+        // ====== Kiểm tra membership ======
+        Member member = memberRepository
+                .findFirstByAccountIdAndProjectIdAndIsDeletedFalse(requestDTO.getIdAccount(), idProject)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        SystemErrorCode.SYS_OBJECT_NOT_FOUND,
+                        "Account is not a member of this project"
+                ));
 
-        Member member = memberRepository.findFirstByAccountIdAndProjectIdAndIsDeletedFalse(requestDTO.getIdAccount(), idProject).orElseThrow(() -> new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Account is not a member of this project"));
-
-        if (member.getStatus() != StatusMember.ACCEPTED) {
-            throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED, "The account has not accepted the invitation to join this project");
-        }
-
-        // Kiểm tra quyền của account
+        // ====== Kiểm tra quyền ======
         if (member.getRole() == Role.ADMIN || member.getRole() == Role.VIEWER) {
-            throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED, "Account do not have permission to complete this task");
+            throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED,
+                    "Account does not have permission to complete this task");
         }
 
+        // ====== Cập nhật người được giao ======
         task.setAccountAssign(member.getAccount());
-
         task = taskRepository.save(task);
+
+        // ====== Lấy thông tin người thực hiện (actor) ======
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+
+        String actorId = null;
+        if (principal instanceof Account) {
+            actorId = ((Account) principal).getId();
+        } else {
+            throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED,
+                    "User not authenticated or invalid principal");
+        }
+
+        System.err.println("Check");
+        // ====== Gửi Kafka Notification ======
+        try {
+            NotificationMessage message = NotificationMessage.builder()
+                    .receiverId(member.getAccount().getId())   // người được giao task
+                    .actorId(actorId)                          // người giao task
+                    .projectId(idProject)
+                    .type(NotificationType.TASK_ASSIGNED)
+                    .title("Bạn vừa được giao một nhiệm vụ mới!")
+                    .content(String.format(
+                            "Nhiệm vụ \"%s\" trong dự án \"%s\" đã được giao cho bạn.",
+                            task.getTitle(),
+                            task.getSection().getProject().getName()
+                    ))
+                    .build();
+
+            kafkaNotificationProducer.sendTaskAssigned(message);
+
+            System.out.printf("📤 [Kafka] Sent TASK_ASSIGNED for task '%s' to account '%s'%n",
+                    task.getTitle(), member.getAccount().getEmail());
+        } catch (Exception e) {
+            System.err.println("❌ Gửi notification TASK_ASSIGNED thất bại: " + e.getMessage());
+        }
 
         return taskMapper.ResponseDTO(task);
     }
