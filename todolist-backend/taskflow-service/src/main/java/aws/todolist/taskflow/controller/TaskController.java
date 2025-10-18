@@ -160,5 +160,17 @@ public class TaskController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Gỡ nhiệm vụ khỏi user", description = "Hủy phân công cho user")
+    @DeleteMapping("/{idProject}/tasks/{idTask}/assignee")
+    @RequireProjectRole({Role.OWNER, Role.MEMBER})
+    public ResponseEntity<ApiResponse<TaskResponseDTO>> assigneeTask(@PathVariable("idProject") String idProject, @PathVariable("idTask") String idTask) {
+
+        TaskResponseDTO taskResponseDTO = taskService.assigneeTask(idTask);
+
+        ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Task has been unassigned successfully", taskResponseDTO);
+
+        return ResponseEntity.ok(response);
+    }
+
 
 }

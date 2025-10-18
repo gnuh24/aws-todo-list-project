@@ -134,7 +134,7 @@
 
 - Task hoàn thành 
     + Mô tả: Khi Task được đánh dấu là hoàn thành (Completed) bởi bất kỳ User nào có quyền.	
-    + Đối tượng: Người được giao Task (Assignee), Người tạo Task (Creator), Người theo dõi Task (Followers).	
+    + Đối tượng: Người được giao Task (Assignee), Người tạo Task (Creator).	
     + Vd: Task @Tên_Task vừa được @User_Thực_hiện đánh dấu Hoàn thành.
 
 

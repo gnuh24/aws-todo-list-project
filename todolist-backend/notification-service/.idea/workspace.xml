@@ -4,7 +4,75 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9d94cf0f-215f-4277-82a6-c399342dfad9" name="Changes" comment="" />
+    <list default="true" id="9d94cf0f-215f-4277-82a6-c399342dfad9" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/../.idea/material_theme_project_new.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/material_theme_project_new.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../docs/list_feature.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../docs/list_feature.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/AuthServiceApplication.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/aop/AppLogger.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/api/ApiPath.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/api/ApiResponse.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/config/ModelMapperConfig.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/config/RedisConfig.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/config/RestTemplate.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/config/SwaggerConfig.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/controller/AuthController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/dto/account/AccountCreateForm.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/dto/account/AccountRedisDTO.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/dto/auth/AuthResponseDTO.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/dto/auth/LoginRequestForm.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/dto/auth/RegisterResponseDTO.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/dto/auth/ResetPasswordForm.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/dto/auth/UpdateEmailForm.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/dto/auth/UpdatePasswordForm.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/dto/auth/UserRegistrationForm.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/entity/Account.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/exceptions/AuthException/AuthExceptionHandler.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/exceptions/AuthException/HmacVerificationException.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/exceptions/AuthException/StepUpAuthenticationException.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/exceptions/DetailError.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/exceptions/ErrorResponse.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/exceptions/JwtException/AccessTokenBlacklistedException.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/exceptions/JwtException/AccessTokenExpiredException.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/exceptions/JwtException/InvalidJWTSignatureException.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/exceptions/JwtException/InvalidTokenTypeException.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/exceptions/JwtException/RefreshTokenBlacklistedException.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/exceptions/JwtException/RefreshTokenExpiredException.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/exceptions/JwtException/RefreshTokenNotFound.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/exceptions/JwtException/TokenExpiredException.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/exceptions/JwtException/UsernameNotFound.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/exceptions/RestExceptionHandler.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/exceptions/errorCode/SystemErrorCode.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/exceptions/otpException/OtpNotFoundException.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/integration/redis/RedisConstants.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/integration/redis/RedisService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/integration/redis/RedisServiceImpl.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/messaging/kafka/consumer/KafkaProducerService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/repository/AccountRepository.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/security/JwtTokenFilter.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/security/JwtTokenProvider.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/security/WebSecurityConfiguration.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/service/AccountService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/service/AccountServiceImpl.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/service/AuthService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/service/AuthServiceImpl.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/service/EmailService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/service/EmailServiceImpl.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/utils/EnvironmentUtils.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/utils/HmacUtil.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/auth/utils/IdGenerator.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/notification/controller/EmailController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/controller/TaskController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/controller/TaskController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/service/TaskService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/service/TaskService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/service/TaskServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/service/TaskServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../taskflow-service/target/classes/aws/todolist/taskflow/controller/TaskController.class" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/target/classes/aws/todolist/taskflow/controller/TaskController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../taskflow-service/target/classes/aws/todolist/taskflow/service/MemberServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/target/classes/aws/todolist/taskflow/service/MemberServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../taskflow-service/target/classes/aws/todolist/taskflow/service/TaskService.class" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/target/classes/aws/todolist/taskflow/service/TaskService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../taskflow-service/target/classes/aws/todolist/taskflow/service/TaskServiceImpl.class" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -23,15 +91,20 @@
     <option name="showLibraryContents" value="true" />
     <option name="showModules" value="false" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.Notification.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "developer",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/Worker/FCJ/To-doList/aws-todo-list-project/todolist-backend/notification-service"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.Notification.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;developer&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Worker/FCJ/To-doList/aws-todo-list-project/todolist-backend/notification-service/pom.xml&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="Notification" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="aws.todolist.notification.NotificationServiceApplication" />

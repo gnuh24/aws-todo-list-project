@@ -17,6 +17,8 @@ public interface TaskService {
 
     TaskResponseDTO assignTask(String idTask, String idProject, TaskAssignRequestDTO requestDTO);
 
+    TaskResponseDTO assigneeTask(String idTask);
+
     TaskResponseDTO updateSectionForTask(String idTask, String idProject, TaskUpdateSectionRequestDTO requestDTO);
 
     TaskResponseDTO updateTask(String idTask, TaskUpdateRequestDTO requestDTO);

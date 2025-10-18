@@ -25,26 +25,40 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 @Service
 public class TaskServiceImpl implements TaskService {
 
+    // Định dạng mong muốn
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss dd/MM/yyyy");
     @Autowired
     private TaskRepository taskRepository;
-
     @Autowired
     private SectionRepository sectionRepository;
-
     @Autowired
     private MemberRepository memberRepository;
-
     @Autowired
     private TaskMapper taskMapper;
-
     @Autowired
     private KafkaNotificationProducer kafkaNotificationProducer;
 
+    private static String getAccountAuthor() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+
+        String actorId = null;
+        if (principal instanceof Account) {
+            actorId = ((Account) principal).getId();
+        } else {
+            throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED,
+                    "User not authenticated or invalid principal");
+        }
+        return actorId;
+    }
 
     @Override
     public TaskDetailResponseDTO getTaskById(String idTask) {
@@ -229,6 +243,43 @@ public class TaskServiceImpl implements TaskService {
         // Kiểm tra trạng thái người dùng tính cập nhật là gì. Nếu là completed thì thêm thời gian vào cập nhật vào
         if (requestDTO.getStatus() == Status.COMPLETED) {
             task.setCompletedAt(now);
+
+            // ====== Lấy thông tin người thực hiện (actor) ======
+            String actorId = getAccountAuthor();
+
+            System.err.println("Check");
+            // ====== Gửi Kafka Notification ======
+
+            List<Account> listAccountReceiver = new ArrayList<>();
+            listAccountReceiver.add(task.getAccountAssign());
+            listAccountReceiver.add(task.getCreatedByAccount());
+
+            for (Account accountReceiver : listAccountReceiver) {
+                try {
+                    NotificationMessage message = NotificationMessage.builder()
+                            .receiverId(accountReceiver.getId())   // người được giao task
+                            .actorId(actorId)                          // người thực hiện cập nhật task
+                            .projectId(task.getSection().getProject().getId())
+                            .type(NotificationType.TASK_COMPLETED)
+                            .title("Nhiệm vụ vừa hoàn thành!")
+                            .content(String.format(
+                                    "Nhiệm vụ \"%s\" trong dự án \"%s\" đã được hoàn thành vào lúc \"%s\".",
+                                    task.getTitle(),
+                                    task.getSection().getProject().getName(),
+                                    task.getCompletedAt().format(formatter)
+                            ))
+                            .build();
+
+                    kafkaNotificationProducer.sendTaskCompleted(message);
+
+                    System.out.printf("📤 [Kafka] Sent TASK_COMPLETED for task '%s' to account '%s'%n",
+                            task.getTitle(), accountReceiver.getEmail());
+                } catch (Exception e) {
+                    System.err.println("❌ Gửi notification TASK_COMPLETED thất bại: " + e.getMessage());
+                }
+            }
+
+
         } else {
             task.setCompletedAt(null);
         }
@@ -260,21 +311,17 @@ public class TaskServiceImpl implements TaskService {
                     "Account does not have permission to complete this task");
         }
 
+        // Kiểm tra phân công có bị trùng ko
+        if (task.getAccountAssign() == member.getAccount()) {
+            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Account has been assigned to this task before");
+        }
+
         // ====== Cập nhật người được giao ======
         task.setAccountAssign(member.getAccount());
         task = taskRepository.save(task);
 
         // ====== Lấy thông tin người thực hiện (actor) ======
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Object principal = authentication.getPrincipal();
-
-        String actorId = null;
-        if (principal instanceof Account) {
-            actorId = ((Account) principal).getId();
-        } else {
-            throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED,
-                    "User not authenticated or invalid principal");
-        }
+        String actorId = getAccountAuthor();
 
         System.err.println("Check");
         // ====== Gửi Kafka Notification ======
@@ -299,6 +346,51 @@ public class TaskServiceImpl implements TaskService {
         } catch (Exception e) {
             System.err.println("❌ Gửi notification TASK_ASSIGNED thất bại: " + e.getMessage());
         }
+
+        return taskMapper.ResponseDTO(task);
+    }
+
+    @Override
+    public TaskResponseDTO assigneeTask(String idTask) {
+
+        Task task = getTaskAndCheck(idTask);
+
+        if (task.getAccountAssign() == null) {
+            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Task hasn't been assigned yet");
+        }
+
+        // Thông báo trước rồi mới set null
+
+        // ====== Lấy thông tin người thực hiện (actor) ======
+        String actorId = getAccountAuthor();
+
+        System.err.println("Check");
+        // ====== Gửi Kafka Notification ======
+        try {
+            NotificationMessage message = NotificationMessage.builder()
+                    .receiverId(task.getAccountAssign().getId())   // người được giao task
+                    .actorId(actorId)
+                    .projectId(task.getSection().getProject().getId())
+                    .type(NotificationType.TASK_ASSIGNED)
+                    .title("Nhiệm vụ đã được gỡ khỏi bạn!")
+                    .content(String.format(
+                            "Nhiệm vụ \"%s\" trong dự án \"%s\" không còn được giao cho bạn.",
+                            task.getTitle(),
+                            task.getSection().getProject().getName()
+                    ))
+                    .build();
+
+            kafkaNotificationProducer.sendTaskAssigned(message);
+
+            System.out.printf("📤 [Kafka] Sent TASK_ASSIGNED for task '%s' to account '%s'%n",
+                    task.getTitle(), task.getAccountAssign().getEmail());
+        } catch (Exception e) {
+            System.err.println("❌ Gửi notification TASK_ASSIGNED thất bại: " + e.getMessage());
+        }
+
+        task.setAccountAssign(null);
+
+        task = taskRepository.save(task);
 
         return taskMapper.ResponseDTO(task);
     }
@@ -378,6 +470,40 @@ public class TaskServiceImpl implements TaskService {
 
         task = taskRepository.save(task);
 
+
+        // ====== Lấy thông tin người thực hiện (actor) ======
+        String actorId = getAccountAuthor();
+
+        System.err.println("Check");
+        // ====== Gửi Kafka Notification ======
+
+        List<Account> listAccountReceiver = new ArrayList<>();
+        listAccountReceiver.add(task.getAccountAssign());
+        listAccountReceiver.add(task.getCreatedByAccount());
+
+        for (Account account : listAccountReceiver) {
+            try {
+                NotificationMessage message = NotificationMessage.builder()
+                        .receiverId(account.getId())   // người được giao task
+                        .actorId(actorId)                          // người thực hiện cập nhật task
+                        .projectId(task.getSection().getProject().getId())
+                        .type(NotificationType.TASK_UPDATED)
+                        .title("Nhiệm vụ vừa được chỉnh sửa!")
+                        .content(String.format(
+                                "Nhiệm vụ \"%s\" trong dự án \"%s\" đã được chỉnh sửa.",
+                                task.getTitle(),
+                                task.getSection().getProject().getName()
+                        ))
+                        .build();
+
+                kafkaNotificationProducer.sendTaskUpdated(message);
+
+                System.out.printf("📤 [Kafka] Sent TASK_UPDATED for task '%s' to account '%s'%n",
+                        task.getTitle(), account.getEmail());
+            } catch (Exception e) {
+                System.err.println("❌ Gửi notification TASK_UPDATED thất bại: " + e.getMessage());
+            }
+        }
 
         return taskMapper.ResponseDTO(task);
     }
@@ -459,7 +585,6 @@ public class TaskServiceImpl implements TaskService {
 
         return taskMapper.ResponseDTO(task);
     }
-
 
     private void updateDeadline(Task task, TaskUpdateRequestDTO requestDTO) {
         if (!requestDTO.isDeadlineSent()) {
