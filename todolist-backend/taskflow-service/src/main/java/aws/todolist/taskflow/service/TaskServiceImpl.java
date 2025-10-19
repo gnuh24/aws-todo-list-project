@@ -33,8 +33,7 @@ import java.util.function.Consumer;
 @Service
 public class TaskServiceImpl implements TaskService {
 
-    // Định dạng mong muốn
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss dd/MM/yyyy");
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm, dd/MM/yyyy");
     @Autowired
     private TaskRepository taskRepository;
     @Autowired
@@ -257,9 +256,10 @@ public class TaskServiceImpl implements TaskService {
             for (Account accountReceiver : listAccountReceiver) {
                 try {
                     NotificationMessage message = NotificationMessage.builder()
-                            .receiverId(accountReceiver.getId())   // người được giao task
+                            .receiverId(accountReceiver.getId())   // người được nhận thông báo
                             .actorId(actorId)                          // người thực hiện cập nhật task
                             .projectId(task.getSection().getProject().getId())
+                            .taskId(task.getId())
                             .type(NotificationType.TASK_COMPLETED)
                             .title("Nhiệm vụ vừa hoàn thành!")
                             .content(String.format(
@@ -330,6 +330,7 @@ public class TaskServiceImpl implements TaskService {
                     .receiverId(member.getAccount().getId())   // người được giao task
                     .actorId(actorId)                          // người giao task
                     .projectId(idProject)
+                    .taskId(task.getId())
                     .type(NotificationType.TASK_ASSIGNED)
                     .title("Bạn vừa được giao một nhiệm vụ mới!")
                     .content(String.format(
@@ -370,6 +371,7 @@ public class TaskServiceImpl implements TaskService {
             NotificationMessage message = NotificationMessage.builder()
                     .receiverId(task.getAccountAssign().getId())   // người được giao task
                     .actorId(actorId)
+                    .taskId(task.getId())
                     .projectId(task.getSection().getProject().getId())
                     .type(NotificationType.TASK_ASSIGNED)
                     .title("Nhiệm vụ đã được gỡ khỏi bạn!")
@@ -484,8 +486,9 @@ public class TaskServiceImpl implements TaskService {
         for (Account account : listAccountReceiver) {
             try {
                 NotificationMessage message = NotificationMessage.builder()
-                        .receiverId(account.getId())   // người được giao task
+                        .receiverId(account.getId())   // người được nhận thông báo
                         .actorId(actorId)                          // người thực hiện cập nhật task
+                        .taskId(task.getId())
                         .projectId(task.getSection().getProject().getId())
                         .type(NotificationType.TASK_UPDATED)
                         .title("Nhiệm vụ vừa được chỉnh sửa!")
@@ -585,6 +588,7 @@ public class TaskServiceImpl implements TaskService {
 
         return taskMapper.ResponseDTO(task);
     }
+
 
     private void updateDeadline(Task task, TaskUpdateRequestDTO requestDTO) {
         if (!requestDTO.isDeadlineSent()) {

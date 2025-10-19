@@ -10,10 +10,16 @@ import aws.todolist.taskflow.exceptions.ProjectException.ForbiddenException;
 import aws.todolist.taskflow.exceptions.ProjectException.ResourceNotFoundException;
 import aws.todolist.taskflow.exceptions.errorCode.SystemErrorCode;
 import aws.todolist.taskflow.mapper.TaskCommentMapper;
+import aws.todolist.taskflow.messaging.kafka.message.NotificationMessage;
+import aws.todolist.taskflow.messaging.kafka.message.NotificationType;
+import aws.todolist.taskflow.messaging.kafka.producer.KafkaNotificationProducer;
 import aws.todolist.taskflow.repository.TaskCommentRepository;
 import aws.todolist.taskflow.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class TaskCommentServiceImpl implements TaskCommentService {
@@ -28,6 +34,9 @@ public class TaskCommentServiceImpl implements TaskCommentService {
     @Autowired
     private TaskCommentMapper taskCommentMapper;
 
+    @Autowired
+    private KafkaNotificationProducer kafkaNotificationProducer;
+
 
     @Override
     public TaskCommentResponseDTO addNewComment(TaskCommentRequestDTO requestDTO, String idTask, Account account) {
@@ -37,6 +46,50 @@ public class TaskCommentServiceImpl implements TaskCommentService {
         TaskComment taskComment = TaskComment.builder().task(task).account(account).comment(requestDTO.getComment()).build();
 
         taskComment = taskCommentRepository.save(taskComment);
+
+
+        System.err.println("Check");
+        // ====== Gửi Kafka Notification ======
+
+
+        // Danh sách người được gửi
+        List<Account> listAccountReceiver = new ArrayList<>();
+        listAccountReceiver.add(task.getAccountAssign());
+        listAccountReceiver.add(task.getCreatedByAccount());
+
+        for (TaskComment comment : task.getTaskComments()) {
+            if (comment.getAccount() != account && comment.getAccount() != task.getCreatedByAccount() && comment.getAccount() != task.getAccountAssign()) {
+                listAccountReceiver.add(comment.getAccount());
+            }
+        }
+
+
+        for (Account accountReceiver : listAccountReceiver) {
+            try {
+                NotificationMessage message = NotificationMessage.builder()
+                        .receiverId(accountReceiver.getId())   // người được nhận thông báo
+                        .actorId(account.getId())                          // người thực hiện cập nhật task
+                        .taskId(task.getId())
+                        .projectId(task.getSection().getProject().getId())
+                        .type(NotificationType.TASK_COMMENTED)
+                        .title("Một bình luận mới được thêm vào Task!")
+                        .content(String.format(
+                                "\"%s\" vừa thêm bình luận mới vào task \"%s\" của dự án \"%s\".",
+                                account.getDisplayName(),
+                                task.getTitle(),
+                                task.getSection().getProject().getName()
+                        ))
+                        .build();
+
+                kafkaNotificationProducer.sendTaskCommented(message);
+
+                System.out.printf("📤 [Kafka] Sent TASK_COMMENTED for task '%s' to account '%s'%n",
+                        task.getTitle(), accountReceiver.getEmail());
+            } catch (Exception e) {
+                System.err.println("❌ Gửi notification TASK_COMMENTED thất bại: " + e.getMessage());
+            }
+        }
+
 
         return taskCommentMapper.toResponse(taskComment);
     }

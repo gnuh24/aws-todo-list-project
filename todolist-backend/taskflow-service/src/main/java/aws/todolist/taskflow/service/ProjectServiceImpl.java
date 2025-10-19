@@ -14,6 +14,9 @@ import aws.todolist.taskflow.exceptions.ProjectException.BadRequestException;
 import aws.todolist.taskflow.exceptions.ProjectException.ResourceNotFoundException;
 import aws.todolist.taskflow.exceptions.errorCode.SystemErrorCode;
 import aws.todolist.taskflow.mapper.ProjectMapper;
+import aws.todolist.taskflow.messaging.kafka.message.NotificationMessage;
+import aws.todolist.taskflow.messaging.kafka.message.NotificationType;
+import aws.todolist.taskflow.messaging.kafka.producer.KafkaNotificationProducer;
 import aws.todolist.taskflow.repository.MemberRepository;
 import aws.todolist.taskflow.repository.ProjectRepository;
 import aws.todolist.taskflow.repository.SectionRepository;
@@ -46,6 +49,9 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Autowired
     private TaskServiceImpl taskService;
+
+    @Autowired
+    private KafkaNotificationProducer kafkaNotificationProducer;
 
     @Override
     public List<ProjectResponseDTO> getAllProject(String accountID) {
@@ -181,6 +187,35 @@ public class ProjectServiceImpl implements ProjectService {
         project.softDelete();
 
         Project saved = projectRepository.saveAndFlush(project);
+
+
+        System.err.println("Check");
+        // ====== Gửi Kafka Notification ======
+
+
+        for (Member member : project.getMembers()) {
+            try {
+                NotificationMessage message = NotificationMessage.builder()
+                        .receiverId(member.getAccount().getId())   // người được nhận thông báo
+                        .actorId(account.getId())                          // người thực hiện cập nhật task
+                        .projectId(project.getId())
+                        .type(NotificationType.PROJECT_DELETED)
+                        .title("Dự án đã bị xóa!")
+                        .content(String.format(
+                                "Dự án \"%s\" đã bị \"%s\" xóa khỏi hệ thống.",
+                                project.getName(),
+                                account.getDisplayName()
+                        ))
+                        .build();
+
+                kafkaNotificationProducer.sendProjectDeleted(message);
+
+                System.out.printf("📤 [Kafka] Sent PROJECT_DELETED to account '%s'%n", member.getAccount().getEmail());
+            } catch (Exception e) {
+                System.err.println("❌ Gửi notification PROJECT_DELETED thất bại: " + e.getMessage());
+            }
+        }
+
         return projectMapper.ResponseDTO(saved);
     }
 
