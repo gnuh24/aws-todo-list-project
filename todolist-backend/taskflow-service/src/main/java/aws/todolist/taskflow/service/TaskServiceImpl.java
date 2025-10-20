@@ -15,9 +15,11 @@ import aws.todolist.taskflow.mapper.TaskMapper;
 import aws.todolist.taskflow.messaging.kafka.message.NotificationMessage;
 import aws.todolist.taskflow.messaging.kafka.message.NotificationType;
 import aws.todolist.taskflow.messaging.kafka.producer.KafkaNotificationProducer;
+import aws.todolist.taskflow.quartzScheduler.TaskSchedulerService;
 import aws.todolist.taskflow.repository.MemberRepository;
 import aws.todolist.taskflow.repository.SectionRepository;
 import aws.todolist.taskflow.repository.TaskRepository;
+import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -44,6 +46,8 @@ public class TaskServiceImpl implements TaskService {
     private TaskMapper taskMapper;
     @Autowired
     private KafkaNotificationProducer kafkaNotificationProducer;
+    @Autowired
+    private TaskSchedulerService taskSchedulerService;
 
     private static String getAccountAuthor() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -161,6 +165,38 @@ public class TaskServiceImpl implements TaskService {
 
         task = taskRepository.save(task);
 
+        // Thông báo kafka nếu task được phân công luôn
+
+
+        if (task.getAccountAssign() != null) {
+            // Thông báo kafka
+
+            List<Account> listAccountReceiver = new ArrayList<>();
+            listAccountReceiver.add(task.getAccountAssign());
+            listAccountReceiver.add(task.getCreatedByAccount());
+
+            String title = "Một nhiệm vụ vừa được giao!";
+            String content = String.format(
+                    "Nhiệm vụ \"%s\" trong dự án \"%s\" đã được giao cho bạn.",
+                    task.getTitle(),
+                    task.getSection().getProject().getName()
+            );
+
+            for (Account accountReceiver : listAccountReceiver) {
+                this.sendNotification(task, accountReceiver, NotificationType.TASK_ASSIGNED, title, content);
+            }
+        }
+
+        // === Đặt scheduler nếu task mới tạo có đặt deadline
+
+        if (task.getDeadline() != null) {
+            try {
+                taskSchedulerService.scheduleTaskWithReminders(task.getId(), task.getDeadline());
+            } catch (SchedulerException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         return taskMapper.ResponseDTO(task);
     }
 
@@ -213,6 +249,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional
+    // Phải lên lịch nhắc hẹn vì có dùng tới trạng thái hoàn thành của task
     public TaskResponseDTO updateStatus(String idTask, TaskUpdateStatusRequestDTO requestDTO, Account account) {
 
         Task task = this.getTaskAndCheck(idTask);
@@ -241,46 +278,53 @@ public class TaskServiceImpl implements TaskService {
 
         // Kiểm tra trạng thái người dùng tính cập nhật là gì. Nếu là completed thì thêm thời gian vào cập nhật vào
         if (requestDTO.getStatus() == Status.COMPLETED) {
+
             task.setCompletedAt(now);
 
-            // ====== Lấy thông tin người thực hiện (actor) ======
-            String actorId = getAccountAuthor();
-
-            System.err.println("Check");
-            // ====== Gửi Kafka Notification ======
+            // Thông báo kafka
 
             List<Account> listAccountReceiver = new ArrayList<>();
             listAccountReceiver.add(task.getAccountAssign());
             listAccountReceiver.add(task.getCreatedByAccount());
 
+            String title = "Nhiệm vụ vừa hoàn thành !";
+            String content = String.format(
+                    "Nhiệm vụ \"%s\" trong dự án \"%s\" đã được hoàn thành vào lúc \"%s\".",
+                    task.getTitle(),
+                    task.getSection().getProject().getName(),
+                    task.getCompletedAt().format(formatter)
+            );
+
             for (Account accountReceiver : listAccountReceiver) {
-                try {
-                    NotificationMessage message = NotificationMessage.builder()
-                            .receiverId(accountReceiver.getId())   // người được nhận thông báo
-                            .actorId(actorId)                          // người thực hiện cập nhật task
-                            .projectId(task.getSection().getProject().getId())
-                            .taskId(task.getId())
-                            .type(NotificationType.TASK_COMPLETED)
-                            .title("Nhiệm vụ vừa hoàn thành!")
-                            .content(String.format(
-                                    "Nhiệm vụ \"%s\" trong dự án \"%s\" đã được hoàn thành vào lúc \"%s\".",
-                                    task.getTitle(),
-                                    task.getSection().getProject().getName(),
-                                    task.getCompletedAt().format(formatter)
-                            ))
-                            .build();
+                this.sendNotification(task, accountReceiver, NotificationType.TASK_COMPLETED, title, content);
+            }
 
-                    kafkaNotificationProducer.sendTaskCompleted(message);
+            // Nếu task có deadline thì xóa lịch thông báo
 
-                    System.out.printf("📤 [Kafka] Sent TASK_COMPLETED for task '%s' to account '%s'%n",
-                            task.getTitle(), accountReceiver.getEmail());
-                } catch (Exception e) {
-                    System.err.println("❌ Gửi notification TASK_COMPLETED thất bại: " + e.getMessage());
+            try {
+                if (taskSchedulerService.isJobExists(task.getId())) {
+                    taskSchedulerService.deleteTaskSchedule(task.getId());
                 }
+            } catch (SchedulerException e) {
+                throw new RuntimeException(e);
             }
 
 
         } else {
+
+            // Nếu có deadline thì cập nhật lịch thông báo trở lại
+
+            if (task.getDeadline() != null) {
+                try {
+
+                    // Lên lịch thông báo sắp đến hạn và trễ hạn
+                    taskSchedulerService.scheduleTaskWithReminders(task.getId(), task.getDeadline());
+
+                } catch (SchedulerException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
             task.setCompletedAt(null);
         }
 
@@ -320,33 +364,24 @@ public class TaskServiceImpl implements TaskService {
         task.setAccountAssign(member.getAccount());
         task = taskRepository.save(task);
 
-        // ====== Lấy thông tin người thực hiện (actor) ======
-        String actorId = getAccountAuthor();
 
-        System.err.println("Check");
-        // ====== Gửi Kafka Notification ======
-        try {
-            NotificationMessage message = NotificationMessage.builder()
-                    .receiverId(member.getAccount().getId())   // người được giao task
-                    .actorId(actorId)                          // người giao task
-                    .projectId(idProject)
-                    .taskId(task.getId())
-                    .type(NotificationType.TASK_ASSIGNED)
-                    .title("Bạn vừa được giao một nhiệm vụ mới!")
-                    .content(String.format(
-                            "Nhiệm vụ \"%s\" trong dự án \"%s\" đã được giao cho bạn.",
-                            task.getTitle(),
-                            task.getSection().getProject().getName()
-                    ))
-                    .build();
+        // Thông báo kafka
 
-            kafkaNotificationProducer.sendTaskAssigned(message);
+        List<Account> listAccountReceiver = new ArrayList<>();
+        listAccountReceiver.add(task.getAccountAssign());
+        listAccountReceiver.add(task.getCreatedByAccount());
 
-            System.out.printf("📤 [Kafka] Sent TASK_ASSIGNED for task '%s' to account '%s'%n",
-                    task.getTitle(), member.getAccount().getEmail());
-        } catch (Exception e) {
-            System.err.println("❌ Gửi notification TASK_ASSIGNED thất bại: " + e.getMessage());
+        String title = "Một nhiệm vụ vừa được giao!";
+        String content = String.format(
+                "Nhiệm vụ \"%s\" trong dự án \"%s\" đã được giao cho bạn.",
+                task.getTitle(),
+                task.getSection().getProject().getName()
+        );
+
+        for (Account accountReceiver : listAccountReceiver) {
+            this.sendNotification(task, accountReceiver, NotificationType.TASK_ASSIGNED, title, content);
         }
+
 
         return taskMapper.ResponseDTO(task);
     }
@@ -362,33 +397,23 @@ public class TaskServiceImpl implements TaskService {
 
         // Thông báo trước rồi mới set null
 
-        // ====== Lấy thông tin người thực hiện (actor) ======
-        String actorId = getAccountAuthor();
+        // Thông báo kafka
 
-        System.err.println("Check");
-        // ====== Gửi Kafka Notification ======
-        try {
-            NotificationMessage message = NotificationMessage.builder()
-                    .receiverId(task.getAccountAssign().getId())   // người được giao task
-                    .actorId(actorId)
-                    .taskId(task.getId())
-                    .projectId(task.getSection().getProject().getId())
-                    .type(NotificationType.TASK_ASSIGNED)
-                    .title("Nhiệm vụ đã được gỡ khỏi bạn!")
-                    .content(String.format(
-                            "Nhiệm vụ \"%s\" trong dự án \"%s\" không còn được giao cho bạn.",
-                            task.getTitle(),
-                            task.getSection().getProject().getName()
-                    ))
-                    .build();
+        List<Account> listAccountReceiver = new ArrayList<>();
+        listAccountReceiver.add(task.getAccountAssign());
+        listAccountReceiver.add(task.getCreatedByAccount());
 
-            kafkaNotificationProducer.sendTaskAssigned(message);
+        String title = "Một nhiệm vụ vừa được gỡ phân công!";
+        String content = String.format(
+                "Nhiệm vụ \"%s\" trong dự án \"%s\" không còn được giao cho bạn.",
+                task.getTitle(),
+                task.getSection().getProject().getName()
+        );
 
-            System.out.printf("📤 [Kafka] Sent TASK_ASSIGNED for task '%s' to account '%s'%n",
-                    task.getTitle(), task.getAccountAssign().getEmail());
-        } catch (Exception e) {
-            System.err.println("❌ Gửi notification TASK_ASSIGNED thất bại: " + e.getMessage());
+        for (Account accountReceiver : listAccountReceiver) {
+            this.sendNotification(task, accountReceiver, NotificationType.TASK_ASSIGNED, title, content);
         }
+
 
         task.setAccountAssign(null);
 
@@ -419,9 +444,7 @@ public class TaskServiceImpl implements TaskService {
 
         // Chuyển section cho task con của task hiện tại nếu có
         task.getTaskChild().forEach(taskChild -> {
-            this.applyRecursive(taskChild, t -> {
-                t.setSection(section);
-            }, c -> {
+            this.applyRecursive(taskChild, t -> t.setSection(section), c -> {
             });
             taskRepository.save(taskChild);
         });
@@ -473,40 +496,48 @@ public class TaskServiceImpl implements TaskService {
         task = taskRepository.save(task);
 
 
-        // ====== Lấy thông tin người thực hiện (actor) ======
-        String actorId = getAccountAuthor();
-
-        System.err.println("Check");
-        // ====== Gửi Kafka Notification ======
+        // Thông báo kafka
 
         List<Account> listAccountReceiver = new ArrayList<>();
         listAccountReceiver.add(task.getAccountAssign());
         listAccountReceiver.add(task.getCreatedByAccount());
 
-        for (Account account : listAccountReceiver) {
+        String title = "Nhiệm vụ vừa được chỉnh sửa!";
+        String content = String.format(
+                "Nhiệm vụ \"%s\" trong dự án \"%s\" đã được chỉnh sửa.",
+                task.getTitle(),
+                task.getSection().getProject().getName()
+        );
+
+        for (Account accountReceiver : listAccountReceiver) {
+            this.sendNotification(task, accountReceiver, NotificationType.TASK_UPDATED, title, content);
+        }
+
+
+        // ====== Kiểm tra xem task có deadline ko nếu có thì cập nhật lại việc lên lịch
+
+        if (task.getDeadline() != null) {
             try {
-                NotificationMessage message = NotificationMessage.builder()
-                        .receiverId(account.getId())   // người được nhận thông báo
-                        .actorId(actorId)                          // người thực hiện cập nhật task
-                        .taskId(task.getId())
-                        .projectId(task.getSection().getProject().getId())
-                        .type(NotificationType.TASK_UPDATED)
-                        .title("Nhiệm vụ vừa được chỉnh sửa!")
-                        .content(String.format(
-                                "Nhiệm vụ \"%s\" trong dự án \"%s\" đã được chỉnh sửa.",
-                                task.getTitle(),
-                                task.getSection().getProject().getName()
-                        ))
-                        .build();
+                // Lên lịch thông báo sắp đến hạn và trễ hạn
+                taskSchedulerService.scheduleTaskWithReminders(task.getId(), task.getDeadline());
+            } catch (SchedulerException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
 
-                kafkaNotificationProducer.sendTaskUpdated(message);
+            // Xóa lịch cũ trước khi action
+            try {
+                if (taskSchedulerService.isJobExists(task.getId())) {
 
-                System.out.printf("📤 [Kafka] Sent TASK_UPDATED for task '%s' to account '%s'%n",
-                        task.getTitle(), account.getEmail());
-            } catch (Exception e) {
-                System.err.println("❌ Gửi notification TASK_UPDATED thất bại: " + e.getMessage());
+                    // Xóa thông báo sắp đến hạn và trễ hạn
+                    taskSchedulerService.deleteTaskSchedule(task.getId());
+
+                }
+            } catch (SchedulerException e) {
+                throw new RuntimeException(e);
             }
         }
+
 
         return taskMapper.ResponseDTO(task);
     }
@@ -523,12 +554,8 @@ public class TaskServiceImpl implements TaskService {
 
         task.setIsArchived(requestDTO.getIsArchived());
 
-        task.getTaskChild().forEach(taskChild -> {
-            this.applyRecursive(taskChild, t -> {
-                t.setIsArchived(requestDTO.getIsArchived());
-            }, c -> {
-            });
-        });
+        task.getTaskChild().forEach(taskChild -> this.applyRecursive(taskChild, t -> t.setIsArchived(requestDTO.getIsArchived()), c -> {
+        }));
 
 
         task = taskRepository.save(task);
@@ -544,13 +571,22 @@ public class TaskServiceImpl implements TaskService {
 
         task.softDelete();
 
+
         task.getTaskComments().forEach(TaskComment::softDelete);
 
-        task.getTaskChild().forEach(TaskChild -> {
-            this.applyRecursive(TaskChild, Task::softDelete, TaskComment::softDelete);
-        });
+        task.getTaskChild().forEach(TaskChild -> this.applyRecursive(TaskChild, Task::softDelete, TaskComment::softDelete));
 
         task = taskRepository.save(task);
+
+        // Xóa lịch cũ trước khi action
+        try {
+            if (taskSchedulerService.isJobExists(task.getId())) {
+                taskSchedulerService.deleteTaskSchedule(task.getId());
+            }
+        } catch (SchedulerException e) {
+            throw new RuntimeException(e);
+        }
+
 
         return taskMapper.ResponseDTO(task);
     }
@@ -570,21 +606,25 @@ public class TaskServiceImpl implements TaskService {
         if (task.getSection().getIsDeleted()) {
             Section newSection = sectionRepository.findTopByProjectIdAndIsDeletedFalseOrderByPositionAsc(idProject);
             task.setSection(newSection);
-            task.getTaskChild().forEach(TaskChild -> {
-                this.applyRecursive(TaskChild, t -> {
-                    t.setSection(newSection);
-                }, c -> {
-                });
-            });
+            task.getTaskChild().forEach(TaskChild -> this.applyRecursive(TaskChild, t -> t.setSection(newSection), c -> {
+            }));
         }
 
         task.restore();
 
-        task.getTaskChild().forEach(TaskChild -> {
-            this.applyRecursive(TaskChild, Task::restore, TaskComment::restore);
-        });
+        task.getTaskChild().forEach(TaskChild -> this.applyRecursive(TaskChild, Task::restore, TaskComment::restore));
 
         task = taskRepository.save(task);
+
+        // 5️⃣ Restore / tạo lại lịch mới nếu có deadline và task chưa bị xóa
+        if (task.getDeadline() != null && !task.getIsDeleted()) {
+            try {
+                taskSchedulerService.scheduleTaskWithReminders(task.getId(), task.getDeadline());
+            } catch (SchedulerException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
 
         return taskMapper.ResponseDTO(task);
     }
@@ -629,15 +669,83 @@ public class TaskServiceImpl implements TaskService {
         return task;
     }
 
+
+    // Hàm sử dụng để áp dụng hành động lên task và đệ quy lên task con, comment
     public void applyRecursive(Task task, Consumer<Task> taskAction, Consumer<TaskComment> commentAction) {
+
         // Áp dụng hành động lên task
         taskAction.accept(task);
+
+
+        // Xóa lịch cũ trước khi action
+        try {
+            if (taskSchedulerService.isJobExists(task.getId())) {
+                taskSchedulerService.deleteTaskSchedule(task.getId());
+            }
+        } catch (SchedulerException e) {
+            throw new RuntimeException(e);
+        }
+
 
         // Áp dụng hành động lên tất cả comment của task
         task.getTaskComments().forEach(commentAction);
 
         // Đệ quy xuống các child
         task.getTaskChild().forEach(child -> applyRecursive(child, taskAction, commentAction));
+
+
+        // 5️⃣ Restore / tạo lại lịch mới nếu có deadline và task chưa bị xóa
+        if (task.getDeadline() != null && !task.getIsDeleted()) {
+            try {
+                taskSchedulerService.scheduleTaskWithReminders(task.getId(), task.getDeadline());
+            } catch (SchedulerException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
+
+    // Hàm để gửi thông báo qua kafka cho toàn bộ loại thông báo khác nhau
+    private void sendNotification(Task task,
+                                  Account accountReceiver,
+                                  NotificationType type,
+                                  String title,
+                                  String content) {
+        if (accountReceiver == null) return;
+
+        // ====== Lấy thông tin người thực hiện (actor) ======
+        String actorId = getAccountAuthor();
+
+        try {
+            NotificationMessage message = NotificationMessage.builder()
+                    .receiverId(accountReceiver.getId())
+                    .actorId(actorId)
+                    .projectId(task.getSection().getProject().getId())
+                    .taskId(task.getId())
+                    .type(type)
+                    .title(title)
+                    .content(content)
+                    .build();
+
+            switch (message.getType()) {
+                case TASK_COMPLETED:
+                    kafkaNotificationProducer.sendTaskCompleted(message);
+                    break;
+                case TASK_ASSIGNED:
+                    kafkaNotificationProducer.sendTaskAssigned(message);
+                    break;
+                case TASK_UPDATED:
+                    kafkaNotificationProducer.sendTaskUpdated(message);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unknown notification type: " + message.getType());
+            }
+
+            System.out.printf("📤 [Kafka] Sent %s for task '%s' to account '%s'%n",
+                    type, task.getTitle(), accountReceiver.getEmail());
+        } catch (Exception e) {
+            System.err.println("❌ Gửi notification " + type + " thất bại: " + e.getMessage());
+        }
+    }
+
 
 }

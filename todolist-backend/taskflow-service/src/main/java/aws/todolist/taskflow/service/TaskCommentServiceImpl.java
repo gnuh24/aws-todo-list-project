@@ -65,6 +65,7 @@ public class TaskCommentServiceImpl implements TaskCommentService {
 
 
         for (Account accountReceiver : listAccountReceiver) {
+            if (account == null) continue;
             try {
                 NotificationMessage message = NotificationMessage.builder()
                         .receiverId(accountReceiver.getId())   // người được nhận thông báo

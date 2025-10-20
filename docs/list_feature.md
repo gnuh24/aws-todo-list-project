@@ -140,7 +140,7 @@
 
 - Task sắp tới hẹn
     + Mô tả: Hệ thống tự động gửi thông báo khi Task còn N ngày/giờ nữa là đến Deadline.	
-    + Đối tượng: Người được giao Task (Assignee).	
+    + Đối tượng: Người được giao Task (Assignee), Người tạo Task (Creator).	
     + Ví dụ: Task @Tên_Task của bạn sẽ sắp tới hạn (còn 4 giờ) vào lúc 10:00, 11/11/2025.
   
 - Task trễ deadline

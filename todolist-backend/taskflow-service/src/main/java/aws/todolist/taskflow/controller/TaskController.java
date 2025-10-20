@@ -44,8 +44,6 @@ public class TaskController {
 
         TaskResponseDTO taskResponseDTO = taskService.addTask(idProject, requestDTO, account);
 
-        System.out.println(taskResponseDTO.getIdAccountAssigned());
-
         ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Task has been created successfully", taskResponseDTO);
 
         return ResponseEntity.ok(response);
