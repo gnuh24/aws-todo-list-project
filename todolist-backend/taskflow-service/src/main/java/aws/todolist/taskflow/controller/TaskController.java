@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/v1/projects")
 @Tag(name = "Task API", description = "CRUD của task")
+@CrossOrigin(origins = "*")
 // TODO: Quyền OWNER, MEMBER
 public class TaskController {
 

@@ -23,6 +23,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1")
 @Tag(name = "Project API", description = "CRUD của project")
+@CrossOrigin(origins = "*")
 public class ProjectController {
 
     @Autowired

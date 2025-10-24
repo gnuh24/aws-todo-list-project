@@ -4,17 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9d94cf0f-215f-4277-82a6-c399342dfad9" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../../docs/list_feature.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../docs/list_feature.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../taskflow-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/service/TaskCommentServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/service/TaskCommentServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/service/TaskServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/service/TaskServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../taskflow-service/target/classes/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/target/classes/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../taskflow-service/target/classes/aws/todolist/taskflow/service/TaskCommentServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/target/classes/aws/todolist/taskflow/service/TaskCommentServiceImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../taskflow-service/target/classes/aws/todolist/taskflow/service/TaskServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/target/classes/aws/todolist/taskflow/service/TaskServiceImpl.class" afterDir="false" />
-    </list>
+    <list default="true" id="9d94cf0f-215f-4277-82a6-c399342dfad9" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
