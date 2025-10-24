@@ -8,15 +8,16 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-parent</artifactId>
                 <version>3.4.0</version>
-                <relativePath/>
+                <relativePath/> <!-- lookup parent from repository -->
         </parent>
 
-        <groupId>com.ec.api-gateway</groupId>
+        <groupId>aws.todolist.api-gateway</groupId>
         <artifactId>api-gateway</artifactId>
         <version>0.0.1-SNAPSHOT</version>
         <name>api-gateway</name>
         <description>API Gateway for Microservices</description>
 
+        <!-- ✅ Đồng bộ Java 21 -->
         <properties>
                 <java.version>21</java.version>
         </properties>
@@ -30,32 +31,32 @@
                         <version>4.2.0</version>
                 </dependency>
 
-                <!-- WebFlux (Netty, non-blocking) -->
+                <!-- WebFlux -->
                 <dependency>
                         <groupId>org.springframework.boot</groupId>
                         <artifactId>spring-boot-starter-webflux</artifactId>
                 </dependency>
 
-                <!-- Spring Boot Actuator (for health check, monitoring) -->
+                <!-- Actuator -->
                 <dependency>
                         <groupId>org.springframework.boot</groupId>
                         <artifactId>spring-boot-starter-actuator</artifactId>
                 </dependency>
 
-                <!-- Redis (Optional: For rate limiting, caching if needed) -->
+                <!-- Redis -->
                 <dependency>
                         <groupId>org.springframework.boot</groupId>
                         <artifactId>spring-boot-starter-data-redis</artifactId>
                 </dependency>
 
-                <!-- Lombok (for reducing boilerplate code) -->
+                <!-- Lombok -->
                 <dependency>
                         <groupId>org.projectlombok</groupId>
                         <artifactId>lombok</artifactId>
                         <optional>true</optional>
                 </dependency>
 
-                <!-- Spring Boot DevTools (for hot reload during development) -->
+                <!-- DevTools -->
                 <dependency>
                         <groupId>org.springframework.boot</groupId>
                         <artifactId>spring-boot-devtools</artifactId>
@@ -63,7 +64,7 @@
                         <optional>true</optional>
                 </dependency>
 
-                <!-- Spring Boot Test (unit tests for filters, routing, etc) -->
+                <!-- Test -->
                 <dependency>
                         <groupId>org.springframework.boot</groupId>
                         <artifactId>spring-boot-starter-test</artifactId>
@@ -74,6 +75,7 @@
 
         <build>
                 <plugins>
+                        <!-- Spring Boot Maven Plugin (Hỗ trợ build và chạy ứng dụng Spring Boot) -->
                         <plugin>
                                 <groupId>org.springframework.boot</groupId>
                                 <artifactId>spring-boot-maven-plugin</artifactId>

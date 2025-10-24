@@ -2,7 +2,6 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
-      <profile default="true" name="Default" enabled="true" />
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -14,21 +13,12 @@
         <module name="taskflow-service" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="catalog-service" target="21" />
-      <module name="news-service" target="21" />
-      <module name="order-service" target="21" />
-      <module name="todolist-backend" target="21" />
-    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="api-gateway" options="-parameters" />
       <module name="auth-service" options="-parameters" />
-      <module name="catalog-service" options="-parameters" />
-      <module name="news-service" options="-parameters" />
       <module name="notification-service" options="-parameters" />
-      <module name="order-service" options="-parameters" />
       <module name="taskflow-service" options="-parameters" />
       <module name="user-service" options="-parameters" />
     </option>

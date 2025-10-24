@@ -58,7 +58,7 @@ public class WebSecurityConfiguration {
         http
                 // Loại bỏ bảo vệ CSRF
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource))
+//                .cors(cors -> cors.configurationSource(corsConfigurationSource))
 
 
                 // Configure các luồng truy cập
