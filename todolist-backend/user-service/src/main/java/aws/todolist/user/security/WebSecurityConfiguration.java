@@ -43,19 +43,19 @@ public class WebSecurityConfiguration {
 		return new BCryptPasswordEncoder();
 	}
 	
-	@Bean
-	public CorsConfigurationSource corsConfigurationSource() {
-		CorsConfiguration configuration = new CorsConfiguration();
-		
-		configuration.setAllowedOrigins(List.of("http://localhost:4200"));
-		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-		configuration.setAllowedHeaders(List.of("*"));
-		configuration.setAllowCredentials(true);
-		
-		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-		source.registerCorsConfiguration("/**", configuration);
-		return source;
-	}
+//	@Bean
+//	public CorsConfigurationSource corsConfigurationSource() {
+//		CorsConfiguration configuration = new CorsConfiguration();
+//
+//		configuration.setAllowedOrigins(List.of("http://localhost:4200"));
+//		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+//		configuration.setAllowedHeaders(List.of("*"));
+//		configuration.setAllowCredentials(true);
+//
+//		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//		source.registerCorsConfiguration("/**", configuration);
+//		return source;
+//	}
 	
 	
 	@Bean
@@ -64,7 +64,7 @@ public class WebSecurityConfiguration {
 		http
 		    // Loại bỏ bảo vệ CSRF
 		    .csrf(AbstractHttpConfigurer::disable)
-		    .cors(cors -> cors.configurationSource(corsConfigurationSource))
+//		    .cors(cors -> cors.configurationSource(corsConfigurationSource))
 		    
 		    
 		    // Configure các luồng truy cập
