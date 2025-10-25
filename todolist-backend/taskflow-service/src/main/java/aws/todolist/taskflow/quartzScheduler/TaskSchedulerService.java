@@ -34,7 +34,6 @@ public class TaskSchedulerService {
             JobDetail jobDetail = JobBuilder.newJob(TaskNotificationReminder.class)
                     .withIdentity(jobKey)
                     .usingJobData("taskId", taskId)
-                    .usingJobData("actor", "11111111-1111-1111-1111-111111111111")
                     .usingJobData("deadline", deadline.toString())
                     .storeDurably()
                     .build();
@@ -119,7 +118,6 @@ public class TaskSchedulerService {
         System.out.println("✅ Trigger đã tạo lịch thông báo trễ deadline cho task " + taskId + " lúc " + reminderOverDue);
 
     }
-
 
     public void deleteTaskSchedule(String taskId) throws SchedulerException {
         JobKey jobKey = new JobKey("taskJob_" + taskId);

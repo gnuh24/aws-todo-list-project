@@ -14,16 +14,13 @@ import aws.todolist.taskflow.exceptions.ProjectException.ForbiddenException;
 import aws.todolist.taskflow.exceptions.ProjectException.ResourceNotFoundException;
 import aws.todolist.taskflow.exceptions.errorCode.SystemErrorCode;
 import aws.todolist.taskflow.mapper.MemberMapper;
-import aws.todolist.taskflow.messaging.kafka.message.NotificationMessage;
 import aws.todolist.taskflow.messaging.kafka.message.NotificationType;
-import aws.todolist.taskflow.messaging.kafka.producer.KafkaNotificationProducer;
 import aws.todolist.taskflow.repository.AccountRepository;
 import aws.todolist.taskflow.repository.MemberRepository;
 import aws.todolist.taskflow.repository.ProjectRepository;
+import aws.todolist.taskflow.utils.NotificationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,9 +42,9 @@ public class MemberServiceImpl implements MemberService {
 
     @Autowired
     private AccountRepository accountRepository;
-    
+
     @Autowired
-    private KafkaNotificationProducer kafkaNotificationProducer;
+    private NotificationUtils notificationUtils;
 
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
@@ -101,27 +98,14 @@ public class MemberServiceImpl implements MemberService {
         Member member = Member.builder().account(account).project(project).role(requestDTO.getRole()).status(StatusMember.PENDING).build();
 
         Member member_saved = memberRepository.saveAndFlush(member);
-	    
-	    // =============================
-	    // 🔔 GỬI KAFKA NOTIFICATION
-	    // =============================
-	    
-	    NotificationMessage message = NotificationMessage.builder()
-		.receiverId(account.getId())                          // Người nhận: account vừa được thêm
-		.actorId(getCurrentActorId()) // Người thực hiện (lấy từ Auth)
-		.projectId(project.getId())                            // Dự án liên quan
-		.type(NotificationType.PROJECT_MEMBER_ADDED)           // Loại thông báo
-		.title("Bạn đã được thêm vào dự án mới!")              // Tiêu đề thông báo
-		.content(String.format(
-		    "Bạn đã được thêm vào dự án '%s' với vai trò %s.",
-		    project.getName(),
-		    requestDTO.getRole().name()
-		))
-		.build();
-	    
-	    kafkaNotificationProducer.sendProjectMemberAdded(message);
-	    
-	    // =============================
+
+        // =============================
+        // 🔔 GỬI KAFKA NOTIFICATION
+        // =============================
+
+        notificationUtils.sendNotification(null, project, null, notificationUtils.getReceiversForMember(member_saved), NotificationType.PROJECT_MEMBER_ADDED);
+
+        // =============================
 
         return memberMapper.ResponseDTO(member_saved);
     }
@@ -131,7 +115,7 @@ public class MemberServiceImpl implements MemberService {
     public MemberResponseDTO updateRoleMember(String idMember, MemberUpdateRoleRequestDTO requestDTO) {
         Optional<Member> OptMember = memberRepository.findFirstByIdAndIsDeletedFalse(idMember);
 
-        Member member;
+        Member member = null;
 
         if (OptMember.isPresent()) {
             member = OptMember.get();
@@ -157,30 +141,15 @@ public class MemberServiceImpl implements MemberService {
 
         redisTemplate.delete(key);
 
-	    
-	    // =============================
-	    // 🔔 Gửi Kafka Notification
-	    // =============================
-	    
-	    try {
-		    NotificationMessage message = NotificationMessage.builder()
-			.receiverId(member_saved.getAccount().getId())              // người được cập nhật quyền
-			.actorId(getCurrentActorId()) // Người thực hiện (lấy từ Auth)
-			.projectId(member_saved.getProject().getId())
-			.type(NotificationType.PROJECT_MEMBER_ROLE_UPDATED)
-			.title("Vai trò của bạn trong dự án đã được cập nhật")
-			.content("Vai trò mới của bạn trong dự án \""
-			    + member_saved.getProject().getName()
-			    + "\" là: " + member_saved.getRole().name())
-			.build();
-		    
-		    kafkaNotificationProducer.sendProjectMemberRoleUpdated(message);
-		    
-		    System.out.println("📤 [Kafka] Sent PROJECT_MEMBER_ROLE_UPDATED for member " + member_saved.getAccount().getEmail());
-	    } catch (Exception e) {
-		    System.err.println("❌ Gửi notification PROJECT_MEMBER_ROLE_UPDATED thất bại: " + e.getMessage());
-	    }
-	
+
+        // =============================
+        // 🔔 Gửi Kafka Notification
+        // =============================
+
+
+        notificationUtils.sendNotification(null, member_saved.getProject(), null, notificationUtils.getReceiversForMember(member_saved), NotificationType.PROJECT_MEMBER_ROLE_UPDATED);
+
+
         return memberMapper.ResponseDTO(member_saved);
     }
 
@@ -257,18 +226,5 @@ public class MemberServiceImpl implements MemberService {
 
         return memberMapper.ResponseDTO(member);
     }
-	
-	private String getCurrentActorId() {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		if (authentication == null || !authentication.isAuthenticated()) {
-			throw new RuntimeException("User not authenticated");
-		}
-		
-		Object principal = authentication.getPrincipal();
-		if (principal instanceof Account account) {
-			return account.getId();
-		}
-		
-		throw new RuntimeException("Invalid principal type");
-	}
+
 }

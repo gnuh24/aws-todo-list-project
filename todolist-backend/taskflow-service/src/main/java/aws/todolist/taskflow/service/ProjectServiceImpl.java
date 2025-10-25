@@ -14,13 +14,12 @@ import aws.todolist.taskflow.exceptions.ProjectException.BadRequestException;
 import aws.todolist.taskflow.exceptions.ProjectException.ResourceNotFoundException;
 import aws.todolist.taskflow.exceptions.errorCode.SystemErrorCode;
 import aws.todolist.taskflow.mapper.ProjectMapper;
-import aws.todolist.taskflow.messaging.kafka.message.NotificationMessage;
 import aws.todolist.taskflow.messaging.kafka.message.NotificationType;
-import aws.todolist.taskflow.messaging.kafka.producer.KafkaNotificationProducer;
 import aws.todolist.taskflow.repository.MemberRepository;
 import aws.todolist.taskflow.repository.ProjectRepository;
 import aws.todolist.taskflow.repository.SectionRepository;
 import aws.todolist.taskflow.repository.TaskRepository;
+import aws.todolist.taskflow.utils.NotificationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,7 +50,7 @@ public class ProjectServiceImpl implements ProjectService {
     private TaskServiceImpl taskService;
 
     @Autowired
-    private KafkaNotificationProducer kafkaNotificationProducer;
+    private NotificationUtils notificationUtils;
 
     @Override
     public List<ProjectResponseDTO> getAllProject(String accountID) {
@@ -143,7 +142,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Transactional
     @Override
-    public ProjectResponseDTO removeProject(String id, Account account) {
+    public ProjectResponseDTO removeProject(String id, Account accountLogging) {
 
         Optional<Project> optProject = projectRepository.findByIdAndIsDeletedFalse(id);
 
@@ -163,10 +162,10 @@ public class ProjectServiceImpl implements ProjectService {
 
         // Chạy vòng lặp để cập nhật các section thành deleted và chuyển task về project default
 
-        Project defaultProject = projectRepository.findProjectIsDefault(account.getId());
+        Project defaultProject = projectRepository.findProjectIsDefault(accountLogging.getId());
 
         if (defaultProject == null) {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "This account doesn't have default project");
+            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "This accountLogging doesn't have default project");
         }
 
         Section sectionDefault = defaultProject.getSections().getFirst();
@@ -193,29 +192,13 @@ public class ProjectServiceImpl implements ProjectService {
         // ====== Gửi Kafka Notification ======
 
 
-        for (Member member : project.getMembers()) {
-            try {
-                NotificationMessage message = NotificationMessage.builder()
-                        .receiverId(member.getAccount().getId())   // người được nhận thông báo
-                        .actorId(account.getId())                          // người thực hiện cập nhật task
-                        .projectId(project.getId())
-                        .type(NotificationType.PROJECT_DELETED)
-                        .title("Dự án đã bị xóa!")
-                        .content(String.format(
-                                "Dự án \"%s\" đã bị \"%s\" xóa khỏi hệ thống.",
-                                project.getName(),
-                                account.getDisplayName()
-                        ))
-                        .build();
+        String content = String.format(
+                "Dự án \"%s\" đã bị \"%s\" xóa khỏi hệ thống.",
+                project.getName(),
+                accountLogging.getDisplayName()
+        );
 
-                kafkaNotificationProducer.sendProjectDeleted(message);
-
-                System.out.printf("📤 [Kafka] Sent PROJECT_DELETED to account '%s'%n", member.getAccount().getEmail());
-            } catch (Exception e) {
-                System.err.println("❌ Gửi notification PROJECT_DELETED thất bại: " + e.getMessage());
-            }
-        }
-
+        notificationUtils.sendNotification(null, project, accountLogging, notificationUtils.getReceiversForProject(project.getMembers()), NotificationType.PROJECT_DELETED);
         return projectMapper.ResponseDTO(saved);
     }
 

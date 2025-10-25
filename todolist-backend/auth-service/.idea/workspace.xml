@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="d63eeb10-748f-4b2e-b07c-a31355f7cbfe" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/target/classes/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/test-classes/com/sgu/backend/BackEndApplicationTests.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/entity/Account.java" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/entity/Account.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/quartzScheduler/TaskNotificationReminder.java" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/quartzScheduler/TaskNotificationReminder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/quartzScheduler/TaskSchedulerService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/quartzScheduler/TaskSchedulerService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/service/MemberServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/service/MemberServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/service/ProjectServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/service/ProjectServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/service/TaskCommentServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/service/TaskCommentServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/service/TaskServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/service/TaskServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../taskflow-service/target/classes/aws/todolist/taskflow/quartzScheduler/TaskNotificationReminder$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../taskflow-service/target/classes/aws/todolist/taskflow/quartzScheduler/TaskNotificationReminder.class" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/target/classes/aws/todolist/taskflow/quartzScheduler/TaskNotificationReminder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../taskflow-service/target/classes/aws/todolist/taskflow/service/MemberServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/target/classes/aws/todolist/taskflow/service/MemberServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../taskflow-service/target/classes/aws/todolist/taskflow/service/TaskServiceImpl$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../taskflow-service/target/classes/aws/todolist/taskflow/service/TaskServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/target/classes/aws/todolist/taskflow/service/TaskServiceImpl.class" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 4
+}</component>
+  <component name="ProjectId" id="33b20imGMwHKpSYYgcXzvYkHzPk" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="false" />
+    <option name="showLibraryContents" value="true" />
+    <option name="showModules" value="false" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.Auth Service.executor&quot;: &quot;Run&quot;,
+    &quot;Application.AuthServiceApplication.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;developer&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Worker/FCJ/To-doList/aws-todo-list-project/todolist-backend/auth-service/pom.xml&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;
+  }
+}</component>
+  <component name="RunManager">
+    <configuration name="Auth Service" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="aws.todolist.auth.AuthServiceApplication" />
+      <module name="auth-service" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="d63eeb10-748f-4b2e-b07c-a31355f7cbfe" name="Changes" comment="" />
+      <created>1759571229319</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1759571229319</updated>
+    </task>
+    <servers />
+  </component>
+</project>

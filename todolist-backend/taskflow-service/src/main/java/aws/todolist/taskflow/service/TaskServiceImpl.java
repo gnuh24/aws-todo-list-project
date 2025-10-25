@@ -12,30 +12,24 @@ import aws.todolist.taskflow.exceptions.ProjectException.ForbiddenException;
 import aws.todolist.taskflow.exceptions.ProjectException.ResourceNotFoundException;
 import aws.todolist.taskflow.exceptions.errorCode.SystemErrorCode;
 import aws.todolist.taskflow.mapper.TaskMapper;
-import aws.todolist.taskflow.messaging.kafka.message.NotificationMessage;
 import aws.todolist.taskflow.messaging.kafka.message.NotificationType;
-import aws.todolist.taskflow.messaging.kafka.producer.KafkaNotificationProducer;
 import aws.todolist.taskflow.quartzScheduler.TaskSchedulerService;
 import aws.todolist.taskflow.repository.MemberRepository;
 import aws.todolist.taskflow.repository.SectionRepository;
 import aws.todolist.taskflow.repository.TaskRepository;
+import aws.todolist.taskflow.utils.NotificationUtils;
 import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Consumer;
 
 @Service
 public class TaskServiceImpl implements TaskService {
 
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm, dd/MM/yyyy");
+
     @Autowired
     private TaskRepository taskRepository;
     @Autowired
@@ -44,24 +38,13 @@ public class TaskServiceImpl implements TaskService {
     private MemberRepository memberRepository;
     @Autowired
     private TaskMapper taskMapper;
-    @Autowired
-    private KafkaNotificationProducer kafkaNotificationProducer;
+
     @Autowired
     private TaskSchedulerService taskSchedulerService;
 
-    private static String getAccountAuthor() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Object principal = authentication.getPrincipal();
+    @Autowired
+    private NotificationUtils notificationUtils;
 
-        String actorId = null;
-        if (principal instanceof Account) {
-            actorId = ((Account) principal).getId();
-        } else {
-            throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED,
-                    "User not authenticated or invalid principal");
-        }
-        return actorId;
-    }
 
     @Override
     public TaskDetailResponseDTO getTaskById(String idTask) {
@@ -77,7 +60,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional
-    public TaskResponseDTO addTask(String idProject, TaskCreateRequestDTO requestDTO, Account account) {
+    public TaskResponseDTO addTask(String idProject, TaskCreateRequestDTO requestDTO, Account accountLogging) {
 
         Task taskFather = null;
 
@@ -139,10 +122,10 @@ public class TaskServiceImpl implements TaskService {
             member = memberRepository.findFirstByAccountIdAndProjectIdAndIsDeletedFalse(requestDTO.getIdAccountAssign(), idProject).orElseThrow(() -> new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Account is not a member of this project"));
 
             if (member.getStatus() != StatusMember.ACCEPTED) {
-                throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED, "The account has not accepted the invitation to join this project");
+                throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED, "The accountLogging has not accepted the invitation to join this project");
             }
 
-            // Kiểm tra quyền của account
+            // Kiểm tra quyền của accountLogging
             if (member.getRole() == Role.ADMIN || member.getRole() == Role.VIEWER) {
                 throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED, "Account do not have permission to complete this task");
             }
@@ -158,7 +141,7 @@ public class TaskServiceImpl implements TaskService {
                 .isPinned(requestDTO.getIsPinned() != null ? requestDTO.getIsPinned() : false)
                 .isArchived(requestDTO.getIsArchived() != null ? requestDTO.getIsArchived() : false)
                 .taskFather(taskFather)
-                .createdByAccount(account)
+                .createdByAccount(accountLogging)
                 .accountAssign(member != null ? member.getAccount() : null)
                 .section(section)
                 .build();
@@ -167,24 +150,15 @@ public class TaskServiceImpl implements TaskService {
 
         // Thông báo kafka nếu task được phân công luôn
 
+        System.out.println(task.getId());
+
 
         if (task.getAccountAssign() != null) {
             // Thông báo kafka
 
-            List<Account> listAccountReceiver = new ArrayList<>();
-            listAccountReceiver.add(task.getAccountAssign());
-            listAccountReceiver.add(task.getCreatedByAccount());
 
-            String title = "Một nhiệm vụ vừa được giao!";
-            String content = String.format(
-                    "Nhiệm vụ \"%s\" trong dự án \"%s\" đã được giao cho bạn.",
-                    task.getTitle(),
-                    task.getSection().getProject().getName()
-            );
-
-            for (Account accountReceiver : listAccountReceiver) {
-                this.sendNotification(task, accountReceiver, NotificationType.TASK_ASSIGNED, title, content);
-            }
+            // Đặt actor là người tạo task
+            notificationUtils.sendNotification(task, task.getSection().getProject(), accountLogging, notificationUtils.getReceiversForTask(task), NotificationType.TASK_ASSIGNED);
         }
 
         // === Đặt scheduler nếu task mới tạo có đặt deadline
@@ -250,12 +224,12 @@ public class TaskServiceImpl implements TaskService {
     @Override
     @Transactional
     // Phải lên lịch nhắc hẹn vì có dùng tới trạng thái hoàn thành của task
-    public TaskResponseDTO updateStatus(String idTask, TaskUpdateStatusRequestDTO requestDTO, Account account) {
+    public TaskResponseDTO updateStatus(String idTask, TaskUpdateStatusRequestDTO requestDTO, Account accountLogging) {
 
         Task task = this.getTaskAndCheck(idTask);
 
         // Kiểm tra xem task có được phân công chưa nếu có thì kiểm tra xem tài khoản đang thực thi có phải người được phân công không
-        if (task.getAccountAssign() != null && !task.getAccountAssign().getId().equals(account.getId())) {
+        if (task.getAccountAssign() != null && !task.getAccountAssign().getId().equals(accountLogging.getId())) {
             throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED, "Task has been assigned for other. You can't change status of it");
         }
 
@@ -283,21 +257,9 @@ public class TaskServiceImpl implements TaskService {
 
             // Thông báo kafka
 
-            List<Account> listAccountReceiver = new ArrayList<>();
-            listAccountReceiver.add(task.getAccountAssign());
-            listAccountReceiver.add(task.getCreatedByAccount());
+            // Actor để null để hàm sendNotification tự lấy accountLogging đang đăng nhập
+            notificationUtils.sendNotification(task, task.getSection().getProject(), null, notificationUtils.getReceiversForTask(task), NotificationType.TASK_COMPLETED);
 
-            String title = "Nhiệm vụ vừa hoàn thành !";
-            String content = String.format(
-                    "Nhiệm vụ \"%s\" trong dự án \"%s\" đã được hoàn thành vào lúc \"%s\".",
-                    task.getTitle(),
-                    task.getSection().getProject().getName(),
-                    task.getCompletedAt().format(formatter)
-            );
-
-            for (Account accountReceiver : listAccountReceiver) {
-                this.sendNotification(task, accountReceiver, NotificationType.TASK_COMPLETED, title, content);
-            }
 
             // Nếu task có deadline thì xóa lịch thông báo
 
@@ -367,20 +329,8 @@ public class TaskServiceImpl implements TaskService {
 
         // Thông báo kafka
 
-        List<Account> listAccountReceiver = new ArrayList<>();
-        listAccountReceiver.add(task.getAccountAssign());
-        listAccountReceiver.add(task.getCreatedByAccount());
 
-        String title = "Một nhiệm vụ vừa được giao!";
-        String content = String.format(
-                "Nhiệm vụ \"%s\" trong dự án \"%s\" đã được giao cho bạn.",
-                task.getTitle(),
-                task.getSection().getProject().getName()
-        );
-
-        for (Account accountReceiver : listAccountReceiver) {
-            this.sendNotification(task, accountReceiver, NotificationType.TASK_ASSIGNED, title, content);
-        }
+        notificationUtils.sendNotification(task, task.getSection().getProject(), null, notificationUtils.getReceiversForTask(task), NotificationType.TASK_ASSIGNED);
 
 
         return taskMapper.ResponseDTO(task);
@@ -394,26 +344,6 @@ public class TaskServiceImpl implements TaskService {
         if (task.getAccountAssign() == null) {
             throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Task hasn't been assigned yet");
         }
-
-        // Thông báo trước rồi mới set null
-
-        // Thông báo kafka
-
-        List<Account> listAccountReceiver = new ArrayList<>();
-        listAccountReceiver.add(task.getAccountAssign());
-        listAccountReceiver.add(task.getCreatedByAccount());
-
-        String title = "Một nhiệm vụ vừa được gỡ phân công!";
-        String content = String.format(
-                "Nhiệm vụ \"%s\" trong dự án \"%s\" không còn được giao cho bạn.",
-                task.getTitle(),
-                task.getSection().getProject().getName()
-        );
-
-        for (Account accountReceiver : listAccountReceiver) {
-            this.sendNotification(task, accountReceiver, NotificationType.TASK_ASSIGNED, title, content);
-        }
-
 
         task.setAccountAssign(null);
 
@@ -498,20 +428,7 @@ public class TaskServiceImpl implements TaskService {
 
         // Thông báo kafka
 
-        List<Account> listAccountReceiver = new ArrayList<>();
-        listAccountReceiver.add(task.getAccountAssign());
-        listAccountReceiver.add(task.getCreatedByAccount());
-
-        String title = "Nhiệm vụ vừa được chỉnh sửa!";
-        String content = String.format(
-                "Nhiệm vụ \"%s\" trong dự án \"%s\" đã được chỉnh sửa.",
-                task.getTitle(),
-                task.getSection().getProject().getName()
-        );
-
-        for (Account accountReceiver : listAccountReceiver) {
-            this.sendNotification(task, accountReceiver, NotificationType.TASK_UPDATED, title, content);
-        }
+        notificationUtils.sendNotification(task, task.getSection().getProject(), null, notificationUtils.getReceiversForTask(task), NotificationType.TASK_UPDATED);
 
 
         // ====== Kiểm tra xem task có deadline ko nếu có thì cập nhật lại việc lên lịch
@@ -701,49 +618,6 @@ public class TaskServiceImpl implements TaskService {
             } catch (SchedulerException e) {
                 throw new RuntimeException(e);
             }
-        }
-    }
-
-    // Hàm để gửi thông báo qua kafka cho toàn bộ loại thông báo khác nhau
-    private void sendNotification(Task task,
-                                  Account accountReceiver,
-                                  NotificationType type,
-                                  String title,
-                                  String content) {
-        if (accountReceiver == null) return;
-
-        // ====== Lấy thông tin người thực hiện (actor) ======
-        String actorId = getAccountAuthor();
-
-        try {
-            NotificationMessage message = NotificationMessage.builder()
-                    .receiverId(accountReceiver.getId())
-                    .actorId(actorId)
-                    .projectId(task.getSection().getProject().getId())
-                    .taskId(task.getId())
-                    .type(type)
-                    .title(title)
-                    .content(content)
-                    .build();
-
-            switch (message.getType()) {
-                case TASK_COMPLETED:
-                    kafkaNotificationProducer.sendTaskCompleted(message);
-                    break;
-                case TASK_ASSIGNED:
-                    kafkaNotificationProducer.sendTaskAssigned(message);
-                    break;
-                case TASK_UPDATED:
-                    kafkaNotificationProducer.sendTaskUpdated(message);
-                    break;
-                default:
-                    throw new IllegalArgumentException("Unknown notification type: " + message.getType());
-            }
-
-            System.out.printf("📤 [Kafka] Sent %s for task '%s' to account '%s'%n",
-                    type, task.getTitle(), accountReceiver.getEmail());
-        } catch (Exception e) {
-            System.err.println("❌ Gửi notification " + type + " thất bại: " + e.getMessage());
         }
     }
 
