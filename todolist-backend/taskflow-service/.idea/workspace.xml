@@ -5,20 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="aafb8b93-6ddf-44d9-bc7c-02d1e2b5b281" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../auth-service/target/classes/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/target/classes/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../auth-service/target/test-classes/com/sgu/backend/BackEndApplicationTests.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/entity/Account.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/entity/Account.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/quartzScheduler/TaskNotificationReminder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/quartzScheduler/TaskNotificationReminder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/quartzScheduler/TaskSchedulerService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/quartzScheduler/TaskSchedulerService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/MemberServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/MemberServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/ProjectServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/ProjectServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/TaskCommentServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/TaskCommentServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/TaskServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/TaskServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/taskflow/quartzScheduler/TaskNotificationReminder$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/taskflow/quartzScheduler/TaskNotificationReminder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/aws/todolist/taskflow/quartzScheduler/TaskNotificationReminder.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/taskflow/service/MemberServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/aws/todolist/taskflow/service/MemberServiceImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/taskflow/service/TaskServiceImpl$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/aws/todolist/taskflow/service/TaskServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/aws/todolist/taskflow/service/TaskServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/dto/task/TaskResponseDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/dto/task/TaskResponseDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/mapper/TaskMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/mapper/TaskMapper.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

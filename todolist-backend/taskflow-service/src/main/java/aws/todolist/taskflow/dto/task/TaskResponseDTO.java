@@ -9,7 +9,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -23,6 +22,9 @@ public class TaskResponseDTO {
 
     @Schema(description = "Tiêu đề Task", example = "Hoàn thành báo cáo")
     private String title;
+
+    @Schema(description = "Mô tả chi tiết nội dung của Task", example = "Cần hoàn thành phần mô tả API và sequence diagram")
+    private String description;
 
     @Schema(description = "Task có được ghim (pinned) hay không", example = "true")
     private Boolean isPinned;
@@ -44,9 +46,6 @@ public class TaskResponseDTO {
 
     @Schema(description = "Thời điểm cập nhật Task")
     private LocalDateTime updatedAt;
-
-    @Schema(description = "Danh sách sub-task")
-    private List<TaskResponseDTO> taskChild;
 
     @Schema(description = "Task cha")
     private String idTaskCha;

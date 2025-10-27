@@ -18,6 +18,7 @@ public class TaskMapper {
         return TaskResponseDTO.builder()
                 .id(task.getId())
                 .title(task.getTitle())
+                .description(task.getDescription())
                 .isPinned(task.getIsPinned())
                 .status(task.getStatus())
                 .priority(task.getPriority())
@@ -25,7 +26,6 @@ public class TaskMapper {
                 .startTime(task.getStartTime())
                 .createdAt(task.getCreatedAt())
                 .updatedAt(task.getUpdatedAt())
-                .taskChild(this.ResponseDTOListTaskChild(task.getTaskChild()))
                 .idTaskCha(task.getTaskFather() != null ? task.getTaskFather().getId() : null)
                 .idAccountCreate(task.getCreatedByAccount().getId())
                 .idAccountAssigned(task.getAccountAssign() != null ? task.getAccountAssign().getId() : null)
@@ -58,8 +58,7 @@ public class TaskMapper {
     public List<TaskResponseDTO> ResponseDTOList(List<Task> tasks) {
         return tasks.stream()
                 .filter(task ->
-                        !task.getIsDeleted() &&
-                                (task.getTaskFather() == null || task.getTaskFather().getIsDeleted())
+                        !task.getIsDeleted() && task.getTaskFather() == null
                 )
                 .map(this::ResponseDTO)
                 .toList();
