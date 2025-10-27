@@ -67,7 +67,7 @@ public class AccountServiceImpl implements AccountService {
 	
 	@Override
 	@Transactional
-	public Account createAccount(AccountCreateForm form) {
+	public Account saveAccount(AccountCreateForm form) {
 		Account account = new Account();
 		
 		account.setId(form.getId());
@@ -75,6 +75,11 @@ public class AccountServiceImpl implements AccountService {
 		account.setPassword(form.getPassword());
 		account.setAvatar(form.getAvatar());
 
+		return accountRepository.save(account);
+	}
+	
+	@Override
+	public Account saveAccount(Account account) {
 		return accountRepository.save(account);
 	}
 	

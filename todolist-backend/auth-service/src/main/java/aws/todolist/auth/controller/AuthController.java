@@ -31,8 +31,11 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/v1")
@@ -88,6 +91,21 @@ public class AuthController {
 		
 		return ResponseEntity.ok(new ApiResponse<>(200, "Login successful", loginInfo));
 	}
+	
+//	// Endpoint login bằng Google
+//	@Operation(summary = "Đăng nhập Google", description = "Đăng nhập người dùng bằng Google OAuth2.")
+//	@GetMapping("/login/google")
+//	public ResponseEntity<ApiResponse<AuthResponseDTO>> loginGoogle(OAuth2AuthenticationToken authentication) {
+//
+//		Map<String, Object> attributes = authentication.getPrincipal().getAttributes();
+//		String email = (String) attributes.get("email");
+//		String name = (String) attributes.get("name");
+//		String avatar = (String) attributes.get("picture"); // <-- avatar từ Google
+//
+//		AuthResponseDTO loginInfo = authService.loginGoogle(email, name, avatar);
+//
+//		return ResponseEntity.ok(new ApiResponse<>(200, "Login Google successful", loginInfo));
+//	}
 	
 	/**
 	 * 📌 Đăng nhập nhân viên

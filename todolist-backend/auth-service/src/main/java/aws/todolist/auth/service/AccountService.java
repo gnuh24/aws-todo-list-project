@@ -14,7 +14,8 @@ public interface AccountService extends UserDetailsService {
 	
 	Account getAccountById(String accountId);
 	Account getAccountByUsername(String email);
-	Account createAccount(AccountCreateForm accountCreateForm);
+	Account saveAccount(AccountCreateForm accountCreateForm);
+	Account saveAccount(Account account);
 	Account activeAccount(String accountId);
 	Account updatePassword(String email, String newPassword);
 	Account updatePassword(Account account, String newPassword);

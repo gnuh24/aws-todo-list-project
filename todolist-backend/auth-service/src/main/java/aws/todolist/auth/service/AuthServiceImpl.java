@@ -87,7 +87,7 @@ public class AuthServiceImpl implements AuthService {
 		
 		redisService.set(RedisConstants.EMAIL_EXIST + ":" + accountCreateForm.getEmail(), "true");
 		
-		return accountService.createAccount(accountCreateForm);
+		return accountService.saveAccount(accountCreateForm);
 		
 	}
 	
@@ -119,6 +119,51 @@ public class AuthServiceImpl implements AuthService {
 		// Tạo và trả về AuthResponseDTO
 		return buildAuthResponse(user);
 	}
+	
+	@Override
+	@Transactional
+	public AuthResponseDTO loginGoogle(String email, String name, String avatar) {
+		// 1️⃣ Tìm user theo email
+		Account user = accountService.getAccountByUsername(email);
+		
+		// 2️⃣ Nếu chưa tồn tại → tạo mới
+		if (user == null) {
+			user = new Account();
+			user.setId(UUID.randomUUID().toString());
+			user.setEmail(email);
+			
+			// Tạo password ngẫu nhiên
+			String randomPassword = UUID.randomUUID().toString().substring(0, 12);
+			user.setPassword(passwordEncoder.encode(randomPassword));
+			
+			user.setDisplayName(name);
+			user.setAvatar(avatar);
+			user.setStatus(Account.Status.ACTIVE); // vì Google đã verify email
+			user.setRole(Account.Role.USER);
+			
+			// Lưu DB
+			accountService.saveAccount(user);
+			redisService.set(RedisConstants.EMAIL_EXIST + ":" + user.getEmail(), "true");
+			
+		}
+		else {
+			// 3️⃣ User đã tồn tại → update thông tin nếu cần
+			if (user.getAvatar() == null || !user.getAvatar().equals(avatar)) {
+				user.setAvatar(avatar);
+			}
+			
+			accountService.saveAccount(user);
+		}
+		
+		
+		if (user.getStatus() == Account.Status.BANNED) {
+			throw new LockedException("Tài khoản của bạn đã bị khóa! Nếu có vấn đề, vui lòng liên hệ Admin.");
+		}
+		
+		// 5️⃣ Trả về response (tạo JWT,...)
+		return buildAuthResponse(user);
+	}
+	
 	
 	@Override
 	public AuthResponseDTO staffLogin(LoginRequestForm request) {

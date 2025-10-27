@@ -15,6 +15,8 @@ public interface AuthService {
 	
 	AuthResponseDTO login(LoginRequestForm request);
 	
+	AuthResponseDTO loginGoogle(String email, String name, String avatar);
+	
 	AuthResponseDTO staffLogin(LoginRequestForm request);
 	
 	AccountRedisDTO register(UserRegistrationForm userRegistrationForm);
