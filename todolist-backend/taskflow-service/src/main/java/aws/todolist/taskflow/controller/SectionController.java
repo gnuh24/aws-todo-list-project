@@ -21,7 +21,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1/projects")
 @Tag(name = "Section API", description = "CRUD của section")
-@CrossOrigin(origins = "*")
 // TODO: OWNER, MEMBER quyền post, patch, delete
 public class SectionController {
 

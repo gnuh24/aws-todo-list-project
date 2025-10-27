@@ -12,9 +12,9 @@ public class SwaggerConfig {
 	public OpenAPI customOpenAPI() {
 		return new OpenAPI()
 			    .info(new Info()
-					.title("Ecommerce microservice API Documentation")
+					.title("Auth service API Documentation")
 					.version("1.0")
-					.description("API Documentation for EC Project")
+					.description("API Documentation for Auth sercice")
 			    );
 		}
 }

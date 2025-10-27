@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/v1/accounts")
-@CrossOrigin(origins = "*")
 @Tag(name = "Account", description = "Quản lý thông tin tài khoản người dùng")
 public class AccountController {
 	

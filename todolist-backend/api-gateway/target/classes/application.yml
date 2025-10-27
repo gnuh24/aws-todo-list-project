@@ -41,3 +41,17 @@ logging:
                 org.springframework.cloud.gateway: DEBUG
                 org.springframework.web: DEBUG
                 org.springframework.security.web.access.ExceptionTranslationFilter: DEBUG
+
+springdoc:
+        api-docs:
+                enabled: true
+        swagger-ui:
+                urls:
+                        - name: user-service
+                          url: http://localhost:8081/api/user/v3/api-docs
+                        - name: taskflow-service
+                          url: http://localhost:8082/api/taskflow/v3/api-docs
+                        - name: auth-service
+                          url: http://localhost:9999/api/auth/v3/api-docs
+                        - name: notification-service
+                          url: http://localhost:9998/api/notification/v3/api-docs

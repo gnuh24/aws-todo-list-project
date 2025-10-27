@@ -36,7 +36,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/v1")
-@CrossOrigin(origins = "*")
 @Tag(name = "Authentication API", description = "Đăng nhập, đăng ký và quản lý xác thực người dùng")
 public class AuthController {
 	

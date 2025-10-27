@@ -22,7 +22,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/v1/projects")
-@CrossOrigin(origins = "*")
 @Tag(name = "Project API", description = "CRUD của member")
 public class MemberController {
 
