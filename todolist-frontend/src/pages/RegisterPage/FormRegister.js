@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { https } from "../../service/api";
+import { https_auth } from "../../service/api";
 import FacebookLoginButton from "../LoginPage/FacebookLoginButton";
 import GoogleLoginButton from "../LoginPage/GoogleLoginButton";
 import "./RegisterPage.css";
@@ -13,7 +13,7 @@ export default function FormRegister() {
     e.preventDefault();
 
     try {
-      const response = await https.post("/api/auth/v1/register", {
+      const response = await https_auth.post("/v1/register", {
         email,
         password,
       });

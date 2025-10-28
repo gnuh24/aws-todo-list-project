@@ -6,7 +6,7 @@ import axios from "axios";
 
 import FacebookLoginButton from "./FacebookLoginButton";
 import GoogleLoginButton from "./GoogleLoginButton";
-import { https } from "../../service/api";
+import { https_auth } from "../../service/api";
 export default function FormLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -15,22 +15,21 @@ export default function FormLogin() {
     e.preventDefault();
 
     try {
-      const response = await https.post("/api/auth/v1/login", {
+      const response = await https_auth.post("/v1/login", {
         email,
         password,
       });
 
       if (response.status === 200) {
-        console.log("✅ Login success:", response.data);
+        console.log(" Login success:", response.data);
 
         const userData = response.data.data;
 
-        // 👉 Lưu toàn bộ thông tin người dùng + token vào localStorage
         localStorage.setItem("USER_INFO", JSON.stringify(userData));
 
         alert("Đăng nhập thành công!");
-        // Chuyển hướng hoặc cập nhật state ứng dụng
-        window.location.href = "/task";
+
+        window.location.href = "/app/inbox";
       }
     } catch (error) {
       console.error("❌ Login failed:", error.response?.data || error.message);

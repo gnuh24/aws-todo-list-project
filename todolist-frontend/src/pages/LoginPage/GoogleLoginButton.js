@@ -1,21 +1,22 @@
-import { GoogleLogin } from "@react-oauth/google";
-import { jwtDecode } from "jwt-decode";
+import React from "react";
 
 export default function GoogleLoginButton() {
-  return (
-    <>
-      <GoogleLogin
-        onSuccess={(credentialResponse) => {
-          console.log("Google Login Success:", credentialResponse);
+  const handleGoogleLogin = () => {
+    window.location.href =
+      "http://localhost:9999/api/auth/oauth2/authorization/google";
+  };
 
-          // Decode JWT để lấy user info
-          const user = jwtDecode(credentialResponse.credential);
-          console.log("User Info:", user);
-        }}
-        onError={() => {
-          console.log("Login Failed");
-        }}
+  return (
+    <button
+      onClick={handleGoogleLogin}
+      className="flex items-center justify-center w-full py-2 mt-3 text-white  hover:bg-gray-50 rounded-lg shadow"
+    >
+      <img
+        src="https://developers.google.com/identity/images/g-logo.png"
+        alt="Google"
+        className="w-5 h-5 mr-2"
       />
-    </>
+      Đăng nhập bằng Google
+    </button>
   );
 }

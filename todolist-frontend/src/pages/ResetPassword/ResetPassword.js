@@ -1,19 +1,49 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { https_auth } from "../../service/api";
 export default function ResetPassword() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  const handleSubmit = (e) => {
+  const [OTP, setOTP] = useState("");
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const emailUser = JSON.parse(localStorage.getItem("USER_VERIFY")); // Lấy email từ localStorage
+    console.log("Email:", emailUser);
+    console.log("OTP:", OTP);
+
+    // Kiểm tra lại password khớp
     if (password !== confirmPassword) {
       alert("Passwords do not match!");
       return;
     }
-    // TODO: call API reset password
-    alert("Password reset successful!");
+
+    try {
+      //  Gọi API reset password
+      const response = await https_auth.patch(
+        `/v1/reset-password/${emailUser}`,
+        {
+          otp: OTP,
+          password: password,
+        }
+      );
+
+      // Kiểm tra phản hồi
+      if (response.status === 200) {
+        console.log(" Reset password success:", response.data);
+        alert("Đặt lại mật khẩu thành công!");
+        localStorage.removeItem("USER_VERIFY"); // Xoá dữ liệu sau khi xong
+        window.location.href = "/login"; // Chuyển hướng về trang đăng nhập
+      }
+    } catch (error) {
+      console.error(" Reset password failed:", error.response?.data || error);
+      alert(
+        error.response?.data?.message ||
+          "Đặt lại mật khẩu thất bại, vui lòng thử lại!"
+      );
+    }
   };
 
   return (
@@ -72,6 +102,19 @@ export default function ResetPassword() {
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* OTP code */}
+            <div className="relative">
+              <input
+                type={OTP}
+                placeholder="Enter your OTP code"
+                value={OTP}
+                onChange={(e) => setOTP(e.target.value)}
+                required
+                // minLength={8}
+                className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-400"
+              />
+            </div>
+
             {/* New password */}
             <div className="relative">
               <input

@@ -1,22 +1,47 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { https_auth } from "../../service/api";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
-    if (email === "duongbinhminh10032004@gmail.com") {
-      // 👉 Nếu email khớp thì chuyển sang trang mailed
-      navigate("/mailed");
-    } else {
-      // Nếu email sai thì báo lỗi
-      setError("Email không tồn tại trong hệ thống.");
+    try {
+      //  Gọi API kiểm tra email
+      const response = await https_auth.get(
+        `/v1/check-email?email=${encodeURIComponent(email)}`
+      );
+
+      // Nếu backend xác nhận email tồn tại
+      if (response.data?.data?.exists === true || response.status === 200) {
+        console.log(" Email tồn tại:", response.data);
+
+        //  Lưu email vào localStorage để dùng cho bước tiếp theo
+        localStorage.setItem("USER_VERIFY", JSON.stringify(email));
+
+        // Gọi API gửi mã OTP
+        await https_auth.post(
+          `/v1/send-reset-password-otp/${encodeURIComponent(email)}`
+        );
+
+        alert(" Mã OTP đã được gửi tới email của bạn!");
+
+        //  Chuyển sang trang nhập OTP (ví dụ: /ResetPassword)
+        navigate("/ResetPassword");
+      } else {
+        setError("Email không tồn tại trong hệ thống.");
+      }
+    } catch (err) {
+      console.error(" Lỗi khi kiểm tra hoặc gửi OTP:", err);
+      setError("Email không tồn tại hoặc gửi OTP thất bại!");
     }
   };
+
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="max-w-5xl w-full grid grid-cols-1 md:grid-cols-2 gap-10 p-6">
