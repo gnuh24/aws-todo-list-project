@@ -22,3 +22,41 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 todolist-frontend/node_modules/
+
+# ====================================
+# ☕ Java / Spring Boot (Backend)
+# ====================================
+
+# Build directories
+**/target/
+**/build/
+**/out/
+
+# Logs
+**/logs/
+
+# Eclipse / STS / IntelliJ
+**/.classpath
+**/.project
+**/.settings/
+**/.springBeans
+**/.sts4-cache/
+*.iml
+.idea/
+*.ipr
+*.iws
+
+# Misc
+*.log
+*.jar
+*.war
+*.ear
+*.class
+
+
+# ====================================
+# 🌟 Optional / OS files
+# ====================================
+*.swp
+*~
+Thumbs.db
