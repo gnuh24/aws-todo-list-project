@@ -23,14 +23,13 @@ export default function TaskEditForm({ task, onSave, onCancel }) {
 
   const handleSave = () => {
     if (!taskName.trim()) return;
-    onSave?.({
-      ...task,
+
+    onSave({
       title: taskName,
       description,
-      date: selectedDate,
-
-      project: selectedProject,
       priority,
+      startTime: selectedDate ? new Date(selectedDate).toISOString() : null,
+      deadline: selectedDate ? new Date(selectedDate).toISOString() : null,
     });
   };
 

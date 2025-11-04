@@ -1,7 +1,13 @@
 import React, { useState } from "react";
 import TaskItem from "../Task/TaskItem";
 
-export default function SectionItem({ section, onAddTaskClick }) {
+export default function SectionItem({
+  handleDeleteTask,
+  handleUpdateTask,
+  projectId,
+  section,
+  onAddTaskClick,
+}) {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
@@ -22,7 +28,15 @@ export default function SectionItem({ section, onAddTaskClick }) {
       {!collapsed && (
         <div className="mt-2">
           {section.tasks?.length ? (
-            section.tasks.map((task) => <TaskItem key={task.id} task={task} />)
+            section.tasks.map((task) => (
+              <TaskItem
+                sectionId={section.id}
+                onDeleteTask={handleDeleteTask}
+                projectId={projectId}
+                key={task.id}
+                task={task}
+              />
+            ))
           ) : (
             <p className="text-sm text-gray-400 italic mt-1">No tasks yet</p>
           )}

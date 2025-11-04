@@ -1,34 +1,106 @@
-// ✅ TaskItem.jsx
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Edit2,
   CalendarDays,
   MessageSquare,
   MoreHorizontal,
   GripVertical,
+  Trash2,
+  Copy,
+  ArrowUp,
+  ArrowDown,
+  Flag,
 } from "lucide-react";
 import TaskEditForm from "../Task/TaskEditForm";
+import { https_taskflow } from "../../service/api";
 
-export default function TaskItem({ task, onUpdate }) {
+export default function TaskItem({
+  onDeleteTask,
+  sectionId,
+  projectId,
+  task,
+  onUpdate,
+}) {
   const [isEditing, setIsEditing] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  // Đóng menu khi click ra ngoài
+  useEffect(() => {
+    const handler = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+  // const handleDelete = async () => {
+  //   if (!window.confirm("Bạn có chắc muốn xoá task này?")) return;
+
+  //   try {
+  //     await https_taskflow.delete(`/v1/projects/${projectId}/tasks/${task.id}`);
+  //     console.log("Deleted successfully");
+  //   } catch (error) {
+  //     console.error("Error deleting task:", error);
+  //   }
+  // };
+  const handleDelete = async () => {
+    try {
+      await https_taskflow.delete(`/v1/projects/${projectId}/tasks/${task.id}`);
+
+      // ✅ cập nhật UI không cần reload
+      onDeleteTask(sectionId, task.id);
+
+      alert("Xoá task thành công!");
+    } catch (error) {
+      console.error("Error deleting task:", error);
+      alert("Xoá task thất bại!");
+    }
+  };
 
   const handleSave = (updatedTask) => {
     onUpdate?.(updatedTask);
     setIsEditing(false);
   };
+  const handleUpdateTaskAPI = async (updatedTask) => {
+    try {
+      const res = await https_taskflow.patch(
+        `/v1/projects/${projectId}/tasks/${task.id}`,
+        {
+          title: updatedTask.title,
+          description: updatedTask.description,
+          priority: updatedTask.priority,
+          isPinned: updatedTask.isPinned ?? task.isPinned ?? false,
+
+          startTime: updatedTask.startTime || null,
+          deadline: updatedTask.deadline || null,
+          startTimeSent: !!updatedTask.startTime,
+          deadlineSent: !!updatedTask.deadline,
+        }
+      );
+      alert("Update thành công");
+      // ✅ notify parent to update UI
+      onUpdate?.(sectionId, { ...task, ...updatedTask });
+
+      setIsEditing(false);
+    } catch (err) {
+      console.error("❌ Update task failed:", err);
+    }
+  };
 
   if (isEditing) {
     return (
       <TaskEditForm
+        onSave={(data) => handleUpdateTaskAPI(data)}
         task={task}
-        onSave={handleSave}
         onCancel={() => setIsEditing(false)}
       />
     );
   }
 
   return (
-    <div className="group flex flex-col border-b hover:bg-gray-50 transition-colors px-2 py-2 rounded-md">
+    <div className="group relative flex flex-col border-b hover:bg-gray-50 transition-colors px-2 py-2 rounded-md">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <GripVertical size={16} className="text-gray-400 cursor-grab" />
@@ -51,9 +123,39 @@ export default function TaskItem({ task, onUpdate }) {
           <button className="p-1 hover:text-gray-900 text-gray-500">
             <MessageSquare size={14} />
           </button>
-          <button className="p-1 hover:text-gray-900 text-gray-500">
-            <MoreHorizontal size={14} />
-          </button>
+
+          {/* More menu button */}
+          <div className="relative" ref={menuRef}>
+            <button
+              className="p-1 hover:text-gray-900 text-gray-500"
+              onClick={() => setMenuOpen(!menuOpen)}
+            >
+              <MoreHorizontal size={14} />
+            </button>
+
+            {menuOpen && (
+              <div className="absolute right-0 mt-1 w-44 bg-white border rounded-md shadow-lg py-1 text-sm animate-fade-in z-50">
+                <button className="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 text-gray-700">
+                  <ArrowUp size={14} /> Add task above
+                </button>
+                <button className="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 text-gray-700">
+                  <ArrowDown size={14} /> Add task below
+                </button>
+                <button className="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 text-gray-700">
+                  <Flag size={14} /> Priority
+                </button>
+                <button className="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 text-gray-700">
+                  <Copy size={14} /> Duplicate
+                </button>
+                <button
+                  onClick={handleDelete}
+                  className="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 text-red-600"
+                >
+                  <Trash2 size={14} /> Delete
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

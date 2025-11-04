@@ -52,6 +52,18 @@ export default function ProjectPage() {
     fetchSections();
   }, [projectId]);
 
+  const handleDeleteTask = (sectionId, taskId) => {
+    setSections((prev) =>
+      prev.map((section) =>
+        section.id === sectionId
+          ? {
+              ...section,
+              tasks: section.tasks.filter((task) => task.id !== taskId),
+            }
+          : section
+      )
+    );
+  };
   const handleAddTask = async (newTask) => {
     if (!currentSection) {
       message.warning("Vui lòng chọn Section để thêm Task!");
@@ -125,20 +137,35 @@ export default function ProjectPage() {
       setIsAddingSection(false);
     }
   };
+  // const handleUpdateTask = (sectionId, updatedTask) => {
+  //   setSections((prev) =>
+  //     prev.map((section) =>
+  //       section.id === sectionId
+  //         ? {
+  //             ...section,
+  //             tasks: section.tasks.map((task) =>
+  //               task.id === updatedTask.id ? updatedTask : task
+  //             ),
+  //           }
+  //         : section
+  //     )
+  //   );
+  // };
   const handleUpdateTask = (sectionId, updatedTask) => {
     setSections((prev) =>
       prev.map((section) =>
         section.id === sectionId
           ? {
               ...section,
-              tasks: section.tasks.map((task) =>
-                task.id === updatedTask.id ? updatedTask : task
+              tasks: section.tasks.map((t) =>
+                t.id === updatedTask.id ? updatedTask : t
               ),
             }
           : section
       )
     );
   };
+
   return (
     <MainLayout>
       <div className="min-h-screen bg-white">
@@ -154,6 +181,8 @@ export default function ProjectPage() {
           <div className="space-y-4">
             {sections.map((section) => (
               <SectionItem
+                handleDeleteTask={handleDeleteTask}
+                projectId={projectId}
                 handleUpdateTask={handleUpdateTask}
                 key={section.id}
                 section={section}
