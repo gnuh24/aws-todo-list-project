@@ -310,16 +310,7 @@ public class AuthServiceImpl implements AuthService {
 	}
 	
 	@Override
-	public AuthResponseDTO refreshToken(HttpServletRequest request) {
-		String refreshToken = "";
-		
-		if (request.getCookies() != null) {
-			for (Cookie cookie : request.getCookies()) {
-				if ("refresh_token".equals(cookie.getName())) {
-					refreshToken = cookie.getValue(); // ✅ This is your refresh token
-				}
-			}
-		}
+	public AuthResponseDTO refreshToken(String refreshToken) {
 		
 		if (refreshToken.isEmpty()) {
 			throw new RefreshTokenNotFound("Không tìm thấy refresh token");
@@ -370,9 +361,4 @@ public class AuthServiceImpl implements AuthService {
 		return response;
 	}
 	
-	@Override
-	public UserDetails getUserDetailByJwtToken(String jwtToken) {
-			String userEmail = jwtTokenProvider.getUsername(jwtToken);
-			return accountService.loadUserByUsername(userEmail);
-	}
 }

@@ -119,12 +119,6 @@
 
 
 
-		<!-- Cloudinary SDK (Dùng để upload ảnh lên Cloudinary) -->
-		<dependency>
-			<groupId>com.cloudinary</groupId>
-			<artifactId>cloudinary-http44</artifactId>
-			<version>1.38.0</version>
-		</dependency>
 
 
 		<!-- SpringDoc OpenAPI (Dùng để tạo tài liệu API Swagger) -->
@@ -133,25 +127,6 @@
                         <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
                         <version>2.8.5</version>
                 </dependency>
-
-
-
-<!--		&lt;!&ndash; https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-dependencies &ndash;&gt;-->
-<!--		<dependency>-->
-<!--			<groupId>org.springframework.cloud</groupId>-->
-<!--			<artifactId>spring-cloud-dependencies</artifactId>-->
-<!--			<version>2024.0.0</version>-->
-<!--			<type>pom</type>-->
-<!--			<scope>import</scope>-->
-<!--		</dependency>-->
-
-
-<!--		&lt;!&ndash; https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-openfeign &ndash;&gt;-->
-<!--		<dependency>-->
-<!--			<groupId>org.springframework.cloud</groupId>-->
-<!--			<artifactId>spring-cloud-starter-openfeign</artifactId>-->
-<!--			<version>4.2.0</version>-->
-<!--		</dependency>-->
 
 
                 <!-- pom.xml -->

@@ -43,7 +43,7 @@ public class AccountController {
 	    description = "Cập nhật thông tin tài khoản của người dùng đang đăng nhập")
 	@PatchMapping("/me")
 	public ResponseEntity<ApiResponse<AccountDetailResponseDTO>> updateAccount(
-	    @RequestBody @Valid AccountUpdateForm form) {
+	    	@RequestBody @Valid AccountUpdateForm form) {
 
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		Account account = (Account) authentication.getPrincipal();

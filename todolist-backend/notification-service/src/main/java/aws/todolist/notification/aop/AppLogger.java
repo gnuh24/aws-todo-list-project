@@ -1,43 +1,56 @@
 package aws.todolist.notification.aop;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.stream.Stream;
+
 @Component
 public class AppLogger {
 	
-	private final Logger logger = LoggerFactory.getLogger("AppLogger");
+	private static final Logger logger = LoggerFactory.getLogger("AppLogger");
+	private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 	
-	private String buildPrefix(HttpServletRequest request) {
-		String ip = request.getRemoteAddr();
-		String uri = request.getRequestURI();
+	private String buildPrefix() {
 		String username = "Anonymous";
-		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth != null && auth.isAuthenticated()) {
+		if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
 			username = auth.getName();
 		}
 		
-		return String.format("[IP: %s] [URI: %s] [User: %s]", ip, uri, username);
+		
+		String traceId = MDC.get("traceId");
+		String requestId = MDC.get("requestId");
+		
+		String timestamp = LocalDateTime.now().format(formatter);
+		
+		return String.format("[Time: %s] [User: %s] [Trace: %s] [Req: %s]", timestamp, username, traceId, requestId);
 	}
 	
-	public void info(HttpServletRequest request, String message, Object... args) {
-		logger.info("{} - " + message, buildPrefix(request), args);
+	private Object[] withPrefix(Object... args) {
+		return Stream.concat(Stream.of(buildPrefix()), Arrays.stream(args)).toArray();
 	}
 	
-	public void warn(HttpServletRequest request, String message, Object... args) {
-		logger.warn("⚠️ {} - " + message, buildPrefix(request), args);
+	public void info(String message, Object... args) {
+		logger.info("{} - " + message, withPrefix(args));
 	}
 	
-	public void error(HttpServletRequest request, String message, Object... args) {
-		logger.error("❌ {} - " + message, buildPrefix(request), args);
+	public void warn(String message, Object... args) {
+		logger.warn("⚠️ {} - " + message, withPrefix(args));
 	}
 	
-	public void debug(HttpServletRequest request, String message, Object... args) {
-		logger.debug("🐛 {} - " + message, buildPrefix(request), args);
+	public void error(String message, Object... args) {
+		logger.error("❌ {} - " + message, withPrefix(args));
+	}
+	
+	public void debug(String message, Object... args) {
+		logger.debug("🐛 {} - " + message, withPrefix(args));
 	}
 }

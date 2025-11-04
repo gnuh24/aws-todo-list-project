@@ -59,7 +59,7 @@ public class AuthExceptionHandler implements AuthenticationEntryPoint, AccessDen
 		String errorCode = SystemErrorCode.AUTH_MISSING_TOKEN; // default fallback
 		HttpStatus status = HttpStatus.UNAUTHORIZED;
 		
-		appLogger.warn(request, "🛑 [{}] {} - {}", errorCode, message, ex.getMessage());
+//		appLogger.warn(request, "🛑 [{}] {} - {}", errorCode, message, ex.getMessage());
 		
 		// Có thể refine ở đây nếu có loại cụ thể (JWT expired, malformed, etc.)
 		// Ví dụ nếu exception instanceof CustomAuthException thì lấy errorCode cụ thể
@@ -88,7 +88,7 @@ public class AuthExceptionHandler implements AuthenticationEntryPoint, AccessDen
 		String detailMessage = ex.toString();
 		String errorCode = SystemErrorCode.AUTH_ACCESS_DENIED;
 		HttpStatus status = HttpStatus.FORBIDDEN;
-		appLogger.warn(request, "🛑 [{}] {} - {}", errorCode, message, ex.getMessage());
+//		appLogger.warn(request, "🛑 [{}] {} - {}", errorCode, message, ex.getMessage());
 		
 		writeJsonResponse(response, status, errorCode, message, detailMessage, null);
 	}

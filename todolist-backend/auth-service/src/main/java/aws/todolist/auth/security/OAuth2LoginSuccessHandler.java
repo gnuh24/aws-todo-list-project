@@ -34,6 +34,6 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         AuthResponseDTO loginInfo = authService.loginGoogle(email, name, avatar);
 
         // redirect về front-end, kèm token hoặc id
-        response.sendRedirect("http://localhost:3000/login-success?token=" + loginInfo.getToken());
+        response.sendRedirect("http://localhost:3000/app/inbox?token=" + loginInfo.getToken());
     }
 }

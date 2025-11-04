@@ -42,7 +42,7 @@ todolist-frontend/node_modules/
 **/.springBeans
 **/.sts4-cache/
 *.iml
-.idea/
+# .idea/
 *.ipr
 *.iws
 

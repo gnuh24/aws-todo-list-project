@@ -30,8 +30,5 @@ public interface AuthService {
 	void sendOtpUpdateEmail(String username);
 	
 	Account updateEmail(UpdateEmailForm form);
-	AuthResponseDTO refreshToken(HttpServletRequest request);
-	UserDetails getUserDetailByJwtToken(String jwtToken);
-	
-	
+	AuthResponseDTO refreshToken(String refreshToken);
 }

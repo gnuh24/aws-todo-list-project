@@ -1,5 +1,6 @@
 package aws.todolist.user.security;
 
+import aws.todolist.user.aop.RequestLoggingFilter;
 import aws.todolist.user.exceptions.AuthException.AuthExceptionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -26,14 +27,13 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfiguration {
-
-//	@Autowired
-//	@Lazy
-//	private AccountService accountService;
 	
 	@Autowired
 	@Lazy
 	private AuthExceptionHandler authExceptionHandler;
+	
+	@Autowired
+	private RequestLoggingFilter requestLoggingFilter;
 	
 	@Autowired
 	private JwtTokenFilter jwtAuthFIlter;
@@ -43,21 +43,21 @@ public class WebSecurityConfiguration {
 		return new BCryptPasswordEncoder();
 	}
 	
-	@Bean
-	public CorsConfigurationSource corsConfigurationSource() {
-		CorsConfiguration configuration = new CorsConfiguration();
-		
-		// ✅ Cho phép tất cả origin, nhưng an toàn hơn "*"
-		configuration.setAllowedOriginPatterns(List.of("*"));
-		
-		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-		configuration.setAllowedHeaders(List.of("*"));
-		configuration.setAllowCredentials(true);
-		
-		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-		source.registerCorsConfiguration("/**", configuration);
-		return source;
-	}
+//	@Bean
+//	public CorsConfigurationSource corsConfigurationSource() {
+//		CorsConfiguration configuration = new CorsConfiguration();
+//
+//		// ✅ Cho phép tất cả origin, nhưng an toàn hơn "*"
+//		configuration.setAllowedOriginPatterns(List.of("*"));
+//
+//		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+//		configuration.setAllowedHeaders(List.of("*"));
+//		configuration.setAllowCredentials(true);
+//
+//		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//		source.registerCorsConfiguration("/**", configuration);
+//		return source;
+//	}
 	
 	
 	@Bean
@@ -66,37 +66,16 @@ public class WebSecurityConfiguration {
 		http
 		    // Loại bỏ bảo vệ CSRF
 		    .csrf(AbstractHttpConfigurer::disable)
-		    .cors(cors -> cors.configurationSource(corsConfigurationSource))
+		    .cors(AbstractHttpConfigurer::disable)
+
+
+//		    .cors(cors -> cors.configurationSource(corsConfigurationSource))
 		    
 		    
 		    // Configure các luồng truy cập
 		    .authorizeHttpRequests(auth -> auth
 			    
 			    // Xác thực tất cả các request
-//			.requestMatchers(HttpMethod.GET, "/accounts/{Id}")                                                .permitAll()
-//			.requestMatchers(HttpMethod.GET, "/accounts/email")                                             .permitAll()
-//
-//			.requestMatchers(HttpMethod.POST, "/accounts")                                                    .permitAll()
-//			.requestMatchers(HttpMethod.POST, "/accounts/activate-account")                         .permitAll()
-//			.requestMatchers(HttpMethod.POST, "/accounts/{accountId}/account-activity-logs").hasAnyAuthority("USER")
-//
-//
-//			.requestMatchers(HttpMethod.PATCH, "/accounts/{id}")                                            .hasAnyAuthority("USER")
-//			.requestMatchers(HttpMethod.PATCH, "/accounts/{id}/update-password")                .hasAnyAuthority("USER")
-//			.requestMatchers(HttpMethod.PATCH, "/accounts/{id}/update-email")                       .hasAnyAuthority("USER")
-//
-//
-//			.requestMatchers( HttpMethod.GET, "/media")                                                           .permitAll()
-//			.requestMatchers( HttpMethod.POST, "/media/upload")                                             .permitAll()
-//
-//
-//			.requestMatchers(HttpMethod.POST, "/auth/send-otp-update-email")                        .hasAnyAuthority("USER")
-//			.requestMatchers(HttpMethod.POST, "/auth/send-otp-reset-password")                    .permitAll()
-//			.requestMatchers(HttpMethod.PATCH, "/auth/{id}/update-role")                                 .hasAnyAuthority("ADMIN")
-//			.requestMatchers(HttpMethod.PATCH, "/auth/{id}/update-status")                              .hasAnyAuthority("ADMIN")
-			    
-	
-			    
 			    .requestMatchers(HttpMethod.GET, "/accounts/me").hasAnyAuthority("USER")
 			    .requestMatchers(HttpMethod.PATCH, "/accounts/me").hasAnyAuthority("USER")
 			
@@ -113,7 +92,11 @@ public class WebSecurityConfiguration {
 		    // Add JWT vào chuỗi lọc và ưu tiên loc theo JWT
 		    .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 		    
+		    // JWT Filter xử lý token
 		    .addFilterBefore(jwtAuthFIlter, UsernamePasswordAuthenticationFilter.class)
+		    
+		    // Logging filter nên nằm trước JWT filter
+		    .addFilterBefore(requestLoggingFilter, JwtTokenFilter.class)
 		    
 		    .exceptionHandling((exceptionHandling) -> exceptionHandling
 			

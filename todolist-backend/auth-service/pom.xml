@@ -79,13 +79,11 @@
 		</dependency>
 
 
-
 		<!-- Spring Boot Security (Dùng để bảo mật API) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
-
 
 
 		<!-- JSON Web Token (JWT) để xác thực API -->
@@ -139,29 +137,6 @@
                         <groupId>org.springframework.boot</groupId>
                         <artifactId>spring-boot-starter-oauth2-client</artifactId>
                 </dependency>
-                <dependency>
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-starter-security</artifactId>
-                </dependency>
-
-
-
-                <!--		&lt;!&ndash; https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-dependencies &ndash;&gt;-->
-<!--		<dependency>-->
-<!--			<groupId>org.springframework.cloud</groupId>-->
-<!--			<artifactId>spring-cloud-dependencies</artifactId>-->
-<!--			<version>2024.0.0</version>-->
-<!--			<type>pom</type>-->
-<!--			<scope>import</scope>-->
-<!--		</dependency>-->
-
-
-<!--		&lt;!&ndash; https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-openfeign &ndash;&gt;-->
-<!--		<dependency>-->
-<!--			<groupId>org.springframework.cloud</groupId>-->
-<!--			<artifactId>spring-cloud-starter-openfeign</artifactId>-->
-<!--			<version>4.2.0</version>-->
-<!--		</dependency>-->
 
 
                 <!-- pom.xml -->

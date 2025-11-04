@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/v1/projects")
-@Tag(name = "Task API", description = "CRUD của task")
+@Tag(name = "Task Comment API", description = "CRUD của task comment")
 // TODO: FULL quyền
 public class TaskCommentController {
 

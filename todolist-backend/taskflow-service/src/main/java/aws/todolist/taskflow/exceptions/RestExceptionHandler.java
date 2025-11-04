@@ -55,7 +55,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             response.setDetailMessage(ex.toString());
         }
 
-        appLogger.error(request, "❌ [{}] {} - {}", code, message, ex.getMessage());
+//        appLogger.error(request, "❌ [{}] {} - {}", code, message, ex.getMessage());
         return new ResponseEntity<>(response, status);
     }
 
@@ -92,7 +92,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         }
 
         HttpServletRequest servletRequest = getRequest(request);
-        appLogger.warn(servletRequest, "🟠 Validation failed: {}", ex.getMessage());
+//        appLogger.warn(servletRequest, "🟠 Validation failed: {}", ex.getMessage());
 
         return buildErrorResponse(
                 servletRequest,
@@ -228,7 +228,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 .errors(null)         // nếu không có validation errors
                 .build();
 
-        appLogger.warn(request, "🛑 [{}] {} - {}", ex.getCode(), ex.getMessage());
+//        appLogger.warn(request, "🛑 [{}] {} - {}", ex.getCode(), ex.getMessage());
 
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
     }
@@ -243,7 +243,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 .errors(null)
                 .build();
 
-        appLogger.warn(request, "🛑 [{}] {} - {}", ex.getCode(), ex.getMessage());
+//        appLogger.warn(request, "🛑 [{}] {} - {}", ex.getCode(), ex.getMessage());
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
@@ -258,7 +258,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 .errors(null)
                 .build();
 
-        appLogger.warn(request, "🛑 [{}] {} - {}", ex.getCode(), ex.getMessage());
+//        appLogger.warn(request, "🛑 [{}] {} - {}", ex.getCode(), ex.getMessage());
 
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }

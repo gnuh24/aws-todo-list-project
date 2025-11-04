@@ -63,7 +63,6 @@ public class TaskSchedulerService {
         // Mốc nhắc nhở trước deadline
         // Tạo các mốc nhắc
         LocalDateTime[] reminderTimes = new LocalDateTime[]{
-                deadline.minusDays(3),   // 3 ngày trước
                 deadline.minusDays(1),   // 1 ngày trước
         };
 

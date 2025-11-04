@@ -46,7 +46,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 			response.setDetailMessage(ex.toString());
 		}
 		
-		appLogger.error(request, "❌ [{}] {} - {}", code, message, ex.getMessage());
+//		appLogger.error(request, "❌ [{}] {} - {}", code, message, ex.getMessage());
 		return new ResponseEntity<>(response, status);
 	}
 	
@@ -83,7 +83,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 		}
 		
 		HttpServletRequest servletRequest = getRequest(request);
-		appLogger.warn(servletRequest, "🟠 Validation failed: {}", ex.getMessage());
+//		appLogger.warn(servletRequest, "🟠 Validation failed: {}", ex.getMessage());
 		
 		return buildErrorResponse(
 		    servletRequest,

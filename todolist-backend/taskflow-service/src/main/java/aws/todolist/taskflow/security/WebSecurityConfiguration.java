@@ -1,5 +1,6 @@
 package aws.todolist.taskflow.security;
 
+import aws.todolist.taskflow.aop.RequestLoggingFilter;
 import aws.todolist.taskflow.exceptions.AuthException.AuthExceptionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -36,26 +37,29 @@ public class WebSecurityConfiguration {
     @Autowired
     private JwtTokenFilter jwtAuthFIlter;
 
+    @Autowired
+    private RequestLoggingFilter requestLoggingFilter;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-	
-	@Bean
-	public CorsConfigurationSource corsConfigurationSource() {
-		CorsConfiguration configuration = new CorsConfiguration();
-		
-		// ✅ Cho phép tất cả origin, nhưng an toàn hơn "*"
-		configuration.setAllowedOriginPatterns(List.of("*"));
-		
-		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-		configuration.setAllowedHeaders(List.of("*"));
-		configuration.setAllowCredentials(true);
-		
-		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-		source.registerCorsConfiguration("/**", configuration);
-		return source;
-	}
+
+//    @Bean
+//    public CorsConfigurationSource corsConfigurationSource() {
+//        CorsConfiguration configuration = new CorsConfiguration();
+//
+//        // ✅ Cho phép tất cả origin, nhưng an toàn hơn "*"
+//        configuration.setAllowedOriginPatterns(List.of("*"));
+//
+//        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+//        configuration.setAllowedHeaders(List.of("*"));
+//        configuration.setAllowCredentials(true);
+//
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        source.registerCorsConfiguration("/**", configuration);
+//        return source;
+//    }
 
 
     @Bean
@@ -64,7 +68,9 @@ public class WebSecurityConfiguration {
         http
                 // Loại bỏ bảo vệ CSRF
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource))
+	    	.cors(AbstractHttpConfigurer::disable)
+
+//                .cors(cors -> cors.configurationSource(corsConfigurationSource))
 
 
                 // Configure các luồng truy cập
@@ -109,7 +115,11 @@ public class WebSecurityConfiguration {
                 // Add JWT vào chuỗi lọc và ưu tiên loc theo JWT
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
+                // JWT Filter xử lý token
                 .addFilterBefore(jwtAuthFIlter, UsernamePasswordAuthenticationFilter.class)
+
+                // Logging filter nên nằm trước JWT filter
+                .addFilterBefore(requestLoggingFilter, JwtTokenFilter.class)
 
                 .exceptionHandling((exceptionHandling) -> exceptionHandling
 

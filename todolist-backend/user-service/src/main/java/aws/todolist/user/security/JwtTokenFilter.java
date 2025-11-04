@@ -99,7 +99,6 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 					context.setAuthentication(authToken);
 					SecurityContextHolder.setContext(context);
 					
-					log.info(request, "✅ Token hợp lệ. Đã xác thực người dùng: {}", userEmail);
 				}
 				
 			} catch (ExpiredJwtException e) {

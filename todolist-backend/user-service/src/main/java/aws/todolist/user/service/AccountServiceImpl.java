@@ -65,8 +65,7 @@ public class AccountServiceImpl implements AccountService {
 			account.setDisplayName(form.getDisplayName());
 		}
 		
-		
-		return account;
+		return accountRepository.save(account);
 	}
 
 

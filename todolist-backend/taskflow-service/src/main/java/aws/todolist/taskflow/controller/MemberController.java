@@ -22,7 +22,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/v1/projects")
-@Tag(name = "Project API", description = "CRUD của member")
+@Tag(name = "Member API", description = "CRUD của member")
 public class MemberController {
 
     @Autowired

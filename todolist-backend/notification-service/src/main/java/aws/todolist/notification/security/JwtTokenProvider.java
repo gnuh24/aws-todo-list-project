@@ -133,6 +133,42 @@ public class JwtTokenProvider {
 		String payload = new String(Base64.getUrlDecoder().decode(encodedPayload), StandardCharsets.UTF_8);
 		return payload.split("\"")[3];
 	}
-	
-	
+
+	/**
+	 * Xác thực token: hợp lệ, chưa hết hạn, chữ ký đúng.
+	 */
+	public boolean validateToken(String token) {
+		if (token == null || token.trim().isEmpty()) {
+			System.err.println("❌ Token is null or empty");
+			return false;
+		}
+
+		try {
+			// Parse và xác minh chữ ký + thời hạn
+			Jws<Claims> claims = Jwts.parser()
+					.verifyWith(secretKey)
+					.build()
+					.parseSignedClaims(token.trim());
+
+			// Không cần làm gì thêm — nếu đến đây là hợp lệ
+			System.out.println("✅ Token valid for user: " + claims.getPayload().getSubject());
+			return true;
+
+		} catch (ExpiredJwtException e) {
+			System.err.println("❌ Token expired: " + e.getMessage());
+		} catch (io.jsonwebtoken.security.SignatureException e) {
+			System.err.println("❌ Invalid signature: " + e.getMessage());
+		} catch (io.jsonwebtoken.MalformedJwtException e) {
+			System.err.println("❌ Malformed token: " + e.getMessage());
+		} catch (IllegalArgumentException e) {
+			System.err.println("❌ Token is null/empty/invalid: " + e.getMessage());
+		} catch (JwtException e) {
+			System.err.println("❌ JWT error: " + e.getMessage());
+		} catch (Exception e) {
+			System.err.println("❌ Unexpected error: " + e.getMessage());
+			e.printStackTrace();
+		}
+
+		return false;
+	}
 }

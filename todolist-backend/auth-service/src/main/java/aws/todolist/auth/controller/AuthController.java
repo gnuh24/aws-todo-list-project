@@ -5,10 +5,7 @@ import aws.todolist.auth.dto.account.AccountRedisDTO;
 import aws.todolist.auth.dto.auth.*;
 import aws.todolist.auth.entity.Account;
 import aws.todolist.auth.exceptions.AuthException.HmacVerificationException;
-import aws.todolist.auth.exceptions.JwtException.InvalidJWTSignatureException;
-import aws.todolist.auth.exceptions.JwtException.InvalidTokenTypeException;
-import aws.todolist.auth.exceptions.JwtException.TokenExpiredException;
-import aws.todolist.auth.exceptions.JwtException.UsernameNotFound;
+import aws.todolist.auth.exceptions.JwtException.*;
 import aws.todolist.auth.security.JwtTokenProvider;
 import aws.todolist.auth.service.AccountService;
 import aws.todolist.auth.service.AuthService;
@@ -86,27 +83,10 @@ public class AuthController {
 		
 		AuthResponseDTO loginInfo = authService.login(loginInputForm);
 		
-//		// ✅ Gắn cookie refresh_token
-//		addRefreshTokenCookie(response, loginInfo.getRefreshToken());
-		
 		return ResponseEntity.ok(new ApiResponse<>(200, "Login successful", loginInfo));
 	}
 	
-//	// Endpoint login bằng Google
-//	@Operation(summary = "Đăng nhập Google", description = "Đăng nhập người dùng bằng Google OAuth2.")
-//	@GetMapping("/login/google")
-//	public ResponseEntity<ApiResponse<AuthResponseDTO>> loginGoogle(OAuth2AuthenticationToken authentication) {
-//
-//		Map<String, Object> attributes = authentication.getPrincipal().getAttributes();
-//		String email = (String) attributes.get("email");
-//		String name = (String) attributes.get("name");
-//		String avatar = (String) attributes.get("picture"); // <-- avatar từ Google
-//
-//		AuthResponseDTO loginInfo = authService.loginGoogle(email, name, avatar);
-//
-//		return ResponseEntity.ok(new ApiResponse<>(200, "Login Google successful", loginInfo));
-//	}
-	
+
 	/**
 	 * 📌 Đăng nhập nhân viên
 	 *
@@ -212,10 +192,15 @@ public class AuthController {
 	
 	@Operation(summary = "Làm mới token", description = "Làm mới token truy cập bằng cách sử dụng refresh token.")
 	@PostMapping("/refresh-token")
-	public ResponseEntity<ApiResponse<AuthResponseDTO>> refreshToken(HttpServletRequest request) {
+	public ResponseEntity<ApiResponse<AuthResponseDTO>> refreshToken(
+	    	@CookieValue(value = "refresh_token", required = false) String refreshToken) {
+		
+		if (refreshToken == null) {
+			throw new RefreshTokenNotFound("Thiếu refresh token!");
+		}
 		
 		// Gọi service để xử lý refresh token và nhận AuthResponseDTO
-		AuthResponseDTO authResponse = authService.refreshToken(request);
+		AuthResponseDTO authResponse = authService.refreshToken(refreshToken);
 		
 		return ResponseEntity.ok(new ApiResponse<>(
 		    200,
@@ -224,57 +209,7 @@ public class AuthController {
 		));
 	}
 	
-//	private void addRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
-//		Cookie cookie = new Cookie("refresh_token", refreshToken);
-//		cookie.setHttpOnly(true);
-//		cookie.setSecure(false);
-//
-//		cookie.setPath("/api/auth/");
-//
-////		cookie.setPath("/api/user/auth/refresh-token");
-////		System.err.println(ApiPath.REFRESH_TOKEN);
-//
-//		cookie.setMaxAge(7 * 24 * 60 * 60); // 7 ngày
-//
-//		response.addCookie(cookie);
-//	}
 
-	@Operation(summary = "Lấy thông tin user từ token (Nội bộ)",
-	    description = "API nội bộ: AuthService trả về thông tin user tương ứng với JWT token. Chỉ cho phép gọi khi kèm X-Internal-Secret hợp lệ.")
-	@GetMapping("/get-user-detail-by-token")
-	public ResponseEntity<ApiResponse<UserDetails>> getUserByToken(@RequestParam String hmacToken, @RequestParam String jwtToken) throws Exception {
-		
-		if(!HmacUtil.verifyHMAC(jwtToken, hmacToken)){
-			throw new HmacVerificationException("hmacToken có dấu hiệu gian lận");
-		}
-		
-		// Gọi service để xử lý refresh token và nhận AuthResponseDTO
-		UserDetails userDetails = authService.getUserDetailByJwtToken(jwtToken);
-		
-		return ResponseEntity.ok(new ApiResponse<>(
-		    200,
-		    "Lấy UserDetail thành công",
-		    userDetails
-		));
-	}
-	
-	@Operation(summary = "Sinh Internal Token (Nội bộ)",
-	    description = "API nội bộ: Sinh Internal Token dựa trên HMAC. Chỉ cho phép gọi khi kèm X-Internal-Secret hợp lệ.")
-	@GetMapping("/get-internal-token")
-	public ResponseEntity<ApiResponse<String>> generateInternalToken(@RequestParam String hmacToken, @RequestParam String serviceName) throws Exception {
-		
-		if (!HmacUtil.verifyHMAC(serviceName, hmacToken)) {
-			throw new HmacVerificationException("hmacToken có dấu hiệu gian lận");
-		}
-		
-		String internalToken = jwtTokenProvider.generateInternalToken(serviceName);
-		
-		return ResponseEntity.ok(new ApiResponse<>(
-		    200,
-		    "Sinh Internal Token thành công",
-		    internalToken
-		));
-	}
-	
+
 	
 }

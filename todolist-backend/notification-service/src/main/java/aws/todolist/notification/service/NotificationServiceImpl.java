@@ -6,6 +6,7 @@ import aws.todolist.notification.dto.notification.NotificationCreateForm;
 import aws.todolist.notification.entity.Account;
 import aws.todolist.notification.entity.Notification;
 import aws.todolist.notification.entity.Notification.NotificationType; // Cần thêm import này
+import aws.todolist.notification.mapper.NotificationMapper;
 import aws.todolist.notification.messaging.kafka.message.NotificationMessage;
 import aws.todolist.notification.repository.AccountRepository;
 import aws.todolist.notification.repository.NotificationRepository;
@@ -31,6 +32,9 @@ public class NotificationServiceImpl implements NotificationService {
 	
 	@Autowired
 	private AppLogger appLogger;
+
+	@Autowired
+	private WebSocketService webSocketService;
 	
 	// GIẢ ĐỊNH: Các service cần thiết để truy vấn dữ liệu nghiệp vụ
 	// @Autowired private TaskService taskService;
@@ -80,6 +84,15 @@ public class NotificationServiceImpl implements NotificationService {
 			
 			System.err.println("💾 [NotificationService] Saved notification "
 			    + msg.getType() + " for receiver " + msg.getReceiverId());
+
+
+			// Gửi thông báo cho user thông qua websocket
+
+			System.err.println("Sent notifications to "+ receiverOpt.get().getEmail());
+
+			webSocketService.sendToUserNew(receiverOpt.get().getEmail(),notification);
+
+
 			
 		} catch (Exception e) {
 			System.err.println("❌ Lỗi khi tạo Notification: " + e.getMessage());

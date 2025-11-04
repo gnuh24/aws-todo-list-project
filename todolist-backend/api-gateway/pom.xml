@@ -54,7 +54,7 @@
                 <!-- Redis -->
                 <dependency>
                         <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-starter-data-redis</artifactId>
+                        <artifactId>spring-boot-starter-data-redis-reactive</artifactId>
                 </dependency>
 
                 <!-- Lombok -->
@@ -78,6 +78,9 @@
                         <artifactId>spring-boot-starter-test</artifactId>
                         <scope>test</scope>
                 </dependency>
+
+
+
 
         </dependencies>
 
