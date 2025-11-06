@@ -2,13 +2,14 @@ import React, { useState } from "react";
 import { Dropdown, Menu, Button } from "antd";
 import { FlagOutlined, CheckOutlined } from "@ant-design/icons";
 
-export default function PriorityDropdown({ priority, setPriority }) {
+export default function PriorityDropdown({ priority, onSelect }) {
 
   const priorities = [
     { id: "HIGH", color: "text-red-500", label: "Priority 1" },
     { id: "MEDIUM", color: "text-orange-400", label: "Priority 2" },
     { id: "LOW", color: "text-blue-500", label: "Priority 3" }
   ];
+
 
   const menu = (
     <Menu
@@ -19,7 +20,7 @@ export default function PriorityDropdown({ priority, setPriority }) {
           <div
             className="flex justify-between items-center w-36 px-2 py-1 rounded-md hover:bg-gray-100 cursor-pointer"
             onClick={() => {
-                setPriority?.(p.id);
+                onSelect?.(p.id);
             }}
           >
             <span className="flex items-center gap-2">

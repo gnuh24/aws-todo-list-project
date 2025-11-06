@@ -55,4 +55,12 @@ public class TaskResponseDTO {
 
     @Schema(description = "id người được phân công", example = "")
     private String idAccountAssigned;
+
+    @Schema(description = "idSection của task")
+    private String idSection;
+
+    @Schema(description = "idProject chứa task")
+    private String idProject;
+
+
 }

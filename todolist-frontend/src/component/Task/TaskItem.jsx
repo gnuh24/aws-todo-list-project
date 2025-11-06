@@ -1,4 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
+import { Dropdown } from "antd";
+
 import {
   Edit2,
   CalendarDays,
@@ -13,6 +15,8 @@ import {
 } from "lucide-react";
 import TaskEditForm from "../Task/TaskEditForm";
 import { https_taskflow } from "../../service/api";
+import dayjs from "dayjs";
+import DatePickerDropdown from "../Dropdown/DatePickerDropdown";
 
 export default function TaskItem({
   onDeleteTask,
@@ -20,10 +24,15 @@ export default function TaskItem({
   projectId,
   task,
   onUpdate,
+  onDeleteTaskUpComing,
+  onUpdateTaskUpComing,
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
+  const formatToDisplay = "HH:mm DD/MM/YYYY";
+  const formatToSend = "YYYY-MM-DDTHH:mm:ss";
+
 
   // Đóng menu khi click ra ngoài
   useEffect(() => {
@@ -46,11 +55,19 @@ export default function TaskItem({
   //   }
   // };
   const handleDelete = async () => {
+    const confirmed = window.confirm("Bạn có chắc chắn muốn xóa task này không?");
+    if (!confirmed) {
+      return;
+    }
+
     try {
-      await https_taskflow.delete(`/v1/projects/${projectId}/tasks/${task.id}`);
+      const response = await https_taskflow.delete(`/v1/projects/${projectId}/tasks/${task.id}`);
 
       // ✅ cập nhật UI không cần reload
-      onDeleteTask(sectionId, task.id);
+      onDeleteTask?.(sectionId, task.id);
+
+      // Dùng cho việc xóa task trong phần upcoming
+      onDeleteTaskUpComing?.(response.data.data);
 
       alert("Xoá task thành công!");
     } catch (error) {
@@ -83,8 +100,13 @@ export default function TaskItem({
       // ✅ notify parent to update UI
       onUpdate?.(sectionId, { ...task, ...updatedTask });
 
+      // Nếu là cập nhật taskUpComing thì reload lại list
+      onUpdateTaskUpComing?.(res.data.data);
+
       setIsEditing(false);
     } catch (err) {
+      // ✅ Thêm alert ở đây
+      alert(err?.response?.data?.message || "Cập nhật thất bại, vui lòng thử lại!");
       console.error("❌ Update task failed:", err);
     }
   };
@@ -117,9 +139,21 @@ export default function TaskItem({
           >
             <Edit2 size={14} />
           </button>
-          <button className="p-1 hover:text-gray-900 text-gray-500">
-            <CalendarDays size={14} />
-          </button>
+
+          <Dropdown
+              trigger={["click"]}
+              dropdownRender={() => (
+                  <DatePickerDropdown isStartTime={true} onSelect={(newStartTime) => {
+                    const taskUpdate = { ...task, startTime: dayjs(newStartTime).format(formatToSend) };
+                    handleUpdateTaskAPI(taskUpdate);
+                  }} />
+              )}
+          >
+            <button className="p-1 hover:text-gray-900 text-gray-500">
+              <CalendarDays size={14} />
+            </button>
+          </Dropdown>
+
           <button className="p-1 hover:text-gray-900 text-gray-500">
             <MessageSquare size={14} />
           </button>
@@ -167,7 +201,7 @@ export default function TaskItem({
           {task.deadline && (
             <span className="text-red-500 flex items-center gap-1">
               <CalendarDays size={12} />
-              {new Date(task.deadline).toLocaleDateString()}
+              {dayjs(task.deadline).format(formatToDisplay)}
             </span>
           )}
         </div>

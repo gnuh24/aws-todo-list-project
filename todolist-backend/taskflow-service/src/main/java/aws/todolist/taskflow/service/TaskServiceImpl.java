@@ -408,6 +408,7 @@ public class TaskServiceImpl implements TaskService {
         if (requestDTO.isStartTimeSent()) {
             LocalDateTime newStart = requestDTO.getStartTime(); // có thể null
             if (newStart != null && newStart.isBefore(todayStart)) {
+                System.err.println("kien" + requestDTO.getStartTime());
                 throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Thời điểm bắt đầu phải ở tương lai");
             }
             task.setStartTime(newStart);

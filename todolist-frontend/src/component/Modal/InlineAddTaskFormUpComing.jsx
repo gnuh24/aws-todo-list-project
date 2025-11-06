@@ -16,6 +16,8 @@ export default function InlineAddTaskFormUpComing({ initialDate, onCancel, onAdd
   const [selectedProject, setSelectedProject] = useState({});
   const [selectedDeadline, setSelectedDeadline] = useState(null);
   const [priority, setPriority] = useState("LOW");
+  const formatToDisplay = "HH:mm DD/MM/YYYY";
+  const formatToSend = "YYYY-MM-DDTHH:mm:ss";
 
     const resetForm = async () => {
         setTaskName("");
@@ -38,8 +40,8 @@ export default function InlineAddTaskFormUpComing({ initialDate, onCancel, onAdd
         const taskDTO = {
             title: taskName,
             description,
-            startTime: selectedDate ? selectedDate.format("YYYY-MM-DDTHH:mm:ss") : dayjs(initialDate).hour(0).minute(0).second(0).format("YYYY-MM-DDTHH:mm:ss"),
-            deadline: selectedDeadline ? selectedDeadline.format("YYYY-MM-DDTHH:mm:ss") : null,
+            startTime: selectedDate ? selectedDate.format(formatToSend) : dayjs(initialDate).hour(0).minute(0).second(0).format(formatToSend),
+            deadline: selectedDeadline ? selectedDeadline.format(formatToSend) : null,
             sectionId: selectedSection.id,
             priority: priority,
         };
@@ -93,7 +95,7 @@ export default function InlineAddTaskFormUpComing({ initialDate, onCancel, onAdd
         {selectedDeadline && (
             <div className="text-[13px] text-gray-600 mb-2 flex items-center gap-1">
                 <ClockCircleOutlined className="text-orange-500" />
-                <span className="text-orange-500">Deadline: {selectedDeadline ? selectedDeadline.format("DD/MM/YYYY HH:mm") : ""}</span>
+                <span className="text-orange-500">Deadline: {selectedDeadline ? selectedDeadline.format(formatToDisplay) : ""}</span>
             </div>
         )}
 
@@ -106,13 +108,13 @@ export default function InlineAddTaskFormUpComing({ initialDate, onCancel, onAdd
               )}
           >
               <Button icon={<CalendarOutlined />} size="small">
-                  {selectedDate ? selectedDate.format("DD/MM/YYYY HH:mm") : "Date"}
+                  {selectedDate ? selectedDate.format(formatToDisplay) : "Date"}
               </Button>
           </Dropdown>
 
 
 
-        <PriorityDropdown priority={priority} setPriority={setPriority} />
+        <PriorityDropdown priority={priority} onSelect={setPriority} />
         <Button icon={<BellOutlined />} size="small">
           Reminders
         </Button>

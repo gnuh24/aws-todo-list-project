@@ -6,20 +6,29 @@ import {
   BellOutlined,
   MoreOutlined,
   InboxOutlined,
+  ClockCircleOutlined
 } from "@ant-design/icons";
 import DatePickerDropdown from "../Dropdown/DatePickerDropdown";
 import PriorityDropdown from "../Dropdown/PriorityDropdown";
 import MoreOptionsDropdown from "../Dropdown/MoreOptionsDropdown";
 import ProjectSelectDropdown from "../Dropdown/ProjectSelectDropdown";
+import dayjs from "dayjs";
 
 export default function TaskEditForm({ task, onSave, onCancel }) {
   const [taskName, setTaskName] = useState(task?.title || "");
   const [description, setDescription] = useState(task?.description || "");
-  const [selectedDate, setSelectedDate] = useState(task?.date || null);
+  const [selectedStartTime, setSelectedStartTime] = useState(task?.startTime || null);
+  const [selectedDeadline, setSelectedDeadline] = useState(task?.deadline || null);
   const [selectedProject, setSelectedProject] = useState(
-    task?.project || "Inbox"
+      {id: task?.idProject} || {}
   );
+  const [selectedSection, setSelectedSection] = useState(
+      {id: task?.idSection} || {}
+  );
+
   const [priority, setPriority] = useState(task?.priority || null);
+  const formatToDisplay = "HH:mm DD/MM/YYYY";
+  const formatToSend = "YYYY-MM-DDTHH:mm:ss";
 
   const handleSave = () => {
     if (!taskName.trim()) return;
@@ -28,8 +37,8 @@ export default function TaskEditForm({ task, onSave, onCancel }) {
       title: taskName,
       description,
       priority,
-      startTime: selectedDate ? new Date(selectedDate).toISOString() : null,
-      deadline: selectedDate ? new Date(selectedDate).toISOString() : null,
+      startTime: selectedStartTime ? dayjs(selectedStartTime).format(formatToSend) : null,
+      deadline: selectedDeadline ? dayjs(setSelectedDeadline).format(formatToSend) : null,
     });
   };
 
@@ -52,22 +61,30 @@ export default function TaskEditForm({ task, onSave, onCancel }) {
         className="border-none text-[13px] text-gray-500 focus:shadow-none mt-2"
       />
 
+      {/* Deadline hiển thị nếu khác null */}
+      {selectedDeadline && (
+          <div className="text-[13px] text-gray-600 mb-2 flex items-center gap-1">
+            <ClockCircleOutlined className="text-orange-500" />
+            <span className="text-orange-500">Deadline: {selectedDeadline ? dayjs(selectedDeadline).format(formatToDisplay) : ""}</span>
+          </div>
+      )}
+
       {/* Buttons row */}
       <div className="flex items-center gap-2 mt-3 flex-wrap">
         {/* Date picker */}
         <Dropdown
           trigger={["click"]}
           dropdownRender={() => (
-            <DatePickerDropdown onSelect={(value) => setSelectedDate(value)} />
+            <DatePickerDropdown onSelect={(value) => setSelectedStartTime(value)} />
           )}
         >
           <Button icon={<CalendarOutlined />} size="small">
-            {selectedDate ? selectedDate.toString() : "Date"}
+            {selectedStartTime ? dayjs(selectedStartTime).format(formatToDisplay) : "Date"}
           </Button>
         </Dropdown>
 
         {/* Priority */}
-        <PriorityDropdown onSelect={(p) => setPriority(p)} />
+        <PriorityDropdown priority={priority} onSelect={setPriority} />
 
         {/* Reminder */}
         <Button icon={<BellOutlined />} size="small">
@@ -86,8 +103,11 @@ export default function TaskEditForm({ task, onSave, onCancel }) {
       <div className="flex justify-between items-center">
         {/* Project select */}
         <ProjectSelectDropdown
-          selected={selectedProject}
-          onSelect={(project) => setSelectedProject(project)}
+            selectedSection={selectedSection}
+            selectedProject={selectedProject}
+            onSelectedSection={setSelectedSection}
+            onSelectedProject={setSelectedProject}
+            disabled={true}
         />
 
         {/* Action buttons */}

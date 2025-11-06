@@ -67,5 +67,11 @@ public class TaskDetailResponseDTO {
 
     @Schema(description = "Danh sách các bình luận trong Task")
     private List<TaskCommentResponseDTO> comments;
+
+    @Schema(description = "Section của task")
+    private String idSection;
+
+    @Schema(description = "Project chứa task")
+    private String idProject;
 }
 

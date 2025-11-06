@@ -29,6 +29,8 @@ public class TaskMapper {
                 .idTaskCha(task.getTaskFather() != null ? task.getTaskFather().getId() : null)
                 .idAccountCreate(task.getCreatedByAccount().getId())
                 .idAccountAssigned(task.getAccountAssign() != null ? task.getAccountAssign().getId() : null)
+                .idSection(task.getSection().getId())
+                .idProject(task.getSection().getProject().getId())
                 .build();
     }
 
@@ -52,6 +54,8 @@ public class TaskMapper {
                 .comments(taskCommentMapper.toResponseList(task.getTaskComments()))
                 .idAccountAssigned(task.getAccountAssign() != null ? task.getAccountAssign().getId() : null)
                 .idAccountCreate(task.getCreatedByAccount().getId())
+                .idSection(task.getSection().getId())
+                .idProject(task.getSection().getProject().getId())
                 .build();
     }
 

@@ -13,6 +13,7 @@ export default function ProjectSelectDropdown({
     selectedSection = {},
     onSelectedSection,
     onSelectedProject,
+    disabled
 }) {
   const [search, setSearch] = useState("");
   const [projects, setProject] = useState([]);
@@ -28,12 +29,13 @@ export default function ProjectSelectDropdown({
         if (response.status !== 200) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        console.log(response.data.data);
         setProject(response.data.data);
       } catch (err) {
         console.error("Error fetching tasks:", err);
       }
     };
+
+
 
     fetchProjects();
   }, []);
@@ -44,6 +46,21 @@ export default function ProjectSelectDropdown({
           s.name?.toLowerCase().includes(search.toLowerCase())
       )
   );
+
+    // Set up lại 2 đối tượng selectedProject và selectedSection nếu mà người dùng đã có sẵn thì thêm tên vào để hiển thị
+    projects.forEach((project) => {
+        if (project.id === selectedProject.id) {
+            selectedProject.name = project.name;
+            project.section.forEach((section) => {
+                if (selectedSection.id === section.id) {
+                    selectedSection.name = section.name;
+                }
+            })
+        }
+    })
+
+
+
 
   const menu = (
     <div className="bg-white rounded-xl shadow-lg p-2 w-72">
@@ -109,12 +126,15 @@ export default function ProjectSelectDropdown({
   );
 
   return (
-    <Dropdown overlay={menu} trigger={["click"]} placement="bottomLeft"  open={open}
+    <Dropdown overlay={menu} trigger={["click"]} placement="bottomLeft"  open={open  && !disabled}
               onOpenChange={(v) => setOpen(v)}>
-      <div className="flex items-center gap-1 cursor-pointer border rounded-md px-2 py-1 hover:bg-gray-50">
-        <TagOutlined className="text-gray-500 pr-2" />
-        <span>{selectedProject.name !== undefined ? selectedProject.name + " / "+ selectedSection.name : ""}</span>
-        <DownOutlined className="text-xs" />
+      <div  onClick={(e) => {
+          if (disabled) return; // không làm gì khi disabled
+            }}
+            className={`bg-white rounded-xl shadow-lg p-2 ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
+        <TagOutlined className="text-gray-500 pr-4" />
+        <span>{selectedProject.id !== undefined ? selectedProject.name + " / "+ selectedSection.name : "Select project / section"}</span>
+        <DownOutlined className="text-xs pl-3" />
       </div>
     </Dropdown>
   );

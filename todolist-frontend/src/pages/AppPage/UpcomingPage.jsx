@@ -14,7 +14,6 @@ export default function UpcomingPage() {
   const [showAddTaskIndex, setShowAddTaskIndex] = useState(null);
   const [showCalendar, setShowCalendar] = useState(false);
   const [tasksByDate, setTasksByDate] = useState({});
-  const [editingTask, setEditingTask] = useState(null);
 
   const [selected, setSelected] = useState();
 
@@ -260,14 +259,45 @@ export default function UpcomingPage() {
 
                           <div className="ml-4 flex flex-col gap-2">
                             {tasksByDate[d.date.toDateString()]?.map((task, idx) => (
-                                <div key={idx}  onClick={() => setEditingTask(task)}>
-                                  {/*<p className="text-sm font-medium">{task.title}</p>*/}
-                                  {/*<p className="text-xs text-gray-500">{task.description}</p>*/}
-                                  {/*<p className="text-xs text-gray-400 italic">{task.project}</p>*/}
-                                  <TaskItem task={task}></TaskItem>
-                                  {/*{editingTask === task && (*/}
-                                  {/*    <TaskEditForm task={task} onCancel={() => setEditingTask(null)} />*/}
-                                  {/*)}*/}
+                                <div key={idx}>
+                                  <TaskItem
+                                      task={task}
+                                      projectId={task.idProject}
+                                      sectionId={task.idSection}
+                                      onDeleteTaskUpComing={(taskDelete) => {
+                                        const dateKey = new Date(taskDelete.startTime).toDateString();
+
+                                        setTasksByDate((prev) => ({
+                                          ...prev,
+                                          [dateKey]: (prev[dateKey] || []).filter(
+                                              (task) => task.id !== taskDelete.id
+                                          ),
+                                        }));
+                                      }}
+                                      onUpdateTaskUpComing={(taskUpdate) => {
+                                        const dateKey = new Date(task.startTime).toDateString();
+                                        const newDateKey = new Date(taskUpdate.startTime).toDateString()
+
+
+                                        // Nếu vị trí cũ và mới trùng nhau thì cũng sẽ xóa vị trí cũ và thêm phần tử mới vào đúng chỗ đó
+
+                                        setTasksByDate((prev) => {
+                                          // Xóa task cũ ở dateKey
+                                          const oldTasks = (prev[dateKey] || []).filter(task => task.id !== taskUpdate.id);
+
+                                          // Thêm taskUpdate vào newDateKey
+                                          const newTasks = newDateKey === dateKey
+                                              ? [...oldTasks, taskUpdate] // nếu date không đổi, thêm vào mảng đã filter
+                                              : [...(prev[newDateKey] || []), taskUpdate]; // nếu date thay đổi, thêm vào mảng mới
+
+                                          return {
+                                            ...prev,
+                                            [dateKey]: oldTasks,
+                                            [newDateKey]: newTasks,
+                                          }
+                                        })
+                                      }}
+                                  />
                                 </div>))}
 
                           </div>
