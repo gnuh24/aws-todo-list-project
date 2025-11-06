@@ -25,10 +25,27 @@ public class SectionMapper {
                 .build();
     }
 
+    public SectionResponseDTO ResponseDTONameAndId(Section section) {
+        return SectionResponseDTO.builder()
+                .id(section.getId())
+                .name(section.getName())
+                .position(section.getPosition())
+                .createdAt(section.getCreatedAt())
+                .updatedAt(section.getUpdatedAt())
+                .build();
+    }
+
     public List<SectionResponseDTO> ResponseDTOList(List<Section> sections) {
         return sections.stream()
                 .filter(section -> !section.getIsDeleted())
                 .map(this::ResponseDTO)
+                .toList();
+    }
+
+    public List<SectionResponseDTO> ResponseDTONameAndIdList(List<Section> sections) {
+        return sections.stream()
+                .filter(section -> !section.getIsDeleted())
+                .map(this::ResponseDTONameAndId)
                 .toList();
     }
 }

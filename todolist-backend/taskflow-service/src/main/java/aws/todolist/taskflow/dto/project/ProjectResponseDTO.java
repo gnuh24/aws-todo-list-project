@@ -1,5 +1,6 @@
 package aws.todolist.taskflow.dto.project;
 
+import aws.todolist.taskflow.dto.section.SectionResponseDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -32,4 +34,7 @@ public class ProjectResponseDTO {
 
     @Schema(description = "Project có phải dự án mặc định không")
     private Boolean isDefault;
+
+    @Schema(description = "Section của project")
+    private List<SectionResponseDTO> section;
 }

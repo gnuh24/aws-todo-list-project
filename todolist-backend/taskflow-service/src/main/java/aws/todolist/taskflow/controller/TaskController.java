@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/v1/projects")
 @Tag(name = "Task API", description = "CRUD của task")
@@ -23,6 +25,17 @@ public class TaskController {
 
     @Autowired
     private TaskService taskService;
+
+    @Operation(summary = "Lấy ra toàn bộ task sắp đến", description = "Lấy ra toàn bộ các task chuẩn bị cần thực hiện")
+    @GetMapping("/taskUpComing")
+    public ResponseEntity<ApiResponse<List<TaskResponseDTO>>> getTaskUpComing(@AuthenticationPrincipal Account account) {
+
+        List<TaskResponseDTO> listTask = taskService.getTaskUpComing(account);
+
+        ApiResponse<List<TaskResponseDTO>> response = new ApiResponse<>(200, "Tasks has fetched successfully", listTask);
+
+        return ResponseEntity.ok(response);
+    }
 
     @Operation(summary = "Lấy ra chi tiết task", description = "Lấy ra thông tin chi tiết của task")
     @GetMapping("/{idProject}/tasks/{idTask}")

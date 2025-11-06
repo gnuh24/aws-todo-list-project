@@ -22,6 +22,7 @@ public class ProjectMapper {
                 .createdAt(project.getCreatedAt())
                 .updatedAt(project.getUpdatedAt())
                 .isDefault(project.getIsDefault())
+                .section(sectionMapper.ResponseDTONameAndIdList(project.getSections()))
                 .build();
     }
 

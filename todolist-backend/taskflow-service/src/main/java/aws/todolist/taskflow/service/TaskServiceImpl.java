@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.function.Consumer;
 
 @Service
@@ -56,6 +57,11 @@ public class TaskServiceImpl implements TaskService {
         }
 
         return taskMapper.ResponseDetailDTO(task);
+    }
+
+    @Override
+    public List<TaskResponseDTO> getTaskUpComing(Account account) {
+        return taskMapper.ResponseDTOList(taskRepository.findByTaskUpComingByAccount(LocalDateTime.now(), account.getId()));
     }
 
     @Override

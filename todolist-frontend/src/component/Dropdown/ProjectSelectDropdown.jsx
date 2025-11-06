@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect  } from "react";
 import {
   InboxOutlined,
   FolderOutlined,
@@ -6,43 +6,43 @@ import {
   DownOutlined,
 } from "@ant-design/icons";
 import { Dropdown, Input } from "antd";
+import {https_taskflow} from "../../service/api";
 
 export default function ProjectSelectDropdown({
-  selected = "Getting Started 👋",
-  onSelect,
+    selectedProject = {},
+    selectedSection = {},
+    onSelectedSection,
+    onSelectedProject,
 }) {
   const [search, setSearch] = useState("");
+  const [projects, setProject] = useState([]);
+  const [open, setOpen] = useState(false);
 
-  const projects = [
-    { id: 1, name: "Inbox", icon: <InboxOutlined />, group: "default" },
-    {
-      id: 2,
-      name: "Getting Started 👋",
-      group: "My Projects",
-      icon: <TagOutlined />,
-    },
-    {
-      id: 3,
-      name: "Capture > Review > Complete",
-      group: "My Projects",
-      icon: <FolderOutlined />,
-    },
-    {
-      id: 4,
-      name: "Build (or Rebuild) Your Systems",
-      group: "My Projects",
-      icon: <FolderOutlined />,
-    },
-    {
-      id: 5,
-      name: "Level Up 🏆",
-      group: "My Projects",
-      icon: <FolderOutlined />,
-    },
-  ];
+  // Fetch api để lấy danh sách các project và section
+  useEffect(() => {
+
+    const fetchProjects = async () => {
+      try {
+        const response = await https_taskflow.get("/v1/projects");
+        // kiểm tra status
+        if (response.status !== 200) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        console.log(response.data.data);
+        setProject(response.data.data);
+      } catch (err) {
+        console.error("Error fetching tasks:", err);
+      }
+    };
+
+    fetchProjects();
+  }, []);
 
   const filtered = projects.filter((p) =>
-    p.name.toLowerCase().includes(search.toLowerCase())
+      p.name.toLowerCase().includes(search.toLowerCase()) ||
+      p.section?.some((s) =>
+          s.name?.toLowerCase().includes(search.toLowerCase())
+      )
   );
 
   const menu = (
@@ -56,41 +56,52 @@ export default function ProjectSelectDropdown({
         size="small"
       />
 
-      {/* Project list */}
+      {/*/!* Project list *!/*/}
       <div className="max-h-64 overflow-y-auto">
-        {filtered.some((p) => p.group === "default") && (
-          <div
-            className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 rounded-md cursor-pointer"
-            onClick={() => onSelect?.("Inbox")}
-          >
-            <InboxOutlined className="text-gray-500" /> Inbox
-          </div>
-        )}
-
         {/* My Projects Section */}
-        {filtered.some((p) => p.group === "My Projects") && (
+        {(
           <>
             <div className="font-semibold text-gray-700 px-3 py-2">
               My Projects
             </div>
-            {filtered
-              .filter((p) => p.group === "My Projects")
-              .map((p) => (
-                <div
-                  key={p.id}
-                  className={`flex items-center justify-between px-3 py-2 rounded-md cursor-pointer hover:bg-gray-100 ${
-                    selected === p.name ? "bg-gray-50" : ""
-                  }`}
-                  onClick={() => onSelect?.(p.name)}
-                >
-                  <div className="flex items-center gap-2">
-                    {p.icon} {p.name}
+            {filtered.map((p) => (
+                <div key={p.id}>
+                  {/* Mục cha */}
+                  <div
+                      className={`flex items-center justify-between px-3 py-2 rounded-md cursor-pointer`}
+                  >
+                    <div className="flex items-center gap-2">
+                      {p.icon} {p.name}
+                    </div>
                   </div>
-                  {selected === p.name && (
-                    <span className="text-red-500 text-xs">✔</span>
+
+                  {/* Mục con (nếu có) */}
+                  {p.section && p.section.length > 0 && (
+                      <div className="ml-6 mt-1 space-y-1">
+                        {p.section.map((s) => (
+                            <div
+                                key={s.id || s.name}
+                                className={`flex items-center justify-between px-3 py-1.5 rounded cursor-pointer hover:bg-gray-50 ${
+                                    selectedSection.name === s.name ? "bg-gray-100" : ""
+                                }`}
+                                onClick={(e) => {
+                                  e.stopPropagation(); // không trigger cha
+                                  onSelectedSection?.(s);
+                                  onSelectedProject?.(p);
+                                  setOpen(false);
+                                }}
+                            >
+                              <div className="flex items-center gap-2 text-sm text-gray-700">
+                                {s.icon || <div className="w-4" />} {/* placeholder nếu không có icon */}
+                                {s.name}
+                              </div>
+                              {selectedSection.name === s.name && <span className="text-red-500 text-xs">✔</span>}
+                            </div>
+                        ))}
+                      </div>
                   )}
                 </div>
-              ))}
+            ))}
           </>
         )}
       </div>
@@ -98,10 +109,11 @@ export default function ProjectSelectDropdown({
   );
 
   return (
-    <Dropdown overlay={menu} trigger={["click"]} placement="bottomLeft">
+    <Dropdown overlay={menu} trigger={["click"]} placement="bottomLeft"  open={open}
+              onOpenChange={(v) => setOpen(v)}>
       <div className="flex items-center gap-1 cursor-pointer border rounded-md px-2 py-1 hover:bg-gray-50">
-        <TagOutlined className="text-gray-500" />
-        <span>{selected}</span>
+        <TagOutlined className="text-gray-500 pr-2" />
+        <span>{selectedProject.name !== undefined ? selectedProject.name + " / "+ selectedSection.name : ""}</span>
         <DownOutlined className="text-xs" />
       </div>
     </Dropdown>

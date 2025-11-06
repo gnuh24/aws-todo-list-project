@@ -16,7 +16,6 @@ export default function AddTaskModal({ open, onCancel, onAdd }) {
   const [taskName, setTaskName] = useState("");
   const [description, setDescription] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
-  console.log("selectedDate: ", selectedDate);
   const [selectedProject, setSelectedProject] = useState("Inbox");
 
   return (

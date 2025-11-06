@@ -3,9 +3,13 @@ package aws.todolist.taskflow.service;
 import aws.todolist.taskflow.dto.task.*;
 import aws.todolist.taskflow.entity.Account;
 
+import java.util.List;
+
 public interface TaskService {
 
     TaskDetailResponseDTO getTaskById(String idTask);
+
+    List<TaskResponseDTO> getTaskUpComing(Account account);
 
     TaskResponseDTO addTask(String idProject, TaskCreateRequestDTO requestDTO, Account account);
 

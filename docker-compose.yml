@@ -52,7 +52,7 @@ services:
     depends_on:
       - zookeeper
     ports:
-      - "9092:9092"   # External listener
+      - "9092:9092" # External listener
       - "29092:29092" # Internal listener (cho Redpanda)
     environment:
       - KAFKA_BROKER_ID=1
@@ -79,9 +79,9 @@ services:
     depends_on:
       - kafka
     ports:
-      - "8083:8080"  # Console UI tại http://localhost:8083
+      - "8083:8080" # Console UI tại http://localhost:8083
     environment:
-      - KAFKA_BROKERS=kafka_broker:29092  # Dùng listener nội bộ (ổn định nhất)
+      - KAFKA_BROKERS=kafka_broker:29092 # Dùng listener nội bộ (ổn định nhất)
 
   # =====================
   # 🌐 User Service (Spring Boot)
@@ -120,7 +120,6 @@ services:
 
     networks:
       - default
-
 
   # =====================
   # 🌐 Auth Service (Spring Boot)
@@ -172,8 +171,8 @@ services:
     depends_on:
       - redis
       - kafka
-      - user-service   # ✅ thêm dòng này để đảm bảo gateway khởi động sau user-service
-      - auth-service   # ✅ thêm để đảm bảo gateway load sau auth
+      - user-service # ✅ thêm dòng này để đảm bảo gateway khởi động sau user-service
+      - auth-service # ✅ thêm để đảm bảo gateway load sau auth
 
     ports:
       - "8080:8080"
@@ -183,7 +182,7 @@ services:
       SPRING_DATA_REDIS_PORT: 6379
 
       # ==== User Service ====
-      USER_SERVICE_URL: http://user-service:8081  # ✅ Gateway có thể gọi sang user-service qua network nội bộ
+      USER_SERVICE_URL: http://user-service:8081 # ✅ Gateway có thể gọi sang user-service qua network nội bộ
       AUTH_SERVICE_URL: http://auth-service:9999
 
     extra_hosts:
@@ -191,8 +190,6 @@ services:
 
     networks:
       - default
-
-
 
 volumes:
   mysql_data:
