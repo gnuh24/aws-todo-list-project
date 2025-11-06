@@ -35,7 +35,7 @@ public class ProjectController {
 
         List<ProjectResponseDTO> listProject = projectService.getAllProject(account.getId());
 
-        ApiResponse<List<ProjectResponseDTO>> response = new ApiResponse<>(200, "list projects has getted successfullys", listProject);
+        ApiResponse<List<ProjectResponseDTO>> response = new ApiResponse<>(200, "Danh sách dự án được lấy thành công", listProject);
 
         return ResponseEntity.ok(response);
 
@@ -49,7 +49,7 @@ public class ProjectController {
 
         ProjectDetailResponseDTO project = projectService.getProjectById(projectID);
 
-        ApiResponse<ProjectDetailResponseDTO> response = new ApiResponse<>(200, "project has getted successfully", project);
+        ApiResponse<ProjectDetailResponseDTO> response = new ApiResponse<>(200, "Chi tiết dự án lấy thành công", project);
 
         return ResponseEntity.ok(response);
     }
@@ -60,7 +60,7 @@ public class ProjectController {
     public ResponseEntity<ApiResponse<ProjectResponseDTO>> addNewProject(@RequestBody @Valid ProjectCreateRequestDTO request, @AuthenticationPrincipal Account account) {
         ProjectResponseDTO project = projectService.addProject(request, account);
 
-        ApiResponse<ProjectResponseDTO> response = new ApiResponse<>(200, "new project was created completely", project);
+        ApiResponse<ProjectResponseDTO> response = new ApiResponse<>(200, "Dự án mới được tạo thành công", project);
 
         return ResponseEntity.ok(response);
     }
@@ -71,7 +71,7 @@ public class ProjectController {
     public ResponseEntity<ApiResponse<ProjectResponseDTO>> updateProject(@PathVariable("id") String projectID, @RequestBody ProjectUpdateRequestDTO request) {
         ProjectResponseDTO project = projectService.updateProject(projectID, request);
 
-        ApiResponse<ProjectResponseDTO> response = new ApiResponse<>(200, "project was updated completely", project);
+        ApiResponse<ProjectResponseDTO> response = new ApiResponse<>(200, "Dự án mới được cập nhật thành công", project);
 
         return ResponseEntity.ok(response);
 
@@ -83,7 +83,7 @@ public class ProjectController {
     public ResponseEntity<ApiResponse<ProjectResponseDTO>> removeProject(@PathVariable("projectId") String projectId, @AuthenticationPrincipal Account account) {
         ProjectResponseDTO project = projectService.removeProject(projectId, account);
 
-        ApiResponse<ProjectResponseDTO> response = new ApiResponse<>(200, "project was updated to is_Deleted completely", project);
+        ApiResponse<ProjectResponseDTO> response = new ApiResponse<>(200, "Dự án cập nhật trạng thái đã xóa", project);
 
         return ResponseEntity.ok(response);
 

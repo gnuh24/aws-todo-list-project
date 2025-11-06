@@ -70,7 +70,7 @@ public class ProjectServiceImpl implements ProjectService {
         if (optProject.isPresent()) {
             project = optProject.get();
         } else {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Project does not exist or has been deleted.");
+            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Dự án không tồn tại hoặc đã bị xóa.");
         }
 
         return projectMapper.ResponseDTODetail(project);
@@ -85,7 +85,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         // Kiểm tra dự án default
         if (projectCreateRequestDTO.getIsDefault() && OptProjectDefault != null) {
-            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Account has default project");
+            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Tài khoản đã có dự án mặc định");
         }
 
 
@@ -124,7 +124,7 @@ public class ProjectServiceImpl implements ProjectService {
         if (optProject.isPresent()) {
             project = optProject.get();
         } else {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Project does not exist or has been deleted.");
+            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Dự án không tồn tại hoặc đã bị xóa.");
         }
 
         if (projectUpdateRequestDTO.getName() != null) {
@@ -151,12 +151,12 @@ public class ProjectServiceImpl implements ProjectService {
         if (optProject.isPresent()) {
             project = optProject.get();
         } else {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Project does not exist or has been deleted.");
+            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Dự án không tồn tại hoặc đã bị xóa.");
         }
 
         // Kiểm tra project có phải là default không
         if (project.getIsDefault()) {
-            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Can't delete: This project is default project");
+            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Không thể xóa dự án mặc định");
         }
 
 
@@ -165,11 +165,12 @@ public class ProjectServiceImpl implements ProjectService {
         Project defaultProject = projectRepository.findProjectIsDefault(accountLogging.getId());
 
         if (defaultProject == null) {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "This accountLogging doesn't have default project");
+            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Account không có project mặc định");
         }
 
         Section sectionDefault = defaultProject.getSections().getFirst();
 
+        // Chạy vòng lặp để cập nhật các section thành deleted và chuyển task về project default
         project.getSections().forEach(section -> {
             section.softDelete();
 

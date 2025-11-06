@@ -32,7 +32,7 @@ public class TaskController {
 
         List<TaskResponseDTO> listTask = taskService.getTaskUpComing(account);
 
-        ApiResponse<List<TaskResponseDTO>> response = new ApiResponse<>(200, "Tasks has fetched successfully", listTask);
+        ApiResponse<List<TaskResponseDTO>> response = new ApiResponse<>(200, "Danh sách task sắp đến đã được lấy thành công", listTask);
 
         return ResponseEntity.ok(response);
     }
@@ -44,11 +44,10 @@ public class TaskController {
 
         TaskDetailResponseDTO taskDetailResponseDTO = taskService.getTaskById(idTask);
 
-        ApiResponse<TaskDetailResponseDTO> response = new ApiResponse<>(200, "Task has fetched successfully", taskDetailResponseDTO);
+        ApiResponse<TaskDetailResponseDTO> response = new ApiResponse<>(200, "Thông tin task đã được lấy thành công", taskDetailResponseDTO);
 
         return ResponseEntity.ok(response);
     }
-
 
     @Operation(summary = "Tạo task mới", description = "Tạo thêm một task mới")
     @PostMapping("/{idProject}/tasks")
@@ -57,7 +56,7 @@ public class TaskController {
 
         TaskResponseDTO taskResponseDTO = taskService.addTask(idProject, requestDTO, account);
 
-        ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Task has been created successfully", taskResponseDTO);
+        ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Task đã được tạo thành công", taskResponseDTO);
 
         return ResponseEntity.ok(response);
     }
@@ -69,11 +68,10 @@ public class TaskController {
 
         TaskResponseDTO taskResponseDTO = taskService.updatePriority(idTask, requestDTO);
 
-        ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Task has been updated priority successfully", taskResponseDTO);
+        ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Độ ưu tiên task đã được cập nhật thành công", taskResponseDTO);
 
         return ResponseEntity.ok(response);
     }
-
 
     @Operation(summary = "Chỉnh sửa mối quan hệ của task", description = "Thay đổi mối quan hệ của task với task khác")
     @PatchMapping("/{idProject}/tasks/{idTask}/update-relationship")
@@ -82,7 +80,7 @@ public class TaskController {
 
         TaskResponseDTO taskResponseDTO = taskService.updateRelationship(idTask, requestDTO);
 
-        ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Task has been updated relationship successfully", taskResponseDTO);
+        ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Mối quan hệ task đã được cập nhật thành công", taskResponseDTO);
 
         return ResponseEntity.ok(response);
     }
@@ -94,19 +92,19 @@ public class TaskController {
 
         TaskResponseDTO taskResponseDTO = taskService.updateStatus(idTask, requestDTO, account);
 
-        ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Task has been updated status successfully", taskResponseDTO);
+        ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Trạng thái task đã được cập nhật thành công", taskResponseDTO);
 
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Phân công task task", description = "Phân công task cho account trong nhóm member của project")
+    @Operation(summary = "Phân công task", description = "Phân công task cho account trong nhóm member của project")
     @PatchMapping("/{idProject}/tasks/{idTask}/assign")
     @RequireProjectRole({Role.OWNER, Role.MEMBER})
     public ResponseEntity<ApiResponse<TaskResponseDTO>> assignAccount(@PathVariable("idProject") String idProject, @PathVariable("idTask") String idTask, @RequestBody @Valid TaskAssignRequestDTO requestDTO) {
 
         TaskResponseDTO taskResponseDTO = taskService.assignTask(idTask, idProject, requestDTO);
 
-        ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Task has been assigned successfully", taskResponseDTO);
+        ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Task đã được phân công thành công", taskResponseDTO);
 
         return ResponseEntity.ok(response);
     }
@@ -118,7 +116,7 @@ public class TaskController {
 
         TaskResponseDTO taskResponseDTO = taskService.updateSectionForTask(idTask, idProject, requestDTO);
 
-        ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Task has been updated section successfully", taskResponseDTO);
+        ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Section của task đã được cập nhật thành công", taskResponseDTO);
 
         return ResponseEntity.ok(response);
     }
@@ -130,7 +128,7 @@ public class TaskController {
 
         TaskResponseDTO taskResponseDTO = taskService.updateTask(idTask, requestDTO);
 
-        ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Task has been updated successfully", taskResponseDTO);
+        ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Thông tin task đã được cập nhật thành công", taskResponseDTO);
 
         return ResponseEntity.ok(response);
     }
@@ -142,7 +140,7 @@ public class TaskController {
 
         TaskResponseDTO taskResponseDTO = taskService.archiveTask(idTask, requestDTO);
 
-        ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Task has been archived successfully", taskResponseDTO);
+        ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Task đã được lưu/archived thành công", taskResponseDTO);
 
         return ResponseEntity.ok(response);
     }
@@ -154,19 +152,19 @@ public class TaskController {
 
         TaskResponseDTO taskResponseDTO = taskService.deleteTask(idTask);
 
-        ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Task has been deleted successfully", taskResponseDTO);
+        ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Task đã được xóa thành công", taskResponseDTO);
 
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Phục hồi task đã xóa", description = "Cập nhật trạng thái ")
+    @Operation(summary = "Phục hồi task đã xóa", description = "Cập nhật trạng thái")
     @PatchMapping("/{idProject}/tasks/{idTask}/restore")
     @RequireProjectRole({Role.OWNER, Role.MEMBER})
     public ResponseEntity<ApiResponse<TaskResponseDTO>> restoreTask(@PathVariable("idProject") String idProject, @PathVariable("idTask") String idTask) {
 
         TaskResponseDTO taskResponseDTO = taskService.restore(idTask, idProject);
 
-        ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Task has been restored successfully", taskResponseDTO);
+        ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Task đã được phục hồi thành công", taskResponseDTO);
 
         return ResponseEntity.ok(response);
     }
@@ -178,7 +176,7 @@ public class TaskController {
 
         TaskResponseDTO taskResponseDTO = taskService.assigneeTask(idTask);
 
-        ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Task has been unassigned successfully", taskResponseDTO);
+        ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Task đã được hủy phân công thành công", taskResponseDTO);
 
         return ResponseEntity.ok(response);
     }

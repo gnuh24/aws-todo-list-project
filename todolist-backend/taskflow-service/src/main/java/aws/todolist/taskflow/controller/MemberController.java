@@ -34,7 +34,7 @@ public class MemberController {
     public ResponseEntity<ApiResponse<List<MemberResponseDTO>>> getMemberByIdProject(@PathVariable("idProject") String id) {
         List<MemberResponseDTO> members = memberService.getAllMember(id);
 
-        ApiResponse<List<MemberResponseDTO>> response = new ApiResponse<>(200, "list members has getted successfully", members);
+        ApiResponse<List<MemberResponseDTO>> response = new ApiResponse<>(200, "Danh sách thành viên đã lấy thành công", members);
 
         return ResponseEntity.ok(response);
     }
@@ -42,11 +42,17 @@ public class MemberController {
     @Operation(summary = "Thêm thành viên mới vào dự án", description = "Thêm một member mới vào dự án")
     @PostMapping("/{idProject}/members")
     @RequireProjectRole({Role.ADMIN, Role.OWNER})
-    public ResponseEntity<ApiResponse<MemberResponseDTO>> addNewMember(@PathVariable("idProject") String id, @RequestBody @Valid MemberCreateRequestDTO request) {
+    public ResponseEntity<ApiResponse<MemberResponseDTO>> addNewMember(
+            @PathVariable("idProject") String id,
+            @RequestBody @Valid MemberCreateRequestDTO request) {
 
         MemberResponseDTO memberResponseDTO = memberService.addNewMember(id, request);
 
-        ApiResponse<MemberResponseDTO> response = new ApiResponse<>(200, "member has added to this project successfully", memberResponseDTO);
+        ApiResponse<MemberResponseDTO> response = new ApiResponse<>(
+                200,
+                "Thành viên đã được thêm vào dự án thành công",
+                memberResponseDTO
+        );
 
         return ResponseEntity.ok(response);
     }
@@ -54,27 +60,36 @@ public class MemberController {
     @Operation(summary = "Thay đổi vai trò", description = "Thay đổi vai trò của member")
     @PatchMapping("/{idProject}/members/{idMember}")
     @RequireProjectRole({Role.ADMIN, Role.OWNER})
-    public ResponseEntity<ApiResponse<MemberResponseDTO>> updateMember(@PathVariable("idProject") String id, @PathVariable("idMember") String idMember, @RequestBody @Valid MemberUpdateRoleRequestDTO request) {
+    public ResponseEntity<ApiResponse<MemberResponseDTO>> updateMember(
+            @PathVariable("idProject") String id,
+            @PathVariable("idMember") String idMember,
+            @RequestBody @Valid MemberUpdateRoleRequestDTO request) {
 
         MemberResponseDTO memberResponseDTO = memberService.updateRoleMember(idMember, request);
 
-        ApiResponse<MemberResponseDTO> response = new ApiResponse<>(200, "member has changed role successfully", memberResponseDTO);
+        ApiResponse<MemberResponseDTO> response = new ApiResponse<>(
+                200,
+                "Vai trò của thành viên đã được cập nhật thành công",
+                memberResponseDTO
+        );
 
         return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Cập nhật trạng thái member", description = "Chuyển trạng thái cho member")
     @PatchMapping("/{idProject}/members/response")
-    public ResponseEntity<ApiResponse<MemberResponseDTO>> updateStatusMember(@PathVariable("idProject") String id, @RequestBody @Valid MemberUpdateStatusRequestDTO request, @AuthenticationPrincipal Account account) {
+    public ResponseEntity<ApiResponse<MemberResponseDTO>> updateStatusMember(
+            @PathVariable("idProject") String id,
+            @RequestBody @Valid MemberUpdateStatusRequestDTO request,
+            @AuthenticationPrincipal Account account) {
 
         MemberResponseDTO memberResponseDTO = memberService.responseRequestMember(id, request, account);
 
         String message;
-
         if (memberResponseDTO.getStatus() == StatusMember.ACCEPTED) {
-            message = "You have accepted the invitation to join this project.";
+            message = "Bạn đã chấp nhận lời mời tham gia dự án.";
         } else {
-            message = "You have declined the invitation to join this project.";
+            message = "Bạn đã từ chối lời mời tham gia dự án.";
         }
 
         ApiResponse<MemberResponseDTO> response = new ApiResponse<>(200, message, memberResponseDTO);
@@ -82,16 +97,22 @@ public class MemberController {
         return ResponseEntity.ok(response);
     }
 
-
     @Operation(summary = "Xóa member", description = "Cập nhật member về trạng thái đã xóa")
     @DeleteMapping("/{idProject}/members/{idMember}")
     @RequireProjectRole({Role.ADMIN, Role.OWNER})
-    public ResponseEntity<ApiResponse<MemberResponseDTO>> deleteMember(@PathVariable("idProject") String id, @PathVariable("idMember") String idMember) {
+    public ResponseEntity<ApiResponse<MemberResponseDTO>> deleteMember(
+            @PathVariable("idProject") String id,
+            @PathVariable("idMember") String idMember) {
 
         MemberResponseDTO memberResponseDTO = memberService.deleteMember(idMember);
 
-        ApiResponse<MemberResponseDTO> response = new ApiResponse<>(200, "member was deleted successfully", memberResponseDTO);
+        ApiResponse<MemberResponseDTO> response = new ApiResponse<>(
+                200,
+                "Thành viên đã được xóa khỏi dự án thành công",
+                memberResponseDTO
+        );
 
         return ResponseEntity.ok(response);
     }
+
 }

@@ -32,7 +32,7 @@ public class TaskCommentController {
 
         TaskCommentResponseDTO taskComment = taskCommentService.addNewComment(requestDTO, idTask, account);
 
-        ApiResponse<TaskCommentResponseDTO> response = new ApiResponse<>(200, "Comment has been created successfully", taskComment);
+        ApiResponse<TaskCommentResponseDTO> response = new ApiResponse<>(200, "Comment đã được tạo thành công", taskComment);
 
         return ResponseEntity.ok(response);
     }
@@ -44,11 +44,10 @@ public class TaskCommentController {
 
         TaskCommentResponseDTO taskComment = taskCommentService.updateComment(requestDTO, idComment, account);
 
-        ApiResponse<TaskCommentResponseDTO> response = new ApiResponse<>(200, "Comment has been updated successfully", taskComment);
+        ApiResponse<TaskCommentResponseDTO> response = new ApiResponse<>(200, "Comment đã được cập nhật thành công", taskComment);
 
         return ResponseEntity.ok(response);
     }
-
 
     @Operation(summary = "Xóa comment", description = "Cập nhật trạng thái comment là đã xóa")
     @DeleteMapping("/{idProject}/tasks/comments/{idComment}")
@@ -57,7 +56,7 @@ public class TaskCommentController {
 
         TaskCommentResponseDTO taskComment = taskCommentService.deleteComment(idComment, account);
 
-        ApiResponse<TaskCommentResponseDTO> response = new ApiResponse<>(200, "Comment has been deleted successfully", taskComment);
+        ApiResponse<TaskCommentResponseDTO> response = new ApiResponse<>(200, "Comment đã được xóa thành công", taskComment);
 
         return ResponseEntity.ok(response);
     }

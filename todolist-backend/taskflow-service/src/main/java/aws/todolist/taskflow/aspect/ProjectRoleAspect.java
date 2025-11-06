@@ -76,7 +76,7 @@ public class ProjectRoleAspect {
         List<Role> allowedRoles = Arrays.asList(requireProjectRole.value());
         if (role == null || !allowedRoles.contains(role)) {
             throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED,
-                    "You do not have permission to access this resource");
+                    "Bạn không có quyền truy cập");
         }
     }
 }

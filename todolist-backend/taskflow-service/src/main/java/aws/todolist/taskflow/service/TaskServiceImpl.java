@@ -31,6 +31,9 @@ import java.util.function.Consumer;
 public class TaskServiceImpl implements TaskService {
 
 
+    // TODO: ĐẶT THỜI GIAN LÀ NGÀY HIỆN TẠI
+    LocalDateTime now = LocalDateTime.now();
+    LocalDateTime todayStart = now.withHour(0).withMinute(0).withSecond(0).withNano(0);
     @Autowired
     private TaskRepository taskRepository;
     @Autowired
@@ -39,13 +42,10 @@ public class TaskServiceImpl implements TaskService {
     private MemberRepository memberRepository;
     @Autowired
     private TaskMapper taskMapper;
-
     @Autowired
     private TaskSchedulerService taskSchedulerService;
-
     @Autowired
     private NotificationUtils notificationUtils;
-
 
     @Override
     public TaskDetailResponseDTO getTaskById(String idTask) {
@@ -53,7 +53,7 @@ public class TaskServiceImpl implements TaskService {
         Task task = taskRepository.findByIdAndIsDeletedFalse(idTask);
 
         if (task == null) {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Task doesn't exist or has been deleted");
+            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Task không tồn tại hoặc đã bị xóa");
         }
 
         return taskMapper.ResponseDetailDTO(task);
@@ -61,7 +61,8 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public List<TaskResponseDTO> getTaskUpComing(Account account) {
-        return taskMapper.ResponseDTOList(taskRepository.findByTaskUpComingByAccount(LocalDateTime.now(), account.getId()));
+        System.err.println(todayStart);
+        return taskMapper.ResponseDTOList(taskRepository.findByTaskUpComingByAccount(todayStart, account.getId()));
     }
 
     @Override
@@ -73,12 +74,12 @@ public class TaskServiceImpl implements TaskService {
         Section section = sectionRepository.findByIdAndIsDeletedFalse(requestDTO.getSectionId());
 
         if (section == null) {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Section doesn't exist or has been deleted");
+            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Section không tồn tại hoặc đã bị xóa");
         }
 
         // Kiểm tra section được dùng có đúng của project không
         if (!section.getProject().getId().equals(idProject)) {
-            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Section isn't belong to this project");
+            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Section không thuộc về Project");
         }
 
         if (requestDTO.getTaskFatherId() != null) {
@@ -86,21 +87,19 @@ public class TaskServiceImpl implements TaskService {
 
             // Kiểm tra xem 2 task có cùng section không
             if (taskFather.getSection() != section) {
-                throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "The two tasks are not in the same section — please move the task to the correct section first.");
+                throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Cả 2 task phải cùng 1 section.");
             }
 
             if (taskFather.getIsArchived()) {
-                throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Cannot update task because its parent is archived.");
+                throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Không thể cập nhật task vì task cha đang ở trạng thái lưu trữ.");
             }
         }
 
 
         // TODO: KHÔNG CHO PHÉP ĐẶT THỜI GIAN Ở QUÁ KHỨ
-        LocalDateTime now = LocalDateTime.now();
-
         if (requestDTO.getStartTime() != null) {
-            if (requestDTO.getStartTime().isBefore(now)) {
-                throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Start time must be in the future.");
+            if (requestDTO.getStartTime().isBefore(todayStart)) {
+                throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Thời điểm bắt đầu phải ở tương lai");
             }
         }
 
@@ -110,12 +109,12 @@ public class TaskServiceImpl implements TaskService {
             if (referenceTime != null) {
                 // Nếu có startTime, deadline phải sau startTime
                 if (!requestDTO.getDeadline().isAfter(referenceTime)) {
-                    throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Deadline must be after start time.");
+                    throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Deadline phải sau thời gian bắt đầu.");
                 }
             } else {
                 // Nếu không có startTime, deadline phải sau hiện tại
-                if (requestDTO.getDeadline().isBefore(now)) {
-                    throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Deadline must be in the future.");
+                if (requestDTO.getDeadline().isBefore(todayStart)) {
+                    throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Deadline phải ở tương lai");
                 }
             }
         }
@@ -125,15 +124,15 @@ public class TaskServiceImpl implements TaskService {
         Member member = null;
 
         if (requestDTO.getIdAccountAssign() != null) {
-            member = memberRepository.findFirstByAccountIdAndProjectIdAndIsDeletedFalse(requestDTO.getIdAccountAssign(), idProject).orElseThrow(() -> new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Account is not a member of this project"));
+            member = memberRepository.findFirstByAccountIdAndProjectIdAndIsDeletedFalse(requestDTO.getIdAccountAssign(), idProject).orElseThrow(() -> new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Tài khoản này không phải là thành viên của dự án"));
 
             if (member.getStatus() != StatusMember.ACCEPTED) {
-                throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED, "The accountLogging has not accepted the invitation to join this project");
+                throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED, "Tài khoản này chưa chấp nhật là thành viên của dự án");
             }
 
             // Kiểm tra quyền của accountLogging
             if (member.getRole() == Role.ADMIN || member.getRole() == Role.VIEWER) {
-                throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED, "Account do not have permission to complete this task");
+                throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED, "Tài khoản này không có quyền hoàn thành task");
             }
 
         }
@@ -206,13 +205,13 @@ public class TaskServiceImpl implements TaskService {
             // Kiểm tra xem 2 task cha và task con có cùng section không
 
             if (taskFather.getSection() != task.getSection()) {
-                throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "The two tasks are not in the same section — please move the task to the correct section first.");
+                throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Cả 2 task phải cùng 1 section.");
             }
 
             // Kiểm tra xem 2 task cha và task con có bị tạo ra mối quan hệ vòng tròn không
 
             if (taskFather.getTaskFather() == task) {
-                throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Creating this task relationship would result in a circular dependency — please adjust the parent/child tasks to avoid loops.");
+                throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Việc tạo mối quan hệ này sẽ tạo ra vòng lặp giữa các task. Vui lòng điều chỉnh parent/child để tránh vòng lặp.");
             }
 
 
@@ -236,25 +235,24 @@ public class TaskServiceImpl implements TaskService {
 
         // Kiểm tra xem task có được phân công chưa nếu có thì kiểm tra xem tài khoản đang thực thi có phải người được phân công không
         if (task.getAccountAssign() != null && !task.getAccountAssign().getId().equals(accountLogging.getId())) {
-            throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED, "Task has been assigned for other. You can't change status of it");
+            throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED, "Task đã được phân công cho người khác. Bạn không thể thay đổi trạng thái của nó");
         }
 
         // Kiểm tra thời gian thực hiện
-        LocalDateTime now = LocalDateTime.now();
-
-        if (task.getStartTime() != null && now.isBefore(task.getStartTime())) {
+        if (task.getStartTime() != null && todayStart.isBefore(task.getStartTime())) {
             throw new BadRequestException(
                     SystemErrorCode.API_BAD_REQUEST,
-                    "You cannot change the status before the task start time."
+                    "Bạn không thể thay đổi trạng thái trước thời gian bắt đầu của task."
             );
         }
 
-        if (task.getDeadline() != null && now.isAfter(task.getDeadline())) {
+        if (task.getDeadline() != null && todayStart.isAfter(task.getDeadline())) {
             throw new BadRequestException(
                     SystemErrorCode.API_BAD_REQUEST,
-                    "You cannot change the status after the task deadline."
+                    "Bạn không thể thay đổi trạng thái sau thời hạn của task."
             );
         }
+
 
         // Kiểm tra trạng thái người dùng tính cập nhật là gì. Nếu là completed thì thêm thời gian vào cập nhật vào
         if (requestDTO.getStatus() == Status.COMPLETED) {
@@ -314,18 +312,18 @@ public class TaskServiceImpl implements TaskService {
                 .findFirstByAccountIdAndProjectIdAndIsDeletedFalse(requestDTO.getIdAccount(), idProject)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         SystemErrorCode.SYS_OBJECT_NOT_FOUND,
-                        "Account is not a member of this project"
+                        "Tài khoản này không phải là thành viên của dự án"
                 ));
 
         // ====== Kiểm tra quyền ======
         if (member.getRole() == Role.ADMIN || member.getRole() == Role.VIEWER) {
             throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED,
-                    "Account does not have permission to complete this task");
+                    "Tài khoản này không có quyền hoàn thành task");
         }
 
         // Kiểm tra phân công có bị trùng ko
         if (task.getAccountAssign() == member.getAccount()) {
-            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Account has been assigned to this task before");
+            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Task hiện đang được phân công cho tài khoản này");
         }
 
         // ====== Cập nhật người được giao ======
@@ -348,7 +346,7 @@ public class TaskServiceImpl implements TaskService {
         Task task = getTaskAndCheck(idTask);
 
         if (task.getAccountAssign() == null) {
-            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Task hasn't been assigned yet");
+            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Task chưa được phân công nên không thể hủy phân công");
         }
 
         task.setAccountAssign(null);
@@ -365,12 +363,12 @@ public class TaskServiceImpl implements TaskService {
         Section section = sectionRepository.findByIdAndIsDeletedFalse(requestDTO.getIdSection());
 
         if (section == null) {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Section doesn't exist or has been deleted");
+            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Section không tồn tại hoặc đã bị xóa");
         }
 
         // Kiểm tra section được dùng có đúng của project không
         if (!section.getProject().getId().equals(idProject)) {
-            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Section isn't belong to this project");
+            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Section không thuộc về Project");
         }
 
         Task task = this.getTaskAndCheck(idTask);
@@ -407,12 +405,10 @@ public class TaskServiceImpl implements TaskService {
             task.setDescription(requestDTO.getDescription());
         }
 
-        LocalDateTime now = LocalDateTime.now();
-
         if (requestDTO.isStartTimeSent()) {
             LocalDateTime newStart = requestDTO.getStartTime(); // có thể null
-            if (newStart != null && newStart.isBefore(now)) {
-                throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Start time must be in the future.");
+            if (newStart != null && newStart.isBefore(todayStart)) {
+                throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Thời điểm bắt đầu phải ở tương lai");
             }
             task.setStartTime(newStart);
         }
@@ -472,7 +468,7 @@ public class TaskServiceImpl implements TaskService {
         Task task = taskRepository.findByIdAndIsDeletedFalse(idTask);
 
         if (task == null) {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Task doesn't exist or has been deleted");
+            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Task không tồn tại hoặc đã bị xóa");
         }
 
         task.setIsArchived(requestDTO.getIsArchived());
@@ -521,7 +517,7 @@ public class TaskServiceImpl implements TaskService {
         Task task = taskRepository.findByIdAndIsDeletedTrue(idTask);
 
         if (task == null) {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Task doesn't exist");
+            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Task không tồn tại");
         }
 
         // Kiểm tra lại section của task hiện tại xem còn không nếu không còn thì lấy 1 section trong project
@@ -560,17 +556,16 @@ public class TaskServiceImpl implements TaskService {
 
         LocalDateTime newDeadline = requestDTO.getDeadline(); // có thể null
         LocalDateTime startTime = task.getStartTime();
-        LocalDateTime now = LocalDateTime.now();
 
         // chỉ validate khi newDeadline != null
         if (newDeadline != null) {
             if (startTime != null && !newDeadline.isAfter(startTime)) {
                 throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST,
-                        "Deadline must be after start time.");
+                        "Deadline phải sau thời gian bắt đầu.");
             }
-            if (startTime == null && newDeadline.isBefore(now)) {
+            if (startTime == null && newDeadline.isBefore(todayStart)) {
                 throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST,
-                        "Deadline must be in the future.");
+                        "Deadline phải ở tương lai");
             }
         }
 
@@ -582,11 +577,11 @@ public class TaskServiceImpl implements TaskService {
         Task task = taskRepository.findByIdAndIsDeletedFalse(idTask);
 
         if (task == null) {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Task doesn't exist or has been deleted");
+            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Task không tồn tại hoặc đã bị xóa");
         }
 
         if (task.getIsArchived()) {
-            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Cannot update task because it is archived.");
+            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Task đang ở trạng thái lưu trữ.");
         }
 
         return task;

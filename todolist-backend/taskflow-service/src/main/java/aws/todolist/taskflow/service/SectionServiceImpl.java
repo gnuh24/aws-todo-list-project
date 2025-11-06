@@ -60,7 +60,7 @@ public class SectionServiceImpl implements SectionService {
         if (optProject.isPresent()) {
             project = optProject.get();
         } else {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Project does not exist or has been deleted.");
+            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Dự án không tồn tại hoặc đã bị xóa");
         }
 
         Integer nextPosition = sectionRepository.findMaxPositionByProjectId(project.getId()) + 1;
@@ -78,7 +78,7 @@ public class SectionServiceImpl implements SectionService {
         Section section = sectionRepository.findByIdAndIsDeletedFalse(idSection);
 
         if (section == null) {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Section doesn't exist or has been deleted");
+            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Section không tồn tại hoặc đã bị xóa");
         }
 
         int oldPosition = section.getPosition();
@@ -100,7 +100,7 @@ public class SectionServiceImpl implements SectionService {
         Section section = sectionRepository.findByIdAndIsDeletedFalse(idSection);
 
         if (section == null) {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Section doesn't exist or has been deleted");
+            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Section không tồn tại hoặc đã bị xóa");
         }
 
         // Kiểm tra xem project của section còn bao nhiêu section để tránh xóa hết section
@@ -109,7 +109,7 @@ public class SectionServiceImpl implements SectionService {
                 .count();
 
         if (totalSections <= 1) {
-            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Cannot delete because the project must have at least one section.");
+            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Không thể xóa vì project cần ít nhật một section.");
         }
 
 
@@ -137,13 +137,13 @@ public class SectionServiceImpl implements SectionService {
         Section sectionSource = sectionRepository.findByIdAndIsDeletedFalse(requestDTO.getIdSectionSource());
 
         if (sectionSource == null) {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Section resource doesn't exist or has been deleted");
+            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Section nguồn không tồn tại hoặc đã bị xóa");
         }
 
         Section sectionDestination = sectionRepository.findByIdAndIsDeletedFalse(requestDTO.getIdSectionDestination());
 
         if (sectionDestination == null) {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Section destination doesn't exist or has been deleted");
+            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Section đích không tồn tại hoặc đã bị xóa");
         }
 
 
@@ -153,13 +153,13 @@ public class SectionServiceImpl implements SectionService {
                 .count();
 
         if (totalSections <= 1) {
-            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Cannot delete because the project must have at least one section.");
+            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Không thể xóa vì project cần ít nhật một section.");
         }
 
 
         // Kiểm tra xem 2 section có cùng project không
         if (sectionSource.getProject() != sectionDestination.getProject()) {
-            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Both sections must belong to the same project.");
+            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Cả 2 section phải cùng một project.");
         }
 
 

@@ -64,7 +64,7 @@ public class MemberServiceImpl implements MemberService {
         Optional<Member> OptMember = memberRepository.findFirstByAccountIdAndProjectIdAndIsDeletedFalse(requestDTO.getIdAccount(), idProject);
 
         if (OptMember.isPresent()) {
-            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "This account has already been added to this project.");
+            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Tài khoản này đã được thêm vào dự án");
         }
 
         // Lấy thông tin chi tiết của project và account
@@ -80,19 +80,19 @@ public class MemberServiceImpl implements MemberService {
         if (OptProject.isPresent()) {
             project = OptProject.get();
         } else {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Project doesn't exist.");
+            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Dự án không tồn tại");
         }
 
         if (OptAccount.isPresent()) {
             account = OptAccount.get();
         } else {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Account doesn't exist.");
+            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Tài khoản không tồn tại.");
         }
 
         // Kiểm tra người dùng có phân quyền làm owner không
 
         if (requestDTO.getRole() == Role.OWNER) {
-            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Cannot assign OWNER role to a member.");
+            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Không thể phân quyền OWNER cho các thành viên khác.");
         }
 
         Member member = Member.builder().account(account).project(project).role(requestDTO.getRole()).status(StatusMember.PENDING).build();
@@ -120,15 +120,15 @@ public class MemberServiceImpl implements MemberService {
         if (OptMember.isPresent()) {
             member = OptMember.get();
         } else {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "This member doesn't exist");
+            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Member không tồn tại");
         }
 
         if (member.getRole() == Role.OWNER) {
-            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Cannot change role: this member is an OWNER.");
+            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Không thể phân quyền OWNER cho người dùng khác");
         }
 
         if (requestDTO.getRole() == Role.OWNER) {
-            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Cannot assign OWNER role to a member.");
+            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Không thể phân quyền OWNER cho người dùng khác");
         }
 
         member.setRole(requestDTO.getRole());
@@ -163,11 +163,11 @@ public class MemberServiceImpl implements MemberService {
         if (OptMember.isPresent()) {
             member = OptMember.get();
         } else {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "This member doesn't exist");
+            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Member không tồn tại");
         }
 
         if (member.getRole() == Role.OWNER) {
-            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Cannot delete member: this member is an OWNER.");
+            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Không thể xóa người dùng là OWNER");
         }
 
         member.softDelete();

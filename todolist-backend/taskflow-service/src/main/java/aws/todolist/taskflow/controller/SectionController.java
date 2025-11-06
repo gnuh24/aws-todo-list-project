@@ -33,7 +33,7 @@ public class SectionController {
     public ResponseEntity<ApiResponse<List<SectionResponseDTO>>> getSectionByIdProject(@PathVariable("idProject") String id) {
         List<SectionResponseDTO> sections = sectionService.getAllSection(id);
 
-        ApiResponse<List<SectionResponseDTO>> response = new ApiResponse<>(200, "List of sections has been fetched successfully.", sections);
+        ApiResponse<List<SectionResponseDTO>> response = new ApiResponse<>(200, "Danh sách section đã được lấy thành công.", sections);
 
         return ResponseEntity.ok(response);
     }
@@ -44,21 +44,20 @@ public class SectionController {
     public ResponseEntity<ApiResponse<SectionResponseDTO>> addNewSection(@PathVariable("idProject") String id, @RequestBody @Valid SectionCreateRequestDTO requestDTO) {
         SectionResponseDTO section = sectionService.addSection(id, requestDTO);
 
-        ApiResponse<SectionResponseDTO> response = new ApiResponse<>(200, "new section has been created successfully", section);
+        ApiResponse<SectionResponseDTO> response = new ApiResponse<>(200, "Section mới đã được tạo thành công.", section);
 
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Cập nhật ví trị section", description = "Đổi vị trí khác cho section")
+    @Operation(summary = "Cập nhật vị trí section", description = "Đổi vị trí khác cho section")
     @PatchMapping("/{idProject}/sections/{idSection}")
     @RequireProjectRole({Role.OWNER, Role.MEMBER})
     public ResponseEntity<ApiResponse<SectionResponseDTO>> updateSection(@PathVariable("idProject") String idProject, @PathVariable("idSection") String id, @RequestBody @Valid SectionUpdateRequestDTO requestDTO) {
         SectionResponseDTO section = sectionService.updateSection(id, requestDTO);
 
-        ApiResponse<SectionResponseDTO> response = new ApiResponse<>(200, "this section has been updated successfully", section);
+        ApiResponse<SectionResponseDTO> response = new ApiResponse<>(200, "Section đã được cập nhật thành công.", section);
 
         return ResponseEntity.ok(response);
-
     }
 
     @Operation(summary = "Xóa section", description = "Xóa section và các task trong section")
@@ -67,10 +66,9 @@ public class SectionController {
     public ResponseEntity<ApiResponse<SectionResponseDTO>> deleteSection(@PathVariable("idProject") String idProject, @PathVariable("idSection") String id) {
         SectionResponseDTO section = sectionService.removeSection(id);
 
-        ApiResponse<SectionResponseDTO> response = new ApiResponse<>(200, "this section has been deleted successfully", section);
+        ApiResponse<SectionResponseDTO> response = new ApiResponse<>(200, "Section đã được xóa thành công.", section);
 
         return ResponseEntity.ok(response);
-
     }
 
     @Operation(summary = "Xóa section và di cư task", description = "Thực hiện xóa section đồng thời, di cư task qua section khác")
@@ -79,8 +77,9 @@ public class SectionController {
     public ResponseEntity<ApiResponse<SectionResponseDTO>> deleteSectionAndMigrateTask(@PathVariable("idProject") String idProject, @RequestBody @Valid SectionDeleteAndMigrateDTO requestDTO) {
         SectionResponseDTO section = sectionService.removeSectionAndMigrate(requestDTO);
 
-        ApiResponse<SectionResponseDTO> response = new ApiResponse<>(200, "this section has been deleted successfully", section);
+        ApiResponse<SectionResponseDTO> response = new ApiResponse<>(200, "Section đã được xóa và các task đã được di cư thành công.", section);
 
         return ResponseEntity.ok(response);
     }
+
 }
