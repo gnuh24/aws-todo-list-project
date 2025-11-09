@@ -98,6 +98,7 @@ export default function MoreOptionsDropdown({ setSelectedDateline, onSelect }) {
                           setSelectedDateline(val);
                           setOpenDatelineTab(false); // tắt dropdown sau khi chọn
                       }}
+                      showForm={openDatelineTab}
                   />
               )}
           >

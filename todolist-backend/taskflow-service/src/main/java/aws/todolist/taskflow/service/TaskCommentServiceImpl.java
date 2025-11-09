@@ -15,6 +15,7 @@ import aws.todolist.taskflow.repository.TaskRepository;
 import aws.todolist.taskflow.utils.NotificationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class TaskCommentServiceImpl implements TaskCommentService {
@@ -34,6 +35,7 @@ public class TaskCommentServiceImpl implements TaskCommentService {
 
 
     @Override
+    @Transactional
     public TaskCommentResponseDTO addNewComment(TaskCommentRequestDTO requestDTO, String idTask, Account accountLogging) {
 
         Task task = getTaskAndCheck(idTask);
@@ -54,6 +56,7 @@ public class TaskCommentServiceImpl implements TaskCommentService {
     }
 
     @Override
+    @Transactional
     public TaskCommentResponseDTO updateComment(TaskCommentRequestDTO requestDTO, String idComment, Account account) {
 
         TaskComment taskComment = getCommentAndCheck(idComment, account);
@@ -66,6 +69,7 @@ public class TaskCommentServiceImpl implements TaskCommentService {
     }
 
     @Override
+    @Transactional
     public TaskCommentResponseDTO deleteComment(String idComment, Account account) {
 
         TaskComment taskComment = getCommentAndCheck(idComment, account);

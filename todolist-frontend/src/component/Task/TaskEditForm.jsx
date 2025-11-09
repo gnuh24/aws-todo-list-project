@@ -15,6 +15,7 @@ import ProjectSelectDropdown from "../Dropdown/ProjectSelectDropdown";
 import dayjs from "dayjs";
 
 export default function TaskEditForm({ task, onSave, onCancel }) {
+  const [showFormDatePicker, setShowFormDatePicker] = useState(false);
   const [taskName, setTaskName] = useState(task?.title || "");
   const [description, setDescription] = useState(task?.description || "");
   const [selectedStartTime, setSelectedStartTime] = useState(task?.startTime || null);
@@ -38,7 +39,8 @@ export default function TaskEditForm({ task, onSave, onCancel }) {
       description,
       priority,
       startTime: selectedStartTime ? dayjs(selectedStartTime).format(formatToSend) : null,
-      deadline: selectedDeadline ? dayjs(setSelectedDeadline).format(formatToSend) : null,
+      deadline: selectedDeadline ? dayjs(selectedDeadline).format(formatToSend) : null,
+      idSection: selectedSection.id
     });
   };
 
@@ -73,10 +75,21 @@ export default function TaskEditForm({ task, onSave, onCancel }) {
       <div className="flex items-center gap-2 mt-3 flex-wrap">
         {/* Date picker */}
         <Dropdown
-          trigger={["click"]}
-          dropdownRender={() => (
-            <DatePickerDropdown onSelect={(value) => setSelectedStartTime(value)} />
-          )}
+            trigger={["click"]}
+            open={showFormDatePicker}
+            onOpenChange={(v) => {
+              setShowFormDatePicker(v); // <-- dùng v thay vì true cố định
+            }}
+            dropdownRender={() => (
+                <DatePickerDropdown
+                    isStartTime={true}
+                    showForm={showFormDatePicker}
+                    onSelect={(val) => {
+                      setSelectedStartTime(val);
+                      setShowFormDatePicker(false); // <<< đóng dropdown sau khi chọn
+                    }}
+                />
+            )}
         >
           <Button icon={<CalendarOutlined />} size="small">
             {selectedStartTime ? dayjs(selectedStartTime).format(formatToDisplay) : "Date"}
@@ -94,6 +107,7 @@ export default function TaskEditForm({ task, onSave, onCancel }) {
         {/* More options */}
         <MoreOptionsDropdown
           onSelect={(action) => console.log("Selected:", action)}
+          setSelectedDateline={setSelectedDeadline}
         />
       </div>
 
@@ -107,20 +121,31 @@ export default function TaskEditForm({ task, onSave, onCancel }) {
             selectedProject={selectedProject}
             onSelectedSection={setSelectedSection}
             onSelectedProject={setSelectedProject}
-            disabled={true}
         />
 
         {/* Action buttons */}
         <div className="flex gap-2">
-          <Button onClick={onCancel}>Cancel</Button>
           <Button
-            type="primary"
-            danger
-            disabled={!taskName.trim()}
-            onClick={handleSave}
+              onClick={(e) => {
+                e.stopPropagation(); // Ngăn nổi bọt, không trigger onClick của div cha
+                onCancel();
+              }}
+          >
+            Cancel
+          </Button>
+
+          <Button
+              type="primary"
+              danger
+              disabled={!taskName.trim()}
+              onClick={(e) => {
+                e.stopPropagation(); // Ngăn nổi bọt
+                handleSave();
+              }}
           >
             Save
           </Button>
+
         </div>
       </div>
     </div>

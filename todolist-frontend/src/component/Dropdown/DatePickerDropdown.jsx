@@ -7,11 +7,10 @@ import {
   CalendarOutlined,
   ClockCircleOutlined,
   ReloadOutlined,
+  CloseOutlined
 } from "@ant-design/icons";
 
-export default function DatePickerDropdown({ isStartTime, onSelect }) {
-
-    const [showForm, setShowForm] = useState(true);
+export default function DatePickerDropdown({ isStartTime, onSelect, showForm}) {
 
     const currentTime = dayjs();
     let today = null;
@@ -33,16 +32,14 @@ export default function DatePickerDropdown({ isStartTime, onSelect }) {
     const nextWeek = currentTime.add(1, "week").day(1); // Monday tuần sau
 
 
-  return (
-      showForm &&
+  return (showForm &&
         <div className="bg-white rounded-md shadow-lg w-72 p-2">
             {/* Quick options */}
             <div className="space-y-1 text-[13px]">
                 <div
                     className="flex justify-between items-center hover:bg-gray-100 rounded px-2 py-1 cursor-pointer"
                     onClick={() =>
-                        {onSelect(today)
-                        setShowForm(false)}
+                        {onSelect(today)}
                     }
                 >
               <span>
@@ -53,8 +50,7 @@ export default function DatePickerDropdown({ isStartTime, onSelect }) {
                 <div
                     className="flex justify-between items-center hover:bg-gray-100 rounded px-2 py-1 cursor-pointer"
                     onClick={() =>
-                    {onSelect(tomorrow)
-                        setShowForm(false)}
+                    {onSelect(tomorrow)}
                     }
                 >
               <span>
@@ -64,9 +60,9 @@ export default function DatePickerDropdown({ isStartTime, onSelect }) {
                 </div>
                 <div
                     className="flex justify-between items-center hover:bg-gray-100 rounded px-2 py-1 cursor-pointer"
-                    onClick={() =>
-                    {onSelect(thisWeekend)
-                        setShowForm(false)}
+                    onClick={() => {
+                        onSelect(thisWeekend)
+                    }
                     }
                 >
               <span>
@@ -77,8 +73,7 @@ export default function DatePickerDropdown({ isStartTime, onSelect }) {
                 <div
                     className="flex justify-between items-center hover:bg-gray-100 rounded px-2 py-1 cursor-pointer"
                     onClick={() =>
-                    {onSelect(nextWeek)
-                        setShowForm(false)}
+                    {onSelect(nextWeek)}
                     }
                 >
               <span>
@@ -99,7 +94,6 @@ export default function DatePickerDropdown({ isStartTime, onSelect }) {
                 }else {
                     onSelect(dayjs(date).hour(23).minute(59).second(59));
                 }
-                  setShowForm(false)
               }}
               disabledDate={(currentDate) => {
                   // currentDate là dayjs object
@@ -114,9 +108,16 @@ export default function DatePickerDropdown({ isStartTime, onSelect }) {
             <Button size="small" icon={<ClockCircleOutlined />}>
               Time
             </Button>
-            <Button size="small" icon={<ReloadOutlined />}>
-              Repeat
-            </Button>
+              <Button
+                  className="hover:bg-red-100 rounded px-2 py-1 cursor-pointer"
+                  size="small"
+                  icon={<CloseOutlined />} // đổi icon thành dấu X hoặc icon hủy
+                  onClick={() => {
+                      onSelect(null);
+                  }}
+              >
+                  Cancel
+              </Button>
           </div>
         </div>
   );

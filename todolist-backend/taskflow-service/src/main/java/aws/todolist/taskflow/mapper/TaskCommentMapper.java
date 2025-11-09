@@ -16,7 +16,7 @@ public class TaskCommentMapper {
                 .id(comment.getId())
                 .taskId(comment.getTask().getId())
                 .accountId(comment.getAccount().getId())
-                .authorName(comment.getAccount().getUsername())
+                .authorName(comment.getAccount().getDisplayName())
                 .authorAvatar(comment.getAccount().getAvatar())
                 .comment(comment.getComment())
                 .createdAt(comment.getCreatedAt())

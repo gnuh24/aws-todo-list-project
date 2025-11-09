@@ -11,18 +11,18 @@ import {https_taskflow} from "../../service/api";
 export default function InlineAddTaskFormUpComing({ initialDate, onCancel, onAdd }) {
   const [taskName, setTaskName] = useState("");
   const [description, setDescription] = useState("");
-  const [selectedDate, setSelectedDate] = useState(null);
+  const selectedStartTime = dayjs(initialDate);
   const [selectedSection, setSelectedSection] = useState({});
   const [selectedProject, setSelectedProject] = useState({});
   const [selectedDeadline, setSelectedDeadline] = useState(null);
   const [priority, setPriority] = useState("LOW");
   const formatToDisplay = "HH:mm DD/MM/YYYY";
   const formatToSend = "YYYY-MM-DDTHH:mm:ss";
+  const [showFormDatePicker, setShowFormDatePicker] = useState(false);
 
     const resetForm = async () => {
         setTaskName("");
         setDescription("");
-        setSelectedDate(null);
         setSelectedSection({});
         setSelectedDeadline(null);
         setSelectedProject({});
@@ -40,7 +40,7 @@ export default function InlineAddTaskFormUpComing({ initialDate, onCancel, onAdd
         const taskDTO = {
             title: taskName,
             description,
-            startTime: selectedDate ? selectedDate.format(formatToSend) : dayjs(initialDate).hour(0).minute(0).second(0).format(formatToSend),
+            startTime: selectedStartTime.format(formatToSend),
             deadline: selectedDeadline ? selectedDeadline.format(formatToSend) : null,
             sectionId: selectedSection.id,
             priority: priority,
@@ -52,7 +52,6 @@ export default function InlineAddTaskFormUpComing({ initialDate, onCancel, onAdd
                 taskDTO,
             );
             if (response.status === 200) {
-                console.log(" Login success:", response.data);
                 onAdd(response.data.data);
                 resetForm();
                 alert("Thêm thành công")
@@ -73,7 +72,7 @@ export default function InlineAddTaskFormUpComing({ initialDate, onCancel, onAdd
 
 
     return (
-    <div className="border rounded-lg p-4 mt-2 w-full max-w-xl bg-white shadow-sm">
+    <div className="border rounded-lg p-4 mt-2 w-full bg-white shadow-sm">
       {/* Task input */}
       <Input
         placeholder="Meet with tutor Friday at 3pm"
@@ -101,17 +100,9 @@ export default function InlineAddTaskFormUpComing({ initialDate, onCancel, onAdd
 
       {/* Action buttons row */}
       <div className="flex flex-wrap gap-2 mb-3">
-          <Dropdown
-              trigger={["click"]}
-              dropdownRender={() => (
-                  <DatePickerDropdown isStartTime = {true} onSelect={(val) => setSelectedDate(val)} />
-              )}
-          >
-              <Button icon={<CalendarOutlined />} size="small">
-                  {selectedDate ? selectedDate.format(formatToDisplay) : "Date"}
-              </Button>
-          </Dropdown>
-
+          <Button icon={<CalendarOutlined />} size="small">
+                  {selectedStartTime.format(formatToDisplay)}
+          </Button>
 
 
         <PriorityDropdown priority={priority} onSelect={setPriority} />

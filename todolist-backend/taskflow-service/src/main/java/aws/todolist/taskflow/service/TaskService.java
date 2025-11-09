@@ -23,7 +23,7 @@ public interface TaskService {
 
     TaskResponseDTO assigneeTask(String idTask);
 
-    TaskResponseDTO updateSectionForTask(String idTask, String idProject, TaskUpdateSectionRequestDTO requestDTO);
+    TaskResponseDTO updateSectionForTask(String idTask, TaskUpdateSectionRequestDTO requestDTO);
 
     TaskResponseDTO updateTask(String idTask, TaskUpdateRequestDTO requestDTO);
 

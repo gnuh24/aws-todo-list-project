@@ -358,32 +358,11 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional
-    public TaskResponseDTO updateSectionForTask(String idTask, String idProject, TaskUpdateSectionRequestDTO requestDTO) {
-
-        Section section = sectionRepository.findByIdAndIsDeletedFalse(requestDTO.getIdSection());
-
-        if (section == null) {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Section không tồn tại hoặc đã bị xóa");
-        }
-
-        // Kiểm tra section được dùng có đúng của project không
-        if (!section.getProject().getId().equals(idProject)) {
-            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Section không thuộc về Project");
-        }
+    public TaskResponseDTO updateSectionForTask(String idTask, TaskUpdateSectionRequestDTO requestDTO) {
 
         Task task = this.getTaskAndCheck(idTask);
 
-        // Hủy mối quan hệ cha con của task khi chuyển section (Sẽ bao phủ được 2 trường hợp là task con và task cha)
-        task.setTaskFather(null);
-
-        // Chuyển section cho task con của task hiện tại nếu có
-        task.getTaskChild().forEach(taskChild -> {
-            this.applyRecursive(taskChild, t -> t.setSection(section), c -> {
-            });
-            taskRepository.save(taskChild);
-        });
-
-        task.setSection(section);
+        updateSection(task, requestDTO.getIdSection());
 
         task = taskRepository.save(task);
 
@@ -423,6 +402,11 @@ public class TaskServiceImpl implements TaskService {
 
         if (requestDTO.getIsPinned() != null) {
             task.setIsPinned(requestDTO.getIsPinned());
+        }
+
+        // Nếu có cập nhật section
+        if (requestDTO.getIdSection() != null) {
+            updateSection(task, requestDTO.getIdSection());
         }
 
 
@@ -586,6 +570,27 @@ public class TaskServiceImpl implements TaskService {
         }
 
         return task;
+    }
+
+    private void updateSection(Task task, String idSection) {
+
+        Section section = sectionRepository.findByIdAndIsDeletedFalse(idSection);
+
+        if (section == null) {
+            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Section không tồn tại hoặc đã bị xóa");
+        }
+
+        // Hủy mối quan hệ cha con của task khi chuyển section (Sẽ bao phủ được 2 trường hợp là task con và task cha)
+        task.setTaskFather(null);
+
+        // Chuyển section cho task con của task hiện tại nếu có
+        task.getTaskChild().forEach(taskChild -> {
+            this.applyRecursive(taskChild, t -> t.setSection(section), c -> {
+            });
+            taskRepository.save(taskChild);
+        });
+
+        task.setSection(section);
     }
 
 

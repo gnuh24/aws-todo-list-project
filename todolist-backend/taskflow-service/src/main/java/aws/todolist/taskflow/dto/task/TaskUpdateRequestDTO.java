@@ -32,6 +32,8 @@ public class TaskUpdateRequestDTO {
 
     private boolean isDeadlineSent;
 
+    private String idSection;
+
     @JsonSetter("startTime")
     public void setStartTime(LocalDateTime startTime) {
         this.startTime = startTime;

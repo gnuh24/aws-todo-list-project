@@ -114,7 +114,7 @@ public class TaskController {
     @RequireProjectRole({Role.OWNER, Role.MEMBER})
     public ResponseEntity<ApiResponse<TaskResponseDTO>> updateSection(@PathVariable("idProject") String idProject, @PathVariable("idTask") String idTask, @RequestBody @Valid TaskUpdateSectionRequestDTO requestDTO) {
 
-        TaskResponseDTO taskResponseDTO = taskService.updateSectionForTask(idTask, idProject, requestDTO);
+        TaskResponseDTO taskResponseDTO = taskService.updateSectionForTask(idTask, requestDTO);
 
         ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Section của task đã được cập nhật thành công", taskResponseDTO);
 

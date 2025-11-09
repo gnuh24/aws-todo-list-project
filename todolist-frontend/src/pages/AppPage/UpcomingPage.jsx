@@ -259,7 +259,7 @@ export default function UpcomingPage() {
 
                           <div className="ml-4 flex flex-col gap-2">
                             {tasksByDate[d.date.toDateString()]?.map((task, idx) => (
-                                <div key={idx}>
+                                <div key={idx} onClick={()=> setShowAddTaskIndex(null)}>
                                   <TaskItem
                                       task={task}
                                       projectId={task.idProject}
