@@ -126,13 +126,12 @@ export default function InlineAddTaskFormUpComing({ initialDate, onCancel, onAdd
         />
 
         <div className="flex gap-2">
-          <Button size="small" onClick={onCancel}>
+          <Button onClick={onCancel}>
             Cancel
           </Button>
           <Button
             type="primary"
             danger
-            size="small"
             disabled={!taskName.trim()}
             onClick={() => {
               handleAddTask();

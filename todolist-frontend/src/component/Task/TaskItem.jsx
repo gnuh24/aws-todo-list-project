@@ -27,6 +27,7 @@ export default function TaskItem({
   onUpdate,
   onDeleteTaskUpComing,
   onUpdateTaskUpComing,
+  isOpenFormAddTaskUpComing,
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [isOpenComment, setIsOpenComment] = useState(false);
@@ -37,6 +38,7 @@ export default function TaskItem({
   const formatToDisplay = "HH:mm DD/MM/YYYY";
   const formatToSend = "YYYY-MM-DDTHH:mm:ss";
   const [showFormDatePicker, setShowFormDatePicker] = useState(false);
+
 
 
   // Đóng menu khi click ra ngoài
@@ -143,7 +145,8 @@ export default function TaskItem({
 
   }
 
-  if (isEditing) {
+  // Nếu có gửi isOpenFormAddTaskUpComing thì phải null mới cho chạy
+  if (isEditing && (typeof isOpenFormAddTaskUpComing === "undefined" || isOpenFormAddTaskUpComing === null)) {
     return (
       <TaskEditForm
         onSave={(data) => handleUpdateTaskAPI(data)}

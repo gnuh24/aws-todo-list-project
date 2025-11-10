@@ -10,7 +10,7 @@ import TaskEditForm from "../../component/Task/TaskEditForm";
 import {https_auth, https_taskflow} from "../../service/api";
 
 export default function UpcomingPage() {
-  const [selectedDate, setselectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [showAddTaskIndex, setShowAddTaskIndex] = useState(null);
   const [showCalendar, setShowCalendar] = useState(false);
   const [tasksByDate, setTasksByDate] = useState({});
@@ -52,14 +52,14 @@ export default function UpcomingPage() {
   const prevWeek = () => {
     const newDate = new Date(selectedDate);
     newDate.setDate(selectedDate.getDate() - 7);
-    setselectedDate(newDate);
+    setSelectedDate(newDate);
   };
 
   // Chuyển tuần sau
   const nextWeek = () => {
     const newDate = new Date(selectedDate);
     newDate.setDate(selectedDate.getDate() + 7);
-    setselectedDate(newDate);
+    setSelectedDate(newDate);
   };
 
   // Lưu ref cho từng ngày
@@ -150,7 +150,7 @@ export default function UpcomingPage() {
                   <LeftOutlined />
                 </button>
                 <button
-                    onClick={() => setselectedDate(new Date())}
+                    onClick={() => setSelectedDate(new Date())}
                     className="border border-gray-300 rounded px-3 py-1 text-sm hover:bg-gray-100"
                 >
                   Today
@@ -171,7 +171,7 @@ export default function UpcomingPage() {
                       animate
                       mode="single"
                       selected={selectedDate}
-                      onSelect={(date) => date && setselectedDate(date)}
+                      onSelect={(date) => date && setSelectedDate(date)}
                       disabled={{ before: new Date() }}
                       classNames={{
                         today: "border-red-500 rounded-full",
@@ -194,7 +194,7 @@ export default function UpcomingPage() {
                             isPast ? "opacity-50 cursor-not-allowed" : ""
                         }`}
                         onClick={() => {
-                          if (!isPast) setselectedDate(d.date);
+                          if (!isPast) setSelectedDate(d.date);
                         }}
                     >
             <span
@@ -235,26 +235,18 @@ export default function UpcomingPage() {
                       <div
                           key={i}
                           ref={(el) => (dayRefs.current[d.date.toDateString()] = el)}
-                          className="border-b pb-6"
+                          className="pb-6"
                       >
                         <div className="flex flex-col gap-2 pb-6">
-                          <div className="flex items-center justify-between">
-                            <p className="text-[13px] text-gray-700 font-medium">
-                              {d.day} {d.date.toLocaleString("en-US", { month: "short" })} · {d.weekday}
-                            </p>
-
-                            {showAddTaskIndex !== i && (
-                                <button
-                                    onClick={() => setShowAddTaskIndex(i)}
-                                    className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-red-500 transition duration-200 ease-in-out group focus:outline-none"
-                                >
-                                  <span className="flex items-center justify-center text-red-500 group-hover:bg-red-500 group-hover:text-white w-6 h-6 rounded-full transition duration-200 ease-in-out">
-                                    ＋
-                                  </span>
-                                  <span>Add task</span>
-                                </button>
-
-                            )}
+                          <div className="flex items-center justify-between border-b pb-3">
+                            <div className="flex items-center gap-2">
+                              <div className="font-bold px-1 py-1 rounded">
+                                {d.day}
+                              </div>
+                              <div className="text-gray-700 font-medium">
+                                {d.date.toLocaleString("en-US", { month: "short" })} · {d.weekday}
+                              </div>
+                            </div>
                           </div>
 
                           <div className="ml-4 flex flex-col gap-2">
@@ -297,8 +289,22 @@ export default function UpcomingPage() {
                                           }
                                         })
                                       }}
+                                      isOpenFormAddTaskUpComing={showAddTaskIndex}
                                   />
-                                </div>))}
+                            </div>))}
+
+                            {showAddTaskIndex !== i && (
+                                <button
+                                    onClick={() => setShowAddTaskIndex(i)}
+                                    className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-red-500 transition duration-200 ease-in-out group focus:outline-none"
+                                >
+                                  <span className="flex items-center justify-center text-red-500 group-hover:bg-red-500 group-hover:text-white w-6 h-6 rounded-full transition duration-200 ease-in-out">
+                                    ＋
+                                  </span>
+                                  <span>Add task</span>
+                                </button>
+
+                            )}
 
                           </div>
 
