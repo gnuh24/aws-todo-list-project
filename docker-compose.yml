@@ -69,19 +69,25 @@ services:
     volumes:
       - kafka_data:/bitnami/kafka
 
-  # =====================
-  # Redpanda Console (UI)
-  # =====================
-  redpanda-console:
-    image: docker.redpanda.com/redpandadata/console:latest
-    container_name: redpanda_console
+  # ==== AKHQ ====
+  akhq:
+    image: tchiotludo/akhq:0.25.0
+    container_name: akhq
     restart: unless-stopped
     depends_on:
       - kafka
+    networks:
+      - default
     ports:
-      - "8083:8080" # Console UI tại http://localhost:8083
+      - "8083:8080"
     environment:
-      - KAFKA_BROKERS=kafka_broker:29092 # Dùng listener nội bộ (ổn định nhất)
+      AKHQ_CONFIGURATION: |
+        akhq:
+          connections:
+            ktpm-cluster:
+              properties:
+                bootstrap.servers: "kafka:29092"  # tên service Kafka trong compose
+
 
   # =====================
   # 🌐 User Service (Spring Boot)
