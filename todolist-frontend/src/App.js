@@ -1,6 +1,6 @@
 import logo from "./logo.svg";
 import "./App.css";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import HomePage from "./pages/HomePage/HomePage";
 import Layout from "./layout/Layout";
 import RegisterPage from "./pages/RegisterPage/RegisterPage";
@@ -27,8 +27,11 @@ function App() {
         <BrowserRouter>
           <Spinner></Spinner>
           <Routes>
-            <Route path="/" element={<Layout></Layout>}>
-              <Route path="/" element={<HomePage></HomePage>}></Route>
+
+            {/* <Route path="/index.html" element={<Navigate to="/" replace />} /> */}
+
+            <Route path="/index.html" element={<Layout></Layout>}>
+              <Route path="/index.html" element={<HomePage></HomePage>}></Route>
             </Route>
             <Route
               path="/register"
@@ -70,6 +73,11 @@ function App() {
             </Route>
             <Route path="testapi" element={<TestAPI></TestAPI>}></Route>
             <Route path="/login-success" element={<LoginSuccess />} />
+
+            <Route
+                path="*"
+                element={<Navigate to="/index.html" replace />}
+            />
           </Routes>
         </BrowserRouter>
       </GoogleOAuthProvider>
