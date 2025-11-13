@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import {useNotifications} from "../../layout/MainLayout";
@@ -6,22 +6,28 @@ import {useNotifications} from "../../layout/MainLayout";
 
 export default function NotificationSocket() {
     
-    const { setCountNotificationsUnRead, setNotifications, pageSizeNotification, setTotalPagesNotification, setNewNotificationFormWebsocket  } = useNotifications();
+    const { setCountNotificationsUnRead, setNotifications, pageSizeNotification, setTotalPagesNotification, setNewNotificationFormWebsocket, pageNumberNotification } = useNotifications();
 
     const [jwtToken] = useState(JSON.parse(localStorage.getItem("USER_INFO"))?.token);
+
+    const pageNumberRef = useRef(pageNumberNotification);
+
+    useEffect(() => {
+        pageNumberRef.current = pageNumberNotification;
+    }, [pageNumberNotification]);
     
     const UpdateNewNotification = (newNotification) => {
-        console.log("Receive new message: " + newNotification);
         setCountNotificationsUnRead((prev) => prev + 1);
         setNotifications((prev) => {
             const updatedList = [newNotification, ...prev];
 
             // Update tổng số trang trước
-            setTotalPagesNotification(Math.ceil(updatedList.length / pageSizeNotification));
+            const totalPages = Math.ceil(updatedList.length / pageSizeNotification);
+            setTotalPagesNotification(totalPages);
 
-            // Nếu danh sách vượt quá 5 phần tử thì xóa phần tử cuối để bảo toàn phân trang
-            if (updatedList.length > pageSizeNotification) {
-                updatedList.pop(); // hoặc dùng slice để an toàn
+            // Nếu danh sách vượt quá 5 phần tử và chưa load hết tổng số trang thì xóa phần tử cuối để bảo toàn phân trang
+            if (pageNumberRef.current < totalPages && updatedList.length > pageSizeNotification) {
+                updatedList.pop();
             }
 
             return updatedList;

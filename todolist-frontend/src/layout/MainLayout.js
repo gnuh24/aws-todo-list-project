@@ -19,6 +19,8 @@ export default function MainLayout() {
 
     const [pageSizeNotification] = useState(PAGE_SIZE);
 
+    const [pageNumberNotification, setPageNumberNotification] = useState(1);        // trang hiện tại
+
     const [totalPagesNotification, setTotalPagesNotification] = useState(0);
 
     const [pageNotification, setPageNotification] = useState(1);        // trang hiện tại
@@ -40,7 +42,7 @@ export default function MainLayout() {
     },[]);
 
     return (
-        <NotificationContext.Provider value={{ countNotificationsUnRead, setCountNotificationsUnRead, notifications, setNotifications, pageSizeNotification, totalPagesNotification, setTotalPagesNotification, pageNotification, setPageNotification, setNewNotificationFormWebsocket }}>
+        <NotificationContext.Provider value={{ countNotificationsUnRead, setCountNotificationsUnRead, notifications, setNotifications, pageSizeNotification, totalPagesNotification, setTotalPagesNotification, pageNotification, setPageNotification, setNewNotificationFormWebsocket, pageNumberNotification, setPageNumberNotification }}>
             <div className="ml-72 flex-1 flex flex-col">
                 <Sidebar />
                 <div className="flex-1 bg-white">

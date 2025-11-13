@@ -8,9 +8,8 @@ import NotificationItem from "../../component/Notification/NotificationItem";
 
 
 export default function NotificationsPage() {
-    const { notifications, setNotifications, setCountNotificationsUnRead, countNotificationsUnRead, totalPagesNotification, setTotalPagesNotification, pageSizeNotification } = useNotifications();
+    const { notifications, setNotifications, setCountNotificationsUnRead, countNotificationsUnRead, totalPagesNotification, setTotalPagesNotification, pageSizeNotification, pageNumberNotification, setPageNumberNotification } = useNotifications();
     const [tab, setTab] = useState("All"); // default là Unread
-    const [page, setPage] = useState(1);        // trang hiện tại
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
@@ -39,8 +38,8 @@ export default function NotificationsPage() {
                 setLoading(false);
             }
         };
-        getAllNotifications(page);
-    }, [page, tab]);
+        getAllNotifications(pageNumberNotification);
+    }, [pageNumberNotification, tab]);
 
     const handleUpdateStatus =  async (status, idNotification) => {
         try{
@@ -153,7 +152,7 @@ export default function NotificationsPage() {
                     <button
                         onClick={() => {
                             setTab("All")
-                            setPage(1)
+                            setPageNumberNotification(1)
                         }}
                         className={`px-3 py-1 rounded-full ${
                             tab === "All" ? "bg-white font-bold" : "bg-gray-200 hover:bg-gray-200"
@@ -164,7 +163,7 @@ export default function NotificationsPage() {
                     <button
                         onClick={() => {
                             setTab("Unread")
-                            setPage(1)
+                            setPageNumberNotification(1)
                         }}
                         className={`px-3 py-1 rounded-full ${
                             tab === "Unread" ? "bg-white font-bold" : "bg-gray-200 hover:bg-gray-200"
@@ -200,10 +199,10 @@ export default function NotificationsPage() {
 
                 </div>
 
-                {page < totalPagesNotification && (
+                {pageNumberNotification < totalPagesNotification && (
                     <div className="flex justify-center py-4 sticky bottom-0 bg-white border-t border-gray-200">
                         <button
-                            onClick={() => setPage((prev) => prev + 1)}
+                            onClick={() => setPageNumberNotification((prev) => prev + 1)}
                             disabled={loading}
                             className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-[#FEF2F2] hover:text-[#DC2626] transition-colors duration-200 disabled:opacity-50"
                         >
