@@ -69,19 +69,25 @@ services:
     volumes:
       - kafka_data:/bitnami/kafka
 
-  # =====================
-  # Redpanda Console (UI)
-  # =====================
-  redpanda-console:
-    image: docker.redpanda.com/redpandadata/console:latest
-    container_name: redpanda_console
+  # ==== AKHQ ====
+  akhq:
+    image: tchiotludo/akhq:0.25.0
+    container_name: akhq
     restart: unless-stopped
     depends_on:
       - kafka
+    networks:
+      - default
     ports:
-      - "8083:8080" # Console UI tại http://localhost:8083
+      - "8083:8080"
     environment:
-      - KAFKA_BROKERS=kafka_broker:29092 # Dùng listener nội bộ (ổn định nhất)
+      AKHQ_CONFIGURATION: |
+        akhq:
+          connections:
+            ktpm-cluster:
+              properties:
+                bootstrap.servers: "kafka:29092"  # tên service Kafka trong compose
+
 
   # =====================
   # 🌐 User Service (Spring Boot)
@@ -160,6 +166,45 @@ services:
       - default
 
   # =====================
+  # 🌐 TaskFlow Service (Spring Boot)
+  # =====================
+  taskflow-service:
+    build:
+      context: ./todolist-backend/taskflow-service
+      dockerfile: Dockerfile
+    container_name: taskflow-service
+    restart: unless-stopped
+    depends_on:
+      - mysql
+      - redis
+      - kafka
+    ports:
+      - "8082:8082"
+    environment:
+      # ==== MySQL ====
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql_db:3306/aws_todolist_database?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD:
+
+      # ==== Redis ====
+      SPRING_DATA_REDIS_HOST: redis_cache
+      SPRING_DATA_REDIS_PORT: 6379
+
+      # ==== Kafka ====
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka_broker:29092
+
+    # ==== Optional custom env ====
+    # GATEWAY_URL: http://api_gateway:8080
+    # SERVER_PORT: 8082
+
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+    networks:
+      - default
+
+
+  # =====================
   # 🌐 API Gateway (Spring Boot)
   # =====================
   api-gateway:
@@ -173,7 +218,7 @@ services:
       - kafka
       - user-service # ✅ thêm dòng này để đảm bảo gateway khởi động sau user-service
       - auth-service # ✅ thêm để đảm bảo gateway load sau auth
-
+      - taskflow-service
     ports:
       - "8080:8080"
     environment:
@@ -184,6 +229,7 @@ services:
       # ==== User Service ====
       USER_SERVICE_URL: http://user-service:8081 # ✅ Gateway có thể gọi sang user-service qua network nội bộ
       AUTH_SERVICE_URL: http://auth-service:9999
+      TASKFLOW_SERVICE_URL: http://taskflow-service:8082
 
     extra_hosts:
       - "host.docker.internal:host-gateway"
