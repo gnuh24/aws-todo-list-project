@@ -19,7 +19,7 @@ export default function ProjectPage() {
   const [newSectionName, setNewSectionName] = useState("");
   const { projectName, projectId } = useParams();
 
-  const idUser = JSON.parse(localStorage.getItem("USER_REGISTER"));
+  const idUser = JSON.parse(localStorage.getItem("USER_INFO"));
   const { id } = idUser;
 
   // ✅ Thêm Task vào section cụ thể
@@ -167,7 +167,6 @@ export default function ProjectPage() {
   };
 
   return (
-    <MainLayout>
       <div className="min-h-screen bg-white">
         {/* HEADER */}
         <ProjectHeader></ProjectHeader>
@@ -212,6 +211,5 @@ export default function ProjectPage() {
           onAdd={handleAddTask}
         />
       </div>
-    </MainLayout>
   );
 }

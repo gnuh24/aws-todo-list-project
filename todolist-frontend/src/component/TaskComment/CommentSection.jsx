@@ -113,7 +113,7 @@ export default function CommentSection({ isOpenComment, comments, handleComment,
                                     <img
                                         src={c.authorAvatar}
                                         alt="avatar"
-                                        className="w-full h-full object-cover"
+                                        className="w-full h-full object-cover rounded-full"
                                         onError={(e) => (e.currentTarget.src = '/default-avatar.png')}
                                     />
                                 ) : (

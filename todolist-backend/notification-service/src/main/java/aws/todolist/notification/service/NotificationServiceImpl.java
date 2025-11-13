@@ -2,11 +2,8 @@ package aws.todolist.notification.service;
 
 
 import aws.todolist.notification.aop.AppLogger;
-import aws.todolist.notification.dto.notification.NotificationCreateForm;
 import aws.todolist.notification.entity.Account;
 import aws.todolist.notification.entity.Notification;
-import aws.todolist.notification.entity.Notification.NotificationType; // Cần thêm import này
-import aws.todolist.notification.mapper.NotificationMapper;
 import aws.todolist.notification.messaging.kafka.message.NotificationMessage;
 import aws.todolist.notification.repository.AccountRepository;
 import aws.todolist.notification.repository.NotificationRepository;
@@ -19,10 +16,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors; // Cần thêm import này
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class NotificationServiceImpl implements NotificationService {
 	
 	private final NotificationRepository notificationRepository;
@@ -52,8 +49,19 @@ public class NotificationServiceImpl implements NotificationService {
 		// Chỉ truyền notificationId và isRead vào Repository
 		return notificationRepository.updateReadStatus(notificationId, isRead);
 	}
-	
-	
+
+	@Override
+	public Long getCountNotificationByIsRead(boolean isRead, String idReceiver) {
+		return notificationRepository.getCountNotificationByIsRead(isRead, idReceiver);
+	}
+
+	@Override
+	public Integer markNotificationsByIsRead(List<String> ids, boolean isRead) {
+		if (ids == null || ids.isEmpty()) return 0;
+		return notificationRepository.markAllAsRead(ids, isRead);
+	}
+
+
 	@Override
 	public void create(NotificationMessage msg) {
 		try {

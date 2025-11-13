@@ -21,6 +21,9 @@ public class NotificationMapper {
                 .actorId(notification.getActor() != null ? notification.getActor().getId() : null)
                 .projectId(notification.getProjectId())
                 .taskId(notification.getTaskId())
+                .displayName(notification.getActor().getDisplayName())
+                .avatar(notification.getActor().getAvatar())
+
                 .build();
     }
 }

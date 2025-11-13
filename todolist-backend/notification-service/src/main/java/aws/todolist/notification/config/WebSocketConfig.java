@@ -1,8 +1,6 @@
 package aws.todolist.notification.config;
 
-
 import aws.todolist.notification.interceptor.AuthChannelInterceptor;
-import aws.todolist.notification.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
@@ -20,14 +18,19 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws")          // ←←← Đây là WebSocket endpoint
-                .setAllowedOriginPatterns("*") // hoặc giới hạn domain cụ thể
-                .withSockJS();               // hỗ trợ fallback (tuỳ chọn)
+        registry.addEndpoint("/ws")  // endpoint WebSocket
+                .setAllowedOriginPatterns("http://localhost:4200"
+                        ,"http://127.0.0.1:4200"
+                        ,"http://localhost:5500"
+                        ,"http://127.0.0.1:5500"
+                        ,"http://localhost:3000"
+                        ,"http://127.0.0.1:3000")
+                .withSockJS();
     }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.enableSimpleBroker("/global", "/private"); // broker destinations
+        registry.enableSimpleBroker("/global", "/private");
     }
 
     @Override

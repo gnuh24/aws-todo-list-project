@@ -19,4 +19,6 @@ public class NotificationResponse {
     private String actorId;
     private String projectId;
     private String taskId;
+    private String displayName;
+    private String avatar;
 }

@@ -17,7 +17,6 @@ export default function TodayPage() {
   };
 
   return (
-    <MainLayout>
       <div className="min-h-screen bg-white flex flex-col">
         {/* Header */}
         <TodayHeader />
@@ -105,6 +104,5 @@ export default function TodayPage() {
           )}
         </div>
       </div>
-    </MainLayout>
   );
 }

@@ -60,3 +60,4 @@ todolist-frontend/node_modules/
 *.swp
 *~
 Thumbs.db
+.vscode/settings.json

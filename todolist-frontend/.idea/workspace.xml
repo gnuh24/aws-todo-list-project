@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="a7719d69-0674-4558-b744-9f01872a3593" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../todolist-backend/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../todolist-backend/api-gateway/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/api-gateway/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../todolist-backend/auth-service/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/auth-service/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/config/WebSocketConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/config/WebSocketConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/controller/NotificationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/controller/NotificationController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/dto/notification/NotificationResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/dto/notification/NotificationResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/interceptor/AuthChannelInterceptor.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/interceptor/AuthChannelInterceptor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/mapper/NotificationMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/mapper/NotificationMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/repository/NotificationRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/repository/NotificationRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/service/NotificationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/service/NotificationService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/service/NotificationServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/service/NotificationServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/service/WebSocketServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/service/WebSocketServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../todolist-backend/taskflow-service/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/taskflow-service/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../todolist-backend/taskflow-service/src/main/java/aws/todolist/taskflow/utils/NotificationUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/taskflow-service/src/main/java/aws/todolist/taskflow/utils/NotificationUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/Header/HeaderSidebar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/Header/HeaderSidebar.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/Sidebar/Sidebar.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/Sidebar/Sidebar.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/TaskComment/CommentSection.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/TaskComment/CommentSection.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/layout/MainLayout.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/layout/MainLayout.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/AppPage/CompletedPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/AppPage/CompletedPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/AppPage/FiltersPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/AppPage/FiltersPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/AppPage/InboxPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/AppPage/InboxPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/AppPage/ProjectPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/AppPage/ProjectPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/AppPage/TodayPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/AppPage/TodayPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/AppPage/UpcomingPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/AppPage/UpcomingPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/service/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/service/api.js" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="35HNE6AgFBuMZnuTwpPpedWDtuC" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="false" />
+    <option name="showLibraryContents" value="true" />
+    <option name="showModules" value="false" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;developer&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Study_In_University/nam3/HocKy2/XayDungPhanMemTheoMoHinhPhanLop/DoAn/QLThanhVienPro3&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.start.executor&quot;: &quot;Run&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;D:\\App_In_This\\set_up\\WebStorm 2025.1.1\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RunManager">
+    <configuration name="start" type="js.build_tools.npm" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="start" />
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-6a121458b545-JavaScript-WS-251.25410.117" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="a7719d69-0674-4558-b744-9f01872a3593" name="Changes" comment="" />
+      <created>1762762923369</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1762762923369</updated>
+      <workItem from="1762762925691" duration="33000" />
+      <workItem from="1762763022111" duration="6252000" />
+      <workItem from="1762779728227" duration="3401000" />
+      <workItem from="1762825985779" duration="5596000" />
+      <workItem from="1762843633634" duration="10684000" />
+      <workItem from="1762912051726" duration="9941000" />
+      <workItem from="1762933777809" duration="4646000" />
+      <workItem from="1762952643675" duration="2792000" />
+      <workItem from="1762999253188" duration="9162000" />
+      <workItem from="1763020897341" duration="527000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

@@ -1,4 +1,3 @@
-import logo from "./logo.svg";
 import "./App.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage/HomePage";
@@ -20,6 +19,8 @@ import UpcomingPage from "./pages/AppPage/UpcomingPage";
 import CompletedPage from "./pages/AppPage/CompletedPage";
 import TestAPI from "./service/TestAPI";
 import LoginSuccess from "./pages/LoginPage/LoginSuccess";
+import NotificationsPage from "./pages/AppPage/NotificationsPage";
+import MainLayout from "./layout/MainLayout";
 function App() {
   return (
     <>
@@ -48,7 +49,7 @@ function App() {
               element={<ResetPassword></ResetPassword>}
             ></Route>
             <Route path="/auth/verify-account" element={<VerifyAccount />} />
-            <Route path="/app">
+            <Route path="/app" element={<MainLayout></MainLayout>}>
               <Route path="inbox" element={<InboxPage></InboxPage>}></Route>
               <Route path="today" element={<TodayPage></TodayPage>}></Route>
               <Route
@@ -66,6 +67,10 @@ function App() {
               <Route
                 path="activity"
                 element={<CompletedPage></CompletedPage>}
+              ></Route>
+              <Route
+                  path="notifications"
+                  element={<NotificationsPage></NotificationsPage>}
               ></Route>
             </Route>
             <Route path="testapi" element={<TestAPI></TestAPI>}></Route>

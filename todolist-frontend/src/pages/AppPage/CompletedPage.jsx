@@ -30,7 +30,8 @@ export default function CompletedPage() {
   const handleClose = () => setOpenTask(null);
 
   return (
-    <MainLayout>
+      <>
+
       <div className="px-10 py-6">
         <ActivityHeader />
 
@@ -76,6 +77,6 @@ export default function CompletedPage() {
 
       {/* Modal component */}
       <TaskDetailModal openTask={openTask} onClose={handleClose} />
-    </MainLayout>
+      </>
   );
 }

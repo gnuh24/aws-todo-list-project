@@ -28,13 +28,17 @@ public class AuthChannelInterceptor implements ChannelInterceptor {
 
             String token = accessor.getFirstNativeHeader("Authorization");
             if (token == null || !token.startsWith("Bearer ")) {
+                System.err.println("Không tìm thấy token");
                 throw new MessagingException("Không tìm thấy token");
             }
 
             token = token.substring(7);
             if (!jwtTokenProvider.validateToken(token)) {
+                System.err.println("Token không hợp lệ");
                 throw new MessagingException("Token không hợp lệ");
             }
+
+            System.err.println(jwtTokenProvider.getUsername(token));
 
             accessor.setUser(new UsernamePasswordAuthenticationToken(jwtTokenProvider.getUsername(token), null, List.of()));
 

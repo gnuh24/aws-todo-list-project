@@ -19,6 +19,15 @@ export let https_taskflow = axios.create({
   },
 });
 
+
+export let https_notification = axios.create({
+  baseURL: "http://localhost:8080/api/notification",
+  headers: {
+    Authorization:
+        "Bearer " + JSON.parse(localStorage.getItem("USER_INFO"))?.token
+  },
+});
+
 // // Add a request interceptor
 // https.interceptors.request.use(
 //   function (config) {

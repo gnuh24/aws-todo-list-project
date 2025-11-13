@@ -38,7 +38,6 @@ export default function FiltersPage() {
   };
 
   return (
-    <MainLayout>
       <div className="p-8 bg-white min-h-screen">
         <h1 className="text-3xl font-bold mb-6">Filters & Labels</h1>
 
@@ -165,6 +164,5 @@ export default function FiltersPage() {
           />
         )}
       </div>
-    </MainLayout>
   );
 }

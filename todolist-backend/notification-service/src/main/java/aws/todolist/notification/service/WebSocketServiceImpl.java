@@ -38,6 +38,7 @@ public class WebSocketServiceImpl implements WebSocketService{
 
         // Kiểm tra user có đang kết nối WebSocket không
         SimpUser simpUser = simpUserRegistry.getUser(email);
+        System.err.println(simpUser);
         if (simpUser == null) {
             System.err.println("❌ User " + email + " chưa kết nối WebSocket hoặc chưa được setUser(authentication)");
             return;

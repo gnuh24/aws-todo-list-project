@@ -124,7 +124,7 @@ public class NotificationUtils {
 
                 switch (message.getType()) {
                     case TASK_COMPLETED: {
-                        message.setTitle("Nhiệm vụ vừa hoàn thành!");
+                        message.setTitle("Nhiệm vụ vừa hoàn thành");
                         message.setContent(String.format(
                                 "Nhiệm vụ \"%s\" trong dự án \"%s\" đã được hoàn thành vào lúc \"%s\".",
                                 task.getTitle(),
@@ -135,7 +135,7 @@ public class NotificationUtils {
                         break;
                     }
                     case TASK_ASSIGNED: {
-                        message.setTitle("Phân công nhiệm vụ được cập nhật!");
+                        message.setTitle("Phân công nhiệm vụ được cập nhật");
                         message.setContent(String.format(
                                 "Nhiệm vụ \"%s\" trong dự án \"%s\" đã được giao cho \"%s\".",
                                 task.getTitle(),
@@ -146,7 +146,7 @@ public class NotificationUtils {
                         break;
                     }
                     case TASK_UPDATED: {
-                        message.setTitle("Nhiệm vụ vừa được chỉnh sửa!");
+                        message.setTitle("Nhiệm vụ vừa được chỉnh sửa");
                         message.setContent(String.format(
                                 "Nhiệm vụ \"%s\" trong dự án \"%s\" đã được chỉnh sửa.",
                                 task.getTitle(),
@@ -156,7 +156,7 @@ public class NotificationUtils {
                         break;
                     }
                     case TASK_COMMENTED: {
-                        message.setTitle("Một bình luận mới được thêm vào Task!");
+                        message.setTitle("Một bình luận mới được thêm vào Task");
                         message.setContent(String.format(
                                 "\"%s\" vừa thêm bình luận mới vào task \"%s\" của dự án \"%s\".",
                                 actor.getDisplayName(),
@@ -189,7 +189,7 @@ public class NotificationUtils {
                         break;
                     }
                     case PROJECT_DELETED: {
-                        message.setTitle("Dự án đã bị xóa!");
+                        message.setTitle("Dự án đã bị xóa");
                         message.setContent(String.format(
                                 "Dự án \"%s\" đã bị \"%s\" xóa khỏi hệ thống.",
                                 project.getName(),
@@ -199,7 +199,7 @@ public class NotificationUtils {
                         break;
                     }
                     case PROJECT_MEMBER_ADDED: {
-                        message.setTitle("Bạn đã được thêm vào dự án mới!");
+                        message.setTitle("Bạn đã được thêm vào dự án mới");
                         message.setContent(String.format(
                                 "Bạn đã được thêm vào dự án '%s' với vai trò '%s'.",
                                 project.getName(),
