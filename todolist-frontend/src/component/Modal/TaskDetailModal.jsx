@@ -18,11 +18,12 @@ export default function TaskDetailModal({
 }) {
   const [taskDetail, setTaskDetail] = useState({});
 
-  const handleComment = async (newComment) => {
+  const handleComment = async (newComment, attachments) => {
     console.log("Comment:", newComment);
     try{
       const response = await https_taskflow.post(`/v1/projects/${task.idProject}/tasks/${task.id}/comments`,{
-        comment: newComment
+        comment: newComment,
+        urls: attachments
       })
 
       if (response.status === 200) {
@@ -95,6 +96,43 @@ export default function TaskDetailModal({
     }
   }
 
+  const onDeleteCommentAttach = async (url) => {
+    try{
+      const res = await https_taskflow.delete(
+          `/v1/projects/${task.idProject}/deleteCommentAttach`,{
+            params: {
+              fileUrl: url
+            }
+          }
+      );
+
+      if (res.status === 200) {
+        const commentAttachDeleted = res.data.data;
+        const updatedComments = (taskDetail.comments || []).map(comment => {
+          // nếu đây là comment chứa attachment vừa xóa
+          if (comment.id === commentAttachDeleted.taskCommentId) {
+            return {
+              ...comment,
+              commentAttach: (comment.commentAttach || []).filter(
+                  att => att.id !== commentAttachDeleted.id
+              )
+            };
+          }
+          return comment;
+        });
+        setTaskDetail(prev => ({ ...prev, comments: updatedComments }));
+      }
+    }catch(err){
+      // Kiểm tra xem server có trả lỗi dạng JSON không
+      if (err.response && err.response.data) {
+        const msg = err.response.data.message || err.response.data.detailMessage || "Đã xảy ra lỗi không xác định";
+        alert(msg);
+      } else {
+        alert("Không thể kết nối đến server. Vui lòng thử lại.");
+      }
+    }
+  }
+
   useEffect(() => {
     const getDetails = async () => {
       try{
@@ -138,7 +176,7 @@ export default function TaskDetailModal({
             <p className="text-gray-500 mb-5">{taskDetail.description}</p>
 
             {/* Comment Box */}
-            <CommentSection isOpenComment={isOpenComment} comments={taskDetail.comments} handleComment={handleComment} onUpdateComment={onUpdateComment}  onDeleteComment={onDeleteComment} />
+            <CommentSection isOpenComment={isOpenComment} comments={taskDetail.comments} handleComment={handleComment} onUpdateComment={onUpdateComment}  onDeleteComment={onDeleteComment} onDeleteCommentAttach={onDeleteCommentAttach}/>
           </div>
 
           {/* RIGHT SIDEBAR */}

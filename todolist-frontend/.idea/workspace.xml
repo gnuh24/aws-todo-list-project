@@ -5,10 +5,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a7719d69-0674-4558-b744-9f01872a3593" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../todolist-backend/taskflow-service/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/taskflow-service/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../todolist-backend/taskflow-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/taskflow-service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../todolist-backend/taskflow-service/src/main/java/aws/todolist/taskflow/dto/taskComment/TaskCommentRequestDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/taskflow-service/src/main/java/aws/todolist/taskflow/dto/taskComment/TaskCommentRequestDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../todolist-backend/taskflow-service/src/main/java/aws/todolist/taskflow/dto/taskComment/TaskCommentResponseDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/taskflow-service/src/main/java/aws/todolist/taskflow/dto/taskComment/TaskCommentResponseDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../todolist-backend/taskflow-service/src/main/java/aws/todolist/taskflow/entity/TaskComment.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/taskflow-service/src/main/java/aws/todolist/taskflow/entity/TaskComment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../todolist-backend/taskflow-service/src/main/java/aws/todolist/taskflow/mapper/TaskCommentMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/taskflow-service/src/main/java/aws/todolist/taskflow/mapper/TaskCommentMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../todolist-backend/taskflow-service/src/main/java/aws/todolist/taskflow/repository/TaskCommentRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/taskflow-service/src/main/java/aws/todolist/taskflow/repository/TaskCommentRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../todolist-backend/taskflow-service/src/main/java/aws/todolist/taskflow/service/TaskCommentServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/taskflow-service/src/main/java/aws/todolist/taskflow/service/TaskCommentServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../todolist-backend/taskflow-service/src/main/java/aws/todolist/taskflow/utils/NotificationUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/taskflow-service/src/main/java/aws/todolist/taskflow/utils/NotificationUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../todolist-backend/taskflow-service/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/taskflow-service/src/main/resources/application.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/component/Notification/NotificationSocket.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/Notification/NotificationSocket.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/layout/MainLayout.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/layout/MainLayout.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/AppPage/NotificationsPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/AppPage/NotificationsPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/Modal/TaskDetailModal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/Modal/TaskDetailModal.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/TaskComment/CommentSection.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/TaskComment/CommentSection.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -80,6 +89,12 @@
       <workItem from="1762999253188" duration="9162000" />
       <workItem from="1763020897341" duration="527000" />
       <workItem from="1763038943374" duration="1671000" />
+      <workItem from="1763040733604" duration="51000" />
+      <workItem from="1763477336088" duration="963000" />
+      <workItem from="1763544571937" duration="1307000" />
+      <workItem from="1763605870607" duration="3724000" />
+      <workItem from="1763625928269" duration="6647000" />
+      <workItem from="1763643913543" duration="107000" />
     </task>
     <servers />
   </component>

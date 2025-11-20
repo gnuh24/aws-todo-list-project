@@ -1,26 +1,24 @@
 import { useState, useEffect, useRef } from "react";
-import {  Input, Button } from "antd";
+import {Input, Button, message} from "antd";
 import {
-    CheckCircleFilled,
-    LockOutlined,
     PaperClipOutlined,
-    AudioOutlined,
-    SmileOutlined,
-    EnterOutlined,
-    DownOutlined,
-    UpOutlined
+    UpOutlined,
+    DeleteOutlined
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import {https_taskflow} from "../../service/api";
 
-export default function CommentSection({ isOpenComment, comments, handleComment, onUpdateComment, onDeleteComment }) {
+const MAX_SIZE = 3 * 1024 * 1024;
+
+export default function CommentSection({ isOpenComment, comments, handleComment, onUpdateComment, onDeleteComment, onDeleteCommentAttach }) {
     const [newComment, setNewComment] = useState("");
+    const [attachments, setAttachments] = useState([]); // list URL trả về từ backend
     const [showComments, setShowComments] = useState(isOpenComment ?? false);
     const [showOption, setShowOption] = useState(null);
     const [showEditForm, setShowEditForm] = useState(null);
     const [isExpanded, setIsExpanded] = useState(false);
     const [openMenu, setOpenMenu] = useState(null);
-    const [auth, setAuth] = useState(() => {
+    const [auth] = useState(() => {
         const raw = localStorage.getItem("USER_INFO");
         if (!raw) return null;
         try { return JSON.parse(raw); } catch { return null; }
@@ -28,6 +26,12 @@ export default function CommentSection({ isOpenComment, comments, handleComment,
     const formatToDisplay = "HH:mm DD/MM"
     const containerRef = useRef(null);
     const menuRef = useRef(null);
+    const fileInputRef = useRef(null);
+
+    const isImage = (url) => {
+        return /\.(png|jpg|jpeg|gif|webp|svg)$/i.test(url);
+    };
+
 
     useEffect(() => {
         if (showComments && containerRef.current) {
@@ -54,13 +58,20 @@ export default function CommentSection({ isOpenComment, comments, handleComment,
 
 
     const handleSubmit = async () => {
-        if (!newComment.trim()) return;
-        await handleComment(newComment);
+        if (!newComment.trim()) {
+            alert("Không bỏ trống nội dung comment")
+            return
+        }
+        await handleComment(newComment, attachments.length > 0 ? attachments : null);
+        setAttachments([]);
         setNewComment("");
     };
 
     const handleUpdate = async (idComment) => {
-        if (!newComment.trim()) return;
+        if (!newComment.trim()) {
+            alert("Không bỏ trống nội dung comment")
+            return
+        }
         await onUpdateComment(newComment, idComment);
         setNewComment("");
         setShowEditForm(null);
@@ -71,10 +82,57 @@ export default function CommentSection({ isOpenComment, comments, handleComment,
         await onDeleteComment(idComment);
     }
 
+    const handleFileSelect = async (e) => {
+        if (!e.target.files) return;
+
+        const files = Array.from(e.target.files);
+
+        for (const file of files) {
+
+            if (file.size > MAX_SIZE) {
+                message.error(`❌ File "${file.name}" vượt quá dung lượng tối đa 3MB`);
+                continue; // bỏ qua file đó, upload file khác
+            }
+
+            const formData = new FormData();
+            formData.append("file", file);
+
+            try {
+                // call API upload
+                const res = await https_taskflow.post("/s3bucketstorage/uploadTemp", formData, {
+                    headers: { "Content-Type": "multipart/form-data" },
+                });
+
+                console.log("res", res);
+
+                // giả sử backend trả về { url: 'https://...' }
+                setAttachments(prev => [...prev, res.data.data]);
+            } catch (error) {
+                console.error("Upload failed", error);
+            }
+        }
+
+        // reset input để chọn file lần nữa nếu muốn
+        e.target.value = "";
+    };
+
+    const handleDeleteFileOnUpdate = async (url) => {
+        if (!window.confirm("Bạn có muốn xóa ảnh này ?")) return;
+
+        onDeleteCommentAttach(url)
+    }
+
 
 
     return (
         <div className="w-full border-t pt-10">
+            <input
+                type="file"
+                multiple={true}
+                ref={fileInputRef}
+                className="hidden"
+                onChange={handleFileSelect}
+            />
             {/* Header */}
             <div className="flex items-center gap-2 mb-3 cursor-pointer select-none" onClick={() => setShowComments(!showComments)}>
                 <UpOutlined
@@ -122,8 +180,8 @@ export default function CommentSection({ isOpenComment, comments, handleComment,
                             </div>
 
                             {/* Comment box */}
-                            {showEditForm !== c.id && (<div className={`border rounded-lg px-5 py-4 bg-white shadow-sm max-w-xs ${
-                                isMe ? 'bg-green-300 border-green-300' : 'bg-white border-gray-300'
+                            {showEditForm !== c.id && (<div className={`border rounded-lg px-5 py-4 shadow-sm max-w-xs bg-white ${
+                                isMe ? 'border-green-400' : 'border-gray-300'
                             } relative`}>
                                 <div className="text-sm font-semibold text-gray-600 mb-1">
                                     <div className="text-sm font-semibold text-gray-600 mb-1">
@@ -136,7 +194,52 @@ export default function CommentSection({ isOpenComment, comments, handleComment,
                                 </div>
 
                                 <div className="text-sm text-gray-700 whitespace-pre-line pt-3">{c.comment}</div>
+
+                                {/* Comment attachments */}
+                                {!!c.commentAttach?.length && (
+                                    <div className="flex flex-wrap gap-2 mt-2 w-full">
+                                        {c.commentAttach.map(att => {
+                                            const url = att.attachmentUrl;
+                                            // 1. Lấy phần cuối của URL
+                                            let filename = url.split('/').pop();
+
+                                            filename.replace(/^[0-9a-fA-F\-]{36}-/, '');
+
+                                            return (
+                                                <div
+                                                    key={att.id}
+                                                    className="w-20 h-20 relative border rounded overflow-hidden bg-gray-50 flex items-center justify-center"
+                                                >
+                                                    {isImage(url) ? (
+                                                        <img
+                                                            src={url}
+                                                            alt=""
+                                                            className="w-full h-full object-cover"
+                                                            onError={(e) => {
+                                                                if (e.currentTarget.src !== '/file-broken.png') {
+                                                                    e.currentTarget.src = '/file-broken.png';
+                                                                }
+                                                            }}
+                                                        />
+                                                    ) : (
+                                                        <a
+                                                            href={url}
+                                                            target="_blank"
+                                                            rel="noreferrer"
+                                                            className="text-xs text-blue-600 underline p-1 break-words text-center"
+                                                        >
+                                                            {filename}
+                                                        </a>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                )}
                             </div>)}
+
+
+
 
                             {showEditForm === c.id && (<div className="w-full border rounded-md p-3">
                                 <Input.TextArea
@@ -146,16 +249,63 @@ export default function CommentSection({ isOpenComment, comments, handleComment,
                                     className="border-none focus:ring-0 resize-none"
                                     autoFocus
                                 />
+                                    {/* Comment attachments */}
+                                    {!!c.commentAttach?.length && (
+                                        <div className="flex flex-wrap gap-2 mt-2 w-full">
+                                            {c.commentAttach.map(att => {
+                                                const url = att.attachmentUrl;
+                                                // 1. Lấy phần cuối của URL
+                                                let filename = url.split('/').pop();
+
+                                                filename.replace(/^[0-9a-fA-F\-]{36}-/, '');
+
+                                                return (
+                                                    <div
+                                                        key={att.id}
+                                                        className="w-20 h-20 relative border rounded overflow-hidden bg-gray-50 flex items-center justify-center"
+                                                    >
+                                                        {isImage(url) ? (
+                                                            <img
+                                                                src={url}
+                                                                alt=""
+                                                                className="w-full h-full object-cover"
+                                                                onError={(e) => {
+                                                                    if (e.currentTarget.src !== '/file-broken.png') {
+                                                                        e.currentTarget.src = '/file-broken.png';
+                                                                    }
+                                                                }}
+                                                            />
+                                                        ) : (
+                                                            <a
+                                                                href={url}
+                                                                target="_blank"
+                                                                rel="noreferrer"
+                                                                className="text-xs text-blue-600 underline p-1 break-words text-center"
+                                                            >
+                                                                {filename}
+                                                            </a>
+                                                        )}
+                                                        {/* Nút xóa */}
+                                                        <button
+                                                            onClick={() =>
+                                                                handleDeleteFileOnUpdate(url)
+                                                            }
+                                                            className="absolute top-0 right-0 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center hover:bg-red-600"
+                                                        >
+                                                            <DeleteOutlined style={{ fontSize: '14px' }} />
+                                                        </button>
+                                                    </div>
+
+                                                );
+                                            })}
+                                        </div>
+                                )}
                                 <div className="flex justify-between items-center mt-2">
                                     <div className="flex gap-3 text-gray-400 text-lg">
-                                        {/*<PaperClipOutlined />*/}
-                                        {/*<AudioOutlined />*/}
-                                        <SmileOutlined />
-                                        {/*<EnterOutlined />*/}
                                     </div>
                                     <div className="flex gap-2">
                                         <Button onClick={()=> setShowEditForm(null)}>Cancel</Button>
-                                        <Button type="primary" danger onClick={() => handleUpdate(c.id)}>Update
+                                        <Button type="primary" danger onClick={() => handleUpdate(c.id)}>
                                             Update
                                         </Button>
                                     </div>
@@ -255,15 +405,46 @@ export default function CommentSection({ isOpenComment, comments, handleComment,
                         }
                     }}
                   />
-                  <div className="flex justify-between items-center mt-2">
+
+                    {attachments.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-2">
+                            {attachments.map((url, idx) => (
+                                <div key={idx} className="w-20 h-20 relative border rounded overflow-hidden bg-gray-50 flex items-center justify-center">
+                                    {isImage(url) ? (
+                                        <img src={url} className="w-full h-full object-cover" alt=""/>
+                                    ) : (
+                                        <a href={url} target="_blank" rel="noreferrer" className="text-xs text-blue-600 underline p-1 break-words text-center">
+                                            File
+                                        </a>
+                                    )}
+                                    {/* Nút xóa */}
+                                    <button
+                                        onClick={() =>
+                                            setAttachments(prev => prev.filter((_, i) => i !== idx))
+                                        }
+                                        className="absolute top-0 right-0 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center hover:bg-red-600"
+                                    >
+                                        <DeleteOutlined style={{ fontSize: '14px' }} />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    <div className="flex justify-between items-center mt-2">
                     <div className="flex gap-3 text-gray-400 text-lg">
-                      {/*<PaperClipOutlined />*/}
-                      {/*<AudioOutlined />*/}
-                      <SmileOutlined />
-                      {/*<EnterOutlined />*/}
+                        <PaperClipOutlined
+                            className="cursor-pointer text-gray-500 hover:text-gray-700"
+                            onClick={() => fileInputRef.current?.click()}
+                        />
                     </div>
                     <div className="flex gap-2">
-                      <Button onClick={()=> setIsExpanded(false)}>Cancel</Button>
+                      <Button onClick={()=> {
+                          setIsExpanded(false)
+                          setNewComment("")
+                          setAttachments([])
+                      }
+                      }>Cancel</Button>
                       <Button type="primary" danger onClick={handleSubmit}>
                         Comment
                       </Button>

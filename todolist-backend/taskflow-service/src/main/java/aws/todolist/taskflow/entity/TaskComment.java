@@ -10,6 +10,8 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "task_comment")
@@ -51,6 +53,10 @@ public class TaskComment {
     @Column(name = "is_deleted", nullable = false)
     @Builder.Default
     private Boolean isDeleted = false;
+
+    @OneToMany(mappedBy = "taskComment", cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<CommentAttach> commentAttaches = new ArrayList<>();
 
     // Soft delete method
     public void softDelete() {

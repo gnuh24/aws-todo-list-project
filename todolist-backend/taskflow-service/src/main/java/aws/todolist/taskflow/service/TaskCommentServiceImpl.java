@@ -5,7 +5,6 @@ import aws.todolist.taskflow.dto.taskComment.TaskCommentResponseDTO;
 import aws.todolist.taskflow.entity.Account;
 import aws.todolist.taskflow.entity.Task;
 import aws.todolist.taskflow.entity.TaskComment;
-import aws.todolist.taskflow.exceptions.ProjectException.ForbiddenException;
 import aws.todolist.taskflow.exceptions.ProjectException.ResourceNotFoundException;
 import aws.todolist.taskflow.exceptions.errorCode.SystemErrorCode;
 import aws.todolist.taskflow.mapper.TaskCommentMapper;
@@ -13,9 +12,12 @@ import aws.todolist.taskflow.messaging.kafka.message.NotificationType;
 import aws.todolist.taskflow.repository.TaskCommentRepository;
 import aws.todolist.taskflow.repository.TaskRepository;
 import aws.todolist.taskflow.utils.NotificationUtils;
+import aws.todolist.taskflow.utils.TaskCommentUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.net.URISyntaxException;
 
 @Service
 public class TaskCommentServiceImpl implements TaskCommentService {
@@ -33,6 +35,12 @@ public class TaskCommentServiceImpl implements TaskCommentService {
     @Autowired
     private NotificationUtils notificationUtils;
 
+    @Autowired
+    private TaskCommentUtils taskCommentUtils;
+
+    @Autowired
+    private CommentAttachService commentAttachService;
+
 
     @Override
     @Transactional
@@ -42,7 +50,19 @@ public class TaskCommentServiceImpl implements TaskCommentService {
 
         TaskComment taskComment = TaskComment.builder().task(task).account(accountLogging).comment(requestDTO.getComment()).build();
 
-        taskComment = taskCommentRepository.save(taskComment);
+        taskComment = taskCommentRepository.saveAndFlush(taskComment);
+
+        // Chạy service thêm mới comment attach
+        if (requestDTO.getUrls() != null) {
+            for (String url : requestDTO.getUrls()) {
+                try {
+
+                    taskComment.getCommentAttaches().add(commentAttachService.addNewCommentAttach(url, taskComment.getId(), accountLogging));
+                } catch (URISyntaxException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
 
 
         System.err.println("Check");
@@ -59,11 +79,26 @@ public class TaskCommentServiceImpl implements TaskCommentService {
     @Transactional
     public TaskCommentResponseDTO updateComment(TaskCommentRequestDTO requestDTO, String idComment, Account account) {
 
-        TaskComment taskComment = getCommentAndCheck(idComment, account);
+        TaskComment taskComment = taskCommentUtils.getCommentAndCheck(idComment, account);
 
-        taskComment.setComment(requestDTO.getComment());
+        if (requestDTO.getComment() != null) {
+            taskComment.setComment(requestDTO.getComment());
+        }
 
-        taskComment = taskCommentRepository.save(taskComment);
+
+        // Chạy service thêm mới comment attach
+        if (requestDTO.getUrls() != null) {
+            for (String url : requestDTO.getUrls()) {
+                try {
+                    taskComment.getCommentAttaches().add(commentAttachService.addNewCommentAttach(url, taskComment.getId(), account));
+                } catch (URISyntaxException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
+        taskComment = taskCommentRepository.saveAndFlush(taskComment);
+
 
         return taskCommentMapper.toResponse(taskComment);
     }
@@ -72,9 +107,11 @@ public class TaskCommentServiceImpl implements TaskCommentService {
     @Transactional
     public TaskCommentResponseDTO deleteComment(String idComment, Account account) {
 
-        TaskComment taskComment = getCommentAndCheck(idComment, account);
+        TaskComment taskComment = taskCommentUtils.getCommentAndCheck(idComment, account);
 
         taskComment.softDelete();
+
+        commentAttachService.deleteCommentAttachByIdComment(taskComment.getId());
 
         taskComment = taskCommentRepository.save(taskComment);
 
@@ -92,19 +129,4 @@ public class TaskCommentServiceImpl implements TaskCommentService {
         return task;
     }
 
-
-    private TaskComment getCommentAndCheck(String idComment, Account account) {
-        TaskComment taskComment = taskCommentRepository.findByIdAndIsDeletedFalse(idComment);
-
-        if (taskComment == null) {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Comment không tồn tại hoặc đã bị xóa");
-        }
-
-        // Kiểm tra xem có đúng chính người tạo comment chỉnh sửa không
-        if (!taskComment.getAccount().getId().equals(account.getId())) {
-            throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED, "Bạn không thể chỉnh sửa comment của người khác");
-        }
-
-        return taskComment;
-    }
 }

@@ -39,9 +39,13 @@ public class NotificationUtils {
     public Set<Account> getReceiversForTask(Task task) {
         Set<Account> receivers = new HashSet<>();
 
-        receivers.add(task.getAccountAssign());
+        Account accountAuthor = getAccountAuthor();
 
-        if (task.getCreatedByAccount() != null) {
+        if (task.getAccountAssign() != null && !Objects.equals(task.getAccountAssign().getId(), accountAuthor.getId())) {
+            receivers.add(task.getAccountAssign());
+        }
+
+        if (!Objects.equals(task.getCreatedByAccount().getId(), accountAuthor.getId())) {
             receivers.add(task.getCreatedByAccount());
         }
 
@@ -68,14 +72,16 @@ public class NotificationUtils {
     public Set<Account> getReceiversForTaskComment(Task task) {
         Set<Account> receivers = new HashSet<>();
 
-        receivers.add(task.getCreatedByAccount());
+        Account accountAuthor = getAccountAuthor();
 
-        if (task.getCreatedByAccount() != null) {
+        if (!Objects.equals(task.getCreatedByAccount().getId(), accountAuthor.getId())) {
             receivers.add(task.getCreatedByAccount());
         }
 
         for (TaskComment comment : task.getTaskComments()) {
-            receivers.add(comment.getAccount());
+            if (!Objects.equals(comment.getAccount().getId(), accountAuthor.getId())) {
+                receivers.add(comment.getAccount());
+            }
         }
 
         return receivers;

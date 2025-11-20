@@ -2,12 +2,16 @@ package aws.todolist.taskflow.mapper;
 
 import aws.todolist.taskflow.dto.taskComment.TaskCommentResponseDTO;
 import aws.todolist.taskflow.entity.TaskComment;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
 public class TaskCommentMapper {
+
+    @Autowired
+    private CommentAttachMapper mapper;
 
     public TaskCommentResponseDTO toResponse(TaskComment comment) {
         if (comment == null) return null;
@@ -21,6 +25,7 @@ public class TaskCommentMapper {
                 .comment(comment.getComment())
                 .createdAt(comment.getCreatedAt())
                 .updatedAt(comment.getUpdatedAt())
+                .commentAttach(mapper.toResponseList(comment.getCommentAttaches()))
                 .build();
     }
 

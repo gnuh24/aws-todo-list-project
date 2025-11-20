@@ -1,6 +1,7 @@
 package aws.todolist.taskflow.dto.taskComment;
 
 
+import aws.todolist.taskflow.dto.commentAttach.CommentAttachResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -39,4 +41,7 @@ public class TaskCommentResponseDTO {
 
     @Schema(description = "Thời điểm bình luận được cập nhật", example = "2025-10-09T10:00:00")
     private LocalDateTime updatedAt;
+
+    @Schema(description = "Danh sách các attachment của commet")
+    private List<CommentAttachResponse> commentAttach;
 }
