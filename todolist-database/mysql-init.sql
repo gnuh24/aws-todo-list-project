@@ -17,6 +17,20 @@ CREATE TABLE `account` (
     `is_deleted`        BOOLEAN NOT NULL 
 );
 
+CREATE TABLE `personal_label` (
+    `id` CHAR(36) PRIMARY KEY,
+    `account_id` CHAR(36) NOT NULL,
+    `name` VARCHAR(255) NOT NULL,
+    `description` TEXT,
+    `created_at` TIMESTAMP NOT NULL,
+    `updated_at` TIMESTAMP NOT NULL,
+    `deleted_at` TIMESTAMP,
+    `is_deleted` BOOLEAN NOT NULL DEFAULT FALSE,
+
+    FOREIGN KEY (`account_id`) REFERENCES `account`(`id`)
+);
+
+
 CREATE TABLE `project` (
     `id`                CHAR(36) PRIMARY KEY,
     `name`              VARCHAR(255) NOT NULL,
@@ -28,6 +42,22 @@ CREATE TABLE `project` (
     `is_deleted`        BOOLEAN NOT NULL,
     `is_default`        BOOLEAN NOT NULL
 );
+
+CREATE TABLE `project_label` (
+    `id` CHAR(36) PRIMARY KEY,
+    `project_id` CHAR(36) NOT NULL,
+    `name` VARCHAR(255) NOT NULL,
+    `description` TEXT,
+    `created_by` CHAR(36),
+    `created_at` TIMESTAMP NOT NULL,
+    `updated_at` TIMESTAMP NOT NULL,
+    `deleted_at` TIMESTAMP,
+    `is_deleted` BOOLEAN NOT NULL DEFAULT FALSE,
+
+    FOREIGN KEY (`project_id`) REFERENCES `project`(`id`),
+    FOREIGN KEY (`created_by`) REFERENCES `account`(`id`)
+);
+
 
 CREATE TABLE `member` (
     `id`                CHAR(36) PRIMARY KEY,
@@ -88,6 +118,21 @@ CREATE TABLE `task` (
     FOREIGN KEY (`created_by`) REFERENCES `account`(`id`)
 );
 
+CREATE TABLE `task_label` (
+    `id` CHAR(36) PRIMARY KEY,  -- primary key riêng
+    `task_id` CHAR(36) NOT NULL,
+    `label_id` CHAR(36) NOT NULL,
+    `label_type` ENUM('personal','project') NOT NULL,
+    `is_ai_generated` BOOLEAN DEFAULT FALSE,
+    `confidence` FLOAT DEFAULT NULL,
+    `created_at` TIMESTAMP NOT NULL,
+
+    FOREIGN KEY (`task_id`) REFERENCES `task`(`id`)
+    -- label_id liên kết với personal_label hoặc project_label tùy label_type
+);
+
+
+
 -- 1. Bảng task_comment
 CREATE TABLE `task_comment` (
     `id`                CHAR(36) PRIMARY KEY,
@@ -122,11 +167,25 @@ VALUES
 ('22222222-2222-2222-2222-222222222222', 'user1@gmail.com', '$2a$10$W2neF9.6Agi6kAKVq8q3fec5dHW8KUA.b0VSIGdIZyUravfLpyIFi', NULL, 'User One', 'USER', 'ACTIVE', NOW(), NOW(), NULL, FALSE),
 ('33333333-3333-3333-3333-333333333333', 'user2@gmail.com', '$2a$10$W2neF9.6Agi6kAKVq8q3fec5dHW8KUA.b0VSIGdIZyUravfLpyIFi', NULL, 'User Two', 'USER', 'ACTIVE', NOW(), NOW(), NULL, FALSE);
 
+INSERT INTO `personal_label` (`id`, `account_id`, `name`, `description`, `created_at`, `updated_at`, `deleted_at`, `is_deleted`)
+VALUES
+('11111111-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '22222222-2222-2222-2222-222222222222', 'Urgent', 'Task cần làm gấp', NOW(), NOW(), NULL, FALSE),
+('22222222-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '22222222-2222-2222-2222-222222222222', 'Review', 'Task cần review', NOW(), NOW(), NULL, FALSE),
+('33333333-cccc-cccc-cccc-cccccccccccc', '33333333-3333-3333-3333-333333333333', 'Learning', 'Task học tập, nghiên cứu', NOW(), NOW(), NULL, FALSE);
+
+
 -- 2. Dữ liệu mẫu cho bảng `project`
 INSERT INTO `project` (`id`, `name`, `is_archived`, `created_at`, `updated_at`, `deleted_at`, `is_deleted`, `is_default`)
 VALUES
 ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Project Alpha', FALSE, NOW(), NOW(), NULL, FALSE, TRUE),
 ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Project Beta', FALSE, NOW(), NOW(), NULL, FALSE, FALSE);
+
+INSERT INTO `project_label` (`id`, `project_id`, `name`, `description`, `created_by`, `created_at`, `updated_at`, `deleted_at`, `is_deleted`)
+VALUES
+('11111111-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Backend', 'Task liên quan backend', '11111111-1111-1111-1111-111111111111', NOW(), NOW(), NULL, FALSE),
+('bbbbbbbb-2222-2222-2222-bbbbbbbbbbbb', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Database', 'Task liên quan database', '11111111-1111-1111-1111-111111111111', NOW(), NOW(), NULL, FALSE),
+('22222222-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Frontend', 'Task liên quan frontend', '11111111-1111-1111-1111-111111111111', NOW(), NOW(), NULL, FALSE);
+
 
 -- 3. Dữ liệu mẫu cho bảng `member`
 INSERT INTO `member` (`id`, `project_id`, `account_id`, `role`, `created_at`, `updated_at`, `deleted_at`, `is_deleted`,`status`)
@@ -149,6 +208,16 @@ VALUES
 ('44444444-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Setup Database', 'Thiết lập cơ sở dữ liệu cho project', FALSE, FALSE, 'PENDING', 'HIGH', '2025-09-30 23:59:59', NULL, NULL, NULL, NOW(), NOW(), NULL, FALSE, NULL, '11111111-1111-1111-1111-111111111111'),
 ('55555555-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '11111111-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Design Schema', 'Thiết kế các bảng cho hệ thống', FALSE, FALSE, 'READY', 'MEDIUM', '2025-10-05 23:59:59', NULL, NULL, NULL, NOW(), NOW(), NULL, FALSE, NULL, '11111111-1111-1111-1111-111111111111'),
 ('66666666-cccc-cccc-cccc-cccccccccccc', '22222222-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Implement API', 'Tạo API cho module project', FALSE, TRUE, 'IN_PROGRESS', 'HIGH', '2025-10-10 23:59:59', NOW(), NULL, NULL, NOW(), NOW(), NULL, FALSE, NULL, '11111111-1111-1111-1111-111111111111');
+
+INSERT INTO `task_label` (`id`, `task_id`, `label_id`, `is_ai_generated`, `confidence`, `created_at`)
+VALUES
+('aaaa1111-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '44444444-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'bbbbbbbb-2222-2222-2222-bbbbbbbbbbbb',  TRUE, 0.95, NOW()),
+('aaaa2222-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '44444444-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-aaaa-aaaa-aaaa-aaaaaaaaaaaa',  TRUE, 0.9, NOW()),
+('aaaa3333-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '55555555-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'bbbbbbbb-2222-2222-2222-bbbbbbbbbbbb',  TRUE, 0.85, NOW()),
+('aaaa4444-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '66666666-cccc-cccc-cccc-cccccccccccc', 'aaaaaaaa-1111-1111-1111-aaaaaaaaaaaa',  TRUE, 0.9, NOW()),
+('aaaa5555-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '66666666-cccc-cccc-cccc-cccccccccccc', '22222222-bbbb-bbbb-bbbb-bbbbbbbbbbbb',  TRUE, 0.75, NOW());
+
+
 
 -- 6. Dữ liệu mẫu cho bảng `task_comment`
 INSERT INTO `task_comment` (`id`, `task_id`, `account_id`, `comment`, `created_at`, `updated_at`, `deleted_at`, `is_deleted`)
