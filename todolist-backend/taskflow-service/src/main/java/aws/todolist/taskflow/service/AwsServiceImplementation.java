@@ -5,9 +5,13 @@ import aws.todolist.taskflow.utils.S3Utils;
 import io.jsonwebtoken.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 
 import java.io.InputStream;
 import java.net.URISyntaxException;
@@ -55,7 +59,7 @@ public class AwsServiceImplementation implements AwsService {
     }
 
     @Override
-    public void moveFileToAttach(String tempUrl) throws URISyntaxException {
+    public String moveFileToAttach(String tempUrl) throws URISyntaxException {
         // 1. Lấy tempKey từ URL tạm
         String tempKey = s3Utils.getKeyFromUrl(tempUrl); // vd: temp/abc123-photo.png
 
@@ -76,6 +80,8 @@ public class AwsServiceImplementation implements AwsService {
 //        deleteFile(tempUrl);
 
         System.out.printf("File moved from %s to %s in bucket %s%n", tempKey, attachKey, defaultBucketName);
+
+        return "https://" + defaultBucketName + ".s3.amazonaws.com/" + attachKey;
     }
 
 
@@ -97,6 +103,34 @@ public class AwsServiceImplementation implements AwsService {
             System.err.printf("Failed to delete file from bucket(%s): %s, error: %s%n", defaultBucketName, fileUrl, e.getMessage());
             throw new RuntimeException("Failed to delete file from S3", e);
         }
+    }
+
+    public ByteArrayResource downloadFile(String url) throws URISyntaxException {
+
+
+        String key = s3Utils.getKeyFromUrl(url);
+
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(defaultBucketName)
+                .key(key)
+                .build();
+
+        ResponseInputStream<GetObjectResponse> s3Object = s3Client.getObject(getObjectRequest);
+
+        byte[] bytes;
+        try {
+            bytes = s3Object.readAllBytes();
+        } catch (IOException e) {
+            throw new RuntimeException("Error reading S3 object");
+        } catch (java.io.IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return new ByteArrayResource(bytes);
+    }
+
+    private String extractFileName(String key) {
+        return key.substring(key.lastIndexOf("/") + 1);
     }
 
 

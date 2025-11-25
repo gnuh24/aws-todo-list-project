@@ -7,6 +7,7 @@ import aws.todolist.taskflow.exceptions.errorCode.SystemErrorCode;
 import aws.todolist.taskflow.messaging.kafka.message.NotificationMessage;
 import aws.todolist.taskflow.messaging.kafka.message.NotificationType;
 import aws.todolist.taskflow.messaging.kafka.producer.KafkaNotificationProducer;
+import aws.todolist.taskflow.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,6 +28,9 @@ public class NotificationUtils {
 
     // Role để thông báo tới user trong trường hợp liên quan tới member;
     private Role roleMember = null;
+
+    @Autowired
+    private MemberRepository memberRepository;
 
 
     @Autowired
@@ -59,7 +63,11 @@ public class NotificationUtils {
     public Set<Account> getReceiversForMember(Member member) {
         Set<Account> receivers = new HashSet<>();
 
-        receivers.add(member.getAccount());
+        List<Member> listMemberInProject = memberRepository.findAllByProjectId(member.getProject().getId());
+
+        for (Member memberInList : listMemberInProject) {
+            receivers.add(memberInList.getAccount());
+        }
 
         roleMember = member.getRole();
 
@@ -119,6 +127,9 @@ public class NotificationUtils {
         }
 
         for (Account accountReceiver : accountReceiverSet) {
+            if (Objects.equals(actor.getId(), accountReceiver.getId())) {
+                continue;
+            }
             try {
                 NotificationMessage message = NotificationMessage.builder()
                         .receiverId(accountReceiver.getId())
@@ -222,6 +233,15 @@ public class NotificationUtils {
                                 roleMember.name()
                         ));
                         kafkaNotificationProducer.sendProjectMemberRoleUpdated(message);
+                        break;
+                    }
+                    case RESPONSE_INVITATION: {
+                        message.setTitle("Lời mời đã được phản hồi");
+                        message.setContent(String.format("%s đã phản hồi lời mời vào project %s",
+                                actor.getDisplayName(),
+                                project.getName()
+                        ));
+                        kafkaNotificationProducer.sendResponseInvitation(message);
                         break;
                     }
                     default:

@@ -252,7 +252,7 @@ CREATE TABLE `notification` (
 		'TASK_REOPENED',
 		'TASK_DUE_SOON',
 		'TASK_OVERDUE',
-        
+        'RESPONSE_INVITATION'
 		'PROJECT_DELETED'
 	) NOT NULL,
  	`title` 		 VARCHAR(255) NOT NULL,

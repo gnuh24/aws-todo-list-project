@@ -190,14 +190,14 @@ public class MemberServiceImpl implements MemberService {
 
         if (optMember.isEmpty()) {
             throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED,
-                    "You are not invited to this project.");
+                    "Bạn không được mời vào project.");
         }
 
         Member member = optMember.get();
 
         if (member.getStatus() != StatusMember.PENDING) {
             throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED,
-                    "You have already responded to this request.");
+                    "Bạn đã phản hồi lời mời rồi.");
         }
 
 
@@ -206,7 +206,7 @@ public class MemberServiceImpl implements MemberService {
         if (LocalDateTime.now().isAfter(expireTime)) {
             member.softDelete();
             memberRepository.save(member);
-            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "This task invitation has expired. Please contact the admin to be invited again.");
+            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Lời mời đã hết hạn. Vui lòng liên hệ với chủ project");
         }
 
         if (member.getStatus() == StatusMember.PENDING) {
@@ -223,6 +223,13 @@ public class MemberServiceImpl implements MemberService {
         String key = "user:" + member.getAccount().getId() + ":project:" + member.getProject().getId() + ":permissions";
 
         redisTemplate.delete(key);
+
+        // =============================
+        // 🔔 Gửi Kafka Notification
+        // =============================
+
+
+        notificationUtils.sendNotification(null, member.getProject(), null, notificationUtils.getReceiversForMember(member), NotificationType.RESPONSE_INVITATION);
 
         return memberMapper.ResponseDTO(member);
     }

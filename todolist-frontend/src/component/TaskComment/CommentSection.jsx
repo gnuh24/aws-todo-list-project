@@ -7,6 +7,8 @@ import {
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import {https_taskflow} from "../../service/api";
+import {CommentAttachItem} from "../CommentAttach/CommentAttachItem";
+import {CommentAttachItemAdd} from "../CommentAttach/CommentAttachItemAdd";
 
 const MAX_SIZE = 3 * 1024 * 1024;
 
@@ -28,9 +30,7 @@ export default function CommentSection({ isOpenComment, comments, handleComment,
     const menuRef = useRef(null);
     const fileInputRef = useRef(null);
 
-    const isImage = (url) => {
-        return /\.(png|jpg|jpeg|gif|webp|svg)$/i.test(url);
-    };
+
 
 
     useEffect(() => {
@@ -69,7 +69,7 @@ export default function CommentSection({ isOpenComment, comments, handleComment,
 
     const handleUpdate = async (idComment) => {
         if (!newComment.trim()) {
-            alert("Không bỏ trống nội dung comment")
+            setShowEditForm(null);
             return
         }
         await onUpdateComment(newComment, idComment);
@@ -197,44 +197,7 @@ export default function CommentSection({ isOpenComment, comments, handleComment,
 
                                 {/* Comment attachments */}
                                 {!!c.commentAttach?.length && (
-                                    <div className="flex flex-wrap gap-2 mt-2 w-full">
-                                        {c.commentAttach.map(att => {
-                                            const url = att.attachmentUrl;
-                                            // 1. Lấy phần cuối của URL
-                                            let filename = url.split('/').pop();
-
-                                            filename.replace(/^[0-9a-fA-F\-]{36}-/, '');
-
-                                            return (
-                                                <div
-                                                    key={att.id}
-                                                    className="w-20 h-20 relative border rounded overflow-hidden bg-gray-50 flex items-center justify-center"
-                                                >
-                                                    {isImage(url) ? (
-                                                        <img
-                                                            src={url}
-                                                            alt=""
-                                                            className="w-full h-full object-cover"
-                                                            onError={(e) => {
-                                                                if (e.currentTarget.src !== '/file-broken.png') {
-                                                                    e.currentTarget.src = '/file-broken.png';
-                                                                }
-                                                            }}
-                                                        />
-                                                    ) : (
-                                                        <a
-                                                            href={url}
-                                                            target="_blank"
-                                                            rel="noreferrer"
-                                                            className="text-xs text-blue-600 underline p-1 break-words text-center"
-                                                        >
-                                                            {filename}
-                                                        </a>
-                                                    )}
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
+                                    <CommentAttachItem commentAttach={c.commentAttach} />
                                 )}
                             </div>)}
 
@@ -251,55 +214,8 @@ export default function CommentSection({ isOpenComment, comments, handleComment,
                                 />
                                     {/* Comment attachments */}
                                     {!!c.commentAttach?.length && (
-                                        <div className="flex flex-wrap gap-2 mt-2 w-full">
-                                            {c.commentAttach.map(att => {
-                                                const url = att.attachmentUrl;
-                                                // 1. Lấy phần cuối của URL
-                                                let filename = url.split('/').pop();
-
-                                                filename.replace(/^[0-9a-fA-F\-]{36}-/, '');
-
-                                                return (
-                                                    <div
-                                                        key={att.id}
-                                                        className="w-20 h-20 relative border rounded overflow-hidden bg-gray-50 flex items-center justify-center"
-                                                    >
-                                                        {isImage(url) ? (
-                                                            <img
-                                                                src={url}
-                                                                alt=""
-                                                                className="w-full h-full object-cover"
-                                                                onError={(e) => {
-                                                                    if (e.currentTarget.src !== '/file-broken.png') {
-                                                                        e.currentTarget.src = '/file-broken.png';
-                                                                    }
-                                                                }}
-                                                            />
-                                                        ) : (
-                                                            <a
-                                                                href={url}
-                                                                target="_blank"
-                                                                rel="noreferrer"
-                                                                className="text-xs text-blue-600 underline p-1 break-words text-center"
-                                                            >
-                                                                {filename}
-                                                            </a>
-                                                        )}
-                                                        {/* Nút xóa */}
-                                                        <button
-                                                            onClick={() =>
-                                                                handleDeleteFileOnUpdate(url)
-                                                            }
-                                                            className="absolute top-0 right-0 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center hover:bg-red-600"
-                                                        >
-                                                            <DeleteOutlined style={{ fontSize: '14px' }} />
-                                                        </button>
-                                                    </div>
-
-                                                );
-                                            })}
-                                        </div>
-                                )}
+                                        <CommentAttachItem commentAttach={c.commentAttach} onDeleteCommentAttach={onDeleteCommentAttach} isEditing={true} />
+                                    )}
                                 <div className="flex justify-between items-center mt-2">
                                     <div className="flex gap-3 text-gray-400 text-lg">
                                     </div>
@@ -407,28 +323,7 @@ export default function CommentSection({ isOpenComment, comments, handleComment,
                   />
 
                     {attachments.length > 0 && (
-                        <div className="flex flex-wrap gap-2 mt-2">
-                            {attachments.map((url, idx) => (
-                                <div key={idx} className="w-20 h-20 relative border rounded overflow-hidden bg-gray-50 flex items-center justify-center">
-                                    {isImage(url) ? (
-                                        <img src={url} className="w-full h-full object-cover" alt=""/>
-                                    ) : (
-                                        <a href={url} target="_blank" rel="noreferrer" className="text-xs text-blue-600 underline p-1 break-words text-center">
-                                            File
-                                        </a>
-                                    )}
-                                    {/* Nút xóa */}
-                                    <button
-                                        onClick={() =>
-                                            setAttachments(prev => prev.filter((_, i) => i !== idx))
-                                        }
-                                        className="absolute top-0 right-0 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center hover:bg-red-600"
-                                    >
-                                        <DeleteOutlined style={{ fontSize: '14px' }} />
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
+                        <CommentAttachItemAdd attachments={attachments} setAttachments={setAttachments} />
                     )}
 
                     <div className="flex justify-between items-center mt-2">

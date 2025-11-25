@@ -16,7 +16,7 @@ public interface ProjectRepository extends JpaRepository<Project, String>, JpaSp
                 FROM Project p 
                 JOIN FETCH p.members m 
                 WHERE m.account.id = :accountId
-                  AND (p.isDeleted = false OR p.isDeleted IS NULL)
+                  AND (p.isDeleted = false OR p.isDeleted IS NULL) AND m.status = ACCEPTED
                 ORDER BY p.updatedAt DESC
             """)
     List<Project> findAllByAccountId(@Param("accountId") String accountId);
@@ -31,6 +31,7 @@ public interface ProjectRepository extends JpaRepository<Project, String>, JpaSp
                 WHERE m.account.id = :accountId
                   AND (p.isDeleted = false OR p.isDeleted IS NULL)
                   AND p.isDefault = true
+                  AND m.status = ACCEPTED  
             """)
     Project findProjectIsDefault(@Param("accountId") String accountId);
 

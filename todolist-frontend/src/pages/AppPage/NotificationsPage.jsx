@@ -41,30 +41,35 @@ export default function NotificationsPage() {
         getAllNotifications(pageNumberNotification);
     }, [pageNumberNotification, tab]);
 
+    const UpdateListNotification = (status, idNotification) => {
+        if (status) {
+            setCountNotificationsUnRead((prev) => prev - 1)
+        }else{
+            setCountNotificationsUnRead((prev) => prev + 1)
+        }
+
+        // Nếu là tab Unread thì xóa thông báo khỏi đó
+
+        if (tab === "Unread"){
+            setNotifications((prev) => prev.filter((item) => item.id !== idNotification));
+        }else{
+            setNotifications((prev) =>
+                prev.map((item) =>
+                    item.id === idNotification ? { ...item, read: !item.read } : item
+                )
+            );
+
+        }
+    }
+
     const handleUpdateStatus =  async (status, idNotification) => {
         try{
             await https_notification.patch(`/v1/notifications/${idNotification}/read-status`, {
                 isRead: status,
             })
 
-            if (status) {
-                setCountNotificationsUnRead((prev) => prev - 1)
-            }else{
-                setCountNotificationsUnRead((prev) => prev + 1)
-            }
+            UpdateListNotification(status, idNotification);
 
-            // Nếu là tab Unread thì xóa thông báo khỏi đó
-
-            if (tab === "Unread"){
-                setNotifications((prev) => prev.filter((item) => item.id === idNotification));
-            }else{
-                setNotifications((prev) =>
-                    prev.map((item) =>
-                        item.id === idNotification ? { ...item, read: !item.read } : item
-                    )
-                );
-
-            }
         }
         catch(error) {
             console.error("Fetch notifications failed:", error);
@@ -178,7 +183,7 @@ export default function NotificationsPage() {
                 <div className="flex flex-col gap-2 flex-1">
                     {notifications.map((n) => (
                         <div key={n.id}>
-                            <NotificationItem  notification={n} handleClickOnNotification={handleClickOnNotification} handleUpdateStatus={handleUpdateStatus} />
+                            <NotificationItem  notification={n} handleClickOnNotification={handleClickOnNotification} handleUpdateStatus={handleUpdateStatus} UpdateListNotification={UpdateListNotification} />
                         </div>
                     ))}
 

@@ -1,5 +1,7 @@
 package aws.todolist.taskflow.service;
 
+import org.springframework.core.io.ByteArrayResource;
+
 import java.io.InputStream;
 import java.net.URISyntaxException;
 
@@ -13,5 +15,7 @@ public interface AwsService {
     void deleteFile(String url);
 
     // Chuyển file từ temp sang attach
-    void moveFileToAttach(String tempUrl) throws URISyntaxException;
+    String moveFileToAttach(String tempUrl) throws URISyntaxException;
+
+    ByteArrayResource downloadFile(String url) throws URISyntaxException;
 }

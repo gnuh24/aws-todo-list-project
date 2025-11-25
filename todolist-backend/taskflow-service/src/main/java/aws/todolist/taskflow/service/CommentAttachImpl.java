@@ -40,13 +40,11 @@ public class CommentAttachImpl implements CommentAttachService {
 
         TaskComment taskComment = taskCommentUtils.getCommentAndCheck(idComment, account);
 
-        CommentAttach commentAttach = CommentAttach.builder().attachmentUrl(url).taskComment(taskComment).build();
+        String newUrl = awsService.moveFileToAttach(url);
 
-        CommentAttach newCommentAttach = commentAttachRepository.save(commentAttach);
+        CommentAttach commentAttach = CommentAttach.builder().attachmentUrl(newUrl).taskComment(taskComment).build();
 
-        awsService.moveFileToAttach(url);
-
-        return newCommentAttach;
+        return commentAttachRepository.save(commentAttach);
     }
 
     @Override

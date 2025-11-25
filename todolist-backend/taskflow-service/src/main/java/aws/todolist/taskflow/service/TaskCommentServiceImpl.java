@@ -56,7 +56,6 @@ public class TaskCommentServiceImpl implements TaskCommentService {
         if (requestDTO.getUrls() != null) {
             for (String url : requestDTO.getUrls()) {
                 try {
-
                     taskComment.getCommentAttaches().add(commentAttachService.addNewCommentAttach(url, taskComment.getId(), accountLogging));
                 } catch (URISyntaxException e) {
                     throw new RuntimeException(e);

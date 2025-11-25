@@ -74,7 +74,13 @@ public class KafkaNotificationConsumer {
 	public void consumeTaskOverdue(String messageJson) {
 		processMessage(messageJson, NotificationType.TASK_OVERDUE);
 	}
-	
+
+	@KafkaListener(topics = "${app.kafka.topic.taskflow.notification.response-invitation}", groupId = "notification-service")
+	public void consumeResponseInvitation(String messageJson) {
+		processMessage(messageJson, NotificationType.RESPONSE_INVITATION);
+	}
+
+
 	// ===========================================================
 	// ⚙️ COMMON HANDLER
 	// ===========================================================

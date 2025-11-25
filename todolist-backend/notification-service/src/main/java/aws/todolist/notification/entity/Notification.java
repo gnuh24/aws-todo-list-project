@@ -82,6 +82,7 @@ public class Notification {
 		TASK_REOPENED,                // Khi task bị mở lại
 		TASK_DUE_SOON,                // Khi task sắp đến hạn
 		TASK_OVERDUE,                 // Khi task bị trễ hạn
-		PROJECT_DELETED               // Khi project bị xóa
+		PROJECT_DELETED,               // Khi project bị xóa
+		RESPONSE_INVITATION            // Khi thành viên phản hồi lời mời
 	}
 }

@@ -5,6 +5,7 @@ import aws.todolist.taskflow.service.AwsService;
 import io.jsonwebtoken.io.IOException;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
+import java.net.URISyntaxException;
 
 @RestController
 @RequestMapping("/s3bucketstorage")
@@ -56,13 +58,13 @@ public class AwsController {
 
     }
 
+//    @GetMapping("/download")
+//    public ResponseEntity<ApiResponse<ByteArrayResource>> download(@RequestParam String url) throws URISyntaxException {
+//        System.err.println(url);
+//        ApiResponse<ByteArrayResource> apiResponse = new ApiResponse<ByteArrayResource>(HttpStatus.OK.value(), "Chuẩn bị file download thành công", null);
+//
+//        return ResponseEntity.ok().body(apiResponse);
+//    }
 
-    @DeleteMapping("/delete")
-    public ResponseEntity<ApiResponse<String>> deleteFile(@RequestParam("fileUrl") String fileUrl) {
-        service.deleteFile(fileUrl);
-        return ResponseEntity.ok(
-                new ApiResponse<>(HttpStatus.OK.value(), "Xoá file thành công", fileUrl)
-        );
 
-    }
 }

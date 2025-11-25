@@ -1,5 +1,43 @@
+import {https_notification, https_taskflow} from "../../service/api";
 
 export default function NotificationItem({ notification, handleClickOnNotification, handleUpdateStatus }) {
+
+    const typeNotificationAddMember = "PROJECT_MEMBER_ADDED"
+    const statusForReponse = {
+        accepted: "ACCEPTED",
+        declined: "DECLINED",
+    }
+
+    const handleAcceptInvite = async (notification) => {
+        try{
+            const res = await https_taskflow.patch(`/v1/projects/${notification.projectId}/members/response`, {
+                status: statusForReponse.accepted,
+            })
+
+           if (res.status === 200) {
+               await handleUpdateStatus(!notification.read, notification.id)
+           }
+        }
+        catch(error) {
+            console.error("Fetch notifications failed:", error);
+        }
+    }
+
+    const handleRejectInvite = async (notification) => {
+        try{
+            const res = await https_taskflow.patch(`/v1/projects/${notification.projectId}/members/response`, {
+                status: statusForReponse.declined,
+            })
+
+            if (res.status === 200) {
+                await handleUpdateStatus(!notification.read, notification.id)
+            }
+        }
+        catch(error) {
+            console.error("Fetch notifications failed:", error);
+        }
+    }
+
     return (
         <>
             <div className={`relative rounded-lg transition-all border-t border-b border-gray-300 ${
@@ -52,10 +90,35 @@ export default function NotificationItem({ notification, handleClickOnNotificati
                     {!notification.read && (
                         <span className="w-3 h-3 bg-[#F48318] rounded-full absolute top-3 right-2"></span>
                     )}
+
+                    {/* ---- Nút Accept / Denied ---- */}
+                    {notification.type === typeNotificationAddMember && !notification.read && (
+                        <div className="flex gap-3 mt-3">
+                            <button
+                                className="px-3 py-1 bg-green-500 text-white rounded-md text-sm hover:bg-green-600"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleAcceptInvite(notification);
+                                }}
+                            >
+                                Accept
+                            </button>
+
+                            <button
+                                className="px-3 py-1 bg-red-500 text-white rounded-md text-sm hover:bg-red-600"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleRejectInvite(notification);
+                                }}
+                            >
+                                Denied
+                            </button>
+                        </div>
+                    )}
                 </div>
 
                 {/* Checkbox riêng, không nằm trong div có onClick */}
-                <div className="absolute bottom-2 right-2">
+                {notification.type !== typeNotificationAddMember && (<div className="absolute bottom-2 right-2">
                     <input
                         type="checkbox"
                         checked={notification.read}
@@ -74,7 +137,7 @@ export default function NotificationItem({ notification, handleClickOnNotificati
                                       cursor-pointer
                                     "
                     />
-                </div>
+                </div>)}
             </div>
 
 
