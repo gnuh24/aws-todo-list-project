@@ -1,5 +1,6 @@
 package aws.todolist.taskflow.service;
 
+import aws.todolist.taskflow.dto.personalLabel.PersonalLabelRequestDTO;
 import aws.todolist.taskflow.dto.personalLabel.PersonalLabelResponseDTO;
 import aws.todolist.taskflow.dto.projectLabel.ProjectLabelResponseDTO;
 import aws.todolist.taskflow.dto.taskLabel.TaskLabelRequestDTO;
@@ -47,6 +48,24 @@ public class LabelService {
 		    .map(l -> new ProjectLabelResponseDTO(l.getId(), l.getName()))
 		    .collect(Collectors.toList());
 	}
+	
+	@Transactional
+	public PersonalLabelResponseDTO createPersonalLabel(PersonalLabelRequestDTO req, Account user) {
+		
+		PersonalLabel label = PersonalLabel.builder()
+		    .id(UUID.randomUUID().toString())
+		    .account(user)
+		    .name(req.getName())
+		    .createdAt(LocalDateTime.now())
+		    .updatedAt(LocalDateTime.now())
+		    .isDeleted(false)
+		    .build();
+		
+		personalLabelRepository.save(label);
+		
+		return new PersonalLabelResponseDTO(label.getId(), label.getName());
+	}
+	
 	
 	@Transactional
 	public TaskLabelResponseDTO addLabelToTask(String projectId, String taskId, TaskLabelRequestDTO req, Account user) {
