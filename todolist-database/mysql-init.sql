@@ -122,7 +122,6 @@ CREATE TABLE `task_label` (
     `id` CHAR(36) PRIMARY KEY,  -- primary key riêng
     `task_id` CHAR(36) NOT NULL,
     `label_id` CHAR(36) NOT NULL,
-    `label_type` ENUM('personal','project') NOT NULL,
     `is_ai_generated` BOOLEAN DEFAULT FALSE,
     `confidence` FLOAT DEFAULT NULL,
     `created_at` TIMESTAMP NOT NULL,
@@ -169,7 +168,7 @@ VALUES
 
 INSERT INTO `personal_label` (`id`, `account_id`, `name`, `description`, `created_at`, `updated_at`, `deleted_at`, `is_deleted`)
 VALUES
-('11111111-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '22222222-2222-2222-2222-222222222222', 'Urgent', 'Task cần làm gấp', NOW(), NOW(), NULL, FALSE),
+('99999999-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', 'Urgent', 'Task cần làm gấp', NOW(), NOW(), NULL, FALSE),
 ('22222222-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '22222222-2222-2222-2222-222222222222', 'Review', 'Task cần review', NOW(), NOW(), NULL, FALSE),
 ('33333333-cccc-cccc-cccc-cccccccccccc', '33333333-3333-3333-3333-333333333333', 'Learning', 'Task học tập, nghiên cứu', NOW(), NOW(), NULL, FALSE);
 

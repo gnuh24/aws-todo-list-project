@@ -29,7 +29,7 @@ public class TaskLabel {
 	private Boolean isAiGenerated = false;
 	
 	@Column
-	private Float confidence;
+	private Float confidence = 0F;
 	
 	@Column(name = "created_at", nullable = false)
 	private LocalDateTime createdAt = LocalDateTime.now();
