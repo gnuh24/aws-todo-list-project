@@ -213,7 +213,7 @@ VALUES
 ('aaaa1111-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '44444444-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'bbbbbbbb-2222-2222-2222-bbbbbbbbbbbb',  TRUE, 0.95, NOW()),
 ('aaaa2222-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '44444444-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-aaaa-aaaa-aaaa-aaaaaaaaaaaa',  TRUE, 0.9, NOW()),
 ('aaaa3333-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '55555555-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'bbbbbbbb-2222-2222-2222-bbbbbbbbbbbb',  TRUE, 0.85, NOW()),
-('aaaa4444-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '66666666-cccc-cccc-cccc-cccccccccccc', 'aaaaaaaa-1111-1111-1111-aaaaaaaaaaaa',  TRUE, 0.9, NOW()),
+('aaaa4444-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '66666666-cccc-cccc-cccc-cccccccccccc', '11111111-aaaa-aaaa-aaaa-aaaaaaaaaaaa',  TRUE, 0.9, NOW()),
 ('aaaa5555-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '66666666-cccc-cccc-cccc-cccccccccccc', '22222222-bbbb-bbbb-bbbb-bbbbbbbbbbbb',  TRUE, 0.75, NOW());
 
 
