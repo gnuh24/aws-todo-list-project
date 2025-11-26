@@ -103,7 +103,7 @@ public class MemberServiceImpl implements MemberService {
         // 🔔 GỬI KAFKA NOTIFICATION
         // =============================
 
-        notificationUtils.sendNotification(null, project, null, notificationUtils.getReceiversForMember(member_saved), NotificationType.PROJECT_MEMBER_ADDED);
+        notificationUtils.sendNotification(null, project, null, notificationUtils.getReceiversForMemberAdd(member_saved), NotificationType.PROJECT_MEMBER_ADDED);
 
         // =============================
 
@@ -147,7 +147,7 @@ public class MemberServiceImpl implements MemberService {
         // =============================
 
 
-        notificationUtils.sendNotification(null, member_saved.getProject(), null, notificationUtils.getReceiversForMember(member_saved), NotificationType.PROJECT_MEMBER_ROLE_UPDATED);
+        notificationUtils.sendNotification(null, member_saved.getProject(), null, notificationUtils.getReceiversForMemberUpdate(member_saved), NotificationType.PROJECT_MEMBER_ROLE_UPDATED);
 
 
         return memberMapper.ResponseDTO(member_saved);
@@ -228,8 +228,13 @@ public class MemberServiceImpl implements MemberService {
         // 🔔 Gửi Kafka Notification
         // =============================
 
+        if (member.getStatus() == StatusMember.ACCEPTED) {
+            notificationUtils.sendNotification(null, member.getProject(), null, notificationUtils.getReceiversForMemberUpdate(member), NotificationType.REQUEST_ACCEPTED);
 
-        notificationUtils.sendNotification(null, member.getProject(), null, notificationUtils.getReceiversForMember(member), NotificationType.RESPONSE_INVITATION);
+        } else {
+            notificationUtils.sendNotification(null, member.getProject(), null, notificationUtils.getReceiversForMemberUpdate(member), NotificationType.REQUEST_DECLINED);
+
+        }
 
         return memberMapper.ResponseDTO(member);
     }

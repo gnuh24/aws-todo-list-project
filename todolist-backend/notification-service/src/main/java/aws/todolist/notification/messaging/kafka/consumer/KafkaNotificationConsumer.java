@@ -75,9 +75,14 @@ public class KafkaNotificationConsumer {
 		processMessage(messageJson, NotificationType.TASK_OVERDUE);
 	}
 
-	@KafkaListener(topics = "${app.kafka.topic.taskflow.notification.response-invitation}", groupId = "notification-service")
-	public void consumeResponseInvitation(String messageJson) {
-		processMessage(messageJson, NotificationType.RESPONSE_INVITATION);
+	@KafkaListener(topics = "${app.kafka.topic.taskflow.notification.request-accepted}", groupId = "notification-service")
+	public void consumeAcceptedRequest(String messageJson) {
+		processMessage(messageJson, NotificationType.REQUEST_ACCEPTED);
+	}
+
+	@KafkaListener(topics = "${app.kafka.topic.taskflow.notification.request-declined}", groupId = "notification-service")
+	public void consumeDeclinedRequest(String messageJson) {
+		processMessage(messageJson, NotificationType.REQUEST_DECLINED);
 	}
 
 

@@ -1,7 +1,6 @@
 package aws.todolist.taskflow.utils;
 
 import aws.todolist.taskflow.entity.*;
-import aws.todolist.taskflow.enums.Role;
 import aws.todolist.taskflow.exceptions.ProjectException.ForbiddenException;
 import aws.todolist.taskflow.exceptions.errorCode.SystemErrorCode;
 import aws.todolist.taskflow.messaging.kafka.message.NotificationMessage;
@@ -27,7 +26,7 @@ public class NotificationUtils {
 
 
     // Role để thông báo tới user trong trường hợp liên quan tới member;
-    private Role roleMember = null;
+    private Member memberGlobal = null;
 
     @Autowired
     private MemberRepository memberRepository;
@@ -60,7 +59,7 @@ public class NotificationUtils {
     /**
      * Lấy danh sách các id cần gửi cho memberservice
      */
-    public Set<Account> getReceiversForMember(Member member) {
+    public Set<Account> getReceiversForMemberUpdate(Member member) {
         Set<Account> receivers = new HashSet<>();
 
         List<Member> listMemberInProject = memberRepository.findAllByProjectId(member.getProject().getId());
@@ -69,7 +68,17 @@ public class NotificationUtils {
             receivers.add(memberInList.getAccount());
         }
 
-        roleMember = member.getRole();
+        memberGlobal = member;
+
+        return receivers;
+    }
+
+    public Set<Account> getReceiversForMemberAdd(Member member) {
+        Set<Account> receivers = new HashSet<>();
+
+        receivers.add(member.getAccount());
+
+        memberGlobal = member;
 
         return receivers;
     }
@@ -216,32 +225,42 @@ public class NotificationUtils {
                         break;
                     }
                     case PROJECT_MEMBER_ADDED: {
-                        message.setTitle("Bạn đã được thêm vào dự án mới");
+                        message.setTitle("Bạn vừa được mời vào dự án");
                         message.setContent(String.format(
                                 "Bạn đã được thêm vào dự án '%s' với vai trò '%s'.",
                                 project.getName(),
-                                roleMember.name()
+                                memberGlobal.getRole().name()
                         ));
                         kafkaNotificationProducer.sendProjectMemberAdded(message);
                         break;
                     }
                     case PROJECT_MEMBER_ROLE_UPDATED: {
-                        message.setTitle("Vai trò của bạn trong dự án đã được cập nhật");
+                        message.setTitle("Vai trò của một thành viên trong dự án đã được cập nhật");
                         message.setContent(String.format(
-                                "Vai trò mới của bạn trong dự án '%s' là: '%s'",
+                                "Vai trò mới của '%s' trong dự án '%s' là: '%s'",
+                                memberGlobal.getAccount().getDisplayName(),
                                 project.getName(),
-                                roleMember.name()
+                                memberGlobal.getRole().name()
                         ));
                         kafkaNotificationProducer.sendProjectMemberRoleUpdated(message);
                         break;
                     }
-                    case RESPONSE_INVITATION: {
-                        message.setTitle("Lời mời đã được phản hồi");
-                        message.setContent(String.format("%s đã phản hồi lời mời vào project %s",
+                    case REQUEST_ACCEPTED: {
+                        message.setTitle("Lời mời đã được chấp nhận");
+                        message.setContent(String.format("%s đã chấp nhận lời mời vào project %s",
                                 actor.getDisplayName(),
                                 project.getName()
                         ));
-                        kafkaNotificationProducer.sendResponseInvitation(message);
+                        kafkaNotificationProducer.sendRequestAccepted(message);
+                        break;
+                    }
+                    case REQUEST_DECLINED: {
+                        message.setTitle("Lời mời đã bị từ chối");
+                        message.setContent(String.format("%s đã từ chối lời mời vào project %s",
+                                actor.getDisplayName(),
+                                project.getName()
+                        ));
+                        kafkaNotificationProducer.sendRequestDeclined(message);
                         break;
                     }
                     default:

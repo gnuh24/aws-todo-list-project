@@ -83,6 +83,7 @@ public class Notification {
 		TASK_DUE_SOON,                // Khi task sắp đến hạn
 		TASK_OVERDUE,                 // Khi task bị trễ hạn
 		PROJECT_DELETED,               // Khi project bị xóa
-		RESPONSE_INVITATION            // Khi thành viên phản hồi lời mời
+		REQUEST_ACCEPTED,               // Khi thành viên chấp nhận lời mời
+		REQUEST_DECLINED                // Khi thành viên từ chối lời mời
 	}
 }

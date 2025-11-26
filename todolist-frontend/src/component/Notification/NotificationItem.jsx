@@ -1,4 +1,4 @@
-import {https_notification, https_taskflow} from "../../service/api";
+import {https_taskflow} from "../../service/api";
 
 export default function NotificationItem({ notification, handleClickOnNotification, handleUpdateStatus }) {
 
@@ -7,6 +7,8 @@ export default function NotificationItem({ notification, handleClickOnNotificati
         accepted: "ACCEPTED",
         declined: "DECLINED",
     }
+
+    const idUserLogging = JSON.parse(localStorage.getItem("USER_INFO"))?.id
 
     const handleAcceptInvite = async (notification) => {
         try{
@@ -90,32 +92,32 @@ export default function NotificationItem({ notification, handleClickOnNotificati
                     {!notification.read && (
                         <span className="w-3 h-3 bg-[#F48318] rounded-full absolute top-3 right-2"></span>
                     )}
-
-                    {/* ---- Nút Accept / Denied ---- */}
-                    {notification.type === typeNotificationAddMember && !notification.read && (
-                        <div className="flex gap-3 mt-3">
-                            <button
-                                className="px-3 py-1 bg-green-500 text-white rounded-md text-sm hover:bg-green-600"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleAcceptInvite(notification);
-                                }}
-                            >
-                                Accept
-                            </button>
-
-                            <button
-                                className="px-3 py-1 bg-red-500 text-white rounded-md text-sm hover:bg-red-600"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleRejectInvite(notification);
-                                }}
-                            >
-                                Denied
-                            </button>
-                        </div>
-                    )}
                 </div>
+
+                {/* ---- Nút Accept / Denied ---- */}
+                {notification.type === typeNotificationAddMember && !notification.read &&(
+                    <div className="flex gap-3 my-3 ml-3">
+                        <button
+                            className="px-3 py-1 bg-green-500 text-white rounded-md text-sm hover:bg-green-600"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleAcceptInvite(notification);
+                            }}
+                        >
+                            Accept
+                        </button>
+
+                        <button
+                            className="px-3 py-1 bg-red-500 text-white rounded-md text-sm hover:bg-red-600"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleRejectInvite(notification);
+                            }}
+                        >
+                            Denied
+                        </button>
+                    </div>
+                )}
 
                 {/* Checkbox riêng, không nằm trong div có onClick */}
                 {notification.type !== typeNotificationAddMember && (<div className="absolute bottom-2 right-2">

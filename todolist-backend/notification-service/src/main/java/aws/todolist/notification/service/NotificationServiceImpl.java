@@ -32,6 +32,9 @@ public class NotificationServiceImpl implements NotificationService {
 
 	@Autowired
 	private WebSocketService webSocketService;
+
+	@Autowired
+	private EmailService emailService;
 	
 	// GIẢ ĐỊNH: Các service cần thiết để truy vấn dữ liệu nghiệp vụ
 	// @Autowired private TaskService taskService;
@@ -100,6 +103,11 @@ public class NotificationServiceImpl implements NotificationService {
 
 			webSocketService.sendToUserNew(receiverOpt.get().getEmail(),notification);
 
+			// Kiểm tra xem người dùng có muốn gửi thông báo đến email hay không
+			if(receiverOpt.get().isReceiveEmail()){
+				emailService.sendNotification(notification);
+			}
+
 
 			
 		} catch (Exception e) {
@@ -107,7 +115,7 @@ public class NotificationServiceImpl implements NotificationService {
 			e.printStackTrace();
 		}
 	}
-	
+
 	
 	
 }

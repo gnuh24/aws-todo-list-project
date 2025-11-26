@@ -1,5 +1,6 @@
 package aws.todolist.notification.service;
 
+import aws.todolist.notification.entity.Notification;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,6 +79,15 @@ public class EmailServiceImpl implements EmailService {
 		sendEmail(username, subject, content);
 	}
 
+	@Override
+	public void sendNotification(Notification notification) {
+		String subject = "Thông báo từ hệ thống TODOIST";
+
+		String content = getEmailContentForNotification(notification);
+
+		sendEmail(notification.getReceiver().getEmail(),subject,content);
+	}
+
 //    @Override
 //    public void sendUpdatePasswordUserConfirm(Account account, OTP otp) {
 //        String subject = "Mã xác nhận đổi mật khẩu";
@@ -128,6 +138,41 @@ public class EmailServiceImpl implements EmailService {
 		    "</div>" +
 		    "</body>" +
 		    "</html>";
+	}
+
+	private String getEmailContentForNotification(Notification notification){
+		return "<!DOCTYPE html>" +
+				"<html>" +
+				"<head>" +
+				"<style>" +
+				"body {font-family: Arial, sans-serif; background: #f5f5f5;}" +
+				".container {max-width: 600px; margin: auto; background: #ffffff; padding: 20px; border-radius: 8px;}" +
+				".header {background-color: #2563eb; padding: 15px; text-align: center; color: white; border-radius: 6px;}" +
+				".content {margin-top: 20px; padding: 20px; border: 1px solid #ddd; border-radius: 6px;}" +
+				".button {background-color: #2563eb; color: white; padding: 12px 20px; text-align: center; text-decoration: none; display: inline-block; border-radius: 6px; font-weight: bold;}" +
+				".footer {margin-top: 18px; text-align: center; color: #888; font-size: 13px;}" +
+				"</style>" +
+				"</head>" +
+				"<body>" +
+				"<div class=\"container\">" +
+				"<div class=\"header\">" +
+				"<h2>" + notification.getTitle() + "</h2>" +
+				"</div>" +
+
+				"<div class=\"content\">" +
+				"<p>Xin chào <b>" + notification.getReceiver().getDisplayName() + "</b>,</p>" +
+				"<p>" + notification.getContent() + "</p>" +
+				"<p style='margin-top: 25px; text-align:center;'>" +
+				"</p>" +
+				"</div>" +
+
+				"<div class=\"footer\">" +
+				"<p>Đây là email tự động. Vui lòng không phản hồi.</p>" +
+				"<p>Cảm ơn bạn đã sử dụng hệ thống của chúng tôi!</p>" +
+				"</div>" +
+				"</div>" +
+				"</body>" +
+				"</html>";
 	}
 	
 

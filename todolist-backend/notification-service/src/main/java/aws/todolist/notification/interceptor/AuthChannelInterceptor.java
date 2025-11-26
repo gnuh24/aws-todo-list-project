@@ -38,7 +38,6 @@ public class AuthChannelInterceptor implements ChannelInterceptor {
                 throw new MessagingException("Token không hợp lệ");
             }
 
-            System.err.println(jwtTokenProvider.getUsername(token));
 
             accessor.setUser(new UsernamePasswordAuthenticationToken(jwtTokenProvider.getUsername(token), null, List.of()));
 

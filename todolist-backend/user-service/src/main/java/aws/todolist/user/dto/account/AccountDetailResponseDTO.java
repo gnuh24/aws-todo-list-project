@@ -14,6 +14,7 @@ public class AccountDetailResponseDTO {
     private String displayName;
     private String role;
     private String status;
+    private boolean receiveEmail;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

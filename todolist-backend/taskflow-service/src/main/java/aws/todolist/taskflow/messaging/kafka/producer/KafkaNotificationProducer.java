@@ -46,8 +46,11 @@ public class KafkaNotificationProducer {
     @Value("${app.kafka.topic.taskflow.notification.project-deleted}")
     private String projectDeletedTopic;
 
-    @Value("${app.kafka.topic.taskflow.notification.response-invitation}")
-    private String responseInvitationTopic;
+    @Value("${app.kafka.topic.taskflow.notification.request-accepted}")
+    private String requestAcceptedTopic;
+
+    @Value("${app.kafka.topic.taskflow.notification.request-declined}")
+    private String requestDeclinedTopic;
     // ======= SENDERS =======
 
     public void sendProjectMemberAdded(NotificationMessage message) {
@@ -90,8 +93,12 @@ public class KafkaNotificationProducer {
         sendMessage(projectDeletedTopic, message);
     }
 
-    public void sendResponseInvitation(NotificationMessage message) {
-        sendMessage(responseInvitationTopic, message);
+    public void sendRequestAccepted(NotificationMessage message) {
+        sendMessage(requestAcceptedTopic, message);
+    }
+
+    public void sendRequestDeclined(NotificationMessage message) {
+        sendMessage(requestDeclinedTopic, message);
     }
 
     // ======= COMMON HANDLER =======
