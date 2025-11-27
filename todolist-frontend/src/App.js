@@ -76,9 +76,9 @@ function App() {
                   element={<NotificationsPage></NotificationsPage>}
               ></Route>
             </Route>
+
             <Route path="testapi" element={<TestAPI></TestAPI>}></Route>
             <Route path="/login-success" element={<LoginSuccess />} />
-
             <Route
                 path="*"
                 element={<Navigate to="/index.html" replace />}

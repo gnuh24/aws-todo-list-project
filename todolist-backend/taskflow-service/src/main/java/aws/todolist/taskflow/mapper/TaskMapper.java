@@ -13,7 +13,7 @@ public class TaskMapper {
 
     @Autowired
     private TaskCommentMapper taskCommentMapper;
-    
+
     @Autowired
     private TaskLabelMapper taskLabelMapper;
 
@@ -59,7 +59,7 @@ public class TaskMapper {
                 .idAccountCreate(task.getCreatedByAccount().getId())
                 .idSection(task.getSection().getId())
                 .idProject(task.getSection().getProject().getId())
-	    .labels(taskLabelMapper.toResponseList(task.getTaskLabels()))
+                .labels(taskLabelMapper.toResponseList(task.getTaskLabels()))
                 .build();
     }
 

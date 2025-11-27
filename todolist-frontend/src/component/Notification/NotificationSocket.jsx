@@ -1,12 +1,12 @@
 import {useEffect, useRef, useState} from "react";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
-import {useNotifications} from "../../layout/MainLayout";
+import {useAppContext} from "../../layout/MainLayout";
 
 
 export default function NotificationSocket() {
     
-    const { setCountNotificationsUnRead, setNotifications, pageSizeNotification, setTotalPagesNotification, setNewNotificationFormWebsocket, pageNumberNotification } = useNotifications();
+    const { setCountNotificationsUnRead, setNotifications, pageSizeNotification, setTotalPagesNotification, setNewNotificationFormWebsocket, pageNumberNotification } = useAppContext();
 
     const [jwtToken] = useState(JSON.parse(localStorage.getItem("USER_INFO"))?.token);
 

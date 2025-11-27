@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNotifications } from "../../layout/MainLayout";
+import { useAppContext } from "../../layout/MainLayout";
 import { CheckOutlined } from "@ant-design/icons";
 import {https_auth, https_notification, https_taskflow} from "../../service/api";
 import { useNavigate } from "react-router-dom";
@@ -8,7 +8,7 @@ import NotificationItem from "../../component/Notification/NotificationItem";
 
 
 export default function NotificationsPage() {
-    const { notifications, setNotifications, setCountNotificationsUnRead, countNotificationsUnRead, totalPagesNotification, setTotalPagesNotification, pageSizeNotification, pageNumberNotification, setPageNumberNotification } = useNotifications();
+    const { notifications, setNotifications, setCountNotificationsUnRead, countNotificationsUnRead, totalPagesNotification, setTotalPagesNotification, pageSizeNotification, pageNumberNotification, setPageNumberNotification } = useAppContext();
     const [tab, setTab] = useState("All"); // default là Unread
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();

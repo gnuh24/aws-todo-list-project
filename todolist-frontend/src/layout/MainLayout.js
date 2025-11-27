@@ -1,17 +1,20 @@
 import Sidebar from "../component/Sidebar/Sidebar";
 import {createContext, useContext, useEffect, useState} from "react";
-import {Outlet} from "react-router-dom";
+import {Outlet, useLocation, useNavigate} from "react-router-dom";
 import {https_notification} from "../service/api";
 import NotificationSocket from "../component/Notification/NotificationSocket";
 import MedalNotification from "../component/Notification/MedalNotification";
+import SettingsModal from "../component/Modal/SettingsModal";
 
-const NotificationContext = createContext();
+const AppContext = createContext();
 
-export const useNotifications = () => useContext(NotificationContext);
+export const useAppContext = () => useContext(AppContext);
 
 const PAGE_SIZE = 5;
 
 export default function MainLayout() {
+
+    const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
     const [countNotificationsUnRead, setCountNotificationsUnRead] = useState(0);
 
@@ -26,6 +29,11 @@ export default function MainLayout() {
     const [pageNotification, setPageNotification] = useState(1);        // trang hiện tại
 
     const [newNotificationFormWebsocket, setNewNotificationFormWebsocket] = useState(null);
+
+
+    const closeSettings = () => {
+        setIsSettingsModalOpen(false);
+    };
 
     useEffect(() => {
         const getCountNotifications = async () => {
@@ -42,7 +50,7 @@ export default function MainLayout() {
     },[]);
 
     return (
-        <NotificationContext.Provider value={{ countNotificationsUnRead, setCountNotificationsUnRead, notifications, setNotifications, pageSizeNotification, totalPagesNotification, setTotalPagesNotification, pageNotification, setPageNotification, setNewNotificationFormWebsocket, pageNumberNotification, setPageNumberNotification }}>
+        <AppContext.Provider value={{ countNotificationsUnRead, setCountNotificationsUnRead, notifications, setNotifications, pageSizeNotification, totalPagesNotification, setTotalPagesNotification, pageNotification, setPageNotification, setNewNotificationFormWebsocket, pageNumberNotification, setPageNumberNotification, setIsSettingsModalOpen }}>
             <div className="ml-72 flex-1 flex flex-col">
                 <Sidebar />
                 <div className="flex-1 bg-white">
@@ -51,6 +59,9 @@ export default function MainLayout() {
                 <NotificationSocket/>
                 {newNotificationFormWebsocket !== null && <MedalNotification message={newNotificationFormWebsocket} setNewNotificationFormWebsocket={setNewNotificationFormWebsocket} />}
             </div>
-        </NotificationContext.Provider>
+
+            {/* Hiển thị modal nếu URL khớp */}
+            {isSettingsModalOpen && <SettingsModal onClose={closeSettings} />}
+        </AppContext.Provider>
     );
 }

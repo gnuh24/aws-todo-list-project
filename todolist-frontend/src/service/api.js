@@ -28,6 +28,16 @@ export let https_notification = axios.create({
   },
 });
 
+export let https_user = axios.create({
+  baseURL: "http://localhost:8080/api/user/v1",
+  headers: {
+    Authorization:
+        "Bearer " + JSON.parse(localStorage.getItem("USER_INFO"))?.token
+  },
+});
+
+
+
 // // Add a request interceptor
 // https.interceptors.request.use(
 //   function (config) {

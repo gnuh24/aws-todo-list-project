@@ -11,11 +11,15 @@ import {
 
 import { Menu } from "antd";
 import { useNavigate } from "react-router-dom";
+import {useAppContext} from "../../layout/MainLayout";
 
 export default function UserMenuDropdown() {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
+    const { setIsSettingsModalOpen } = useAppContext();
+
+
+    const handleLogout = () => {
     // 🧹 Xoá thông tin người dùng
     localStorage.removeItem("USER_INFO");
 
@@ -40,9 +44,13 @@ export default function UserMenuDropdown() {
       </div>
 
       {/* Menu Items */}
-      <Menu.Item key="settings" icon={<SettingOutlined />}>
-        Settings
-      </Menu.Item>
+        <Menu.Item
+            key="settings"
+            icon={<SettingOutlined />}
+            onClick={() => setIsSettingsModalOpen(true)}
+        >
+            Settings
+        </Menu.Item>
       <Menu.Item key="team" icon={<TeamOutlined />}>
         Add a team
       </Menu.Item>

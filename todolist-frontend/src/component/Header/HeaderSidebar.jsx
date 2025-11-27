@@ -8,13 +8,13 @@ import { Dropdown } from "antd";
 
 import UserMenuDropdown from "../UserMenu/UserMenuDropdown";
 import {useLocation, useNavigate} from "react-router-dom";
-import {useNotifications} from "../../layout/MainLayout";
+import {useAppContext} from "../../layout/MainLayout";
 
 export default function HeaderSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { countNotificationsUnRead } = useNotifications();
+  const { countNotificationsUnRead } = useAppContext();
 
     return (
     <div className="flex items-center justify-between px-4 py-3 border-b">

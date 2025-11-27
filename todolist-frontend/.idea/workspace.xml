@@ -5,18 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a7719d69-0674-4558-b744-9f01872a3593" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../todolist-backend/auth-service/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/auth-service/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../todolist-backend/auth-service/src/main/java/aws/todolist/auth/entity/Account.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/auth-service/src/main/java/aws/todolist/auth/entity/Account.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/entity/Account.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/entity/Account.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/service/EmailService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/service/EmailService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/service/EmailServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/service/EmailServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/service/NotificationServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/service/NotificationServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../todolist-backend/taskflow-service/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/taskflow-service/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../todolist-backend/user-service/src/main/java/aws/todolist/user/dto/account/AccountDetailResponseDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/user-service/src/main/java/aws/todolist/user/dto/account/AccountDetailResponseDTO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../todolist-backend/user-service/src/main/java/aws/todolist/user/entity/Account.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/user-service/src/main/java/aws/todolist/user/entity/Account.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../todolist-backend/taskflow-service/src/main/java/aws/todolist/taskflow/mapper/TaskMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/taskflow-service/src/main/java/aws/todolist/taskflow/mapper/TaskMapper.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/component/Notification/NotificationItem.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/Notification/NotificationItem.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/RegisterPage/VerifyAccount.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/RegisterPage/VerifyAccount.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/Header/HeaderSidebar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/Header/HeaderSidebar.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/Notification/NotificationSocket.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/Notification/NotificationSocket.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/UserMenu/UserMenuDropdown.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/UserMenu/UserMenuDropdown.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/layout/MainLayout.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/layout/MainLayout.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/AppPage/NotificationsPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/AppPage/NotificationsPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/service/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/service/api.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -99,7 +97,10 @@
       <workItem from="1764036239631" duration="8903000" />
       <workItem from="1764053474185" duration="5766000" />
       <workItem from="1764059945214" duration="547000" />
-      <workItem from="1764124169932" duration="3885000" />
+      <workItem from="1764124169932" duration="4731000" />
+      <workItem from="1764142721464" duration="5876000" />
+      <workItem from="1764162073694" duration="2782000" />
+      <workItem from="1764208883268" duration="7213000" />
     </task>
     <servers />
   </component>
