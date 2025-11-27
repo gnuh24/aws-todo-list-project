@@ -4,10 +4,6 @@ import aws.todolist.taskflow.aop.AppLogger;
 import aws.todolist.taskflow.api.ApiResponse;
 import aws.todolist.taskflow.exceptions.DetailError;
 import aws.todolist.taskflow.exceptions.ErrorResponse;
-import aws.todolist.taskflow.exceptions.JwtException.AccessTokenBlacklistedException;
-import aws.todolist.taskflow.exceptions.JwtException.AccessTokenExpiredException;
-import aws.todolist.taskflow.exceptions.JwtException.InvalidJWTSignatureException;
-import aws.todolist.taskflow.exceptions.JwtException.InvalidTokenTypeException;
 import aws.todolist.taskflow.exceptions.errorCode.SystemErrorCode;
 import aws.todolist.taskflow.utils.EnvironmentUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -58,23 +54,7 @@ public class AuthExceptionHandler implements AuthenticationEntryPoint, AccessDen
         HttpStatus status = HttpStatus.UNAUTHORIZED;
 
 //		appLogger.warn(request, "🛑 [{}] {} - {}", errorCode, message, ex.getMessage());
-
-        // Có thể refine ở đây nếu có loại cụ thể (JWT expired, malformed, etc.)
-        // Ví dụ nếu exception instanceof CustomAuthException thì lấy errorCode cụ thể
-        // ==== NHÓM: TOKEN KHÁC ====
-        if (ex instanceof AccessTokenExpiredException) {
-            errorCode = SystemErrorCode.AUTH_EXPIRED_TOKEN;
-            message = "Access token đã hết hạn.";
-        } else if (ex instanceof AccessTokenBlacklistedException) {
-            errorCode = SystemErrorCode.AUTH_TOKEN_BLACKLISTED;
-            message = "Access token đã bị thu hồi hoặc không hợp lệ.";
-        } else if (ex instanceof InvalidTokenTypeException) {
-            errorCode = SystemErrorCode.AUTH_REFRESH_TOKEN_INVALID_TYP;
-            message = "Token chứa type không hợp lệ.";
-        } else if (ex instanceof InvalidJWTSignatureException) {
-            errorCode = SystemErrorCode.AUTH_REFRESH_TOKEN_INVALID_SIGNATURE;
-            message = "Token có chữ ký không hợp lệ.";
-        }
+	    
 
         writeJsonResponse(response, status, errorCode, message, detailMessage, null);
     }

@@ -5,6 +5,7 @@ import aws.todolist.taskflow.annotation.RequireProjectRole;
 import aws.todolist.taskflow.api.ApiResponse;
 import aws.todolist.taskflow.dto.section.*;
 import aws.todolist.taskflow.enums.Role;
+import aws.todolist.taskflow.service.AccountService;
 import aws.todolist.taskflow.service.SectionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,6 +24,9 @@ public class SectionController {
 
     @Autowired
     private SectionService sectionService;
+    
+    @Autowired
+    private AccountService accountService;
 
     @Operation(summary = "Lấy danh sách section của project", description = "Dùng id client cung cấp để lấy danh sách section")
     @GetMapping("/{idProject}/sections")

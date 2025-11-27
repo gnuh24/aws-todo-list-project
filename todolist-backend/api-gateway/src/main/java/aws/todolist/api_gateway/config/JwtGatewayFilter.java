@@ -56,6 +56,7 @@ public class JwtGatewayFilter implements GlobalFilter {
 			    .header("X-Token-Type", type)
 			    .build();
 			
+			System.err.println("Đã pass qua: " + email);
 			return chain.filter(exchange.mutate().request(modifiedRequest).build());
 			
 		} catch (ExpiredJwtException e) {

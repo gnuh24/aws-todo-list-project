@@ -4,15 +4,13 @@ import aws.todolist.taskflow.api.ApiResponse;
 import aws.todolist.taskflow.dto.taskLabel.TaskLabelRequestDTO;
 import aws.todolist.taskflow.dto.taskLabel.TaskLabelResponseDTO;
 import aws.todolist.taskflow.entity.Account;
+import aws.todolist.taskflow.service.AccountService;
 import aws.todolist.taskflow.service.LabelService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -25,17 +23,17 @@ public class TaskLabelController {
 	@Autowired
 	private LabelService labelService;
 	
+	@Autowired
+	private AccountService accountService;
+	
 	@Operation(summary = "Lấy danh sách nhãn", description = "Lấy cả nhãn cá nhân và nhãn của project")
 	@GetMapping("/{projectId}/labels")
-	public ResponseEntity<ApiResponse<?>> getLabels(@PathVariable("projectId") String projectId) {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		Object principal = authentication.getPrincipal();
-		if (!(principal instanceof Account)) {
-			return ResponseEntity.status(401).body(new ApiResponse<>(401, "User not authenticated", null));
-		}
-		String userId = ((Account) principal).getId();
+	public ResponseEntity<ApiResponse<?>> getLabels(
+	    @PathVariable("projectId") String projectId,
+	    @RequestHeader("X-User-Id") String accountId
+	) {
 		
-		var personalLabels = labelService.getPersonalLabels(userId);
+		var personalLabels = labelService.getPersonalLabels(accountId);
 		var projectLabels = labelService.getProjectLabels(projectId);
 		
 		var responseBody = Map.of(
@@ -52,17 +50,13 @@ public class TaskLabelController {
 	public ResponseEntity<ApiResponse<TaskLabelResponseDTO>> addTaskLabel(
 	    @PathVariable("projectId") String projectId,
 	    @PathVariable("taskId") String taskId,
-	    @RequestBody @Valid TaskLabelRequestDTO requestDTO
+	    @RequestBody @Valid TaskLabelRequestDTO requestDTO,
+	    @RequestHeader("X-User-Id") String accountId
+	
 	) {
 		
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		Object principal = authentication.getPrincipal();
-		if (!(principal instanceof Account)) {
-			return ResponseEntity.status(401).body(new ApiResponse<>(401, "User not authenticated", null));
-		}
-		String userId = ((Account) principal).getId();
-		
-		TaskLabelResponseDTO taskLabel = labelService.addLabelToTask(projectId, taskId, requestDTO, (Account) principal);
+		Account account = accountService.getAccountById(accountId);
+		TaskLabelResponseDTO taskLabel = labelService.addLabelToTask(projectId, taskId, requestDTO, account);
 		return ResponseEntity.ok(new ApiResponse<>(200, "Thêm nhãn thành công", taskLabel));
 	}
 	
@@ -71,14 +65,8 @@ public class TaskLabelController {
 	public ResponseEntity<ApiResponse<String>> deleteTaskLabel(
 	    @PathVariable String projectId,
 	    @PathVariable String taskId,
-	    @PathVariable String labelId,
-	    @AuthenticationPrincipal Account account
+	    @PathVariable String labelId
 	) {
-	
-//		if (account == null) {
-//			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-//			    .body(new ApiResponse<>(401, "User not authenticated"));
-//		}
 		
 		labelService.removeLabelFromTask(projectId, taskId, labelId);
 		

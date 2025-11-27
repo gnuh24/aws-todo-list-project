@@ -1,11 +1,12 @@
 package aws.todolist.notification.aop;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -19,11 +20,12 @@ public class AppLogger {
 	private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 	
 	private String buildPrefix() {
-		String username = "Anonymous";
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
-			username = auth.getName();
-		}
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder
+		    .currentRequestAttributes())
+		    .getRequest();
+		
+		String username = request.getHeader("X-User-Email");
+		if (username == null) username = "Anonymous";
 		
 		
 		String traceId = MDC.get("traceId");

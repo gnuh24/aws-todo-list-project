@@ -9,13 +9,13 @@ import aws.todolist.taskflow.dto.member.MemberUpdateStatusRequestDTO;
 import aws.todolist.taskflow.entity.Account;
 import aws.todolist.taskflow.enums.Role;
 import aws.todolist.taskflow.enums.StatusMember;
+import aws.todolist.taskflow.service.AccountService;
 import aws.todolist.taskflow.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,6 +27,9 @@ public class MemberController {
 
     @Autowired
     private MemberService memberService;
+    
+    @Autowired
+    private AccountService accountService;
 
     @Operation(summary = "Lấy danh sách member của project", description = "Dùng id client cung cấp để lấy danh sách member")
     @GetMapping("/{idProject}/members")
@@ -81,9 +84,11 @@ public class MemberController {
     public ResponseEntity<ApiResponse<MemberResponseDTO>> updateStatusMember(
             @PathVariable("idProject") String id,
             @RequestBody @Valid MemberUpdateStatusRequestDTO request,
-            @AuthenticationPrincipal Account account) {
-
-        MemberResponseDTO memberResponseDTO = memberService.responseRequestMember(id, request, account);
+	    @RequestHeader("X-User-Id") String accountId
+    ) {
+	    
+	    Account account = accountService.getAccountById(accountId);
+	    MemberResponseDTO memberResponseDTO = memberService.responseRequestMember(id, request, account);
 
         String message;
         if (memberResponseDTO.getStatus() == StatusMember.ACCEPTED) {

@@ -9,13 +9,13 @@ import aws.todolist.taskflow.dto.project.ProjectResponseDTO;
 import aws.todolist.taskflow.dto.project.ProjectUpdateRequestDTO;
 import aws.todolist.taskflow.entity.Account;
 import aws.todolist.taskflow.enums.Role;
+import aws.todolist.taskflow.service.AccountService;
 import aws.todolist.taskflow.service.ProjectServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,12 +28,18 @@ public class ProjectController {
 	@Autowired
 	private ProjectServiceImpl projectService;
 	
+	@Autowired
+	private AccountService accountService;
+	
 	
 	@Operation(summary = "Lấy danh sách các project", description = "Lấy danh sách các project theo id của người dùng")
 	@GetMapping("/projects")
-	public ResponseEntity<ApiResponse<List<ProjectResponseDTO>>> GetListProject(@AuthenticationPrincipal Account account) {
+	public ResponseEntity<ApiResponse<List<ProjectResponseDTO>>> GetListProject(
+	    @RequestHeader("X-User-Id") String accountId
+	) {
 		
-		List<ProjectResponseDTO> listProject = projectService.getAllProject(account.getId());
+		
+		List<ProjectResponseDTO> listProject = projectService.getAllProject(accountId);
 		
 		ApiResponse<List<ProjectResponseDTO>> response = new ApiResponse<>(200, "Danh sách dự án được lấy thành công", listProject);
 		
@@ -57,7 +63,9 @@ public class ProjectController {
 	@Operation(summary = "Tạo một project mới", description = "Thực hiện khởi tạo một project mới")
 	@PostMapping("/projects")
 	// @Valid là annotation dùng để kích hoạt validation trên các đối tượng (DTO, entity…) khi được truyền vào controller.
-	public ResponseEntity<ApiResponse<ProjectResponseDTO>> addNewProject(@RequestBody @Valid ProjectCreateRequestDTO request, @AuthenticationPrincipal Account account) {
+	public ResponseEntity<ApiResponse<ProjectResponseDTO>> addNewProject(@RequestBody @Valid ProjectCreateRequestDTO request, @RequestHeader("X-User-Id") String accountId) {
+		
+		Account account = accountService.getAccountById(accountId);
 		ProjectResponseDTO project = projectService.addProject(request, account);
 		
 		ApiResponse<ProjectResponseDTO> response = new ApiResponse<>(200, "Dự án mới được tạo thành công", project);
@@ -80,7 +88,9 @@ public class ProjectController {
 	@Operation(summary = "Xóa project", description = "Chuyển trạng thái project về đã xóa")
 	@DeleteMapping("/projects/{projectId}")
 	@RequireProjectRole({Role.OWNER})
-	public ResponseEntity<ApiResponse<ProjectResponseDTO>> removeProject(@PathVariable("projectId") String projectId, @AuthenticationPrincipal Account account) {
+	public ResponseEntity<ApiResponse<ProjectResponseDTO>> removeProject(@PathVariable("projectId") String projectId, @RequestHeader("X-User-Id") String accountId) {
+		Account account = accountService.getAccountById(accountId);
+		
 		ProjectResponseDTO project = projectService.removeProject(projectId, account);
 		
 		ApiResponse<ProjectResponseDTO> response = new ApiResponse<>(200, "Dự án cập nhật trạng thái đã xóa", project);
