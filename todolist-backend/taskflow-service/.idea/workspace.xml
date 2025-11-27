@@ -6,16 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="aafb8b93-6ddf-44d9-bc7c-02d1e2b5b281" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/mapper/TaskMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/mapper/TaskMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../user-service/src/main/java/aws/todolist/user/dto/account/AccountUpdateForm.java" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/src/main/java/aws/todolist/user/dto/account/AccountUpdateForm.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../user-service/src/main/java/aws/todolist/user/service/AccountServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/src/main/java/aws/todolist/user/service/AccountServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/App.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/component/Header/HeaderSidebar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/component/Header/HeaderSidebar.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/component/Notification/NotificationSocket.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/component/Notification/NotificationSocket.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/component/UserMenu/UserMenuDropdown.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/component/UserMenu/UserMenuDropdown.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/layout/MainLayout.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/layout/MainLayout.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/pages/AppPage/NotificationsPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/pages/AppPage/NotificationsPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/controller/SectionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/controller/SectionController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/SectionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/SectionService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/SectionServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/SectionServiceImpl.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

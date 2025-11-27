@@ -1,9 +1,6 @@
 package aws.todolist.taskflow.service;
 
-import aws.todolist.taskflow.dto.section.SectionCreateRequestDTO;
-import aws.todolist.taskflow.dto.section.SectionDeleteAndMigrateDTO;
-import aws.todolist.taskflow.dto.section.SectionResponseDTO;
-import aws.todolist.taskflow.dto.section.SectionUpdateRequestDTO;
+import aws.todolist.taskflow.dto.section.*;
 import aws.todolist.taskflow.entity.Project;
 import aws.todolist.taskflow.entity.Section;
 import aws.todolist.taskflow.entity.Task;
@@ -74,7 +71,7 @@ public class SectionServiceImpl implements SectionService {
 
     @Override
     @Transactional
-    public SectionResponseDTO updateSection(String idSection, SectionUpdateRequestDTO requestDTO) {
+    public SectionResponseDTO updatePositionSection(String idSection, SectionUpdateRequestDTO requestDTO) {
         Section section = sectionRepository.findByIdAndIsDeletedFalse(idSection);
 
         if (section == null) {
@@ -89,6 +86,23 @@ public class SectionServiceImpl implements SectionService {
             sectionRepository.shiftPositionsDown(section.getProject().getId(), newPosition, oldPosition);
         }
         section.setPosition(newPosition);
+
+
+        Section saved = sectionRepository.saveAndFlush(section);
+
+        return sectionMapper.ResponseDTO(saved);
+    }
+
+    @Override
+    public SectionResponseDTO updateNameSection(String idSection, SectionUpdateNameDTO requestDTO) {
+        Section section = sectionRepository.findByIdAndIsDeletedFalse(idSection);
+
+        if (section == null) {
+            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Section không tồn tại hoặc đã bị xóa");
+        }
+
+        section.setName(requestDTO.getName());
+
         Section saved = sectionRepository.saveAndFlush(section);
 
         return sectionMapper.ResponseDTO(saved);

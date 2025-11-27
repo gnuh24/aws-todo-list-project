@@ -3,10 +3,7 @@ package aws.todolist.taskflow.controller;
 
 import aws.todolist.taskflow.annotation.RequireProjectRole;
 import aws.todolist.taskflow.api.ApiResponse;
-import aws.todolist.taskflow.dto.section.SectionCreateRequestDTO;
-import aws.todolist.taskflow.dto.section.SectionDeleteAndMigrateDTO;
-import aws.todolist.taskflow.dto.section.SectionResponseDTO;
-import aws.todolist.taskflow.dto.section.SectionUpdateRequestDTO;
+import aws.todolist.taskflow.dto.section.*;
 import aws.todolist.taskflow.enums.Role;
 import aws.todolist.taskflow.service.SectionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,12 +50,24 @@ public class SectionController {
     @PatchMapping("/{idProject}/sections/{idSection}")
     @RequireProjectRole({Role.OWNER, Role.MEMBER})
     public ResponseEntity<ApiResponse<SectionResponseDTO>> updateSection(@PathVariable("idProject") String idProject, @PathVariable("idSection") String id, @RequestBody @Valid SectionUpdateRequestDTO requestDTO) {
-        SectionResponseDTO section = sectionService.updateSection(id, requestDTO);
+        SectionResponseDTO section = sectionService.updatePositionSection(id, requestDTO);
 
         ApiResponse<SectionResponseDTO> response = new ApiResponse<>(200, "Section đã được cập nhật thành công.", section);
 
         return ResponseEntity.ok(response);
     }
+
+    @Operation(summary = "Cập nhật tên section", description = "Đổi tên khác cho section")
+    @PatchMapping("/{idProject}/sections/{idSection}/update-name")
+    @RequireProjectRole({Role.OWNER, Role.MEMBER})
+    public ResponseEntity<ApiResponse<SectionResponseDTO>> updateNameSection(@PathVariable("idProject") String idProject, @PathVariable("idSection") String id, @RequestBody @Valid SectionUpdateNameDTO requestDTO) {
+        SectionResponseDTO section = sectionService.updateNameSection(id, requestDTO);
+
+        ApiResponse<SectionResponseDTO> response = new ApiResponse<>(200, "Section đã được cập nhật thành công.", section);
+
+        return ResponseEntity.ok(response);
+    }
+    
 
     @Operation(summary = "Xóa section", description = "Xóa section và các task trong section")
     @DeleteMapping("/{idProject}/sections/{idSection}")
