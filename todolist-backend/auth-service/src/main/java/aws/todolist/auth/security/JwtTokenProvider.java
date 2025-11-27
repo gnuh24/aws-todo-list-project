@@ -1,5 +1,6 @@
 package aws.todolist.auth.security;
 
+import aws.todolist.auth.entity.Account;
 import io.jsonwebtoken.*;
 import jakarta.annotation.PostConstruct;
 import lombok.Data;
@@ -49,6 +50,10 @@ public class JwtTokenProvider {
 			claims.put("role", userDetails.getAuthorities().iterator().next().getAuthority());
 		}
 		
+		if (userDetails instanceof Account account) {
+			claims.put("accountId", account.getId());
+		}
+		
 		return Jwts.builder()
 		    .setClaims(claims)
 		    .setSubject(userDetails.getUsername())
@@ -58,20 +63,6 @@ public class JwtTokenProvider {
 		    .compact();
 	}
 	
-	// ✅ Generate Internal Token
-	public String generateInternalToken(String serviceName) {
-		Map<String, Object> claims = new HashMap<>();
-		claims.put("typ", "internal");   // Mark this as internal token
-		claims.put("service", serviceName); // Ai đã generate (ví dụ: "auth-service")
-		
-		return Jwts.builder()
-		    .setClaims(claims)
-		    .setSubject("internal-token") // Subject cố định, không gắn với user
-		    .setIssuedAt(new Date(System.currentTimeMillis()))
-		    .setExpiration(new Date(System.currentTimeMillis() + INTERNAL_EXPIRATION_TIME)) // thời gian sống có thể ngắn hơn
-		    .signWith(secretKey)
-		    .compact();
-	}
 	
 	
 	// ✅ Generate Refresh Token
@@ -81,6 +72,10 @@ public class JwtTokenProvider {
 		
 		if (userDetails.getAuthorities() != null && !userDetails.getAuthorities().isEmpty()) {
 			claims.put("role", userDetails.getAuthorities().iterator().next().getAuthority());
+		}
+		
+		if (userDetails instanceof Account account) {
+			claims.put("accountId", account.getId());
 		}
 		
 		return Jwts.builder()

@@ -1,282 +1,283 @@
 version: "3.9"
 
 services:
-    mysql:
-        image: mysql:8.0.36
-        container_name: mysql_db
-        restart: unless-stopped
-        environment:
-            MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
-            MYSQL_DATABASE: aws_todolist_database
-        ports:
-            - "3306:3306"
-        volumes:
-            - ./todolist-database/mysql-init.sql:/docker-entrypoint-initdb.d/init.sql
-            - mysql_data:/var/lib/mysql
+  mysql:
+    image: mysql:8.0.36
+    container_name: mysql_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: aws_todolist_database
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./todolist-database/mysql-init.sql:/docker-entrypoint-initdb.d/init.sql
+      - mysql_data:/var/lib/mysql
 
-    redis:
-        image: redis:7.2.4
-        container_name: redis_cache
-        restart: unless-stopped
-        ports:
-            - "6379:6379"
-        volumes:
-            - redis_data:/data
-            - ./todolist-database/redis-init.sh:/usr/local/bin/redis-init.sh
-        command: ["sh", "/usr/local/bin/redis-init.sh"]
+  redis:
+    image: redis:7.2.4
+    container_name: redis_cache
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+      - ./todolist-database/redis-init.sh:/usr/local/bin/redis-init.sh
+    command: ["sh", "/usr/local/bin/redis-init.sh"]
 
-    # =====================
-    # Zookeeper (Official)
-    # =====================
-    zookeeper:
-        image: zookeeper:3.9
-        container_name: zookeeper
-        restart: unless-stopped
-        ports:
-            - "2181:2181"
-        environment:
-            ZOO_MY_ID: 1
-            ZOO_SERVERS: server.1=zookeeper:2888:3888;2181
-            ZOO_4LW_COMMANDS_WHITELIST: mntr,conf,ruok,stat
-        volumes:
-            - zookeeper_data:/data
-            - zookeeper_datalog:/datalog
+  # =====================
+  # Zookeeper (Official)
+  # =====================
+  zookeeper:
+    image: zookeeper:3.9
+    container_name: zookeeper
+    restart: unless-stopped
+    ports:
+      - "2181:2181"
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_SERVERS: server.1=zookeeper:2888:3888;2181
+      ZOO_4LW_COMMANDS_WHITELIST: mntr,conf,ruok,stat
+    volumes:
+      - zookeeper_data:/data
+      - zookeeper_datalog:/datalog
 
-    # =====================
-    # Kafka 3.5 (Bitnami)
-    # =====================
-    kafka:
-        image: bitnamilegacy/kafka:3.5
-        container_name: kafka_broker
-        restart: unless-stopped
-        depends_on:
-            - zookeeper
-        ports:
-            - "9092:9092" # External listener
-            - "29092:29092" # Internal listener (cho Redpanda)
-        environment:
-            - KAFKA_BROKER_ID=1
-            - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
-            - ALLOW_PLAINTEXT_LISTENER=yes
+  # =====================
+  # Kafka 3.5 (Bitnami)
+  # =====================
+  kafka:
+    image: bitnamilegacy/kafka:3.5
+    container_name: kafka_broker
+    restart: unless-stopped
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092" # External listener
+      - "29092:29092" # Internal listener (cho Redpanda)
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
 
-            # ⚙️ 2 listener: internal (cho docker network) và external (cho host)
-            - KAFKA_CFG_LISTENERS=INTERNAL://:29092,EXTERNAL://:9092
-            - KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL://kafka_broker:29092,EXTERNAL://localhost:9092
-            - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
-            - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=INTERNAL
+      # ⚙️ 2 listener: internal (cho docker network) và external (cho host)
+      - KAFKA_CFG_LISTENERS=INTERNAL://:29092,EXTERNAL://:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL://kafka_broker:29092,EXTERNAL://localhost:9092
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=INTERNAL
 
-            - KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR=1
-        volumes:
-            - kafka_data:/bitnami/kafka
+      - KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+    volumes:
+      - kafka_data:/bitnami/kafka
 
-    # ==== AKHQ ====
-    akhq:
-        image: tchiotludo/akhq:0.25.0
-        container_name: akhq
-        restart: unless-stopped
-        depends_on:
-            - kafka
-        networks:
-            - default
-        ports:
-            - "8083:8080"
-        environment:
-            AKHQ_CONFIGURATION: |
-                akhq:
-                    connections:
-                        ktpm-cluster:
-                            properties:
-                                bootstrap.servers: "kafka:29092"  # tên service Kafka trong compose
+  # ==== AKHQ ====
+  akhq:
+    image: tchiotludo/akhq:0.25.0
+    container_name: akhq
+    restart: unless-stopped
+    depends_on:
+      - kafka
+    networks:
+      - default
+    ports:
+      - "8083:8080"
+    environment:
+      AKHQ_CONFIGURATION: |
+        akhq:
+          connections:
+            ktpm-cluster:
+              properties:
+                bootstrap.servers: "kafka:29092"  # tên service Kafka trong compose
 
 
-    # =====================
-    # 🌐 User Service (Spring Boot)
-    # =====================
-    user-service:
-        build:
-            context: ./todolist-backend/user-service
-            dockerfile: Dockerfile
-        container_name: user-service
-        restart: unless-stopped
-        depends_on:
-            - mysql
-            - redis
-            - kafka
-        ports:
-            - "8081:8081"
-        environment:
-            # ==== MySQL ====
-            SPRING_DATASOURCE_URL: jdbc:mysql://mysql_db:3306/aws_todolist_database?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
-            SPRING_DATASOURCE_USERNAME: root
-            SPRING_DATASOURCE_PASSWORD:
+  # =====================
+  # 🌐 User Service (Spring Boot)
+  # =====================
+  user-service:
+    build:
+      context: ./todolist-backend/user-service
+      dockerfile: Dockerfile
+    container_name: user-service
+    restart: unless-stopped
+    depends_on:
+      - mysql
+      - redis
+      - kafka
+    ports:
+      - "8081:8081"
+    environment:
+      # ==== MySQL ====
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql_db:3306/aws_todolist_database?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD:
 
-            # ==== Redis ====
-            SPRING_DATA_REDIS_HOST: redis_cache
-            SPRING_DATA_REDIS_PORT: 6379
+      # ==== Redis ====
+      SPRING_DATA_REDIS_HOST: redis_cache
+      SPRING_DATA_REDIS_PORT: 6379
 
-            # ==== Kafka ====
-            SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka_broker:29092
+      # ==== Kafka ====
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka_broker:29092
 
-        # ==== Optional custom env ====
-        # GATEWAY_URL: http://api_gateway:8080
-        # SERVER_PORT: 8081
+    # ==== Optional custom env ====
+    # GATEWAY_URL: http://api_gateway:8080
+    # SERVER_PORT: 8081
 
-        extra_hosts:
-            - "host.docker.internal:host-gateway"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
-        networks:
-            - default
+    networks:
+      - default
 
-    # =====================
-    # 🌐 Auth Service (Spring Boot)
-    # =====================
-    auth-service:
-        build:
-            context: ./todolist-backend/auth-service
-            dockerfile: Dockerfile
-        container_name: auth-service
-        restart: unless-stopped
-        depends_on:
-            - mysql
-            - redis
-            - kafka
-        ports:
-            - "9999:9999"
-        environment:
-            # ==== MySQL ====
-            SPRING_DATASOURCE_URL: jdbc:mysql://mysql_db:3306/aws_todolist_database?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
-            SPRING_DATASOURCE_USERNAME: root
-            SPRING_DATASOURCE_PASSWORD:
+  # =====================
+  # 🌐 Auth Service (Spring Boot)
+  # =====================
+  auth-service:
+    build:
+      context: ./todolist-backend/auth-service
+      dockerfile: Dockerfile
+    container_name: auth-service
+    restart: unless-stopped
+    depends_on:
+      - mysql
+      - redis
+      - kafka
+    ports:
+      - "9999:9999"
+    environment:
+      # ==== MySQL ====
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql_db:3306/aws_todolist_database?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD:
 
-            # ==== Redis ====
-            SPRING_DATA_REDIS_HOST: redis_cache
-            SPRING_DATA_REDIS_PORT: 6379
+      # ==== Redis ====
+      SPRING_DATA_REDIS_HOST: redis_cache
+      SPRING_DATA_REDIS_PORT: 6379
 
-            # ==== Kafka ====
-            SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka_broker:29092
+      # ==== Kafka ====
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka_broker:29092
 
-        # ==== Optional custom env ====
-        # GATEWAY_URL: http://api_gateway:8080
-        # SERVER_PORT: 8081
+    # ==== Optional custom env ====
+    # GATEWAY_URL: http://api_gateway:8080
+    # SERVER_PORT: 8081
 
-        extra_hosts:
-            - "host.docker.internal:host-gateway"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
-        networks:
-            - default
+    networks:
+      - default
 
-    # =====================
-    # 🌐 TaskFlow Service (Spring Boot)
-    # =====================
-    taskflow-service:
-        build:
-            context: ./todolist-backend/taskflow-service
-            dockerfile: Dockerfile
-        container_name: taskflow-service
-        restart: unless-stopped
-        depends_on:
-            - mysql
-            - redis
-            - kafka
-        ports:
-            - "8082:8082"
-        environment:
-            # ==== MySQL ====
-            SPRING_DATASOURCE_URL: jdbc:mysql://mysql_db:3306/aws_todolist_database?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
-            SPRING_DATASOURCE_USERNAME: root
-            SPRING_DATASOURCE_PASSWORD:
+  # =====================
+  # 🌐 TaskFlow Service (Spring Boot)
+  # =====================
+  taskflow-service:
+    build:
+      context: ./todolist-backend/taskflow-service
+      dockerfile: Dockerfile
+    container_name: taskflow-service
+    restart: unless-stopped
+    depends_on:
+      - mysql
+      - redis
+      - kafka
+    ports:
+      - "8082:8082"
+    environment:
+      # ==== MySQL ====
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql_db:3306/aws_todolist_database?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD:
 
-            # ==== Redis ====
-            SPRING_DATA_REDIS_HOST: redis_cache
-            SPRING_DATA_REDIS_PORT: 6379
+      # ==== Redis ====
+      SPRING_DATA_REDIS_HOST: redis_cache
+      SPRING_DATA_REDIS_PORT: 6379
 
-            # ==== Kafka ====
-            SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka_broker:29092
+      # ==== Kafka ====
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka_broker:29092
 
-        # ==== Optional custom env ====
-        # GATEWAY_URL: http://api_gateway:8080
-        # SERVER_PORT: 8082
+    # ==== Optional custom env ====
+    # GATEWAY_URL: http://api_gateway:8080
+    # SERVER_PORT: 8082
 
-        extra_hosts:
-            - "host.docker.internal:host-gateway"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
-        networks:
-            - default
+    networks:
+      - default
 
-    # =====================
-    # 🌐 TaskFlow Service (Spring Boot)
-    # =====================
-    notification-service:
-        build:
-            context: ./todolist-backend/notification-service
-            dockerfile: Dockerfile
-        container_name: notification-service
-        restart: unless-stopped
-        depends_on:
-            - mysql
-            - redis
-            - kafka
-        ports:
-            - "9998:9998"
-        environment:
-            # ==== MySQL ====
-            SPRING_DATASOURCE_URL: jdbc:mysql://mysql_db:3306/aws_todolist_database?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
-            SPRING_DATASOURCE_USERNAME: root
-            SPRING_DATASOURCE_PASSWORD:
+  # =====================
+  # 🌐 TaskFlow Service (Spring Boot)
+  # =====================
+  notification-service:
+    build:
+      context: ./todolist-backend/notification-service
+      dockerfile: Dockerfile
+    container_name: notification-service
+    restart: unless-stopped
+    depends_on:
+      - mysql
+      - redis
+      - kafka
+    ports:
+      - "9998:9998"
+    environment:
+      # ==== MySQL ====
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql_db:3306/aws_todolist_database?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD:
+      
+      # ==== Redis ====
+      SPRING_DATA_REDIS_HOST: redis_cache
+      SPRING_DATA_REDIS_PORT: 6379
 
-            # ==== Redis ====
-            SPRING_DATA_REDIS_HOST: redis_cache
-            SPRING_DATA_REDIS_PORT: 6379
+      # ==== Kafka ====
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka_broker:29092
 
-            # ==== Kafka ====
-            SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka_broker:29092
+    # ==== Optional custom env ====
+    # GATEWAY_URL: http://api_gateway:8080
+    # SERVER_PORT: 8082
 
-        # ==== Optional custom env ====
-        # GATEWAY_URL: http://api_gateway:8080
-        # SERVER_PORT: 8082
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
-        extra_hosts:
-            - "host.docker.internal:host-gateway"
+    networks:
+      - default
 
-        networks:
-            - default
+  # =====================
+  # 🌐 API Gateway (Spring Boot)
+  # =====================
+  api-gateway:
+    build:
+      context: ./todolist-backend/api-gateway
+      dockerfile: Dockerfile
+    container_name: api_gateway
+    restart: unless-stopped
+    depends_on:
+      - redis
+      - kafka
+      - user-service # ✅ thêm dòng này để đảm bảo gateway khởi động sau user-service
+      - auth-service # ✅ thêm để đảm bảo gateway load sau auth
+      - taskflow-service
+    ports:
+      - "8080:8080"
+    environment:
+      # ==== Redis ====
+      SPRING_DATA_REDIS_HOST: redis_cache
+      SPRING_DATA_REDIS_PORT: 6379
 
-    # =====================
-    # 🌐 API Gateway (Spring Boot)
-    # =====================
-    api-gateway:
-        build:
-            context: ./todolist-backend/api-gateway
-            dockerfile: Dockerfile
-        container_name: api_gateway
-        restart: unless-stopped
-        depends_on:
-            - redis
-            - kafka
-            - user-service # ✅ thêm dòng này để đảm bảo gateway khởi động sau user-service
-            - auth-service # ✅ thêm để đảm bảo gateway load sau auth
-            - taskflow-service
-        ports:
-            - "8080:8080"
-        environment:
-            # ==== Redis ====
-            SPRING_DATA_REDIS_HOST: redis_cache
-            SPRING_DATA_REDIS_PORT: 6379
+      # ==== User Service ====
+      USER_SERVICE_URL: http://user-service:8081 # ✅ Gateway có thể gọi sang user-service qua network nội bộ
+      AUTH_SERVICE_URL: http://auth-service:9999
+      TASKFLOW_SERVICE_URL: http://taskflow-service:8082
+      NOTIFICATION_SERVICE_URL: http://notification-service:9998
 
-            # ==== User Service ====
-            USER_SERVICE_URL: http://user-service:8081 # ✅ Gateway có thể gọi sang user-service qua network nội bộ
-            AUTH_SERVICE_URL: http://auth-service:9999
-            TASKFLOW_SERVICE_URL: http://taskflow-service:8082
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
-        extra_hosts:
-            - "host.docker.internal:host-gateway"
-
-        networks:
-            - default
+    networks:
+      - default
 
 volumes:
-    mysql_data:
-    redis_data:
-    zookeeper_data:
-    zookeeper_datalog:
-    kafka_data:
+  mysql_data:
+  redis_data:
+  zookeeper_data:
+  zookeeper_datalog:
+  kafka_data:

@@ -16,33 +16,33 @@ import java.util.List;
 
 @Component
 public class AuthChannelInterceptor implements ChannelInterceptor {
-
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider; // class validate token và lấy authentication
-
-    @Override
-    public Message<?> preSend(Message<?> message, MessageChannel channel) {
-        StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
-
-        if (StompCommand.CONNECT.equals(accessor.getCommand())) {
-
-            String token = accessor.getFirstNativeHeader("Authorization");
-            if (token == null || !token.startsWith("Bearer ")) {
-                System.err.println("Không tìm thấy token");
-                throw new MessagingException("Không tìm thấy token");
-            }
-
-            token = token.substring(7);
-            if (!jwtTokenProvider.validateToken(token)) {
-                System.err.println("Token không hợp lệ");
-                throw new MessagingException("Token không hợp lệ");
-            }
-
-
-            accessor.setUser(new UsernamePasswordAuthenticationToken(jwtTokenProvider.getUsername(token), null, List.of()));
-
-        }
-
-        return message;
-    }
+	
+	@Autowired
+	private JwtTokenProvider jwtTokenProvider; // class validate token và lấy authentication
+	
+	@Override
+	public Message<?> preSend(Message<?> message, MessageChannel channel) {
+		StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+		
+		if (StompCommand.CONNECT.equals(accessor.getCommand())) {
+			
+			String token = accessor.getFirstNativeHeader("Authorization");
+			if (token == null || !token.startsWith("Bearer ")) {
+				System.err.println("Không tìm thấy token");
+				throw new MessagingException("Không tìm thấy token");
+			}
+			
+			token = token.substring(7);
+			if (!jwtTokenProvider.validateToken(token)) {
+				System.err.println("Token không hợp lệ");
+				throw new MessagingException("Token không hợp lệ");
+			}
+			
+			
+			accessor.setUser(new UsernamePasswordAuthenticationToken(jwtTokenProvider.getUsername(token), null, List.of()));
+			
+		}
+		
+		return message;
+	}
 }

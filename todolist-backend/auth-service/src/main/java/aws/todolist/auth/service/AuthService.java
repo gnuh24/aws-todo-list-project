@@ -25,10 +25,10 @@ public interface AuthService {
 	
 	Account resetPassword(String username, ResetPasswordForm form);
 	
-	Account updatePassword(UpdatePasswordForm form);
+	Account updatePassword(String accountId, UpdatePasswordForm form);
 	
 	void sendOtpUpdateEmail(String username);
 	
-	Account updateEmail(UpdateEmailForm form);
+	Account updateEmail(String accountId,  UpdateEmailForm form);
 	AuthResponseDTO refreshToken(String refreshToken);
 }

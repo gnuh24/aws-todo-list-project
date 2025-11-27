@@ -237,11 +237,9 @@ public class AuthServiceImpl implements AuthService {
 	}
 	
 	@Override
-	public Account updatePassword(UpdatePasswordForm form) {
+	public Account updatePassword(String accountId, UpdatePasswordForm form) {
 		
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		Account account = (Account) authentication.getPrincipal();
-		
+		Account account = accountService.getAccountById(accountId);
 		if (!passwordEncoder.matches(form.getOldPassword(), account.getPassword())) {
 			throw new StepUpAuthenticationException("Mật khẩu hiện không đúng !!");
 		}
@@ -260,11 +258,9 @@ public class AuthServiceImpl implements AuthService {
 	}
 	
 	@Override
-	public Account updateEmail(UpdateEmailForm form) {
+	public Account updateEmail(String accountId, UpdateEmailForm form) {
 		
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		Account account = (Account) authentication.getPrincipal();
-		
+		Account account = accountService.getAccountById(accountId);
 		if (!passwordEncoder.matches(form.getCurrentPassword(), account.getPassword())) {
 			throw new StepUpAuthenticationException("Mật khẩu hiện tại không đúng.");
 		}

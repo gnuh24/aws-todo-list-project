@@ -1,6 +1,4 @@
-package aws.todolist.user.exceptions.JwtException;
-
-import org.springframework.security.core.AuthenticationException;
+package aws.todolist.api_gateway.exceptions.JwtException;
 
 public class UsernameNotFound extends AuthenticationException {
     public UsernameNotFound(String message) {

@@ -19,22 +19,10 @@ public class AccountServiceImpl implements AccountService {
 	
 	@Autowired
 	private AccountRepository accountRepository;
-
-//    @Autowired
-//    private ModelMapper modelMapper;
-//
-//    @Autowired
-//    private OTPService otpService;
-//
-//    @Autowired
-//    private JwtTokenProvider jwtTokenProvider;
 	
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 	
-	//    @Autowired
-//    private EmailService emailService;
-//
 	@Autowired
 	private RedisService redisService;
 	

@@ -1,4 +1,4 @@
-package aws.todolist.user.utils;
+package aws.todolist.api_gateway.utils;
 
 import java.security.SecureRandom;
 

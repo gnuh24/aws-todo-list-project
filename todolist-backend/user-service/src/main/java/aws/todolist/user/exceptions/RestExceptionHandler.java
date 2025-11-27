@@ -1,10 +1,7 @@
 package aws.todolist.user.exceptions;
 
 import aws.todolist.user.aop.AppLogger;
-import aws.todolist.user.exceptions.AuthException.StepUpAuthenticationException;
-import aws.todolist.user.exceptions.JwtException.*;
 import aws.todolist.user.exceptions.errorCode.SystemErrorCode;
-import aws.todolist.user.exceptions.otpException.OtpNotFoundException;
 import aws.todolist.user.utils.EnvironmentUtils;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,10 +9,10 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
-import org.springframework.security.authentication.*;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -28,8 +25,8 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.io.FileNotFoundException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
@@ -120,99 +117,10 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 		return buildErrorResponse(request, HttpStatus.NOT_FOUND, SystemErrorCode.SYS_FILE_NOT_FOUND, ex.getMessage(), ex, null);
 	}
 	
-	@ExceptionHandler(FileNotFoundException.class)
-	public ResponseEntity<Object> handleFileNotFound(HttpServletRequest request, FileNotFoundException ex) {
-		return buildErrorResponse(request, HttpStatus.NOT_FOUND, SystemErrorCode.SYS_FILE_NOT_FOUND, "Không tìm thấy tệp", ex, null);
-	}
-	
-	@ExceptionHandler(InvalidTokenTypeException.class)
-	public ResponseEntity<Object> handleReTypeException(HttpServletRequest request, InvalidTokenTypeException ex) {
-		String code = SystemErrorCode.AUTH_INVALID_CREDENTIALS;
-		String message = "Xác thực thất bại";
-		
-	
-			code = SystemErrorCode.AUTH_REFRESH_TOKEN_INVALID_TYP;
-			message = "Token chứa type không hợp lệ.";
-	
-		
-		return buildErrorResponse(request, HttpStatus.UNAUTHORIZED, code, message, ex, null);
-	}
-	
-	
-	@ExceptionHandler(AuthenticationException.class)
-	public ResponseEntity<Object> handleAuthenticationException(HttpServletRequest request, AuthenticationException ex) {
-		String code = SystemErrorCode.AUTH_INVALID_CREDENTIALS;
-		String message = "Xác thực thất bại";
-		
-		// ==== NHÓM: LOGIN / TÀI KHOẢN ====
-		if (ex instanceof BadCredentialsException) {
-			code = SystemErrorCode.AUTH_INVALID_CREDENTIALS;
-			message = "Email hoặc mật khẩu không đúng!";
-		} else if (ex instanceof LockedException) {
-			code = SystemErrorCode.AUTH_ACCOUNT_LOCKED;
-			message = "Tài khoản đã bị khóa!";
-		} else if (ex instanceof DisabledException) {
-			code = SystemErrorCode.AUTH_ACCOUNT_INACTIVE;
-			message = "Tài khoản chưa được kích hoạt!";
-		} else if (ex instanceof UsernameNotFoundException) {
-			code = SystemErrorCode.AUTH_ACCOUNT_NOT_FOUND;
-			message = "Tài khoản không tồn tại!";
-		}
-		
-		// ==== NHÓM: REFRESH TOKEN ====
-		else if (ex instanceof RefreshTokenNotFound) {
-			code = SystemErrorCode.AUTH_MISSING_REFRESH_TOKEN;
-			message = "Không tìm thấy refresh token.";
-		} else if (ex instanceof RefreshTokenExpiredException) {
-			code = SystemErrorCode.AUTH_REFRESH_TOKEN_EXPIRED;
-			message = "Refresh token đã hết hạn.";
-		} else if (ex instanceof RefreshTokenBlacklistedException) {
-			code = SystemErrorCode.AUTH_REFRESH_TOKEN_BLACKLISTED;
-			message = "Refresh token đã bị thu hồi hoặc không hợp lệ.";
-		}
-		
-		// ==== NHÓM: TOKEN KHÁC ====
-		else if (ex instanceof InvalidTokenTypeException) {
-			code = SystemErrorCode.AUTH_REFRESH_TOKEN_INVALID_TYP;
-			message = "Token chứa type không hợp lệ.";
-		} else if (ex instanceof InvalidJWTSignatureException) {
-			code = SystemErrorCode.AUTH_REFRESH_TOKEN_INVALID_SIGNATURE;
-			message = "Token có chữ ký không hợp lệ.";
-		}
-		
-		return buildErrorResponse(request, HttpStatus.UNAUTHORIZED, code, message, ex, null);
-	}
-	
-	
-	
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<Object> handleGeneric(HttpServletRequest request, Exception ex) {
 		return buildErrorResponse(request, HttpStatus.INTERNAL_SERVER_ERROR, SystemErrorCode.SYSTEM_UNKNOWN_ERROR, "Lỗi không xác định", ex, null);
 	}
-	
-	
-
-	
-	@ExceptionHandler(OtpNotFoundException.class)
-	public ResponseEntity<Object> handleOtpNotFound(HttpServletRequest request, OtpNotFoundException ex) {
-		return buildErrorResponse(request, HttpStatus.BAD_REQUEST,
-		    SystemErrorCode.AUTH_OTP_NOT_FOUND,
-		    ex.getMessage(),
-		    ex,
-		    null);
-	}
-	
-	
-	@ExceptionHandler(StepUpAuthenticationException.class)
-	public ResponseEntity<Object> handleStepUpAuthFail(HttpServletRequest request, StepUpAuthenticationException ex) {
-		return buildErrorResponse(request, HttpStatus.UNAUTHORIZED,
-		    SystemErrorCode.AUTH_2FA_FAILED,
-		    "Xác thực bổ sung không thành công. Vui lòng kiểm tra lại mật khẩu.",
-		    ex,
-		    null);
-	}
-	
-	
 	
 	
 	

@@ -48,21 +48,10 @@ public class NotificationController {
 	@GetMapping("/my-notification")
 	public ResponseEntity<ApiResponse<Page<NotificationResponse>>> getNotifications(
 	    Pageable pageable,
-	    @RequestParam(value = "isRead", required = false) Boolean isRead // Thêm filter
+	    @RequestParam(value = "isRead", required = false) Boolean isRead,
+	    @RequestHeader("X-User-Id") String receiverId
+	
 	) {
-		
-		// 1. Xử lý Security Context và Principal
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		Object principal = authentication.getPrincipal();
-		
-		if (!(principal instanceof Account)) {
-			return new ResponseEntity<>(
-			    new ApiResponse<>(HttpStatus.UNAUTHORIZED.value(), "User not authenticated or invalid principal.", null),
-			    HttpStatus.UNAUTHORIZED
-			);
-		}
-		
-		String receiverId = ((Account) principal).getId();
 		
 		// 2. Gọi Service: Truyền thêm tham số isRead
 		Page<Notification> notifications =
@@ -82,20 +71,11 @@ public class NotificationController {
 	}
 
 	@GetMapping("/count-my-notification-unread")
-	public ResponseEntity<ApiResponse<Long>> countMyNotificationsByIsRead(@RequestParam(value = "isRead", required = false) Boolean isRead) {
-
-		// 1. Xử lý Security Context và Principal
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		Object principal = authentication.getPrincipal();
-
-		if (!(principal instanceof Account)) {
-			return new ResponseEntity<>(
-					new ApiResponse<>(HttpStatus.UNAUTHORIZED.value(), "User not authenticated or invalid principal.", null),
-					HttpStatus.UNAUTHORIZED
-			);
-		}
-
-		String receiverId = ((Account) principal).getId();
+	public ResponseEntity<ApiResponse<Long>> countMyNotificationsByIsRead(
+	    @RequestParam(value = "isRead", required = false) Boolean isRead,
+	    @RequestHeader("X-User-Id") String receiverId
+	) {
+		
 
 		// 2. Gọi Service: Truyền thêm tham số isRead
 		Long count = notificationService.getCountNotificationByIsRead(isRead, receiverId); // Đã thêm isRead

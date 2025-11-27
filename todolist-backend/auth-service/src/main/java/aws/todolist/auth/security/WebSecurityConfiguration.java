@@ -32,32 +32,13 @@ public class WebSecurityConfiguration {
 	private AuthExceptionHandler authExceptionHandler;
 	
 	@Autowired
-	private JwtTokenFilter jwtAuthFIlter;
-	
-	@Autowired
 	private RequestLoggingFilter requestLoggingFilter;
-
 	
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
 	
-//	@Bean
-//	public CorsConfigurationSource corsConfigurationSource() {
-//		CorsConfiguration configuration = new CorsConfiguration();
-//
-//		// ✅ Cho phép tất cả origin, nhưng an toàn hơn "*"
-//		configuration.setAllowedOriginPatterns(List.of("*"));
-//
-//		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-//		configuration.setAllowedHeaders(List.of("*"));
-//		configuration.setAllowCredentials(true);
-//
-//		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//		source.registerCorsConfiguration("/**", configuration);
-//		return source;
-//	}
 
 	@Autowired
 	@Lazy
@@ -87,11 +68,8 @@ public class WebSecurityConfiguration {
 		    
 		    .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 		    
-		    // JWT Filter xử lý token
-		    .addFilterBefore(jwtAuthFIlter, UsernamePasswordAuthenticationFilter.class)
-		    
 		    // Logging filter nên nằm trước JWT filter
-		    .addFilterBefore(requestLoggingFilter, JwtTokenFilter.class)
+		    .addFilterBefore(requestLoggingFilter, UsernamePasswordAuthenticationFilter.class)
 		    
 		    .exceptionHandling(exception -> exception
 			.authenticationEntryPoint(authExceptionHandler)

@@ -35,30 +35,11 @@ public class WebSecurityConfiguration {
 	@Autowired
 	private RequestLoggingFilter requestLoggingFilter;
 	
-	@Autowired
-	private JwtTokenFilter jwtAuthFIlter;
 	
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-	
-//	@Bean
-//	public CorsConfigurationSource corsConfigurationSource() {
-//		CorsConfiguration configuration = new CorsConfiguration();
-//
-//		// ✅ Cho phép tất cả origin, nhưng an toàn hơn "*"
-//		configuration.setAllowedOriginPatterns(List.of("*"));
-//
-//		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-//		configuration.setAllowedHeaders(List.of("*"));
-//		configuration.setAllowCredentials(true);
-//
-//		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//		source.registerCorsConfiguration("/**", configuration);
-//		return source;
-//	}
-	
 	
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http,
@@ -67,10 +48,6 @@ public class WebSecurityConfiguration {
 		    // Loại bỏ bảo vệ CSRF
 		    .csrf(AbstractHttpConfigurer::disable)
 		    .cors(AbstractHttpConfigurer::disable)
-
-
-//		    .cors(cors -> cors.configurationSource(corsConfigurationSource))
-		    
 		    
 		    // Configure các luồng truy cập
 		    .authorizeHttpRequests(auth -> auth
@@ -79,24 +56,18 @@ public class WebSecurityConfiguration {
 			    .requestMatchers(HttpMethod.GET, "/accounts/me").hasAnyAuthority("USER")
 			    .requestMatchers(HttpMethod.PATCH, "/accounts/me").hasAnyAuthority("USER")
 			
-			    
 			    // Còn lại cần xác thực
 //			    .anyRequest().authenticated()
 			
 			    .anyRequest().permitAll()
-		    
-		    
-		    
+			
 		    ).httpBasic(Customizer.withDefaults())
 		    
 		    // Add JWT vào chuỗi lọc và ưu tiên loc theo JWT
 		    .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 		    
-		    // JWT Filter xử lý token
-		    .addFilterBefore(jwtAuthFIlter, UsernamePasswordAuthenticationFilter.class)
-		    
 		    // Logging filter nên nằm trước JWT filter
-		    .addFilterBefore(requestLoggingFilter, JwtTokenFilter.class)
+		    .addFilterBefore(requestLoggingFilter, UsernamePasswordAuthenticationFilter.class)
 		    
 		    .exceptionHandling((exceptionHandling) -> exceptionHandling
 			

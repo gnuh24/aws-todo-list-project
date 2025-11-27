@@ -4,35 +4,19 @@ import aws.todolist.auth.api.ApiResponse;
 import aws.todolist.auth.dto.account.AccountRedisDTO;
 import aws.todolist.auth.dto.auth.*;
 import aws.todolist.auth.entity.Account;
-import aws.todolist.auth.exceptions.AuthException.HmacVerificationException;
-import aws.todolist.auth.exceptions.JwtException.*;
+import aws.todolist.auth.exceptions.JwtException.RefreshTokenNotFound;
 import aws.todolist.auth.security.JwtTokenProvider;
 import aws.todolist.auth.service.AccountService;
 import aws.todolist.auth.service.AuthService;
-import aws.todolist.auth.utils.HmacUtil;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.security.SignatureException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.internal.bytebuddy.asm.Advice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/v1")
@@ -78,15 +62,14 @@ public class AuthController {
 	@Operation(summary = "Đăng nhập người dùng", description = "Đăng nhập người dùng vào hệ thống.")
 	@PostMapping("/login")
 	public ResponseEntity<ApiResponse<AuthResponseDTO>> loginUser(
-	    	@RequestBody @Valid LoginRequestForm loginInputForm,
-	    	HttpServletResponse response) {
+	    @RequestBody @Valid LoginRequestForm loginInputForm) {
 		
 		AuthResponseDTO loginInfo = authService.login(loginInputForm);
 		
 		return ResponseEntity.ok(new ApiResponse<>(200, "Login successful", loginInfo));
 	}
 	
-
+	
 	/**
 	 * 📌 Đăng nhập nhân viên
 	 *
@@ -96,11 +79,11 @@ public class AuthController {
 	@Operation(summary = "Đăng nhập nhân viên", description = "Đăng nhập nhân viên vào hệ thống.")
 	@PostMapping("/staff-login")
 	public ResponseEntity<ApiResponse<AuthResponseDTO>> loginStaff(
-	    	@RequestBody @Valid LoginRequestForm loginInputForm,
-	    	HttpServletResponse response) {
+	    @RequestBody @Valid LoginRequestForm loginInputForm,
+	    HttpServletResponse response) {
 		
 		AuthResponseDTO loginInfo = authService.staffLogin(loginInputForm);
-		
+
 //		// ✅ Gắn cookie refresh_token
 //		addRefreshTokenCookie(response, loginInfo.getRefreshToken());
 		
@@ -163,12 +146,15 @@ public class AuthController {
 		    new ApiResponse<>(200, "Hệ thống đã gửi OTP sang email " + newEmail + ". Bạn có 3 phút để kiểm tra nhé", null)
 		);
 	}
-
+	
 	
 	@PatchMapping("/update-email")
-	public ResponseEntity<ApiResponse<String>> updateEmail(@RequestBody @Valid UpdateEmailForm form) {
+	public ResponseEntity<ApiResponse<String>> updateEmail(
+	    @RequestBody @Valid UpdateEmailForm form,
+	    @RequestHeader("X-User-Id") String accountId
+	) {
 		
-		authService.updateEmail(form);
+		authService.updateEmail(accountId, form);
 		
 		return ResponseEntity.ok(new ApiResponse<>(200, "Email updated successfully", null));
 	}
@@ -183,9 +169,12 @@ public class AuthController {
 	}
 	
 	@PatchMapping("/update-password")
-	public ResponseEntity<ApiResponse<String>> updatePassword(@RequestBody @Valid UpdatePasswordForm form) {
+	public ResponseEntity<ApiResponse<String>> updatePassword(
+	    @RequestBody @Valid UpdatePasswordForm form,
+	    @RequestHeader("X-User-Id") String accountId
+	) {
 		
-		authService.updatePassword(form);
+		authService.updatePassword(accountId, form);
 		
 		return ResponseEntity.ok(new ApiResponse<>(200, "Password updated successfully", null));
 	}
@@ -193,7 +182,7 @@ public class AuthController {
 	@Operation(summary = "Làm mới token", description = "Làm mới token truy cập bằng cách sử dụng refresh token.")
 	@PostMapping("/refresh-token")
 	public ResponseEntity<ApiResponse<AuthResponseDTO>> refreshToken(
-	    	@CookieValue(value = "refresh_token", required = false) String refreshToken) {
+	    @CookieValue(value = "refresh_token", required = false) String refreshToken) {
 		
 		if (refreshToken == null) {
 			throw new RefreshTokenNotFound("Thiếu refresh token!");
@@ -209,7 +198,5 @@ public class AuthController {
 		));
 	}
 	
-
-
 	
 }
