@@ -32,23 +32,12 @@ public class JwtGatewayFilter implements GlobalFilter {
 
 		String path = exchange.getRequest().getURI().getPath();
 
-		System.err.println(path);
-
-
-
-		String authHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
-
-
-		System.err.println(authHeader);
-
-		System.err.println("------------------------------------------------------------");
 
 		if (ApiPath.isPublicPath(path)) {
 			return chain.filter(exchange);
 		}
-		
 
-
+		String authHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
 
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
 			return Mono.error(new MissingTokenException("Missing Authorization header"));

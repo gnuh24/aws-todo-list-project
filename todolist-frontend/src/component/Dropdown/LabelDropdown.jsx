@@ -5,7 +5,7 @@ import {https_taskflow} from "../../service/api";
 export function DropdownMenu({ selectedLabels, personalLabels, sharedLabels: projectLabels, onAddNew, onSelect }) {
     const [search, setSearch] = useState("");
 
-
+    console.log(personalLabels);
 
 
     // Lọc nhãn theo search

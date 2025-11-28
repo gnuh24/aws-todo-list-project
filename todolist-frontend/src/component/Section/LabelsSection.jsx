@@ -37,7 +37,6 @@ export function LabelsSection({taskDetail}) {
                     const newLabel = res.data.data;
                     if (!selectedLabels.some(l => l.id === newLabel.id)) {
                         setSelectedLabels([...selectedLabels, newLabel]);
-                        setPersonalLabels([...personalLabels, newLabel]);
                     }
                 }
             } else {
@@ -51,7 +50,6 @@ export function LabelsSection({taskDetail}) {
                     const newLabel = res.data.data;
                     if (!selectedLabels.some(l => l.id === newLabel.id)) {
                         setSelectedLabels([...selectedLabels, newLabel]);
-                        setProjectLabels([...projectLabels, newLabel]);
                     }
                 }
             }

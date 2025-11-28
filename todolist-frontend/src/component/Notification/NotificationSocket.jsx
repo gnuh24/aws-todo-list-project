@@ -45,7 +45,7 @@ export default function NotificationSocket() {
             connectHeaders: { Authorization: "Bearer " + jwtToken },
             //debug: (str) => console.log("[STOMP Debug] " + str),
             reconnectDelay: 5000,
-            onConnect: (frame) => {
+            onConnect: () => {
                 console.log("✅ Connected WebSocket");
 
                 // 🔔 Đăng ký kênh cá nhân (private)

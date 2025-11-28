@@ -24,82 +24,80 @@ import java.util.List;
 @RequestMapping("/v1")
 @Tag(name = "Project API", description = "CRUD của project")
 public class ProjectController {
-	
-	@Autowired
-	private ProjectServiceImpl projectService;
-	
-	@Autowired
-	private AccountService accountService;
-	
-	
-	@Operation(summary = "Lấy danh sách các project", description = "Lấy danh sách các project theo id của người dùng")
-	@GetMapping("/projects")
-	public ResponseEntity<ApiResponse<List<ProjectResponseDTO>>> GetListProject(
-	    @RequestHeader("X-User-Id") String accountId
-	) {
-		
-		
-		List<ProjectResponseDTO> listProject = projectService.getAllProject(accountId);
-		
-		ApiResponse<List<ProjectResponseDTO>> response = new ApiResponse<>(200, "Danh sách dự án được lấy thành công", listProject);
-		
-		return ResponseEntity.ok(response);
-		
-	}
-	
-	
-	@Operation(summary = "Lấy thông tin chi tiết của project", description = "Lấy toàn bộ thông tin chi tiết của project")
-	@GetMapping("/projects/{id}")
-	@RequireProjectRole({Role.OWNER, Role.ADMIN, Role.MEMBER, Role.VIEWER})
-	public ResponseEntity<ApiResponse<ProjectDetailResponseDTO>> GetProjectByID(@PathVariable("id") String projectID) {
-		
-		ProjectDetailResponseDTO project = projectService.getProjectById(projectID);
-		
-		ApiResponse<ProjectDetailResponseDTO> response = new ApiResponse<>(200, "Chi tiết dự án lấy thành công", project);
-		
-		return ResponseEntity.ok(response);
-	}
-	
-	@Operation(summary = "Tạo một project mới", description = "Thực hiện khởi tạo một project mới")
-	@PostMapping("/projects")
-	// @Valid là annotation dùng để kích hoạt validation trên các đối tượng (DTO, entity…) khi được truyền vào controller.
-	public ResponseEntity<ApiResponse<ProjectResponseDTO>> addNewProject(@RequestBody @Valid ProjectCreateRequestDTO request, @RequestHeader("X-User-Id") String accountId) {
-		
-		Account account = accountService.getAccountById(accountId);
-		ProjectResponseDTO project = projectService.addProject(request, account);
-		
-		ApiResponse<ProjectResponseDTO> response = new ApiResponse<>(200, "Dự án mới được tạo thành công", project);
-		
-		return ResponseEntity.ok(response);
-	}
-	
-	@Operation(summary = "Chỉnh sửa project", description = "Chỉnh sửa thông tin project bao gồm name và isArchived")
-	@PatchMapping("/projects/{id}")
-	@RequireProjectRole({Role.OWNER})
-	public ResponseEntity<ApiResponse<ProjectResponseDTO>> updateProject(@PathVariable("id") String projectID, @RequestBody ProjectUpdateRequestDTO request) {
-		ProjectResponseDTO project = projectService.updateProject(projectID, request);
-		
-		ApiResponse<ProjectResponseDTO> response = new ApiResponse<>(200, "Dự án mới được cập nhật thành công", project);
-		
-		return ResponseEntity.ok(response);
-		
-	}
-	
-	@Operation(summary = "Xóa project", description = "Chuyển trạng thái project về đã xóa")
-	@DeleteMapping("/projects/{projectId}")
-	@RequireProjectRole({Role.OWNER})
-	public ResponseEntity<ApiResponse<ProjectResponseDTO>> removeProject(@PathVariable("projectId") String projectId, @RequestHeader("X-User-Id") String accountId) {
-		Account account = accountService.getAccountById(accountId);
-		
-		ProjectResponseDTO project = projectService.removeProject(projectId, account);
-		
-		ApiResponse<ProjectResponseDTO> response = new ApiResponse<>(200, "Dự án cập nhật trạng thái đã xóa", project);
-		
-		return ResponseEntity.ok(response);
-		
-	}
-	
-	
+
+    @Autowired
+    private ProjectServiceImpl projectService;
+
+    @Autowired
+    private AccountService accountService;
+
+
+    @Operation(summary = "Lấy danh sách các project", description = "Lấy danh sách các project theo id của người dùng")
+    @GetMapping("/projects")
+    public ResponseEntity<ApiResponse<List<ProjectResponseDTO>>> GetListProject(
+            @RequestHeader("X-User-Id") String accountId
+    ) {
+
+        List<ProjectResponseDTO> listProject = projectService.getAllProject(accountId);
+
+        ApiResponse<List<ProjectResponseDTO>> response = new ApiResponse<>(200, "Danh sách dự án được lấy thành công", listProject);
+
+        return ResponseEntity.ok(response);
+
+    }
+
+
+    @Operation(summary = "Lấy thông tin chi tiết của project", description = "Lấy toàn bộ thông tin chi tiết của project")
+    @GetMapping("/projects/{id}")
+    @RequireProjectRole({Role.OWNER, Role.ADMIN, Role.MEMBER, Role.VIEWER})
+    public ResponseEntity<ApiResponse<ProjectDetailResponseDTO>> GetProjectByID(@PathVariable("id") String projectID) {
+
+        ProjectDetailResponseDTO project = projectService.getProjectById(projectID);
+
+        ApiResponse<ProjectDetailResponseDTO> response = new ApiResponse<>(200, "Chi tiết dự án lấy thành công", project);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Tạo một project mới", description = "Thực hiện khởi tạo một project mới")
+    @PostMapping("/projects")
+    // @Valid là annotation dùng để kích hoạt validation trên các đối tượng (DTO, entity…) khi được truyền vào controller.
+    public ResponseEntity<ApiResponse<ProjectResponseDTO>> addNewProject(@RequestBody @Valid ProjectCreateRequestDTO request, @RequestHeader("X-User-Id") String accountId) {
+
+        Account account = accountService.getAccountById(accountId);
+        ProjectResponseDTO project = projectService.addProject(request, account);
+
+        ApiResponse<ProjectResponseDTO> response = new ApiResponse<>(200, "Dự án mới được tạo thành công", project);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Chỉnh sửa project", description = "Chỉnh sửa thông tin project bao gồm name và isArchived")
+    @PatchMapping("/projects/{id}")
+    @RequireProjectRole({Role.OWNER})
+    public ResponseEntity<ApiResponse<ProjectResponseDTO>> updateProject(@PathVariable("id") String projectID, @RequestBody ProjectUpdateRequestDTO request) {
+        ProjectResponseDTO project = projectService.updateProject(projectID, request);
+
+        ApiResponse<ProjectResponseDTO> response = new ApiResponse<>(200, "Dự án mới được cập nhật thành công", project);
+
+        return ResponseEntity.ok(response);
+
+    }
+
+    @Operation(summary = "Xóa project", description = "Chuyển trạng thái project về đã xóa")
+    @DeleteMapping("/projects/{projectId}")
+    @RequireProjectRole({Role.OWNER})
+    public ResponseEntity<ApiResponse<ProjectResponseDTO>> removeProject(@PathVariable("projectId") String projectId, @RequestHeader("X-User-Id") String accountId) {
+        Account account = accountService.getAccountById(accountId);
+
+        ProjectResponseDTO project = projectService.removeProject(projectId, account);
+
+        ApiResponse<ProjectResponseDTO> response = new ApiResponse<>(200, "Dự án cập nhật trạng thái đã xóa", project);
+
+        return ResponseEntity.ok(response);
+
+    }
+
 
 //    @Operation(summary = "Phục hồi project đã xóa", description = "Chuyển trạng thái project đã xóa về như cũ")
 //    @PatchMapping("/projects/{id}/restore")
