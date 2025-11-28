@@ -100,7 +100,7 @@ CREATE TABLE `task` (
     `is_archived`       BOOLEAN NOT NULL,
     `is_pinned`         BOOLEAN NOT NULL,
     `status`            ENUM('PENDING', 'READY', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED') DEFAULT NULL,
-    `priority`          ENUM('HIGH', 'MEDIUM', 'LOW') DEFAULT NULL,
+    `priority`          ENUM('CRITICAL','HIGH', 'MEDIUM', 'LOW') DEFAULT NULL,
     `deadline`          TIMESTAMP,
     `start_time`        TIMESTAMP,
     `completed_at`      TIMESTAMP,
