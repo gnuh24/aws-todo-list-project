@@ -7,6 +7,7 @@ import aws.todolist.api_gateway.exceptions.JwtException.MissingTokenException;
 import aws.todolist.api_gateway.exceptions.JwtException.TokenExpiredException;
 import aws.todolist.api_gateway.utils.EnvironmentUtils;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.security.SecureRequest;
 import io.jsonwebtoken.security.SignatureException;
 import org.springdoc.core.fn.builders.server.Builder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,12 +29,27 @@ public class JwtGatewayFilter implements GlobalFilter {
 	
 	@Override
 	public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+
 		String path = exchange.getRequest().getURI().getPath();
+
+		System.err.println(path);
+
+
+
+		String authHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
+
+
+		System.err.println(authHeader);
+
+		System.err.println("------------------------------------------------------------");
+
 		if (ApiPath.isPublicPath(path)) {
 			return chain.filter(exchange);
 		}
 		
-		String authHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
+
+
+
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
 			return Mono.error(new MissingTokenException("Missing Authorization header"));
 		}

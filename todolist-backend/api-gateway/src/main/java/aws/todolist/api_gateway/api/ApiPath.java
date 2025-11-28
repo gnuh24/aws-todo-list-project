@@ -54,6 +54,9 @@ public class ApiPath {
 	// ---------- SWAGGER & DOCS ----------
 	public static final String SWAGGER_UI = BASE + "/swagger/**";
 	public static final String API_DOCS = BASE + "/v3/api-docs/**";
+
+	// ---------- WEBSOCKET -------------
+	public static final String WEBSOCKET = BASE + "/notification/ws/**";
 	
 	// ---------- PUBLIC PATHS ----------
 	private static final List<String> PUBLIC_PATH_PATTERNS = List.of(
@@ -66,7 +69,8 @@ public class ApiPath {
 	    RESET_PASSWORD,
 	    REFRESH_TOKEN,
 	    SWAGGER_UI,
-	    API_DOCS
+	    API_DOCS,
+			WEBSOCKET
 	);
 	
 	private static final AntPathMatcher matcher = new AntPathMatcher();
