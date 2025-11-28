@@ -241,6 +241,23 @@ services:
     networks:
       - default
 
+
+  # =====================
+  # 🌐 AI Model Service (Flask)
+  # =====================
+  ai-model-service:
+    build:
+      context: ./model  # thư mục chứa app.py + model_label.joblib + Dockerfile
+      dockerfile: Dockerfile
+    container_name: ai-model-service
+    restart: unless-stopped
+    ports:
+      - "9997:9997"
+    volumes:
+      - ./model/model_label.joblib:/app/model_label.joblib
+    networks:
+      - default
+
   # =====================
   # 🌐 API Gateway (Spring Boot)
   # =====================
@@ -256,6 +273,7 @@ services:
       - user-service # ✅ thêm dòng này để đảm bảo gateway khởi động sau user-service
       - auth-service # ✅ thêm để đảm bảo gateway load sau auth
       - taskflow-service
+      - ai-model-service
     ports:
       - "8080:8080"
     environment:
@@ -268,6 +286,7 @@ services:
       AUTH_SERVICE_URL: http://auth-service:9999
       TASKFLOW_SERVICE_URL: http://taskflow-service:8082
       NOTIFICATION_SERVICE_URL: http://notification-service:9998
+      AI_MODEL_SERVICE: http://ai-model-service:9997
 
     extra_hosts:
       - "host.docker.internal:host-gateway"

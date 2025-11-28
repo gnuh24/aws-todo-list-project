@@ -7,6 +7,7 @@ import java.util.List;
 public class ApiPath {
 	
 	public static final String BASE = "/api";
+	public static final String MODEL = BASE + "/model/**";
 	
 	// ---------- AUTH ----------
 	public static final String AUTH = BASE + "/auth";
@@ -60,6 +61,7 @@ public class ApiPath {
 	
 	// ---------- PUBLIC PATHS ----------
 	private static final List<String> PUBLIC_PATH_PATTERNS = List.of(
+	    MODEL,
 	    LOGIN,
 	    STAFF_LOGIN,
 	    REGISTER,
