@@ -1,13 +1,12 @@
-// src/components/TaskDetailModal.jsx
 import {
-  CheckCircleFilled,
   LockOutlined
 } from "@ant-design/icons";
-import { Modal } from "antd";
+import { Modal, Tooltip} from "antd";
 import { useState, useEffect } from "react";
 import {https_taskflow} from "../../service/api";
 import CommentSection from "../TaskComment/CommentSection";
-import dayjs from "dayjs";
+import {LabelsSection} from "../Section/LabelsSection";
+import PriorityDropdown from "../Dropdown/PriorityDropdown";
 
 export default function TaskDetailModal({
                                           isOpenComment,
@@ -133,6 +132,28 @@ export default function TaskDetailModal({
     }
   }
 
+  const onUpdatePriority = async (newPriority) => {
+    try{
+      const res = await https_taskflow.patch(
+          `/v1/projects/${task.idProject}/tasks/${task.id}/update-priority`,{
+            priority: newPriority
+          }
+      );
+
+      if (res.status === 200) {
+        setTaskDetail(prev => ({ ...prev, priority: newPriority }));
+      }
+    }catch(err){
+      // Kiểm tra xem server có trả lỗi dạng JSON không
+      if (err.response && err.response.data) {
+        const msg = err.response.data.message || err.response.data.detailMessage || "Đã xảy ra lỗi không xác định";
+        alert(msg);
+      } else {
+        alert("Không thể kết nối đến server. Vui lòng thử lại.");
+      }
+    }
+  }
+
   useEffect(() => {
     const getDetails = async () => {
       try{
@@ -151,8 +172,9 @@ export default function TaskDetailModal({
       onCancel={onClose}
       footer={null}
       width={1000}
+      high={800}
       centered
-      styles={{  body: {padding: 0, borderRadius: 10} }}
+      styles={{  body: {padding: 15, borderRadius: 10} }}
     >
       {openTask && (
         <div className="flex">
@@ -166,6 +188,7 @@ export default function TaskDetailModal({
                   onChange={(e) => {
                     e.stopPropagation();
                     const updatedStatus = taskDetail.status !== "COMPLETED" ? "COMPLETED" : "PENDING"
+                    setTaskDetail(prev => ({ ...prev, status: updatedStatus }));
                     onUpdateStatus(updatedStatus);
                   }}
               />
@@ -186,12 +209,42 @@ export default function TaskDetailModal({
               icon={<LockOutlined />}
               value="Inbox"
             />
-            <SidebarItem label="Date" value="+" />
-            <SidebarItem label="Deadline" icon={<LockOutlined />} />
-            <SidebarItem label="Priority" value="P4" />
-            <SidebarItem label="Labels" value="+" />
-            <SidebarItem label="Reminders" value="+" />
-            <SidebarItem label="Location" icon={<LockOutlined />} />
+            {/* Date */}
+            <SidebarItem label="Date" value="+"
+                         onClick={() => console.log("Open date picker")}
+            />
+
+            {/* Deadline */}
+            <SidebarItem
+                label="Deadline"
+                icon={<LockOutlined />}
+                onClick={() => console.log("Deadline locked")}
+            />
+
+            {/* Priority */}
+            <SidebarItem
+                label="Priority"
+            >
+              <PriorityDropdown priority={taskDetail.priority} onSelect={onUpdatePriority} />
+            </SidebarItem>
+
+
+            {/* Labels with dropdown */}
+            <LabelsSection taskDetail={taskDetail}></LabelsSection>
+
+            {/* Reminders */}
+            <SidebarItem
+                label="Reminders"
+                value="+"
+                onClick={() => console.log("Reminders")}
+            />
+
+            {/* Location */}
+            <SidebarItem
+                label="Location"
+                icon={<LockOutlined />}
+                onClick={() => console.log("Location locked")}
+            />
           </div>
         </div>
       )}
@@ -199,14 +252,28 @@ export default function TaskDetailModal({
   );
 }
 
-function SidebarItem({ label, value, icon }) {
+
+export function SidebarItem({ label, value, icon, onClick, children }) {
   return (
-    <div className="flex items-center justify-between py-1.5 text-sm text-gray-600">
-      <div className="flex items-center gap-2">
-        {icon || <span className="text-gray-400">📁</span>}
-        <span>{label}</span>
-      </div>
-      <span className="text-gray-500">{value}</span>
-    </div>
+      <Tooltip title={label}>
+        {/* Đường kẻ phân cách */}
+        <div className="border-t border-gray-200 my-1" />
+        <div
+            className="flex justify-between items-center cursor-pointer px-3 py-2 hover:bg-gray-100 rounded-lg"
+            onClick={onClick}
+        >
+          <div className="flex items-center gap-2">
+            {icon}
+            <span>{label}</span>
+          </div>
+
+          <div className="text-gray-600">
+            {value ? <span>{value}</span> : children}
+          </div>
+        </div>
+
+      </Tooltip>
+
+
   );
 }

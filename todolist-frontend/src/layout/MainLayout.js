@@ -3,7 +3,7 @@ import {createContext, useContext, useEffect, useState} from "react";
 import {Outlet, useLocation, useNavigate} from "react-router-dom";
 import {https_notification} from "../service/api";
 import NotificationSocket from "../component/Notification/NotificationSocket";
-import MedalNotification from "../component/Notification/MedalNotification";
+import ModalNotification from "../component/Notification/ModalNotification";
 import SettingsModal from "../component/Modal/SettingsModal";
 
 const AppContext = createContext();
@@ -57,7 +57,7 @@ export default function MainLayout() {
                     <Outlet/>
                 </div>
                 <NotificationSocket/>
-                {newNotificationFormWebsocket !== null && <MedalNotification message={newNotificationFormWebsocket} setNewNotificationFormWebsocket={setNewNotificationFormWebsocket} />}
+                {newNotificationFormWebsocket !== null && <ModalNotification message={newNotificationFormWebsocket} setNewNotificationFormWebsocket={setNewNotificationFormWebsocket} />}
             </div>
 
             {/* Hiển thị modal nếu URL khớp */}

@@ -6,15 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="a7719d69-0674-4558-b744-9f01872a3593" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/../todolist-backend/taskflow-service/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/taskflow-service/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../todolist-backend/taskflow-service/src/main/java/aws/todolist/taskflow/mapper/TaskMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/taskflow-service/src/main/java/aws/todolist/taskflow/mapper/TaskMapper.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/component/Header/HeaderSidebar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/Header/HeaderSidebar.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/Dropdown/PriorityDropdown.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/Dropdown/PriorityDropdown.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/Modal/TaskDetailModal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/Modal/TaskDetailModal.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/Notification/MedalNotification.jsx" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/component/Notification/NotificationSocket.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/Notification/NotificationSocket.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/component/UserMenu/UserMenuDropdown.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/UserMenu/UserMenuDropdown.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/layout/MainLayout.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/layout/MainLayout.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/AppPage/NotificationsPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/AppPage/NotificationsPage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/service/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/service/api.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -101,6 +98,10 @@
       <workItem from="1764142721464" duration="5876000" />
       <workItem from="1764162073694" duration="2782000" />
       <workItem from="1764208883268" duration="7213000" />
+      <workItem from="1764230957672" duration="6756000" />
+      <workItem from="1764249606532" duration="1372000" />
+      <workItem from="1764296468843" duration="7136000" />
+      <workItem from="1764316845851" duration="7932000" />
     </task>
     <servers />
   </component>

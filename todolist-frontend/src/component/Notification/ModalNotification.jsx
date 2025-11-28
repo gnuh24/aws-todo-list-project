@@ -1,8 +1,8 @@
-// components/MedalNotification.jsx
+// components/ModalNotification.jsx
 import React, { useState, useEffect } from 'react';
 import {useNavigate} from "react-router-dom";
 
-const MedalNotification = ({ message, duration = 5000, setNewNotificationFormWebsocket }) => {
+const ModalNotification = ({ message, duration = 5000, setNewNotificationFormWebsocket }) => {
   const [isVisible, setIsVisible] = useState(true);
   const navigate = useNavigate();
 
@@ -52,4 +52,4 @@ const MedalNotification = ({ message, duration = 5000, setNewNotificationFormWeb
   );
 };
 
-export default MedalNotification;
+export default ModalNotification;

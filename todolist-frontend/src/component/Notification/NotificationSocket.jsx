@@ -43,7 +43,7 @@ export default function NotificationSocket() {
         const client = new Client({
             webSocketFactory: () => socket,
             connectHeaders: { Authorization: "Bearer " + jwtToken },
-            // debug: (str) => console.log("[STOMP Debug] " + str),
+            //debug: (str) => console.log("[STOMP Debug] " + str),
             reconnectDelay: 5000,
             onConnect: (frame) => {
                 console.log("✅ Connected WebSocket");

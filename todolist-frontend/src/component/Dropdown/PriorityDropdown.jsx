@@ -4,14 +4,16 @@ import { FlagOutlined, CheckOutlined } from "@ant-design/icons";
 
 export default function PriorityDropdown({ priority, onSelect }) {
 
-  const priorities = [
-    { id: "HIGH", color: "text-red-500", label: "Priority 1" },
-    { id: "MEDIUM", color: "text-orange-400", label: "Priority 2" },
-    { id: "LOW", color: "text-blue-500", label: "Priority 3" }
-  ];
+    const priorities = [
+        { id: "CRITICAL", color: "text-red-700", label: "Critical" },   // Cực kỳ khẩn cấp
+        { id: "HIGH",     color: "text-red-500", label: "High" },       // Quan trọng
+        { id: "MEDIUM",   color: "text-orange-400", label: "Medium" },  // Bình thường
+        { id: "LOW",      color: "text-blue-500", label: "Low" }        // Thấp
+    ];
 
 
-  const menu = (
+
+    const menu = (
     <Menu
       className="rounded-lg shadow-lg p-1"
       items={priorities.map((p) => ({
