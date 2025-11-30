@@ -1,11 +1,12 @@
-import {Menu, Input, Empty, Checkbox} from "antd";
+import {Menu, Input, Empty, Checkbox, Button, message} from "antd";
 import { useState, useMemo } from "react";
 import {https_taskflow} from "../../service/api";
+import SpinnerForSettings from "../Spinner/SpinnerForSettings";
 
-export function DropdownMenu({ selectedLabels, personalLabels, sharedLabels: projectLabels, onAddNew, onSelect }) {
+export function DropdownMenu({ selectedLabels, personalLabels, sharedLabels: projectLabels, onAddNew, onSelect, handleAISuggestion }) {
     const [search, setSearch] = useState("");
-
-    console.log(personalLabels);
+    const [aiLoading, setAiLoading] = useState(false);
+    const [aiSuggestion, setAiSuggestion] = useState(null);
 
 
     // Lọc nhãn theo search
@@ -40,6 +41,76 @@ export function DropdownMenu({ selectedLabels, personalLabels, sharedLabels: pro
                     />
                 </Menu.Item>
 
+                {/* Nút AI Suggest */}
+                <Menu.Item key="ai-button" disabled style={{ cursor: "default", padding: 0 }}>
+                    <Button
+                        type="text"
+                        style={{ width: "100%", textAlign: "left", fontWeight: "bold", color: "#722ED1" }}
+                        onClick={async () => {
+                            setAiLoading(true);
+                            const suggestion = await handleAISuggestion();
+                            setAiSuggestion(suggestion);
+                            setAiLoading(false);
+                        }}
+                    >
+                        ✨ Suggest labels with AI
+                    </Button>
+                </Menu.Item>
+
+
+                {/* Loading AI */}
+                {aiLoading && (
+                    <Menu.Item key="ai-loading" disabled style={{ textAlign: "center" }}>
+                        <SpinnerForSettings></SpinnerForSettings>
+                    </Menu.Item>
+                )}
+
+                {/* AI Suggestions */}
+                {!aiLoading && aiSuggestion && (
+                    <>
+                        <Menu.ItemGroup title="AI Suggestion">
+                            <Menu.Item
+                                key="ai-suggest"
+                                disabled={selectedLabels.some(lb => lb.name.toLowerCase() === aiSuggestion.toLowerCase())} // disable nếu đã chọn
+                                onClick={() => {
+                                    const lowerAI = aiSuggestion.toLowerCase();
+
+                                    // Kiểm tra tồn tại trong Personal / Project
+                                    const personal = filteredPersonal.find(lb => lb.name.toLowerCase() === lowerAI);
+                                    const project  = filteredProject.find(lb => lb.name.toLowerCase() === lowerAI);
+
+                                    if (personal) {
+                                        onSelect(personal.id, true);  // gán personal label
+                                    } else if (project) {
+                                        onSelect(project.id, false);  // gán project label
+                                    } else {
+                                        onAddNew(aiSuggestion, true); // tạo label mới từ AI
+                                    }
+
+                                    setSearch("");
+                                    setAiSuggestion(null);
+                                }}
+                                style={{
+                                    fontWeight: filteredPersonal.concat(filteredProject).some(lb => lb.name.toLowerCase() === aiSuggestion.toLowerCase()) ? "normal" : "bold",
+                                    color: filteredPersonal.concat(filteredProject).some(lb => lb.name.toLowerCase() === aiSuggestion.toLowerCase()) ? "#555" : "#FF7875",
+                                }}
+                            >
+                                {aiSuggestion}
+                                {selectedLabels.some(lb => lb.name.toLowerCase() === aiSuggestion.toLowerCase()) && (
+                                    <span style={{ fontSize: 12, opacity: 0.5, marginLeft: 4 }}>(already added)</span>
+                                )}
+                                {!selectedLabels.some(lb => lb.name.toLowerCase() === aiSuggestion.toLowerCase()) &&
+                                    filteredPersonal.concat(filteredProject).some(lb => lb.name.toLowerCase() === aiSuggestion.toLowerCase()) && (
+                                        <span style={{ fontSize: 12, opacity: 0.7, marginLeft: 4 }}>(exists)</span>
+                                    )}
+                            </Menu.Item>
+                        </Menu.ItemGroup>
+
+                        <Menu.Divider />
+                    </>
+                )}
+
+
                 {/* Personal labels */}
                 {filteredPersonal.length > 0 && (
                     <>
@@ -47,7 +118,11 @@ export function DropdownMenu({ selectedLabels, personalLabels, sharedLabels: pro
                             {filteredPersonal.map(lb => (
                                 <Menu.Item
                                     key={`personal-${lb.id}`}
-                                    onClick={() => onSelect(lb.id,true)} // click để chọn label nếu cần
+                                    onClick={() => {
+                                        onSelect(lb.id,true)
+                                        setSearch("");
+                                        setAiSuggestion(null);
+                                    }} // click để chọn label nếu cần
                                 >
                                     {lb.name}
                                 </Menu.Item>
@@ -64,7 +139,11 @@ export function DropdownMenu({ selectedLabels, personalLabels, sharedLabels: pro
                             {filteredProject.map(lb => (
                                 <Menu.Item
                                     key={`shared-${lb.id}`}
-                                    onClick={() => onSelect(lb.id,false)} // click để chọn label nếu cần
+                                    onClick={() => {
+                                        onSelect(lb.id,false)
+                                        setSearch("");
+                                        setAiSuggestion(null);
+                                    }} // click để chọn label nếu cần
                                 >
                                     {lb.name}
                                 </Menu.Item>

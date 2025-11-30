@@ -5,16 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a7719d69-0674-4558-b744-9f01872a3593" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../todolist-backend/api-gateway/src/main/java/aws/todolist/api_gateway/config/JwtGatewayFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/api-gateway/src/main/java/aws/todolist/api_gateway/config/JwtGatewayFilter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../todolist-backend/api-gateway/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/api-gateway/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/resources/application-dev.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/resources/application-dev.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../todolist-backend/taskflow-service/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/taskflow-service/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../todolist-backend/taskflow-service/src/main/java/aws/todolist/taskflow/aspect/ProjectRoleAspect.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/taskflow-service/src/main/java/aws/todolist/taskflow/aspect/ProjectRoleAspect.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../todolist-backend/taskflow-service/src/main/java/aws/todolist/taskflow/controller/ProjectController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/taskflow-service/src/main/java/aws/todolist/taskflow/controller/ProjectController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/component/Dropdown/LabelDropdown.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/Dropdown/LabelDropdown.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/component/Notification/NotificationSocket.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/Notification/NotificationSocket.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/component/Section/LabelsSection.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/Section/LabelsSection.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/service/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/service/api.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -106,6 +100,8 @@
       <workItem from="1764296468843" duration="7136000" />
       <workItem from="1764316845851" duration="7932000" />
       <workItem from="1764338753937" duration="1906000" />
+      <workItem from="1764421495470" duration="2506000" />
+      <workItem from="1764489727074" duration="866000" />
     </task>
     <servers />
   </component>

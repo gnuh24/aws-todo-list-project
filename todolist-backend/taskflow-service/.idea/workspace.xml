@@ -5,12 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="aafb8b93-6ddf-44d9-bc7c-02d1e2b5b281" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../api-gateway/src/main/java/aws/todolist/api_gateway/config/JwtGatewayFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/../api-gateway/src/main/java/aws/todolist/api_gateway/config/JwtGatewayFilter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../api-gateway/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../api-gateway/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../notification-service/src/main/resources/application-dev.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../notification-service/src/main/resources/application-dev.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/aspect/ProjectRoleAspect.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/aspect/ProjectRoleAspect.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/controller/ProjectController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/controller/ProjectController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/AwsServiceImplementation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/AwsServiceImplementation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/component/Dropdown/LabelDropdown.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/component/Dropdown/LabelDropdown.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/component/Section/LabelsSection.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/component/Section/LabelsSection.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/service/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/service/api.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

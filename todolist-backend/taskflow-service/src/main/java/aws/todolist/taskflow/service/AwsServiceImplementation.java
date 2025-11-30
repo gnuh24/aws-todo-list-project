@@ -9,9 +9,11 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.ResponseInputStream;
+import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.InputStream;
 import java.net.URISyntaxException;
@@ -38,14 +40,14 @@ public class AwsServiceImplementation implements AwsService {
             MediaType mediaType = FileType.fromFilename(originalFileName);
 
 //            TODO: Test logic trước nào deploy thì mở ra
-//            PutObjectRequest request = PutObjectRequest.builder()
-//                    .bucket(defaultBucketName)
-//                    .key(tempKey)
-//                    .contentLength(contentLength)
-//                    .contentType(mediaType.toString())
-//                    .build();
-//
-//            s3Client.putObject(request, RequestBody.fromInputStream(data, contentLength));
+            PutObjectRequest request = PutObjectRequest.builder()
+                    .bucket(defaultBucketName)
+                    .key(tempKey)
+                    .contentLength(contentLength)
+                    .contentType(mediaType.toString())
+                    .build();
+
+            s3Client.putObject(request, RequestBody.fromInputStream(data, contentLength));
 
 
             System.out.printf("File uploaded to bucket(%s): %s%n", defaultBucketName, tempKey);
@@ -69,15 +71,15 @@ public class AwsServiceImplementation implements AwsService {
         // TODO: Để test logic trước
 
         // 3. Copy object trong S3
-//        s3Client.copyObject(builder -> builder
-//                .sourceBucket(defaultBucketName)
-//                .sourceKey(tempKey)
-//                .destinationBucket(defaultBucketName)
-//                .destinationKey(attachKey)
-//                .build());
-//
+        s3Client.copyObject(builder -> builder
+                .sourceBucket(defaultBucketName)
+                .sourceKey(tempKey)
+                .destinationBucket(defaultBucketName)
+                .destinationKey(attachKey)
+                .build());
+
 //        // 4. Xóa file temp
-//        deleteFile(tempUrl);
+        deleteFile(tempUrl);
 
         System.out.printf("File moved from %s to %s in bucket %s%n", tempKey, attachKey, defaultBucketName);
 
@@ -93,10 +95,10 @@ public class AwsServiceImplementation implements AwsService {
             String key = s3Utils.getKeyFromUrl(fileUrl);
 
             // Xóa object trong S3 (bucket mặc định)
-//            s3Client.deleteObject(builder -> builder
-//                    .bucket(defaultBucketName) // bucket mặc định
-//                    .key(key)
-//                    .build());
+            s3Client.deleteObject(builder -> builder
+                    .bucket(defaultBucketName) // bucket mặc định
+                    .key(key)
+                    .build());
 
             System.out.printf("File deleted from bucket(%s): %s%n", defaultBucketName, key);
         } catch (Exception e) {

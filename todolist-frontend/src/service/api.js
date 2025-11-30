@@ -1,9 +1,11 @@
 import axios from "axios";
 import { store } from "..";
 
+const BASE_URL = "http://localhost:8080/api";
+
 // axios instance
 export let https_auth = axios.create({
-  baseURL: "http://localhost:8080/api/auth",
+  baseURL: BASE_URL+"/auth",
   // headers: {
   //   TokenCybersoft:
   //     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5Mb3AiOiJCb290Y2FtcCA2OCIsIkhldEhhblN0cmluZyI6IjE1LzAxLzIwMjUiLCJIZXRIYW5UaW1lIjoiMTczNjg5OTIwMDAwMCIsIm5iZiI6MTcwOTEzOTYwMCwiZXhwIjoxNzM3MDQ2ODAwfQ.15h8Zu___NIMHyUdFGA_OXmW8LeIiC8dEKnAv1v362Q",
@@ -12,7 +14,7 @@ export let https_auth = axios.create({
   // },
 });
 export let https_taskflow = axios.create({
-  baseURL: "http://localhost:8080/api/taskflow",
+  baseURL: BASE_URL+"/taskflow",
   headers: {
     Authorization:
       "Bearer " + JSON.parse(localStorage.getItem("USER_INFO"))?.token
@@ -21,7 +23,7 @@ export let https_taskflow = axios.create({
 
 
 export let https_notification = axios.create({
-  baseURL: "http://localhost:8080/api/notification",
+  baseURL: BASE_URL+"/notification",
   headers: {
     Authorization:
         "Bearer " + JSON.parse(localStorage.getItem("USER_INFO"))?.token
@@ -29,12 +31,21 @@ export let https_notification = axios.create({
 });
 
 export let https_user = axios.create({
-  baseURL: "http://localhost:8080/api/user/v1",
+  baseURL: BASE_URL+"/user/v1",
   headers: {
     Authorization:
         "Bearer " + JSON.parse(localStorage.getItem("USER_INFO"))?.token
   },
 });
+
+export let https_model = axios.create({
+  baseURL: BASE_URL+"/model",
+  headers: {
+    Authorization:
+        "Bearer " + JSON.parse(localStorage.getItem("USER_INFO"))?.token
+  },
+});
+
 
 
 

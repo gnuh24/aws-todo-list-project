@@ -3,7 +3,7 @@ import {useEffect, useState} from "react";
 import { CloseOutlined } from "@ant-design/icons";
 import {DropdownMenu} from "../Dropdown/LabelDropdown";
 import {SidebarItem} from "../Modal/TaskDetailModal";
-import {https_taskflow} from "../../service/api";
+import {https_model, https_taskflow} from "../../service/api";
 
 export function LabelsSection({taskDetail}) {
     const [selectedLabels, setSelectedLabels] = useState(taskDetail.labels);
@@ -23,6 +23,22 @@ export function LabelsSection({taskDetail}) {
         }
         fetchData();
     },[])
+
+    const handleAISuggestion = async () => {
+        try{
+            const res = await https_model.post("/predict",{
+                title: taskDetail.title,
+                description: taskDetail.description,
+            })
+
+            if (res.status === 200) {
+                console.log(res.data.result.label)
+                return res.data.result.label;
+            }
+        }catch (error) {
+            console.log(error);
+        }
+    }
 
     const addLabel = async (idLabel, isPersonalLabels) => {
         try{
@@ -100,6 +116,7 @@ export function LabelsSection({taskDetail}) {
             if (res.status === 200) {
                 const newLabels = res.data.data;
                 await addLabel(newLabels.id,true);
+                setPersonalLabels((prev)=>[...prev, newLabels]);
             }
         }catch(err){
             // Kiểm tra xem server có trả lỗi dạng JSON không
@@ -123,7 +140,8 @@ export function LabelsSection({taskDetail}) {
                     onSelect: addLabel,
                     personalLabels,
                     sharedLabels: projectLabels,
-                    onAddNew: createLabel
+                    onAddNew: createLabel,
+                    handleAISuggestion: handleAISuggestion,
                 })}
                 trigger={["click"]}
             >
