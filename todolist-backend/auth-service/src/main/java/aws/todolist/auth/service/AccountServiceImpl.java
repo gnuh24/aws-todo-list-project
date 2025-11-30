@@ -1,18 +1,14 @@
 package aws.todolist.auth.service;
 
-
 import aws.todolist.auth.dto.account.AccountCreateForm;
 import aws.todolist.auth.entity.Account;
-import aws.todolist.auth.integration.redis.RedisService;
+import aws.todolist.auth.mapper.AuthMapper;
 import aws.todolist.auth.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
 
 @Service
 public class AccountServiceImpl implements AccountService {
@@ -24,7 +20,7 @@ public class AccountServiceImpl implements AccountService {
 	private PasswordEncoder passwordEncoder;
 	
 	@Autowired
-	private RedisService redisService;
+	private AuthMapper authMapper;
 	
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -54,15 +50,8 @@ public class AccountServiceImpl implements AccountService {
 	
 	
 	@Override
-	@Transactional
 	public Account saveAccount(AccountCreateForm form) {
-		Account account = new Account();
-		
-		account.setId(form.getId());
-		account.setEmail(form.getEmail());
-		account.setPassword(form.getPassword());
-		account.setAvatar(form.getAvatar());
-
+		Account account = authMapper.toAccount(form);
 		return accountRepository.save(account);
 	}
 	

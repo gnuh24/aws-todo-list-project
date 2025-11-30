@@ -4,29 +4,24 @@ import aws.todolist.auth.aop.AppLogger;
 import aws.todolist.auth.dto.account.AccountCreateForm;
 import aws.todolist.auth.dto.account.AccountRedisDTO;
 import aws.todolist.auth.dto.auth.*;
-import aws.todolist.auth.exceptions.JwtException.*;
 import aws.todolist.auth.entity.Account;
 import aws.todolist.auth.exceptions.AuthException.AuthExceptionHandler;
 import aws.todolist.auth.exceptions.AuthException.StepUpAuthenticationException;
+import aws.todolist.auth.exceptions.JwtException.*;
 import aws.todolist.auth.exceptions.otpException.OtpNotFoundException;
 import aws.todolist.auth.integration.redis.RedisConstants;
 import aws.todolist.auth.integration.redis.RedisService;
+import aws.todolist.auth.mapper.AuthMapper;
 import aws.todolist.auth.messaging.kafka.producer.KafkaProducerService;
 import aws.todolist.auth.security.JwtTokenProvider;
 import aws.todolist.auth.utils.EnvironmentUtils;
 import aws.todolist.auth.utils.IdGenerator;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -48,25 +43,13 @@ public class AuthServiceImpl implements AuthService {
 	private PasswordEncoder passwordEncoder;
 	
 	@Autowired
-	private ModelMapper modelMapper;
-	
-	@Autowired
-	private AppLogger log;
-	
-	@Autowired
-	private EnvironmentUtils environmentUtils;
-	
-	@Autowired
-	private AuthExceptionHandler authExceptionHandler;
-	
-	@Autowired
-	private EmailService emailService;
-	
-	@Autowired
 	private RedisService redisService;
 	
 	@Autowired
 	private KafkaProducerService kafkaProducerService;
+	
+	@Autowired
+	private AuthMapper authMapper;
 	
 	
 	@Override
@@ -79,11 +62,7 @@ public class AuthServiceImpl implements AuthService {
 			throw new OtpNotFoundException("OTP không tồn tại hoặc đã hết hạn sử dụng !");
 		}
 		
-		AccountCreateForm accountCreateForm = new AccountCreateForm();
-		accountCreateForm.setId(account.getId());
-		accountCreateForm.setEmail(account.getEmail());
-		accountCreateForm.setPassword(account.getPassword());
-		accountCreateForm.setAvatar("avatar-default-icon.png");
+		AccountCreateForm accountCreateForm = authMapper.toAccountCreateForm(account);
 		
 		redisService.set(RedisConstants.EMAIL_EXIST + ":" + accountCreateForm.getEmail(), "true");
 		
@@ -98,91 +77,91 @@ public class AuthServiceImpl implements AuthService {
 	
 	@Override
 	public AuthResponseDTO login(LoginRequestForm request) {
-		Account user = accountService.getAccountByUsername(request.getEmail());
+		Account account = accountService.getAccountByUsername(request.getEmail());
 		
-		if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+		if (account == null || !passwordEncoder.matches(request.getPassword(), account.getPassword())) {
 			throw new BadCredentialsException("Email hoặc mật khẩu không đúng!");
 		}
 		
-//		if (user.getRole() != Account.Role.USER) {
+//		if (account.getRole() != Account.Role.USER) {
 //			throw new BadCredentialsException("Email hoặc mật khẩu không đúng!");
 //		}
 		
-		if (user.getStatus().toString().equals("INACTIVE")) {
+		if (account.getStatus().toString().equals("INACTIVE")) {
 			throw new DisabledException("Tài khoản của bạn chưa được kích hoạt, hãy kiểm tra email " + request.getEmail());
 		}
 		
-		if (user.getStatus().toString().equals("BANNED")) {
+		if (account.getStatus().toString().equals("BANNED")) {
 			throw new LockedException("Tài khoản của bạn đã bị khóa! Nếu có vấn đề, vui lòng liên hệ Admin.");
 		}
 		
 		// Tạo và trả về AuthResponseDTO
-		return buildAuthResponse(user);
+		return authMapper.toAuthResponse(account, jwtTokenProvider);
 	}
 	
 	@Override
 	@Transactional
 	public AuthResponseDTO loginGoogle(String email, String name, String avatar) {
-		// 1️⃣ Tìm user theo email
-		Account user = accountService.getAccountByUsername(email);
+		// 1️⃣ Tìm account theo email
+		Account account = accountService.getAccountByUsername(email);
 		
 		// 2️⃣ Nếu chưa tồn tại → tạo mới
-		if (user == null) {
-			user = new Account();
-			user.setId(UUID.randomUUID().toString());
-			user.setEmail(email);
+		if (account == null) {
+			account = new Account();
+			account.setId(UUID.randomUUID().toString());
+			account.setEmail(email);
 			
 			// Tạo password ngẫu nhiên
 			String randomPassword = UUID.randomUUID().toString().substring(0, 12);
-			user.setPassword(passwordEncoder.encode(randomPassword));
+			account.setPassword(passwordEncoder.encode(randomPassword));
 			
-			user.setDisplayName(name);
-			user.setAvatar(avatar);
-			user.setStatus(Account.Status.ACTIVE); // vì Google đã verify email
-			user.setRole(Account.Role.USER);
+			account.setDisplayName(name);
+			account.setAvatar(avatar);
+			account.setStatus(Account.Status.ACTIVE); // vì Google đã verify email
+			account.setRole(Account.Role.USER);
 			
 			// Lưu DB
-			accountService.saveAccount(user);
-			redisService.set(RedisConstants.EMAIL_EXIST + ":" + user.getEmail(), "true");
+			accountService.saveAccount(account);
+			redisService.set(RedisConstants.EMAIL_EXIST + ":" + account.getEmail(), "true");
 			
 		}
 		else {
 			// 3️⃣ User đã tồn tại → update thông tin nếu cần
-			if (user.getAvatar() == null || !user.getAvatar().equals(avatar)) {
-				user.setAvatar(avatar);
+			if (account.getAvatar() == null || !account.getAvatar().equals(avatar)) {
+				account.setAvatar(avatar);
 			}
 			
-			accountService.saveAccount(user);
+			accountService.saveAccount(account);
 		}
 		
 		
-		if (user.getStatus() == Account.Status.BANNED) {
+		if (account.getStatus() == Account.Status.BANNED) {
 			throw new LockedException("Tài khoản của bạn đã bị khóa! Nếu có vấn đề, vui lòng liên hệ Admin.");
 		}
 		
 		// 5️⃣ Trả về response (tạo JWT,...)
-		return buildAuthResponse(user);
+		return authMapper.toAuthResponse(account, jwtTokenProvider);
 	}
 	
 	
 	@Override
 	public AuthResponseDTO staffLogin(LoginRequestForm request) {
-		Account user = accountService.getAccountByUsername(request.getEmail());
+		Account account = accountService.getAccountByUsername(request.getEmail());
 		
-		if (user == null || user.getRole().equals(Account.Role.USER) || !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+		if (account == null || account.getRole().equals(Account.Role.USER) || !passwordEncoder.matches(request.getPassword(), account.getPassword())) {
 			throw new BadCredentialsException("Email hoặc mật khẩu không đúng!");
 		}
 		
-		if (user.getStatus().toString().equals("INACTIVE")) {
+		if (account.getStatus().toString().equals("INACTIVE")) {
 			throw new DisabledException("Tài khoản của bạn chưa được kích hoạt, hãy kiểm tra email " + request.getEmail());
 		}
 		
-		if (user.getStatus().toString().equals("BANNED")) {
+		if (account.getStatus().toString().equals("BANNED")) {
 			throw new LockedException("Tài khoản của bạn đã bị khóa! Nếu có vấn đề, vui lòng liên hệ Admin.");
 		}
 		
 		// Tạo và trả về AuthResponseDTO
-		return buildAuthResponse(user);
+		return authMapper.toAuthResponse(account, jwtTokenProvider);
 	}
 	
 
@@ -210,7 +189,6 @@ public class AuthServiceImpl implements AuthService {
 		redisService.setObjectWithTTL(RedisConstants.OTP_VERIFY_ACCOUNT + ":" + otp, account, 5, TimeUnit.MINUTES);
 		
 		kafkaProducerService.sendRegisterEmail(userRegistrationForm.getEmail(), otp);
-//		emailService.sendRegistrationUserConfirm(userRegistrationForm.getEmail(), otp);
 		return account;
 	}
 	
@@ -220,8 +198,6 @@ public class AuthServiceImpl implements AuthService {
 		String otp = IdGenerator.generateOTP();
 		redisService.set(RedisConstants.OTP_FORGOT_PASSWORD + ":" + email, otp, 3, TimeUnit.MINUTES);
 		kafkaProducerService.sendResetPasswordEmail(email, otp);
-
-//		emailService.sendResetPasswordUserConfirm(username, otp);
 	}
 	
 	@Override
@@ -254,7 +230,6 @@ public class AuthServiceImpl implements AuthService {
 		String otp = IdGenerator.generateOTP();
 		redisService.set(RedisConstants.OTP_CHANGE_EMAIL + ":" + newEmail, otp, 3, TimeUnit.MINUTES);
 		kafkaProducerService.sendUpdateEmail(newEmail, otp);
-//		emailService.sendUpdateEmailOtp(newEmail, otp);
 	}
 	
 	@Override
@@ -279,30 +254,6 @@ public class AuthServiceImpl implements AuthService {
 		
 		accountService.updateEmail(account, form.getNewEmail());
 		return account;
-	}
-	
-	
-	private AuthResponseDTO buildAuthResponse(Account user) {
-		AuthResponseDTO response = new AuthResponseDTO();
-		response.setId(user.getId());
-		response.setEmail(user.getUsername());
-		response.setRole(user.getRole().toString());
-		response.setDisplayName(user.getDisplayName());
-		response.setAvatar(user.getAvatar());
-		// Tạo Token
-		String jwt = jwtTokenProvider.generateToken(user);
-		response.setToken(jwt);
-		response.setTokenExpirationTime("30 phút");
-
-//		redisService.set(RedisContants.TOKEN + jwt, true);
-		
-		
-		// Tạo Refresh Token
-		String refreshToken = jwtTokenProvider.generateRefreshToken(user);
-		response.setRefreshToken(refreshToken);
-		response.setRefreshTokenExpirationTime("7 ngày");
-		
-		return response;
 	}
 	
 	@Override

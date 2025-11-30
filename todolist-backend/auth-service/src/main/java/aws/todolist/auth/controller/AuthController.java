@@ -13,7 +13,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,9 +27,6 @@ public class AuthController {
 	
 	@Autowired
 	private AccountService accountService;
-	
-	@Autowired
-	private ModelMapper modelMapper;
 	
 	@Autowired
 	private JwtTokenProvider jwtTokenProvider;

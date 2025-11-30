@@ -41,26 +41,26 @@ public class Account implements Serializable, UserDetails {
 	
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 20)
-	private Role role = Role.USER;
+	private Role role;
 	
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 20)
-	private Status status = Status.ACTIVE;
+	private Status status;
 	
-	@Column(name = "created_at", nullable = false)
-	private LocalDateTime createdAt = LocalDateTime.now();
+	@Column(name = "created_at", nullable = false, updatable = false)
+	private LocalDateTime createdAt;
 	
 	@Column(name = "updated_at", nullable = false)
-	private LocalDateTime updatedAt = LocalDateTime.now();
+	private LocalDateTime updatedAt;
 	
 	@Column(name = "deleted_at")
 	private LocalDateTime deletedAt;
 	
 	@Column(name = "is_deleted", nullable = false)
-	private boolean isDeleted = false;
-
+	private boolean isDeleted;
+	
 	@Column(name = "receive_email", nullable = false)
-	private boolean receiveEmail = false;
+	private boolean receiveEmail;
 	
 	// --- ENUMS ---
 	public enum Role {
@@ -79,7 +79,7 @@ public class Account implements Serializable, UserDetails {
 	
 	@Override
 	public String getUsername() {
-		return this.email; // Dùng email làm username
+		return this.email;
 	}
 	
 	@Override
@@ -100,5 +100,32 @@ public class Account implements Serializable, UserDetails {
 	@Override
 	public boolean isEnabled() {
 		return this.status == Status.ACTIVE && !isDeleted;
+	}
+	
+	// --- Lifecycle hooks để set default ---
+	@PrePersist
+	public void prePersist() {
+		if (createdAt == null) {
+			createdAt = LocalDateTime.now();
+		}
+		if (updatedAt == null) {
+			updatedAt = LocalDateTime.now();
+		}
+		if (role == null) {
+			role = Role.USER;
+		}
+		if (status == null) {
+			status = Status.ACTIVE;
+		}
+		if (avatar == null || avatar.isEmpty()) {
+			avatar = "avatar-default-icon.png";
+		}
+		isDeleted = false;
+		receiveEmail = false;
+	}
+	
+	@PreUpdate
+	public void preUpdate() {
+		updatedAt = LocalDateTime.now();
 	}
 }
