@@ -30,7 +30,7 @@ public class WebSocketServiceImpl implements WebSocketService{
 
     @Override
     public void sendGlobal(Notification notification) {
-        messagingTemplate.convertAndSend("/global", mapper.mapToResponse(notification));
+        messagingTemplate.convertAndSend("/global", mapper.toResponse(notification));
     }
 
 
@@ -46,7 +46,7 @@ public class WebSocketServiceImpl implements WebSocketService{
         System.out.println("✅ User " + email + " đang online qua WebSocket, sessions: " + simpUser.getSessions().size());
 
         String destination = "/private";
-        messagingTemplate.convertAndSendToUser(email,destination, mapper.mapToResponse(notification));
+        messagingTemplate.convertAndSendToUser(email,destination, mapper.toResponse(notification));
     }
 
 

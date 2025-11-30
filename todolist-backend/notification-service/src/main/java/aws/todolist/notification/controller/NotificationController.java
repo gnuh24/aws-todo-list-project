@@ -6,9 +6,11 @@ import aws.todolist.notification.dto.notification.NotificationResponse;
 import aws.todolist.notification.dto.notification.UpdateMoreIdRequest;
 import aws.todolist.notification.dto.notification.UpdateReadStatusRequest;
 import aws.todolist.notification.entity.Notification;
+import aws.todolist.notification.mapper.NotificationMapper;
 import aws.todolist.notification.service.NotificationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -22,24 +24,8 @@ public class NotificationController {
 	
 	private final NotificationService notificationService;
 	
-	// Phương thức Helper để ánh xạ Entity sang DTO
-	private NotificationResponse mapToResponse(Notification notification) {
-		// Logic mapping...
-		return NotificationResponse.builder()
-		    .id(notification.getId())
-		    .title(notification.getTitle())
-		    .content(notification.getContent())
-		    .type(notification.getType())
-		    .isRead(notification.isRead())
-		    .createdAt(notification.getCreatedAt())
-		    // Lấy ID từ entity
-		    .actorId(notification.getActor() != null ? notification.getActor().getId() : null)
-		    .projectId(notification.getProjectId())
-		    .taskId(notification.getTaskId())
-		    .displayName(notification.getActor().getDisplayName())
-		    .avatar(notification.getActor().getAvatar())
-		    .build();
-	}
+	@Autowired
+	private NotificationMapper notificationMapper;
 	
 	@GetMapping("/my-notification")
 	public ResponseEntity<ApiResponse<Page<NotificationResponse>>> getNotifications(
@@ -54,7 +40,7 @@ public class NotificationController {
 		    notificationService.getNotifications(receiverId, isRead, pageable); // Đã thêm isRead
 		
 		// 3. Thực hiện ánh xạ (Mapping) từ Entity sang DTO
-		Page<NotificationResponse> notificationsPage = notifications.map(this::mapToResponse);
+		Page<NotificationResponse> notificationsPage = notificationMapper.toResponsePage(notifications);
 		
 		// 4. Đóng gói vào Custom ApiResponse và trả về ResponseEntity
 		ApiResponse<Page<NotificationResponse>> response = new ApiResponse<>(
@@ -65,6 +51,7 @@ public class NotificationController {
 		
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
+	
 	@GetMapping("/count-my-notification-unread")
 	public ResponseEntity<ApiResponse<Long>> countMyNotificationsByIsRead(
 	    @RequestParam(value = "isRead", required = false) Boolean isRead,
