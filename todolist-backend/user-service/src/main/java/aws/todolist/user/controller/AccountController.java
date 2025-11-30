@@ -4,11 +4,11 @@ import aws.todolist.user.api.ApiResponse;
 import aws.todolist.user.dto.account.AccountDetailResponseDTO;
 import aws.todolist.user.dto.account.AccountUpdateForm;
 import aws.todolist.user.entity.Account;
+import aws.todolist.user.mapper.AccountMapper;
 import aws.todolist.user.service.AccountService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +22,7 @@ public class AccountController {
 	private AccountService accountService;
 	
 	@Autowired
-	private ModelMapper modelMapper;
+	private AccountMapper accountMapper;
 	
 	@Operation(summary = "Lấy chi tiết account đang đăng nhập",
 	    description = "Chỉ admin hoặc chính người dùng mới có thể xem thông tin account của mình")
@@ -31,7 +31,7 @@ public class AccountController {
 	    @RequestHeader("X-User-Id") String accountId
 	) {
 		Account account = accountService.getAccountById(accountId);
-		AccountDetailResponseDTO accountDTO1 = modelMapper.map(account, AccountDetailResponseDTO.class);
+		AccountDetailResponseDTO accountDTO1 = accountMapper.entityToDetailDTO(account);
 		return ResponseEntity.ok(new ApiResponse<>(200, "Lấy thông tin account thành công", accountDTO1));
 	}
 	
@@ -45,7 +45,7 @@ public class AccountController {
 		
 		Account account = accountService.getAccountById(accountId);
 		Account updatedAccount = accountService.updateAccount(account, form);
-		AccountDetailResponseDTO responseDTO = modelMapper.map(updatedAccount, AccountDetailResponseDTO.class);
+		AccountDetailResponseDTO responseDTO = accountMapper.entityToDetailDTO(updatedAccount);
 		
 		return ResponseEntity.ok(
 		    new ApiResponse<>(200, "Cập nhật account thành công", responseDTO)
