@@ -31,8 +31,6 @@ export default function CommentSection({ isOpenComment, comments, handleComment,
     const fileInputRef = useRef(null);
 
 
-
-
     useEffect(() => {
         if (showComments && containerRef.current) {
             containerRef.current.scrollTop = containerRef.current.scrollHeight;

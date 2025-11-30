@@ -6,9 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="a7719d69-0674-4558-b744-9f01872a3593" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/component/Dropdown/LabelDropdown.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/Dropdown/LabelDropdown.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/component/Section/LabelsSection.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/Section/LabelsSection.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/service/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/service/api.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/Modal/TaskDetailModal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/Modal/TaskDetailModal.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/Task/TaskItem.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/Task/TaskItem.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/TaskComment/CommentSection.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/TaskComment/CommentSection.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -101,7 +101,7 @@
       <workItem from="1764316845851" duration="7932000" />
       <workItem from="1764338753937" duration="1906000" />
       <workItem from="1764421495470" duration="2506000" />
-      <workItem from="1764489727074" duration="866000" />
+      <workItem from="1764489727074" duration="5678000" />
     </task>
     <servers />
   </component>

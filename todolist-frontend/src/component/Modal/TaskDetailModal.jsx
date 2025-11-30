@@ -13,7 +13,7 @@ export default function TaskDetailModal({
                                           openTask,
                                           onClose,
                                           task,
-                                          onUpdateStatus
+                                          onUpdateStatus,
 }) {
   const [taskDetail, setTaskDetail] = useState({});
 
@@ -156,15 +156,22 @@ export default function TaskDetailModal({
 
   useEffect(() => {
     const getDetails = async () => {
-      try{
-        const response = await https_taskflow.get(`/v1/projects/${task.idProject}/tasks/${task.id}`)
+      try {
+        const response = await https_taskflow.get(
+            `/v1/projects/${task.idProject}/tasks/${task.id}`
+        );
         setTaskDetail(response.data.data);
-      }catch (error) {
+        console.log(response.data.data);
+      } catch (error) {
         console.log(error);
       }
-    }
+    };
+
     getDetails();
-  }, [task]);
+  }, []);
+
+  console.log(taskDetail)
+
 
   return (
     <Modal
@@ -175,6 +182,7 @@ export default function TaskDetailModal({
       high={800}
       centered
       styles={{  body: {padding: 15, borderRadius: 10} }}
+      destroyOnClose
     >
       {openTask && (
         <div className="flex">
@@ -185,11 +193,12 @@ export default function TaskDetailModal({
                   checked={taskDetail.status === "COMPLETED"}
                   type="checkbox"
                   className="cursor-pointer accent-red-500 w-5 h-5 rounded-full"
-                  onChange={(e) => {
+                  onChange={async (e) => {
                     e.stopPropagation();
                     const updatedStatus = taskDetail.status !== "COMPLETED" ? "COMPLETED" : "PENDING"
-                    setTaskDetail(prev => ({ ...prev, status: updatedStatus }));
-                    onUpdateStatus(updatedStatus);
+                    if (await onUpdateStatus(updatedStatus)) {
+                      setTaskDetail(prev => ({...prev, status: updatedStatus}));
+                    }
                   }}
               />
               <h3 className="font-semibold text-gray-800 text-lg">

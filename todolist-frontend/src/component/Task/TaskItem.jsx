@@ -39,8 +39,6 @@ export default function TaskItem({
   const formatToSend = "YYYY-MM-DDTHH:mm:ss";
   const [showFormDatePicker, setShowFormDatePicker] = useState(false);
 
-
-
   // Đóng menu khi click ra ngoài
   useEffect(() => {
     const handler = (e) => {
@@ -130,8 +128,12 @@ export default function TaskItem({
         onUpdateTaskUpComing?.(updatedTask);
 
         setNewStatus(updatedTask.status);
+
+        return true;
       } else {
         setNewStatus(task.status);
+
+        return false;
       }
 
     } catch (err) {
@@ -151,13 +153,20 @@ export default function TaskItem({
       <TaskEditForm
         onSave={(data) => handleUpdateTaskAPI(data)}
         task={task}
-        onCancel={() => setIsEditing(false)}
+        onCancel={(e) => {
+          setIsEditing(false)
+        }}
       />
     );
   }
 
   return (
-    <div className="group relative flex flex-col border-b hover:bg-gray-50 transition-colors px-2 py-2 rounded-md">
+    <div className="group relative flex flex-col border-b hover:bg-gray-50 transition-colors px-2 py-2 rounded-md"
+         onClick={(e) => {
+           e.stopPropagation();
+           setIsOpenComment(false)
+           setOpenTaskDetailModal(true)
+         }}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <GripVertical size={16} className="text-gray-400 cursor-grab" />
@@ -181,7 +190,10 @@ export default function TaskItem({
         <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
           <button
             className="p-1 hover:text-gray-900 text-gray-500"
-            onClick={() => setIsEditing(true)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsEditing(true)
+            }}
           >
             <Edit2 size={14} />
           </button>
@@ -265,7 +277,7 @@ export default function TaskItem({
         </div>
       )}
 
-      <TaskDetailModal
+      {openTaskDetailModal && <TaskDetailModal
           isOpenComment={isOpenComment}
           openTask={openTaskDetailModal}       // boolean
           task={task}                      // dữ liệu task
@@ -275,7 +287,7 @@ export default function TaskItem({
             setIsOpenComment(false)
           }}   // hàm đóng
           onUpdateStatus={handleUpdateStatus}
-      />
+      />}
     </div>
 
 
