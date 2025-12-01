@@ -56,13 +56,13 @@ public class TaskServiceImpl implements TaskService {
             throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Task không tồn tại hoặc đã bị xóa");
         }
 
-        return taskMapper.ResponseDetailDTO(task);
+        return taskMapper.toDetailResponse(task);
     }
 
     @Override
     public List<TaskResponseDTO> getTaskUpComing(Account account) {
         System.err.println(todayStart);
-        return taskMapper.ResponseDTOList(taskRepository.findByTaskUpComingByAccount(todayStart, account.getId()));
+        return taskMapper.toResponseList(taskRepository.findByTaskUpComingByAccount(todayStart, account.getId()));
     }
 
     @Override
@@ -176,7 +176,7 @@ public class TaskServiceImpl implements TaskService {
             }
         }
 
-        return taskMapper.ResponseDTO(task);
+        return taskMapper.toResponse(task);
     }
 
     @Override
@@ -189,7 +189,7 @@ public class TaskServiceImpl implements TaskService {
 
         task = taskRepository.save(task);
 
-        return taskMapper.ResponseDTO(task);
+        return taskMapper.toResponse(task);
     }
 
     @Override
@@ -223,7 +223,7 @@ public class TaskServiceImpl implements TaskService {
 
         task = taskRepository.save(task);
 
-        return taskMapper.ResponseDTO(task);
+        return taskMapper.toResponse(task);
     }
 
     @Override
@@ -298,7 +298,7 @@ public class TaskServiceImpl implements TaskService {
 
         task = taskRepository.save(task);
 
-        return taskMapper.ResponseDTO(task);
+        return taskMapper.toResponse(task);
     }
 
     @Override
@@ -337,7 +337,7 @@ public class TaskServiceImpl implements TaskService {
         notificationUtils.sendNotification(task, task.getSection().getProject(), null, notificationUtils.getReceiversForTask(task), NotificationType.TASK_ASSIGNED);
 
 
-        return taskMapper.ResponseDTO(task);
+        return taskMapper.toResponse(task);
     }
 
     @Override
@@ -353,7 +353,7 @@ public class TaskServiceImpl implements TaskService {
 
         task = taskRepository.save(task);
 
-        return taskMapper.ResponseDTO(task);
+        return taskMapper.toResponse(task);
     }
 
     @Override
@@ -367,7 +367,7 @@ public class TaskServiceImpl implements TaskService {
         task = taskRepository.save(task);
 
 
-        return taskMapper.ResponseDTO(task);
+        return taskMapper.toResponse(task);
     }
 
     @Override
@@ -443,7 +443,7 @@ public class TaskServiceImpl implements TaskService {
         }
 
 
-        return taskMapper.ResponseDTO(task);
+        return taskMapper.toResponse(task);
     }
 
     @Override
@@ -464,7 +464,7 @@ public class TaskServiceImpl implements TaskService {
 
         task = taskRepository.save(task);
 
-        return taskMapper.ResponseDTO(task);
+        return taskMapper.toResponse(task);
     }
 
     @Override
@@ -492,7 +492,7 @@ public class TaskServiceImpl implements TaskService {
         }
 
 
-        return taskMapper.ResponseDTO(task);
+        return taskMapper.toResponse(task);
     }
 
     @Override
@@ -530,7 +530,7 @@ public class TaskServiceImpl implements TaskService {
         }
 
 
-        return taskMapper.ResponseDTO(task);
+        return taskMapper.toResponse(task);
     }
 
 
@@ -627,8 +627,6 @@ public class TaskServiceImpl implements TaskService {
             }
         }
     }
-    
-    
 
 
 }

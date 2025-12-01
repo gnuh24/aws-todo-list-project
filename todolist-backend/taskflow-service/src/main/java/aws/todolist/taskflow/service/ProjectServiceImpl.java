@@ -56,7 +56,7 @@ public class ProjectServiceImpl implements ProjectService {
     public List<ProjectResponseDTO> getAllProject(String accountID) {
         List<Project> projects = projectRepository.findAllByAccountId(accountID);
 
-        return projectMapper.ResponseDTOList(projects);
+        return projectMapper.toResponseList(projects);
 
     }
 
@@ -73,7 +73,7 @@ public class ProjectServiceImpl implements ProjectService {
             throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Dự án không tồn tại hoặc đã bị xóa.");
         }
 
-        return projectMapper.ResponseDTODetail(project);
+        return projectMapper.toDetailResponse(project);
     }
 
 
@@ -110,7 +110,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         saved.getSections().add(section);
 
-        return projectMapper.ResponseDTO(saved);
+        return projectMapper.toResponse(saved);
     }
 
     @Transactional
@@ -137,7 +137,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         Project saved = projectRepository.saveAndFlush(project);
 
-        return projectMapper.ResponseDTO(saved);
+        return projectMapper.toResponse(saved);
     }
 
     @Transactional
@@ -200,7 +200,7 @@ public class ProjectServiceImpl implements ProjectService {
         );
 
         notificationUtils.sendNotification(null, project, accountLogging, notificationUtils.getReceiversForProject(project.getMembers()), NotificationType.PROJECT_DELETED);
-        return projectMapper.ResponseDTO(saved);
+        return projectMapper.toResponse(saved);
     }
 
 //    @Transactional

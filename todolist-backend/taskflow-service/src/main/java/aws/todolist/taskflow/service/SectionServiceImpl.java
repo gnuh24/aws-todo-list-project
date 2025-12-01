@@ -43,7 +43,7 @@ public class SectionServiceImpl implements SectionService {
 
         List<Section> sections = sectionRepository.findByProjectIdAndIsDeletedFalseOrderByPositionAsc(idProject);
 
-        return sectionMapper.ResponseDTOList(sections);
+        return sectionMapper.toResponseList(sections);
     }
 
     @Override
@@ -66,7 +66,7 @@ public class SectionServiceImpl implements SectionService {
 
         Section saved_section = sectionRepository.saveAndFlush(section);
 
-        return sectionMapper.ResponseDTO(saved_section);
+        return sectionMapper.toResponse(saved_section);
     }
 
     @Override
@@ -90,7 +90,7 @@ public class SectionServiceImpl implements SectionService {
 
         Section saved = sectionRepository.saveAndFlush(section);
 
-        return sectionMapper.ResponseDTO(saved);
+        return sectionMapper.toResponse(saved);
     }
 
     @Override
@@ -105,7 +105,7 @@ public class SectionServiceImpl implements SectionService {
 
         Section saved = sectionRepository.saveAndFlush(section);
 
-        return sectionMapper.ResponseDTO(saved);
+        return sectionMapper.toResponse(saved);
     }
 
     @Override
@@ -140,7 +140,7 @@ public class SectionServiceImpl implements SectionService {
 
         Section saved = sectionRepository.save(section);
 
-        return sectionMapper.ResponseDTO(saved);
+        return sectionMapper.toResponse(saved);
     }
 
     @Override
@@ -195,6 +195,6 @@ public class SectionServiceImpl implements SectionService {
 
         Section saved = sectionRepository.saveAndFlush(sectionSource);
 
-        return sectionMapper.ResponseDTO(saved);
+        return sectionMapper.toResponse(saved);
     }
 }

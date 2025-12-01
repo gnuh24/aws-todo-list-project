@@ -2,50 +2,41 @@ package aws.todolist.taskflow.mapper;
 
 import aws.todolist.taskflow.dto.section.SectionResponseDTO;
 import aws.todolist.taskflow.entity.Section;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-@Component
-public class SectionMapper {
+@Mapper(componentModel = "spring", uses = TaskMapper.class)
+public interface SectionMapper {
 
-    @Autowired
-    private TaskMapper taskMapper;
+    // Map Section → SectionResponseDTO full (có tasks)
+    @Mapping(target = "tasks", source = "tasks")
+    SectionResponseDTO toResponse(Section section);
 
-    public SectionResponseDTO ResponseDTO(Section section) {
-        return SectionResponseDTO.builder()
-                .id(section.getId())
-                .name(section.getName())
-                .isArchived(section.getIsArchived())
-                .position(section.getPosition())
-                .createdAt(section.getCreatedAt())
-                .updatedAt(section.getUpdatedAt())
-                .tasks(taskMapper.ResponseDTOList(section.getTasks()))
-                .build();
-    }
+    // Map Section → SectionResponseDTO chỉ id + name + position
+    @Mapping(target = "tasks", ignore = true)
+    SectionResponseDTO toResponseNameAndId(Section section);
 
-    public SectionResponseDTO ResponseDTONameAndId(Section section) {
-        return SectionResponseDTO.builder()
-                .id(section.getId())
-                .name(section.getName())
-                .position(section.getPosition())
-                .createdAt(section.getCreatedAt())
-                .updatedAt(section.getUpdatedAt())
-                .build();
-    }
-
-    public List<SectionResponseDTO> ResponseDTOList(List<Section> sections) {
+    // Map list Section → list SectionResponseDTO full, filter isDeleted
+    @Named("full")
+    default List<SectionResponseDTO> toResponseList(List<Section> sections) {
+        if (sections == null || sections.isEmpty()) return List.of();
         return sections.stream()
-                .filter(section -> !section.getIsDeleted())
-                .map(this::ResponseDTO)
-                .toList();
+                .filter(section -> section.getIsDeleted() == null || !section.getIsDeleted())
+                .map(this::toResponse)
+                .collect(Collectors.toList());
     }
 
-    public List<SectionResponseDTO> ResponseDTONameAndIdList(List<Section> sections) {
+    // Map list Section → list SectionResponseDTO (name + id only), filter isDeleted
+    @Named("nameAndId")
+    default List<SectionResponseDTO> toResponseNameAndIdList(List<Section> sections) {
+        if (sections == null || sections.isEmpty()) return List.of();
         return sections.stream()
-                .filter(section -> !section.getIsDeleted())
-                .map(this::ResponseDTONameAndId)
-                .toList();
+                .filter(section -> section.getIsDeleted() == null || !section.getIsDeleted())
+                .map(this::toResponseNameAndId)
+                .collect(Collectors.toList());
     }
 }

@@ -3,46 +3,22 @@ package aws.todolist.taskflow.mapper;
 import aws.todolist.taskflow.dto.project.ProjectDetailResponseDTO;
 import aws.todolist.taskflow.dto.project.ProjectResponseDTO;
 import aws.todolist.taskflow.entity.Project;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import java.util.List;
 
-@Component
-public class ProjectMapper {
+@Mapper(componentModel = "spring", uses = SectionMapper.class)
+public interface ProjectMapper {
 
-    @Autowired
-    private SectionMapper sectionMapper;
+    // Map Project → ProjectResponseDTO (chỉ id+name+section list name/id)
+    @Mapping(target = "section", source = "sections", qualifiedByName = "nameAndId")
+    ProjectResponseDTO toResponse(Project project);
 
-    public ProjectResponseDTO ResponseDTO(Project project) {
-        return ProjectResponseDTO.builder()
-                .id(project.getId())
-                .name(project.getName())
-                .isArchived(project.getIsArchived())
-                .createdAt(project.getCreatedAt())
-                .updatedAt(project.getUpdatedAt())
-                .isDefault(project.getIsDefault())
-                .section(sectionMapper.ResponseDTONameAndIdList(project.getSections()))
-                .build();
-    }
+    // Map list Project → list ProjectResponseDTO
+    List<ProjectResponseDTO> toResponseList(List<Project> projects);
 
-    public List<ProjectResponseDTO> ResponseDTOList(List<Project> projects) {
-        return projects.stream()
-                .map(this::ResponseDTO)
-                .toList();
-    }
-
-    public ProjectDetailResponseDTO ResponseDTODetail(Project project) {
-        return ProjectDetailResponseDTO.builder()
-                .id(project.getId())
-                .name(project.getName())
-                .isArchived(project.getIsArchived())
-                .createdAt(project.getCreatedAt())
-                .updatedAt(project.getUpdatedAt())
-                .isDefault(project.getIsDefault())
-                .sections(sectionMapper.ResponseDTOList(project.getSections()))
-                .build();
-
-    }
-
+    // Map Project → ProjectDetailResponseDTO (full, sections full)
+    @Mapping(target = "sections", source = "sections", qualifiedByName = "full")
+    ProjectDetailResponseDTO toDetailResponse(Project project);
 }

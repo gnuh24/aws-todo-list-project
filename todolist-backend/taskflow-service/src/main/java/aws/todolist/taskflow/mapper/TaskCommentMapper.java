@@ -2,43 +2,41 @@ package aws.todolist.taskflow.mapper;
 
 import aws.todolist.taskflow.dto.taskComment.TaskCommentResponseDTO;
 import aws.todolist.taskflow.entity.TaskComment;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.mapstruct.AfterMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.factory.Mappers;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-@Component
-public class TaskCommentMapper {
+@Mapper(componentModel = "spring", uses = CommentAttachMapper.class)
+public interface TaskCommentMapper {
 
-    @Autowired
-    private CommentAttachMapper mapper;
 
-    public TaskCommentResponseDTO toResponse(TaskComment comment) {
-        if (comment == null) return null;
+    // Map entity → DTO, nested mapping
+    @Mapping(target = "taskId", source = "task.id")
+    @Mapping(target = "accountId", source = "account.id")
+    @Mapping(target = "authorName", source = "account.displayName")
+    @Mapping(target = "authorAvatar", source = "account.avatar")
+    TaskCommentResponseDTO toResponse(TaskComment comment);
 
-        return TaskCommentResponseDTO.builder()
-                .id(comment.getId())
-                .taskId(comment.getTask().getId())
-                .accountId(comment.getAccount().getId())
-                .authorName(comment.getAccount().getDisplayName())
-                .authorAvatar(comment.getAccount().getAvatar())
-                .comment(comment.getComment())
-                .createdAt(comment.getCreatedAt())
-                .updatedAt(comment.getUpdatedAt())
-                .commentAttach(mapper.toResponseList(comment.getCommentAttaches()))
-                .build();
+    // Sau khi mapping, lọc comment bị xóa và map commentAttach
+    @AfterMapping
+    default void handleAfterMapping(TaskComment comment, @MappingTarget TaskCommentResponseDTO dto) {
+        if (comment.getCommentAttaches() != null) {
+            CommentAttachMapper mapper = Mappers.getMapper(CommentAttachMapper.class);
+            dto.setCommentAttach(mapper.toResponseList(comment.getCommentAttaches()));
+        }
     }
 
-    /**
-     * Chuyển danh sách TaskComment entity sang danh sách DTO
-     */
-    public List<TaskCommentResponseDTO> toResponseList(List<TaskComment> comments) {
+    // Nếu muốn lọc comment bị xóa khi map list
+    default List<TaskCommentResponseDTO> toResponseListFiltered(List<TaskComment> comments) {
         if (comments == null || comments.isEmpty()) return List.of();
-
         return comments.stream()
-                .filter(taskComment -> !taskComment.getIsDeleted())
+                .filter(tc -> tc.getIsDeleted() == null || !tc.getIsDeleted())
                 .map(this::toResponse)
-                .toList();
+                .collect(Collectors.toList());
     }
-
 }

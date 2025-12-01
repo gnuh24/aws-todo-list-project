@@ -3,81 +3,60 @@ package aws.todolist.taskflow.mapper;
 import aws.todolist.taskflow.dto.task.TaskDetailResponseDTO;
 import aws.todolist.taskflow.dto.task.TaskResponseDTO;
 import aws.todolist.taskflow.entity.Task;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.mapstruct.*;
+import org.mapstruct.factory.Mappers;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-@Component
-public class TaskMapper {
+@Mapper(componentModel = "spring")
+public interface TaskMapper {
 
-    @Autowired
-    private TaskCommentMapper taskCommentMapper;
+    // Map Task → TaskResponseDTO (task cha)
+    @Mapping(target = "idTaskCha", source = "taskFather.id")
+    @Mapping(target = "idAccountCreate", source = "createdByAccount.id")
+    @Mapping(target = "idAccountAssigned", source = "accountAssign.id")
+    @Mapping(target = "idSection", source = "section.id")
+    @Mapping(target = "idProject", source = "section.project.id")
+    TaskResponseDTO toResponse(Task task);
 
-    @Autowired
-    private TaskLabelMapper taskLabelMapper;
-
-    public TaskResponseDTO ResponseDTO(Task task) {
-        return TaskResponseDTO.builder()
-                .id(task.getId())
-                .title(task.getTitle())
-                .description(task.getDescription())
-                .isPinned(task.getIsPinned())
-                .status(task.getStatus())
-                .priority(task.getPriority())
-                .deadline(task.getDeadline())
-                .startTime(task.getStartTime())
-                .createdAt(task.getCreatedAt())
-                .updatedAt(task.getUpdatedAt())
-                .idTaskCha(task.getTaskFather() != null ? task.getTaskFather().getId() : null)
-                .idAccountCreate(task.getCreatedByAccount().getId())
-                .idAccountAssigned(task.getAccountAssign() != null ? task.getAccountAssign().getId() : null)
-                .idSection(task.getSection().getId())
-                .idProject(task.getSection().getProject().getId())
-                .build();
-    }
-
-    public TaskDetailResponseDTO ResponseDetailDTO(Task task) {
-        if (task == null) return null;
-
-        return TaskDetailResponseDTO.builder()
-                .id(task.getId())
-                .title(task.getTitle())
-                .description(task.getDescription())
-                .isArchived(task.getIsArchived())
-                .isPinned(task.getIsPinned())
-                .status(task.getStatus())
-                .priority(task.getPriority())
-                .deadline(task.getDeadline())
-                .startTime(task.getStartTime())
-                .completedAt(task.getCompletedAt())
-                .createdAt(task.getCreatedAt())
-                .updatedAt(task.getUpdatedAt())
-                .taskChild(this.ResponseDTOListTaskChild(task.getTaskChild()))
-                .comments(taskCommentMapper.toResponseList(task.getTaskComments()))
-                .idAccountAssigned(task.getAccountAssign() != null ? task.getAccountAssign().getId() : null)
-                .idAccountCreate(task.getCreatedByAccount().getId())
-                .idSection(task.getSection().getId())
-                .idProject(task.getSection().getProject().getId())
-                .labels(taskLabelMapper.toResponseList(task.getTaskLabels()))
-                .build();
-    }
-
-    public List<TaskResponseDTO> ResponseDTOList(List<Task> tasks) {
+    // Map list Task → list TaskResponseDTO (task cha, filter isDeleted + null taskFather)
+    default List<TaskResponseDTO> toResponseList(List<Task> tasks) {
+        if (tasks == null || tasks.isEmpty()) return List.of();
         return tasks.stream()
-                .filter(task ->
-                        !task.getIsDeleted() && task.getTaskFather() == null
-                )
-                .map(this::ResponseDTO)
-                .toList();
+                .filter(task -> !task.getIsDeleted() && task.getTaskFather() == null)
+                .map(this::toResponse)
+                .collect(Collectors.toList());
     }
 
-
-    // Chuyển danh sách task con thành danh sách DTO
-    public List<TaskResponseDTO> ResponseDTOListTaskChild(List<Task> tasks) {
+    // Map list Task con → list TaskResponseDTO (taskChild)
+    @Named("taskChildList")
+    default List<TaskResponseDTO> toResponseListTaskChild(List<Task> tasks) {
+        if (tasks == null || tasks.isEmpty()) return List.of();
         return tasks.stream()
                 .filter(task -> !task.getIsDeleted())
-                .map(this::ResponseDTO)
-                .toList();
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    // Map Task → TaskDetailResponseDTO
+    @Mapping(target = "taskChild", source = "taskChild", qualifiedByName = "taskChildList")
+    @Mapping(target = "idAccountAssigned", source = "accountAssign.id")
+    @Mapping(target = "idAccountCreate", source = "createdByAccount.id")
+    @Mapping(target = "idSection", source = "section.id")
+    @Mapping(target = "idProject", source = "section.project.id")
+    TaskDetailResponseDTO toDetailResponse(Task task);
+
+    // Sau khi mapping, lọc comment bị xóa và map commentAttach
+    @AfterMapping
+    default void handleAfterMapping(Task task, @MappingTarget TaskDetailResponseDTO dto) {
+        if (task.getTaskComments() != null) {
+            TaskCommentMapper taskCommentMapper = Mappers.getMapper(TaskCommentMapper.class);
+            dto.setComments(taskCommentMapper.toResponseListFiltered(task.getTaskComments()));
+        }
+        if (task.getTaskLabels() != null) {
+            TaskLabelMapper taskLabelMapper = Mappers.getMapper(TaskLabelMapper.class);
+            dto.setLabels(taskLabelMapper.toResponseList(task.getTaskLabels()));
+        }
     }
 }

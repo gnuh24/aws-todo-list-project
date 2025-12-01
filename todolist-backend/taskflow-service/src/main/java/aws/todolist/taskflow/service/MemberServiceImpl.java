@@ -53,7 +53,7 @@ public class MemberServiceImpl implements MemberService {
     public List<MemberResponseDTO> getAllMember(String idProject) {
         List<Member> members = memberRepository.findAllByProjectId(idProject);
 
-        return memberMapper.ResponseDTOList(members);
+        return memberMapper.toResponseList(members);
     }
 
     @Transactional
@@ -107,7 +107,7 @@ public class MemberServiceImpl implements MemberService {
 
         // =============================
 
-        return memberMapper.ResponseDTO(member_saved);
+        return memberMapper.toResponse(member_saved);
     }
 
     @Override
@@ -150,7 +150,7 @@ public class MemberServiceImpl implements MemberService {
         notificationUtils.sendNotification(null, member_saved.getProject(), null, notificationUtils.getReceiversForMemberUpdate(member_saved), NotificationType.PROJECT_MEMBER_ROLE_UPDATED);
 
 
-        return memberMapper.ResponseDTO(member_saved);
+        return memberMapper.toResponse(member_saved);
     }
 
     @Override
@@ -180,7 +180,7 @@ public class MemberServiceImpl implements MemberService {
 
         redisTemplate.delete(key);
 
-        return memberMapper.ResponseDTO(member_saved);
+        return memberMapper.toResponse(member_saved);
     }
 
     @Override
@@ -236,7 +236,7 @@ public class MemberServiceImpl implements MemberService {
 
         }
 
-        return memberMapper.ResponseDTO(member);
+        return memberMapper.toResponse(member);
     }
 
 }
