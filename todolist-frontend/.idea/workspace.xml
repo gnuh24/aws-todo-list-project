@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="a7719d69-0674-4558-b744-9f01872a3593" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../todolist-backend/api-gateway/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/api-gateway/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/interceptor/AuthChannelInterceptor.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/interceptor/AuthChannelInterceptor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/repository/NotificationRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/repository/NotificationRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../todolist-backend/taskflow-service/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/taskflow-service/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../todolist-backend/taskflow-service/src/main/java/aws/todolist/taskflow/utils/NotificationUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/taskflow-service/src/main/java/aws/todolist/taskflow/utils/NotificationUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/Header/ActivityHeader.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/Header/ActivityHeader.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/Modal/AddFilterModal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/Modal/AddFilterModal.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/Modal/InlineAddTaskFormUpComing.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/Modal/InlineAddTaskFormUpComing.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/Modal/TaskDetailModal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/Modal/TaskDetailModal.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/Spinner/SpinnerForSettings.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/Spinner/SpinnerForSettings.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/Task/TaskItem.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/Task/TaskItem.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/TaskComment/CommentSection.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/TaskComment/CommentSection.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/AppPage/CompletedPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/AppPage/CompletedPage.jsx" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="35HNE6AgFBuMZnuTwpPpedWDtuC" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="false" />
+    <option name="showLibraryContents" value="true" />
+    <option name="showModules" value="false" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;developer&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Study_In_University/nam3/HocKy2/XayDungPhanMemTheoMoHinhPhanLop/DoAn/QLThanhVienPro3&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.start.executor&quot;: &quot;Run&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;D:\\App_In_This\\set_up\\WebStorm 2025.1.1\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RunManager">
+    <configuration name="start" type="js.build_tools.npm" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="start" />
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-6a121458b545-JavaScript-WS-251.25410.117" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="a7719d69-0674-4558-b744-9f01872a3593" name="Changes" comment="" />
+      <created>1762762923369</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1762762923369</updated>
+      <workItem from="1762762925691" duration="33000" />
+      <workItem from="1762763022111" duration="6252000" />
+      <workItem from="1762779728227" duration="3401000" />
+      <workItem from="1762825985779" duration="5596000" />
+      <workItem from="1762843633634" duration="10684000" />
+      <workItem from="1762912051726" duration="9941000" />
+      <workItem from="1762933777809" duration="4646000" />
+      <workItem from="1762952643675" duration="2792000" />
+      <workItem from="1762999253188" duration="9162000" />
+      <workItem from="1763020897341" duration="527000" />
+      <workItem from="1763038943374" duration="1671000" />
+      <workItem from="1763040733604" duration="51000" />
+      <workItem from="1763477336088" duration="963000" />
+      <workItem from="1763544571937" duration="1307000" />
+      <workItem from="1763605870607" duration="3724000" />
+      <workItem from="1763625928269" duration="6647000" />
+      <workItem from="1763643913543" duration="107000" />
+      <workItem from="1763712215252" duration="4788000" />
+      <workItem from="1763730819017" duration="2279000" />
+      <workItem from="1764036239631" duration="8903000" />
+      <workItem from="1764053474185" duration="5766000" />
+      <workItem from="1764059945214" duration="547000" />
+      <workItem from="1764124169932" duration="4731000" />
+      <workItem from="1764142721464" duration="5876000" />
+      <workItem from="1764162073694" duration="2782000" />
+      <workItem from="1764208883268" duration="7213000" />
+      <workItem from="1764230957672" duration="6756000" />
+      <workItem from="1764249606532" duration="1372000" />
+      <workItem from="1764296468843" duration="7136000" />
+      <workItem from="1764316845851" duration="7932000" />
+      <workItem from="1764338753937" duration="1906000" />
+      <workItem from="1764421495470" duration="2506000" />
+      <workItem from="1764489727074" duration="6056000" />
+      <workItem from="1764508602838" duration="1774000" />
+      <workItem from="1764558405973" duration="2869000" />
+      <workItem from="1764575704790" duration="4832000" />
+      <workItem from="1764594205337" duration="3742000" />
+      <workItem from="1764640911758" duration="8611000" />
+      <workItem from="1764662219506" duration="10396000" />
+      <workItem from="1764680246263" duration="3272000" />
+      <workItem from="1764683626273" duration="162000" />
+      <workItem from="1764729897694" duration="6160000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

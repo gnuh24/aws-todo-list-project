@@ -1,17 +1,17 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  isLoading: true, // Quan trọng: KHÔNG load khi vừa vào app
+  isLoading: false,
 };
 
 const SpinnerSlice = createSlice({
   name: "spinnerslice",
   initialState,
   reducers: {
-    setLoadingOn: (state) => {
+    setLoadingOn: (state, action) => {
       state.isLoading = true;
     },
-    setLoadingOff: (state) => {
+    setLoadingOff: (state, action) => {
       state.isLoading = false;
     },
   },

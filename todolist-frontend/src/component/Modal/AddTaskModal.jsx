@@ -1,31 +1,22 @@
 import React, { useState } from "react";
-import { Modal, Input, Button, Dropdown } from "antd";
-import { CalendarOutlined, BellOutlined } from "@ant-design/icons";
-
+import { Modal, Input, Button, Dropdown, Menu } from "antd";
+import {
+  CalendarOutlined,
+  FlagOutlined,
+  BellOutlined,
+  MoreOutlined,
+  InboxOutlined,
+} from "@ant-design/icons";
 import DatePickerDropdown from "../Dropdown/DatePickerDropdown";
 import PriorityDropdown from "../Dropdown/PriorityDropdown";
 import MoreOptionsDropdown from "../Dropdown/MoreOptionsDropdown";
 import ProjectSelectDropdown from "../Dropdown/ProjectSelectDropdown";
 
-export default function AddTaskModal({
-  onSelectProjectSection,
-  open,
-  onCancel,
-  onAdd,
-}) {
+export default function AddTaskModal({ open, onCancel, onAdd }) {
   const [taskName, setTaskName] = useState("");
   const [description, setDescription] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
-
-  // -------------------------
-  // NEW: selected lưu cả object
-  // -------------------------
-  const [selectedProject, setSelectedProject] = useState({
-    projectId: null,
-    projectName: "Inbox",
-    sectionId: null,
-    sectionName: null,
-  });
+  const [selectedProject, setSelectedProject] = useState("Inbox");
 
   return (
     <Modal
@@ -68,15 +59,12 @@ export default function AddTaskModal({
               {selectedDate ? selectedDate.toString() : "Date"}
             </Button>
           </Dropdown>
-
           <PriorityDropdown
             onSelect={(p) => console.log("Priority selected:", p)}
           />
-
           <Button icon={<BellOutlined />} size="small">
             Reminders
           </Button>
-
           <MoreOptionsDropdown
             onSelect={(action) => console.log("Chọn:", action)}
           />
@@ -88,11 +76,7 @@ export default function AddTaskModal({
         <div className="flex justify-between items-center">
           <ProjectSelectDropdown
             selected={selectedProject}
-            onSelect={(data) => {
-              // data = { projectId, projectName, sectionId, sectionName }
-              setSelectedProject(data);
-              onSelectProjectSection?.(data);
-            }}
+            onSelect={(project) => setSelectedProject(project)}
           />
 
           <div className="flex gap-2">
@@ -105,16 +89,14 @@ export default function AddTaskModal({
                 onAdd({
                   title: taskName,
                   description,
-                  deadline: selectedDate,
-                  project: selectedProject,
+                  deadline: selectedDate, // ✅ đổi selectedDate → deadline
                 });
-
                 setTaskName("");
                 setDescription("");
                 setSelectedDate(null);
               }}
             >
-              Add task11111111111111
+              Add task
             </Button>
           </div>
         </div>

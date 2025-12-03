@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { toast } from "sonner";
 import { https_auth } from "../../service/api";
 import FacebookLoginButton from "../LoginPage/FacebookLoginButton";
 import GoogleLoginButton from "../LoginPage/GoogleLoginButton";
@@ -27,7 +26,7 @@ export default function FormRegister() {
         // 👉 Lưu thông tin user (nếu cần)
         localStorage.setItem("USER_REGISTER", JSON.stringify(userData));
 
-        toast.error("🎉 Đăng ký thành công! Hãy đăng nhập để tiếp tục.");
+        alert("🎉 Đăng ký thành công! Hãy đăng nhập để tiếp tục.");
         // 👉 Chuyển hướng sang trang login
         window.location.href = "/login";
       }
@@ -36,7 +35,7 @@ export default function FormRegister() {
         "❌ Register failed:",
         error.response?.data || error.message
       );
-      toast.error(error.response?.data?.message || "Đăng ký thất bại!");
+      alert(error.response?.data?.message || "Đăng ký thất bại!");
     }
   };
 
@@ -121,18 +120,18 @@ export default function FormRegister() {
           {/* Social Buttons */}
           <div className="space-y-3 mb-6">
             <GoogleLoginButton></GoogleLoginButton>
-            {/* <FacebookLoginButton
+            <FacebookLoginButton
               handleLogin={handleLogin}
-            ></FacebookLoginButton> */}
+            ></FacebookLoginButton>
 
-            {/* <button className="w-full flex items-center justify-center border rounded-md py-2 hover:bg-gray-50">
+            <button className="w-full flex items-center justify-center border rounded-md py-2 hover:bg-gray-50">
               <img
                 src="https://www.svgrepo.com/show/448233/apple.svg"
                 alt="Apple"
                 className="h-5 w-5 mr-2"
               />
               Continue with Apple
-            </button> */}
+            </button>
           </div>
 
           {/* Email + Password */}

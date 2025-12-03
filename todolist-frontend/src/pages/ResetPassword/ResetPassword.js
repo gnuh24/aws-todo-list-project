@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { toast } from "sonner";
 import { https_auth } from "../../service/api";
 export default function ResetPassword() {
   const [password, setPassword] = useState("");
@@ -17,7 +16,7 @@ export default function ResetPassword() {
 
     // Kiểm tra lại password khớp
     if (password !== confirmPassword) {
-      toast.error("Passwords do not match!");
+      alert("Passwords do not match!");
       return;
     }
 
@@ -34,13 +33,13 @@ export default function ResetPassword() {
       // Kiểm tra phản hồi
       if (response.status === 200) {
         console.log(" Reset password success:", response.data);
-        toast.error("Đặt lại mật khẩu thành công!");
+        alert("Đặt lại mật khẩu thành công!");
         localStorage.removeItem("USER_VERIFY"); // Xoá dữ liệu sau khi xong
         window.location.href = "/login"; // Chuyển hướng về trang đăng nhập
       }
     } catch (error) {
       console.error(" Reset password failed:", error.response?.data || error);
-      toast.error(
+      alert(
         error.response?.data?.message ||
           "Đặt lại mật khẩu thất bại, vui lòng thử lại!"
       );

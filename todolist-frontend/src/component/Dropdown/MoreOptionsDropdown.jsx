@@ -6,12 +6,17 @@ import {
   EnvironmentOutlined,
   ClockCircleOutlined,
   ApiOutlined,
+  CalendarOutlined
 } from "@ant-design/icons";
+import DatePickerDropdown from "./DatePickerDropdown";
 
-export default function MoreOptionsDropdown({ onSelect }) {
+export default function MoreOptionsDropdown({ setSelectedDateline, onSelect }) {
+
+    const [openDatelineTab, setOpenDatelineTab] = React.useState(false);
+
   const menu = (
     <Menu
-      className="rounded-xl shadow-lg p-1 w-44"
+      className="rounded-xl shadow-lg p-2 w-44 bg-white border border-gray-200"
       items={[
         {
           key: "labels",
@@ -40,11 +45,14 @@ export default function MoreOptionsDropdown({ onSelect }) {
           key: "deadline",
           label: (
             <div className="flex items-center gap-2 px-2 py-1 rounded-md hover:bg-gray-100 cursor-pointer">
-              <ClockCircleOutlined className="text-orange-500" />
-              Deadline
+                <ClockCircleOutlined className="text-orange-500" />
+                Deadline
             </div>
           ),
-          onClick: () => onSelect?.("deadline"),
+          onClick: () => {
+              onSelect?.("deadline")
+              setOpenDatelineTab(true);
+          },
         },
         { type: "divider" },
         {
@@ -74,8 +82,29 @@ export default function MoreOptionsDropdown({ onSelect }) {
   );
 
   return (
-    <Dropdown overlay={menu} trigger={["click"]} placement="bottomRight">
-      <Button icon={<MoreOutlined />} size="small" className="border-none" />
-    </Dropdown>
+      <>
+          <Dropdown overlay={menu} trigger={["click"]} placement="bottomRight">
+              <Button icon={<MoreOutlined />} size="small" className="border-none" />
+          </Dropdown>
+
+          <Dropdown
+              trigger={["click"]}
+              open={openDatelineTab}
+              onOpenChange={setOpenDatelineTab}
+              dropdownRender={() => (
+                  <DatePickerDropdown
+                      onSelect={(val) => {
+                          console.log(val);
+                          setSelectedDateline(val);
+                          setOpenDatelineTab(false); // tắt dropdown sau khi chọn
+                      }}
+                      showForm={openDatelineTab}
+                  />
+              )}
+          >
+          </Dropdown>
+
+      </>
+
   );
 }

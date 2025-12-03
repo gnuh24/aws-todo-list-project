@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { ClimbingBoxLoader } from "react-spinners";
+import { PacmanLoader } from "react-spinners";
 import { setLoadingOn, setLoadingOff } from "../../redux/SpinnerSlice";
 
 export default function Spinner() {
@@ -11,7 +11,7 @@ export default function Spinner() {
     dispatch(setLoadingOn());
     const timer = setTimeout(() => {
       dispatch(setLoadingOff());
-    }, 1500);
+    }, 150); // 2s
 
     return () => clearTimeout(timer);
   }, [dispatch]);
@@ -21,20 +21,17 @@ export default function Spinner() {
       style={{
         width: "100vw",
         height: "100vh",
-        background: "white", // TODOIST STYLE
+        background: "black",
         position: "fixed",
-        inset: 0,
-        zIndex: 2000,
+        top: 0,
+        left: 0,
+        zIndex: 2,
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
       }}
     >
-      <ClimbingBoxLoader
-        size={22} // nhỏ gọn tinh tế như Todoist
-        color="#e44232" // màu đỏ Todoist
-        speedMultiplier={1.4} // nhẹ nhàng không quá nhanh
-      />
+      <PacmanLoader size={150} color="#fca311" speedMultiplier={3} />
     </div>
   ) : null;
 }

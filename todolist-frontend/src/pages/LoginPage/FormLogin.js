@@ -7,7 +7,6 @@ import axios from "axios";
 import FacebookLoginButton from "./FacebookLoginButton";
 import GoogleLoginButton from "./GoogleLoginButton";
 import { https_auth } from "../../service/api";
-import { toast } from "sonner";
 export default function FormLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -28,42 +27,42 @@ export default function FormLogin() {
 
         localStorage.setItem("USER_INFO", JSON.stringify(userData));
 
-        toast.error("Đăng nhập thành công!");
+        alert("Đăng nhập thành công!");
 
         window.location.href = "/app/inbox";
       }
     } catch (error) {
       console.error("❌ Login failed:", error.response?.data || error.message);
-      toast.error(error.response?.data?.message || "Login failed!");
+      alert(error.response?.data?.message || "Login failed!");
     }
   };
 
-  // const handleLogin = () => {
-  //   window.FB.login(
-  //     (response) => {
-  //       if (response.authResponse) {
-  //         console.log("✅ Logged in:", response);
+  const handleLogin = () => {
+    window.FB.login(
+      (response) => {
+        if (response.authResponse) {
+          console.log("✅ Logged in:", response);
 
-  //         // Gọi API Graph để lấy thông tin user
-  //         window.FB.api(
-  //           "/me",
-  //           { fields: "name,email,picture" },
-  //           function (userInfo) {
-  //             console.log("👤 User info:", userInfo);
-  //             // bạn có thể destructure ra
-  //             const { name, email, picture } = userInfo;
-  //             console.log("Name:", name);
-  //             console.log("Email:", email);
-  //             console.log("Avatar URL:", picture?.data?.url);
-  //           }
-  //         );
-  //       } else {
-  //         console.log("❌ Login failed or cancelled");
-  //       }
-  //     },
-  //     { scope: "public_profile,email" } // cần 'email' để lấy email
-  //   );
-  // };
+          // Gọi API Graph để lấy thông tin user
+          window.FB.api(
+            "/me",
+            { fields: "name,email,picture" },
+            function (userInfo) {
+              console.log("👤 User info:", userInfo);
+              // bạn có thể destructure ra
+              const { name, email, picture } = userInfo;
+              console.log("Name:", name);
+              console.log("Email:", email);
+              console.log("Avatar URL:", picture?.data?.url);
+            }
+          );
+        } else {
+          console.log("❌ Login failed or cancelled");
+        }
+      },
+      { scope: "public_profile,email" } // cần 'email' để lấy email
+    );
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white">
@@ -126,7 +125,7 @@ export default function FormLogin() {
               Continue with Google
             </button> */}
             <GoogleLoginButton></GoogleLoginButton>
-            {/* <FacebookLoginButton
+            <FacebookLoginButton
               handleLogin={handleLogin}
             ></FacebookLoginButton>
 
@@ -137,7 +136,7 @@ export default function FormLogin() {
                 className="h-5 w-5 mr-2"
               />
               Continue with Apple
-            </button> */}
+            </button>
           </div>
 
           {/* Email + Password */}
