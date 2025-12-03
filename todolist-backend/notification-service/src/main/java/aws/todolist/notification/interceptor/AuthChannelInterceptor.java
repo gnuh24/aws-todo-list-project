@@ -28,8 +28,6 @@ public class AuthChannelInterceptor implements ChannelInterceptor {
 			
 			String token = accessor.getFirstNativeHeader("Authorization");
 
-			System.err.println("Kien_"+token);
-
 			if (token == null || !token.startsWith("Bearer ")) {
 				System.err.println("Không tìm thấy token");
 				throw new MessagingException("Không tìm thấy token");

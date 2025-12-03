@@ -7,6 +7,7 @@ import PriorityDropdown from "../Dropdown/PriorityDropdown";
 import MoreOptionsDropdown from "../Dropdown/MoreOptionsDropdown";
 import ProjectSelectDropdown from "../Dropdown/ProjectSelectDropdown";
 import {https_taskflow} from "../../service/api";
+import {toast} from "sonner";
 
 export default function InlineAddTaskFormUpComing({ initialDate, onCancel, onAdd }) {
   const [taskName, setTaskName] = useState("");
@@ -33,7 +34,7 @@ export default function InlineAddTaskFormUpComing({ initialDate, onCancel, onAdd
         if (!taskName.trim()) return;
 
         if (selectedSection.id === undefined) {
-            alert("Vui lòng chọn project / section");
+            toast.info("Vui lòng chọn project / section");
             return;
         }
 
@@ -54,7 +55,7 @@ export default function InlineAddTaskFormUpComing({ initialDate, onCancel, onAdd
             if (response.status === 200) {
                 onAdd(response.data.data);
                 resetForm();
-                alert("Thêm thành công")
+                toast.success("Thêm thành công")
             }
         } catch (err) {
             console.error("Add task failed", err);
@@ -62,9 +63,9 @@ export default function InlineAddTaskFormUpComing({ initialDate, onCancel, onAdd
             // Kiểm tra xem server có trả lỗi dạng JSON không
             if (err.response && err.response.data) {
                 const msg = err.response.data.message || err.response.data.detailMessage || "Đã xảy ra lỗi không xác định";
-                alert(msg);
+                toast.error(msg);
             } else {
-                alert("Không thể kết nối đến server. Vui lòng thử lại.");
+                toast.info("Không thể kết nối đến server. Vui lòng thử lại.");
             }
         }
     };

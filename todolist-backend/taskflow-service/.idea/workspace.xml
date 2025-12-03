@@ -5,25 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="aafb8b93-6ddf-44d9-bc7c-02d1e2b5b281" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../api-gateway/src/main/java/aws/todolist/api_gateway/config/JwtGatewayFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/../api-gateway/src/main/java/aws/todolist/api_gateway/config/JwtGatewayFilter.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../api-gateway/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../api-gateway/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../notification-service/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../notification-service/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../notification-service/src/main/java/aws/todolist/notification/interceptor/AuthChannelInterceptor.java" beforeDir="false" afterPath="$PROJECT_DIR$/../notification-service/src/main/java/aws/todolist/notification/interceptor/AuthChannelInterceptor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../notification-service/src/main/java/aws/todolist/notification/repository/NotificationRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../notification-service/src/main/java/aws/todolist/notification/repository/NotificationRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/mapper/CommentAttachMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/mapper/CommentAttachMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/mapper/MemberMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/mapper/MemberMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/mapper/ProjectMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/mapper/ProjectMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/mapper/SectionMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/mapper/SectionMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/mapper/TaskCommentMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/mapper/TaskCommentMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/mapper/TaskLabelMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/mapper/TaskLabelMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/mapper/TaskMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/mapper/TaskMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/MemberServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/MemberServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/ProjectServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/ProjectServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/SectionServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/SectionServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/TaskServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/TaskServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/utils/NotificationUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/utils/NotificationUtils.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../todolist-frontend/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/component/Header/ActivityHeader.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/component/Header/ActivityHeader.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/component/Settings/NotificationsSetting.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/component/Settings/NotificationsSetting.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/component/Modal/TaskDetailModal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/component/Modal/TaskDetailModal.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/component/Spinner/SpinnerForSettings.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/component/Spinner/SpinnerForSettings.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/component/Task/TaskItem.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/component/Task/TaskItem.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/pages/AppPage/CompletedPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/pages/AppPage/CompletedPage.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { X, Info } from "lucide-react";
 import FilterAssistModal from "./FilterAssistModal";
+import {toast} from "sonner";
 
 export default function AddFilterModal({ onClose, onAdd }) {
   const [name, setName] = useState("");
@@ -9,7 +10,7 @@ export default function AddFilterModal({ onClose, onAdd }) {
   const [favorite, setFavorite] = useState(false);
   const [showAssist, setShowAssist] = useState(false);
   const handleSubmit = () => {
-    if (!name.trim()) return alert("Please enter a name");
+    if (!name.trim()) return toast.info("Please enter a name");
     const newFilter = {
       id: Date.now(),
       name,

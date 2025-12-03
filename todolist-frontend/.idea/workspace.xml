@@ -5,10 +5,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a7719d69-0674-4558-b744-9f01872a3593" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../todolist-backend/api-gateway/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/api-gateway/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/interceptor/AuthChannelInterceptor.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/interceptor/AuthChannelInterceptor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/repository/NotificationRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/repository/NotificationRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../todolist-backend/taskflow-service/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/taskflow-service/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../todolist-backend/taskflow-service/src/main/java/aws/todolist/taskflow/utils/NotificationUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/taskflow-service/src/main/java/aws/todolist/taskflow/utils/NotificationUtils.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/Header/ActivityHeader.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/Header/ActivityHeader.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/Modal/AddFilterModal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/Modal/AddFilterModal.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/Modal/InlineAddTaskFormUpComing.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/Modal/InlineAddTaskFormUpComing.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/component/Modal/TaskDetailModal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/Modal/TaskDetailModal.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/Spinner/SpinnerForSettings.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/Spinner/SpinnerForSettings.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/component/Task/TaskItem.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/Task/TaskItem.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/component/TaskComment/CommentSection.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/TaskComment/CommentSection.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/AppPage/CompletedPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/AppPage/CompletedPage.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -101,7 +114,16 @@
       <workItem from="1764316845851" duration="7932000" />
       <workItem from="1764338753937" duration="1906000" />
       <workItem from="1764421495470" duration="2506000" />
-      <workItem from="1764489727074" duration="5678000" />
+      <workItem from="1764489727074" duration="6056000" />
+      <workItem from="1764508602838" duration="1774000" />
+      <workItem from="1764558405973" duration="2869000" />
+      <workItem from="1764575704790" duration="4832000" />
+      <workItem from="1764594205337" duration="3742000" />
+      <workItem from="1764640911758" duration="8611000" />
+      <workItem from="1764662219506" duration="10396000" />
+      <workItem from="1764680246263" duration="3272000" />
+      <workItem from="1764683626273" duration="162000" />
+      <workItem from="1764729897694" duration="6160000" />
     </task>
     <servers />
   </component>

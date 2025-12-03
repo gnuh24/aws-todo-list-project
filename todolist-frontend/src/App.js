@@ -9,7 +9,7 @@ import Spinner from "./component/Spinner/Spinner";
 import ResetPassword from "./pages/ResetPassword/ResetPassword";
 import ForgotPasswordMail from "./pages/ForgotPasswordMail/ForgotPasswordMail";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-
+import { Toaster } from "sonner";
 import VerifyAccount from "./pages/RegisterPage/VerifyAccount";
 import InboxPage from "./pages/AppPage/InboxPage";
 import TodayPage from "./pages/AppPage/TodayPage";
@@ -24,6 +24,7 @@ import MainLayout from "./layout/MainLayout";
 function App() {
   return (
     <>
+      <Toaster position="top-right" richColors closeButton duration={2500} />
       <GoogleOAuthProvider clientId="100882842939-4lmau4i91h1b6q040efmnm7jun8fue2r.apps.googleusercontent.com">
         <BrowserRouter>
           <Spinner></Spinner>

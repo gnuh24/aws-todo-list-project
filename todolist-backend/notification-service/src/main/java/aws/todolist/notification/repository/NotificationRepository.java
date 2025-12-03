@@ -36,4 +36,19 @@ public interface NotificationRepository extends JpaRepository<Notification, Stri
 	@Modifying
 	@Query("UPDATE Notification n SET n.isRead = :isRead WHERE n.id IN :ids")
 	Integer markAllAsRead(@Param("ids") List<String> ids, @Param("isRead") boolean isRead);
+
+	@Query("""
+			    SELECT DISTINCT n
+			    FROM Notification n
+			    WHERE n.projectId IN :projectIds
+			      AND n.type IN :types
+			      AND n.actor.id IN :actorIds
+			    ORDER BY n.createdAt DESC
+			""")
+	List<Notification> findDistinctActorAndType(
+			List<String> projectIds,
+			List<String> actorIds,
+			List<Notification.NotificationType> types
+	);
+
 }

@@ -18,6 +18,7 @@ import { https_taskflow } from "../../service/api";
 import dayjs from "dayjs";
 import DatePickerDropdown from "../Dropdown/DatePickerDropdown";
 import TaskDetailModal from "../Modal/TaskDetailModal";
+import {toast} from "sonner";
 
 export default function TaskItem({
   onDeleteTask,
@@ -38,6 +39,7 @@ export default function TaskItem({
   const formatToDisplay = "HH:mm DD/MM/YYYY";
   const formatToSend = "YYYY-MM-DDTHH:mm:ss";
   const [showFormDatePicker, setShowFormDatePicker] = useState(false);
+
 
   // Đóng menu khi click ra ngoài
   useEffect(() => {
@@ -65,10 +67,9 @@ export default function TaskItem({
       // Dùng cho việc xóa task trong phần upcoming
       onDeleteTaskUpComing?.(response.data.data);
 
-      alert("Xoá task thành công!");
+      toast.success("Xoá task thành công!");
     } catch (error) {
-      console.error("Error deleting task:", error);
-      alert("Xoá task thất bại!");
+        toast.error(error?.response?.data?.message || "Xóa thất bại, vui lòng thử lại!");
     }
   };
 
@@ -93,7 +94,7 @@ export default function TaskItem({
           deadlineSent: true,
         }
       );
-      alert("Update thành công");
+      toast.success("Update thành công");
       // ✅ notify parent to update UI
       onUpdate?.(sectionId, { ...task, ...updatedTask });
 
@@ -102,9 +103,7 @@ export default function TaskItem({
 
       setIsEditing(false);
     } catch (err) {
-      // ✅ Thêm alert ở đây
-      alert(err?.response?.data?.message || "Cập nhật thất bại, vui lòng thử lại!");
-      console.error("❌ Update task failed:", err);
+      toast.error(err?.response?.data?.message || "Cập nhật thất bại, vui lòng thử lại!");
     }
   };
 
@@ -116,8 +115,6 @@ export default function TaskItem({
             status: updatedStatus,
           }
       );
-      // ✅ notify parent to update UI
-      console.log("success:", res.data);
 
       if (res.status === 200) {
         const updatedTask = res.data.data;
@@ -137,14 +134,9 @@ export default function TaskItem({
       }
 
     } catch (err) {
-      // ✅ Thêm alert ở đây
-      alert(err?.response?.data?.message || "Cập nhật thất bại, vui lòng thử lại!");
-      console.error("❌ Update task failed:", err);
+      toast.error(err?.response?.data?.message || "Cập nhật thất bại, vui lòng thử lại!")
       setNewStatus(task.status);
     }
-
-
-
   }
 
   // Nếu có gửi isOpenFormAddTaskUpComing thì phải null mới cho chạy
@@ -277,7 +269,7 @@ export default function TaskItem({
         </div>
       )}
 
-      {openTaskDetailModal && <TaskDetailModal
+      <TaskDetailModal
           isOpenComment={isOpenComment}
           openTask={openTaskDetailModal}       // boolean
           task={task}                      // dữ liệu task
@@ -287,7 +279,7 @@ export default function TaskItem({
             setIsOpenComment(false)
           }}   // hàm đóng
           onUpdateStatus={handleUpdateStatus}
-      />}
+      />
     </div>
 
 

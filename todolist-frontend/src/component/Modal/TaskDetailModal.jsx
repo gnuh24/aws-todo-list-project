@@ -7,6 +7,7 @@ import {https_taskflow} from "../../service/api";
 import CommentSection from "../TaskComment/CommentSection";
 import {LabelsSection} from "../Section/LabelsSection";
 import PriorityDropdown from "../Dropdown/PriorityDropdown";
+import {toast} from "sonner";
 
 export default function TaskDetailModal({
                                           isOpenComment,
@@ -18,7 +19,6 @@ export default function TaskDetailModal({
   const [taskDetail, setTaskDetail] = useState({});
 
   const handleComment = async (newComment, attachments) => {
-    console.log("Comment:", newComment);
     try{
       const response = await https_taskflow.post(`/v1/projects/${task.idProject}/tasks/${task.id}/comments`,{
         comment: newComment,
@@ -26,7 +26,6 @@ export default function TaskDetailModal({
       })
 
       if (response.status === 200) {
-        console.log("success:", response.data.data);
         const taskDetailNew = { ...taskDetail, comments: [...taskDetail.comments,response.data.data] };
         setTaskDetail(taskDetailNew);
       }
@@ -36,9 +35,9 @@ export default function TaskDetailModal({
       // Kiểm tra xem server có trả lỗi dạng JSON không
       if (err.response && err.response.data) {
         const msg = err.response.data.message || err.response.data.detailMessage || "Đã xảy ra lỗi không xác định";
-        alert(msg);
+        toast.error(msg);
       } else {
-        alert("Không thể kết nối đến server. Vui lòng thử lại.");
+        toast.info("Không thể kết nối đến server. Vui lòng thử lại.");
       }
     }
   };
@@ -51,8 +50,6 @@ export default function TaskDetailModal({
           { comment: newComment }
       );
 
-      console.log("success:", res.data);
-
       if (res.status === 200) {
         const commentUpdated = res.data.data;
         const updatedComments = taskDetail.comments.map(comment =>
@@ -64,9 +61,9 @@ export default function TaskDetailModal({
       // Kiểm tra xem server có trả lỗi dạng JSON không
       if (err.response && err.response.data) {
         const msg = err.response.data.message || err.response.data.detailMessage || "Đã xảy ra lỗi không xác định";
-        alert(msg);
+        toast.error(msg);
       } else {
-        alert("Không thể kết nối đến server. Vui lòng thử lại.");
+        toast.info("Không thể kết nối đến server. Vui lòng thử lại.");
       }
     }
   };
@@ -88,9 +85,9 @@ export default function TaskDetailModal({
       // Kiểm tra xem server có trả lỗi dạng JSON không
       if (err.response && err.response.data) {
         const msg = err.response.data.message || err.response.data.detailMessage || "Đã xảy ra lỗi không xác định";
-        alert(msg);
+        toast.error(msg);
       } else {
-        alert("Không thể kết nối đến server. Vui lòng thử lại.");
+        toast.info("Không thể kết nối đến server. Vui lòng thử lại.");
       }
     }
   }
@@ -125,9 +122,9 @@ export default function TaskDetailModal({
       // Kiểm tra xem server có trả lỗi dạng JSON không
       if (err.response && err.response.data) {
         const msg = err.response.data.message || err.response.data.detailMessage || "Đã xảy ra lỗi không xác định";
-        alert(msg);
+        toast.error(msg);
       } else {
-        alert("Không thể kết nối đến server. Vui lòng thử lại.");
+        toast.info("Không thể kết nối đến server. Vui lòng thử lại.");
       }
     }
   }
@@ -147,12 +144,13 @@ export default function TaskDetailModal({
       // Kiểm tra xem server có trả lỗi dạng JSON không
       if (err.response && err.response.data) {
         const msg = err.response.data.message || err.response.data.detailMessage || "Đã xảy ra lỗi không xác định";
-        alert(msg);
+        toast.error(msg);
       } else {
-        alert("Không thể kết nối đến server. Vui lòng thử lại.");
+        toast.info("Không thể kết nối đến server. Vui lòng thử lại.");
       }
     }
   }
+
 
   useEffect(() => {
     const getDetails = async () => {
@@ -160,17 +158,14 @@ export default function TaskDetailModal({
         const response = await https_taskflow.get(
             `/v1/projects/${task.idProject}/tasks/${task.id}`
         );
-        setTaskDetail(response.data.data);
-        console.log(response.data.data);
+        setTaskDetail(prev => ({ ...response.data.data }));
       } catch (error) {
         console.log(error);
       }
     };
 
     getDetails();
-  }, []);
-
-  console.log(taskDetail)
+  }, [task]); // chạy lại khi openTask hoặc task thay đổi
 
 
   return (
@@ -182,9 +177,8 @@ export default function TaskDetailModal({
       high={800}
       centered
       styles={{  body: {padding: 15, borderRadius: 10} }}
-      destroyOnClose
     >
-      {openTask && (
+      {Object.keys(taskDetail).length > 0 && (
         <div className="flex">
           {/* LEFT CONTENT */}
           <div className="flex-1 p-6 border-r">
