@@ -5,7 +5,7 @@ import Header from "../component/Header/Header";
 
 export default function Layout() {
   return (
-    <div>
+    <div className="min-h-screen w-full bg-gradient-to-b from-[#b0d0ff] via-[#d8e7ff] to-[#e8f3ff] overflow-hidden">
       <Header></Header>
       <Outlet></Outlet>
       <Footer></Footer>

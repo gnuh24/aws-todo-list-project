@@ -1,5 +1,6 @@
+import logo from "./logo.svg";
 import "./App.css";
-import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage/HomePage";
 import Layout from "./layout/Layout";
 import RegisterPage from "./pages/RegisterPage/RegisterPage";
@@ -9,7 +10,7 @@ import Spinner from "./component/Spinner/Spinner";
 import ResetPassword from "./pages/ResetPassword/ResetPassword";
 import ForgotPasswordMail from "./pages/ForgotPasswordMail/ForgotPasswordMail";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-import { Toaster } from "sonner";
+
 import VerifyAccount from "./pages/RegisterPage/VerifyAccount";
 import InboxPage from "./pages/AppPage/InboxPage";
 import TodayPage from "./pages/AppPage/TodayPage";
@@ -19,8 +20,10 @@ import UpcomingPage from "./pages/AppPage/UpcomingPage";
 import CompletedPage from "./pages/AppPage/CompletedPage";
 import TestAPI from "./service/TestAPI";
 import LoginSuccess from "./pages/LoginPage/LoginSuccess";
-import NotificationsPage from "./pages/AppPage/NotificationsPage";
-import MainLayout from "./layout/MainLayout";
+import SecureGate from "./layout/SecureGate";
+import { Toaster } from "sonner";
+import ArchivePage from "./pages/AppPage/ArchivePage";
+import UnArchivePage from "./pages/AppPage/UnArchivePgae";
 function App() {
   return (
     <>
@@ -29,11 +32,8 @@ function App() {
         <BrowserRouter>
           <Spinner></Spinner>
           <Routes>
-
-            {/* <Route path="/index.html" element={<Navigate to="/" replace />} /> */}
-
-            <Route path="/index.html" element={<Layout></Layout>}>
-              <Route path="/index.html" element={<HomePage></HomePage>}></Route>
+            <Route path="/" element={<Layout></Layout>}>
+              <Route path="/" element={<HomePage></HomePage>}></Route>
             </Route>
             <Route
               path="/register"
@@ -53,7 +53,14 @@ function App() {
               element={<ResetPassword></ResetPassword>}
             ></Route>
             <Route path="/auth/verify-account" element={<VerifyAccount />} />
-            <Route path="/app" element={<MainLayout></MainLayout>}>
+            <Route
+              path="/app"
+              element={
+                <SecureGate>
+                  <Outlet />
+                </SecureGate>
+              }
+            >
               <Route path="inbox" element={<InboxPage></InboxPage>}></Route>
               <Route path="today" element={<TodayPage></TodayPage>}></Route>
               <Route
@@ -64,6 +71,12 @@ function App() {
                 path="projects/:projectName/:projectId"
                 element={<ProjectPage></ProjectPage>}
               ></Route>
+
+              <Route
+                path="archive/:projectName/:projectId"
+                element={<UnArchivePage></UnArchivePage>}
+              ></Route>
+
               <Route
                 path="upcoming"
                 element={<UpcomingPage></UpcomingPage>}
@@ -72,18 +85,14 @@ function App() {
                 path="activity"
                 element={<CompletedPage></CompletedPage>}
               ></Route>
+
               <Route
-                  path="notifications"
-                  element={<NotificationsPage></NotificationsPage>}
+                path="archive"
+                element={<ArchivePage></ArchivePage>}
               ></Route>
             </Route>
-
             <Route path="testapi" element={<TestAPI></TestAPI>}></Route>
             <Route path="/login-success" element={<LoginSuccess />} />
-            <Route
-                path="*"
-                element={<Navigate to="/index.html" replace />}
-            />
           </Routes>
         </BrowserRouter>
       </GoogleOAuthProvider>

@@ -1,40 +1,72 @@
-const SettingsSidebar = ({ activeTab, setActiveTab }) => {
-    return (
-        <div className="w-64 p-4 bg-gray-50 border-r border-gray-200 h-full flex flex-col">
+import {
+  UserOutlined,
+  BgColorsOutlined,
+  BellOutlined,
+  CheckSquareOutlined,
+  CloudOutlined,
+  TeamOutlined,
+  CalendarOutlined,
+  AppstoreOutlined,
+  DatabaseOutlined,
+  DashboardOutlined,
+} from "@ant-design/icons";
 
-            {/*<div className="mb-4">*/}
-            {/*    <input*/}
-            {/*        type="text"*/}
-            {/*        placeholder="Search"*/}
-            {/*        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"*/}
-            {/*    />*/}
-            {/*</div>*/}
+export default function SettingsSidebar() {
+  const menuItems = [
+    { label: "Account", icon: <UserOutlined />, active: true },
+    { label: "General", icon: <DashboardOutlined /> },
+    { label: "Subscription", icon: <CloudOutlined /> },
+    { label: "Theme", icon: <BgColorsOutlined /> },
+    { label: "Sidebar", icon: <AppstoreOutlined /> },
+    { label: "Quick Add", icon: <CheckSquareOutlined /> },
+    { label: "Productivity", icon: <DatabaseOutlined /> },
+    { label: "Reminders", icon: <BellOutlined /> },
+    { label: "Notifications", icon: <BellOutlined /> },
+    { label: "Backups", icon: <CloudOutlined /> },
+    { label: "Integrations", icon: <AppstoreOutlined /> },
+    { label: "Calendars", icon: <CalendarOutlined /> },
+  ];
 
-            <nav className="flex-1 space-y-1">
-                <button
-                    onClick={() => setActiveTab("account")}
-                    className={`w-full text-left px-3 py-2 rounded-md text-sm 
-            ${activeTab === "account" ? "bg-gray-200 font-semibold" : "hover:bg-gray-100"}`}
-                >
-                    Account
-                </button>
+  return (
+    <div className="w-64 bg-[#f8f6f4] border-r border-gray-300 h-full px-3 py-4 overflow-y-auto">
+      <h2 className="px-3 py-1 text-[15px] font-semibold mb-2">Settings</h2>
 
-                <button
-                    onClick={() => setActiveTab("notifications")}
-                    className={`w-full text-left px-3 py-2 rounded-md text-sm 
-            ${activeTab === "notifications" ? "bg-gray-200 font-semibold" : "hover:bg-gray-100"}`}
-                >
-                    Notifications
-                </button>
-            </nav>
-
-            <div className="mt-auto pt-4 border-t border-gray-200">
-                <button className="flex items-center w-full px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-md">
-                    <span className="mr-2">➕</span> Add team
-                </button>
-            </div>
+      {menuItems.map((item) => (
+        <div
+          key={item.label}
+          className={`flex items-center gap-3 px-3 py-2 cursor-pointer rounded-md text-[15px]
+          ${
+            item.active
+              ? "bg-[#fce9e4] text-[#d1453b] font-medium"
+              : "hover:bg-gray-200"
+          }`}
+        >
+          {item.icon}
+          {item.label}
         </div>
-    );
-};
+      ))}
 
-export default SettingsSidebar;
+      <div className="mt-6">
+        <h4 className="text-xs uppercase text-gray-500 px-3 mb-2">
+          Hút hầm cầu Quang Hồng
+        </h4>
+
+        <div className="flex items-center gap-3 px-3 py-2 cursor-pointer rounded-md hover:bg-gray-200">
+          <div className="w-6 h-6 rounded bg-red-600 flex items-center justify-center text-white font-bold text-sm">
+            H
+          </div>
+          <span>General</span>
+        </div>
+
+        <div className="flex items-center gap-3 px-3 py-2 cursor-pointer rounded-md hover:bg-gray-200">
+          <TeamOutlined />
+          People
+        </div>
+
+        <div className="flex items-center gap-3 px-3 py-2 cursor-pointer rounded-md hover:bg-gray-200">
+          <span className="text-gray-600">+ Add team</span>
+        </div>
+      </div>
+    </div>
+  );
+}

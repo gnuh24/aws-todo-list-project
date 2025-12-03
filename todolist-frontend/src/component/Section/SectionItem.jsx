@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import MoreMenu from "../Dropdown/MoreMenu";
 import TaskItem from "../Task/TaskItem";
 
 export default function SectionItem({
@@ -7,36 +8,80 @@ export default function SectionItem({
   projectId,
   section,
   onAddTaskClick,
+  handleSaveEdit,
+  handleDeleteSection,
+  handleArchive,
 }) {
   const [collapsed, setCollapsed] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState(section.name);
 
   return (
     <div className="border rounded-md p-3">
       {/* Header section */}
-      <div
-        className="flex justify-between items-center cursor-pointer"
-        onClick={() => setCollapsed(!collapsed)}
-      >
-        <h3 className="font-semibold text-gray-800 flex items-center gap-1">
-          <span>{collapsed ? "▶" : "▼"}</span>
-          {section.name}
-        </h3>
-        <button className="hover:text-gray-600 text-gray-400">⋯</button>
-      </div>
+      {isEditing ? (
+        <div className="space-y-3 w-full">
+          <input
+            value={editName}
+            onChange={(e) => setEditName(e.target.value)}
+            className="w-full border rounded-lg px-3 py-2 outline-none focus:ring focus:ring-blue-100"
+            autoFocus
+          />
+
+          <div className="flex items-center gap-4">
+            <button
+              className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+              onClick={() =>
+                handleSaveEdit(
+                  section.id,
+                  editName,
+                  (projectId = { projectId })
+                )
+              }
+            >
+              Save
+            </button>
+
+            <button
+              className="text-gray-500 hover:underline"
+              onClick={() => {
+                setEditName(section.name);
+                setIsEditing(false);
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="flex justify-between items-center">
+          <h2 className="text-lg font-semibold">{section.name}</h2>
+
+          <MoreMenu
+            onEdit={() => setIsEditing(true)}
+            onDelete={() => handleDeleteSection(section.id)}
+            onArchive={() => handleArchive(section.id)}
+          />
+        </div>
+      )}
 
       {/* Task list */}
       {!collapsed && (
         <div className="mt-2">
-          {section.tasks?.length ? (
-            section.tasks.map((task) => (
-              <TaskItem
-                sectionId={section.id}
-                onDeleteTask={handleDeleteTask}
-                projectId={projectId}
-                key={task.id}
-                task={task}
-              />
-            ))
+          {section.tasks?.filter((task) => task.status === "PENDING").length >
+          0 ? (
+            section.tasks
+              .filter((task) => task.status === "PENDING")
+              .map((task) => (
+                <TaskItem
+                  key={task.id}
+                  task={task}
+                  sectionId={section.id}
+                  projectId={projectId}
+                  onDeleteTask={handleDeleteTask}
+                  handleUpdateTask={handleUpdateTask}
+                />
+              ))
           ) : (
             <p className="text-sm text-gray-400 italic mt-1">No tasks yet</p>
           )}
