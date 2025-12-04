@@ -13,7 +13,7 @@ public class NotificationResponse {
     private String title;
     private String content;
     private NotificationType type;
-    private boolean isRead;
+    private boolean read;
     private LocalDateTime createdAt;
     
     private String actorId;

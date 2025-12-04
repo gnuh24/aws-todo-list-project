@@ -3,13 +3,14 @@ import {Input, Button, message} from "antd";
 import {
     PaperClipOutlined,
     UpOutlined,
-    DeleteOutlined
+    DeleteOutlined, EditOutlined, CopyOutlined
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import {https_taskflow} from "../../service/api";
 import {CommentAttachItem} from "../CommentAttach/CommentAttachItem";
 import {CommentAttachItemAdd} from "../CommentAttach/CommentAttachItemAdd";
 import SpinnerForSettings from "../Spinner/SpinnerForSettings";
+import {toast} from "sonner";
 
 const MAX_SIZE = 3 * 1024 * 1024;
 
@@ -17,7 +18,6 @@ export default function CommentSection({ isOpenComment, comments, handleComment,
     const [newComment, setNewComment] = useState("");
     const [attachments, setAttachments] = useState([]); // list URL trả về từ backend
     const [showComments, setShowComments] = useState(isOpenComment ?? false);
-    const [showOption, setShowOption] = useState(null);
     const [showEditForm, setShowEditForm] = useState(null);
     const [isExpanded, setIsExpanded] = useState(false);
     const [openMenu, setOpenMenu] = useState(null);
@@ -83,8 +83,8 @@ export default function CommentSection({ isOpenComment, comments, handleComment,
     };
 
     const handleDelete = async (idComment) => {
-        setLoading(true);
         if (!window.confirm("Bạn có muốn xóa comment này không?")) return
+        setLoading(true);
         await onDeleteComment(idComment);
         setLoading(false);
     }
@@ -164,25 +164,21 @@ export default function CommentSection({ isOpenComment, comments, handleComment,
                         showComments ? "max-h-80" : "max-h-0"
                     }`}
                 >
-                    {comments.map((c, i) => {
+                    {comments.map((c) => {
                         const isMe = c.accountId === auth.id;
+
                         return (
                             <div
-                                key={i}
-                                className={`flex gap-2 py-2 px-2 rounded-lg ${
-                                    isMe ? 'flex-row-reverse text-right' : 'flex-row text-left'
-                                }`}
-                                onMouseEnter={() => {
-                                    if (showEditForm !== c.id) setShowOption(c.id)
-                                }}
+                                key={c.id}
+                                className="flex gap-2 py-2 rounded-lg"
                                 onMouseLeave={() => {
-                                    setShowOption(null)
-                                    setOpenMenu(null)
+                                    setOpenMenu(null);
                                 }}
                             >
+
                                 {/* Avatar */}
-                                <div className="w-9 h-9 rounded-full bg-[#56D08A] text-white flex items-center justify-center font-semibold">
-                                    {c.authorAvatar? (
+                                <div className="w-9 h-9 rounded-full bg-[#56D08A] text-white flex items-center justify-center font-semibold flex-shrink-0">
+                                    {c.authorAvatar ? (
                                         <img
                                             src={c.authorAvatar}
                                             alt="avatar"
@@ -195,97 +191,94 @@ export default function CommentSection({ isOpenComment, comments, handleComment,
                                 </div>
 
                                 {/* Comment box */}
-                                {showEditForm !== c.id && (<div className={`border rounded-lg px-5 py-4 shadow-sm max-w-xs bg-white ${
-                                    isMe ? 'border-green-400' : 'border-gray-300'
-                                } relative`}>
-                                    <div className="text-sm font-semibold text-gray-600 mb-1">
-                                        <div className="text-sm font-semibold text-gray-600 mb-1">
-                                            {c.authorName}
-                                        </div>
-                                        <div className="text-xs text-gray-600 mb-1">
-                                            {dayjs(c.updatedAt).format(formatToDisplay)}
-                                        </div>
-
-                                    </div>
-
-                                    <div className="text-sm text-gray-700 whitespace-pre-line pt-3">{c.comment}</div>
-
-                                    {/* Comment attachments */}
-                                    {!!c.commentAttach?.length && (
-                                        <CommentAttachItem commentAttach={c.commentAttach} />
-                                    )}
-                                </div>)}
-
-
-
-
-                                {showEditForm === c.id && (<div className="w-full border rounded-md p-3">
-                                    <Input.TextArea
-                                        rows={3}
-                                        defaultValue={c.comment}
-                                        onChange={(e) => setNewComment(e.target.value)}
-                                        className="border-none focus:ring-0 resize-none"
-                                        autoFocus
-                                    />
-                                        {/* Comment attachments */}
-                                        {!!c.commentAttach?.length && (
-                                            <CommentAttachItem commentAttach={c.commentAttach} onDeleteCommentAttach={onDeleteCommentAttach} isEditing={true} />
-                                        )}
-                                    <div className="flex justify-between items-center mt-2">
-                                        <div className="flex gap-3 text-gray-400 text-lg">
-                                        </div>
-                                        <div className="flex gap-2">
-                                            <Button onClick={()=> setShowEditForm(null)}>Cancel</Button>
-                                            <Button type="primary" danger onClick={() => handleUpdate(c.id)}>
-                                                Update
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </div>)}
-
-                                {/* 3 chấm ngoài comment box */}
-                                {isMe && showOption === c.id && (
-                                    <div className="relative flex items-end" ref={menuRef}>
-                                        <button
-                                            onClick={() => {
-                                                if (openMenu === null) {
-                                                    setOpenMenu(c.id)
-                                                }else{
-                                                    setOpenMenu(null)
-                                                }
-                                            }}
-
-                                            className="w-5 h-5 flex items-center justify-center text-gray-500 hover:text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors duration-200 shadow-sm focus:outline-none"
+                                <div className="flex-1">
+                                    {showEditForm !== c.id ? (
+                                        <div
+                                            className="relative rounded-lg px-5 pb-4 shadow-sm bg-white group"
                                         >
-                                            ⋮
-                                        </button>
+                                            <div className="text-sm font-semibold text-gray-600 mb-1">{c.authorName}</div>
+                                            <div className="text-xs text-gray-600 mb-1">{dayjs(c.updatedAt).format(formatToDisplay)}</div>
+                                            <div className="text-sm text-gray-700 whitespace-pre-line pt-3">{c.comment}</div>
+                                            {!!c.commentAttach?.length && <CommentAttachItem commentAttach={c.commentAttach} />}
 
-                                        {openMenu === c.id && (
-                                            <div className="absolute bottom-5 mb-2 right-0 w-24 bg-white border rounded shadow-md z-10">
-                                                <button className="w-full text-left px-2 py-1 hover:bg-gray-100 text-sm" onClick={() => {
-                                                    setShowEditForm(c.id)
-                                                    setShowOption(null)
-                                                    setIsExpanded(false)
-                                                    setNewComment("") // Reset lại biến newComment trong trường hợp đang tạo mới mà cancel
-                                                }}>Edit</button>
-                                                <button className="w-full text-left px-2 py-1 hover:bg-gray-100 text-sm text-red-500" onClick={
-                                                    // Đóng form edit và add nếu đang mở
-                                                    () => {
-                                                        setShowEditForm(null)
-                                                        setIsExpanded(false)
-                                                        setNewComment("")
-                                                        handleDelete(c.id)
-                                                        setShowOption(null) // Đóng form chọn
-                                                    }
-                                                }>Delete</button>
+                                            {/* Menu button */}
+                                            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                                <button
+                                                    onClick={() => setOpenMenu(openMenu === c.id ? null : c.id)}
+                                                    className="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-gray-800 bg-gray-100 hover:bg-green-100 rounded-md text-2xl shadow-md focus:outline-none transition-colors duration-200"
+                                                >
+                                                    ⋯
+                                                </button>
+
+                                                {openMenu === c.id && (
+                                                    <div className="absolute top-12 right-0 w-36 bg-white border rounded-lg shadow-lg z-20">
+                                                        {isMe && (
+                                                            <>
+                                                                <button
+                                                                    className="w-full text-left px-3 py-2 hover:bg-gray-100 text-sm flex items-center gap-2"
+                                                                    onClick={() => {
+                                                                        setShowEditForm(c.id);
+                                                                        setNewComment('');
+                                                                    }}
+                                                                >
+                                                                    <EditOutlined className="text-base" /> Edit
+                                                                </button>
+                                                                <button
+                                                                    className="w-full text-left px-3 py-2 hover:bg-gray-100 text-sm text-red-500 flex items-center gap-2"
+                                                                    onClick={() => {
+                                                                        setShowEditForm(null);
+                                                                        setNewComment('');
+                                                                        handleDelete(c.id);
+                                                                    }}
+                                                                >
+                                                                    <DeleteOutlined className="text-base" /> Delete
+                                                                </button>
+                                                            </>
+                                                        )}
+                                                        <button
+                                                            className="w-full text-left px-3 py-2 hover:bg-gray-100 text-sm flex items-center gap-2"
+                                                            onClick={() => {
+                                                                navigator.clipboard.writeText(c.comment);
+                                                                toast.success('Copied to clipboard!');
+                                                            }}
+                                                        >
+                                                            <CopyOutlined className="text-base" /> Copy text
+                                                        </button>
+                                                    </div>
+                                                )}
                                             </div>
-                                        )}
-                                    </div>
-
-                                )}
+                                        </div>
+                                    ) : (
+                                        <div className="rounded-md p-3 bg-white w-full border">
+                                            <Input.TextArea
+                                                rows={3}
+                                                defaultValue={c.comment}
+                                                onChange={(e) => setNewComment(e.target.value)}
+                                                className="border-none focus:ring-0 resize-none w-full"
+                                                autoFocus
+                                            />
+                                            {!!c.commentAttach?.length && (
+                                                <CommentAttachItem
+                                                    commentAttach={c.commentAttach}
+                                                    onDeleteCommentAttach={onDeleteCommentAttach}
+                                                    isEditing
+                                                />
+                                            )}
+                                            <div className="flex justify-end gap-2 mt-2">
+                                                <Button onClick={() => setShowEditForm(null)}>Cancel</Button>
+                                                <Button type="primary" danger onClick={() => handleUpdate(c.id)}>
+                                                    Update
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
+
                         );
+
                     })}
+
                 </div>
 
 

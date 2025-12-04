@@ -52,7 +52,7 @@ public class Notification {
 	
 	// Đã đọc chưa
 	@Column(name = "is_read", nullable = false)
-	private boolean isRead = false;
+	private boolean read = false;
 	
 	// Thời gian tạo (Sử dụng @CreationTimestamp nếu cần tự động)
 	@Column(name = "created_at", nullable = false)

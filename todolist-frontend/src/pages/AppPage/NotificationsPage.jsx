@@ -27,6 +27,8 @@ export default function NotificationsPage() {
 
                 const { content, totalPages } = response.data.data;
 
+                console.log(content);
+
                 // Dựa vào pageNumber, không dựa vào biến page trong scope
                 setNotifications((prev) =>
                     pageNumber === 1 ? content : [...prev, ...content]
@@ -40,6 +42,7 @@ export default function NotificationsPage() {
         };
         getAllNotifications(pageNumberNotification);
     }, [pageNumberNotification, tab]);
+
 
     const UpdateListNotification = (status, idNotification) => {
         if (status) {

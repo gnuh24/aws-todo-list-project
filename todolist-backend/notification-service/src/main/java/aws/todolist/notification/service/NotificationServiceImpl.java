@@ -86,7 +86,7 @@ public class NotificationServiceImpl implements NotificationService {
 			    .type(msg.getType())
 			    .title(msg.getTitle())
 			    .content(msg.getContent())
-			    .isRead(false)
+			    .read(false)
 			    .createdAt(LocalDateTime.now())
 			    .isDeleted(false)
 			    .build();
