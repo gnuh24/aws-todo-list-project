@@ -3,12 +3,15 @@ package aws.todolist.user.exceptions;
 import aws.todolist.user.aop.AppLogger;
 import aws.todolist.user.exceptions.errorCode.SystemErrorCode;
 import aws.todolist.user.utils.EnvironmentUtils;
+
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -42,8 +45,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 		if (environmentUtils.isDevMode()) {
 			response.setDetailMessage(ex.toString());
 		}
-		
-//		appLogger.error(request, "❌ [{}] {} - {}", code, message, ex.getMessage());
+		System.err.println(ex.getClass());
 		return new ResponseEntity<>(response, status);
 	}
 	
@@ -115,6 +117,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(EntityNotFoundException.class)
 	public ResponseEntity<Object> handleEntityNotFound(HttpServletRequest request, EntityNotFoundException ex) {
 		return buildErrorResponse(request, HttpStatus.NOT_FOUND, SystemErrorCode.SYS_FILE_NOT_FOUND, ex.getMessage(), ex, null);
+	}
+	
+	@ExceptionHandler(aws.todolist.user.exceptions.AccountNotFoundException.class)
+	public ResponseEntity<Object> handleAccountNotFoundException(HttpServletRequest request, aws.todolist.user.exceptions.AccountNotFoundException ex) {
+		return buildErrorResponse(request, HttpStatus.NOT_FOUND, SystemErrorCode.ACCOUNT_PROFILE_NOT_FOUND, ex.getMessage(), ex, null);
 	}
 	
 	@ExceptionHandler(Exception.class)
