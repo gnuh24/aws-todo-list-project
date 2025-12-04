@@ -5,6 +5,8 @@ import aws.todolist.user.dto.account.AccountUpdateForm;
 import aws.todolist.user.entity.Account;
 import aws.todolist.user.integration.redis.RedisService;
 import aws.todolist.user.repository.AccountRepository;
+import aws.todolist.user.exceptions.AccountNotFoundException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -16,17 +18,7 @@ public class AccountServiceImpl implements AccountService {
 	
 	@Autowired
 	private AccountRepository accountRepository;
-	
 
-//    @Autowired
-//    private ModelMapper modelMapper;
-//
-//    @Autowired
-//    private OTPService otpService;
-//
-//    @Autowired
-//    private JwtTokenProvider jwtTokenProvider;
-	
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 	
@@ -40,9 +32,9 @@ public class AccountServiceImpl implements AccountService {
 	
 	
 	@Override
-	public Account getAccountById(String accountId) {
+	public Account getAccountById(String accountId) throws AccountNotFoundException {
 		return accountRepository.findById(accountId)
-		    .orElseThrow(() -> new UsernameNotFoundException("Account with accountId " + accountId + " not found"));
+		    .orElseThrow(() -> new AccountNotFoundException("Account with accountId " + accountId + " not found"));
 	}
 	
 	@Override

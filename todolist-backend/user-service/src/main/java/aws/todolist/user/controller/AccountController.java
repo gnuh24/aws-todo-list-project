@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import aws.todolist.user.exceptions.AccountNotFoundException;
 
 @RestController
 @RequestMapping("/v1/accounts")
@@ -29,7 +30,7 @@ public class AccountController {
 	@GetMapping("/me")
 	public ResponseEntity<ApiResponse<AccountDetailResponseDTO>> getAccountInfo(
 	    @RequestHeader("X-User-Id") String accountId
-	) {
+	) throws AccountNotFoundException {
 		Account account = accountService.getAccountById(accountId);
 		AccountDetailResponseDTO accountDTO1 = accountMapper.entityToDetailDTO(account);
 		return ResponseEntity.ok(new ApiResponse<>(200, "Lấy thông tin account thành công", accountDTO1));
@@ -41,7 +42,7 @@ public class AccountController {
 	public ResponseEntity<ApiResponse<AccountDetailResponseDTO>> updateAccount(
 	    @RequestBody @Valid AccountUpdateForm form,
 	    @RequestHeader("X-User-Id") String accountId
-	) {
+	) throws AccountNotFoundException {
 		
 		Account account = accountService.getAccountById(accountId);
 		Account updatedAccount = accountService.updateAccount(account, form);
