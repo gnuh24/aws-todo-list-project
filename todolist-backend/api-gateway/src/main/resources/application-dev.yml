@@ -1,0 +1,222 @@
+spring:
+    # =========================
+    # ☁️ Spring Cloud Gateway
+    # =========================
+    cloud:
+        gateway:
+            # 🔹 Global CORS
+            globalcors:
+                add-to-simple-url-handler-mapping: true
+                corsConfigurations:
+                    '[/api/taskflow/**]':
+                        allowedOrigins:
+                            - "http://localhost:4200"
+                            - "http://127.0.0.1:4200"
+                            - "http://localhost:5500"
+                            - "http://127.0.0.1:5500"
+                            - "http://localhost:3000"
+                            - "http://127.0.0.1:3000"
+                        allowedMethods:
+                            - GET
+                            - POST
+                            - PUT
+                            - PATCH
+                            - DELETE
+                            - OPTIONS
+                        allowedHeaders: "*"
+                        allowCredentials: true
+
+                    '[/api/notification/v1/**]':
+                        allowedOrigins:
+                            - "http://localhost:4200"
+                            - "http://127.0.0.1:4200"
+                            - "http://localhost:5500"
+                            - "http://127.0.0.1:5500"
+                            - "http://localhost:3000"
+                            - "http://127.0.0.1:3000"
+                        allowedMethods:
+                            - GET
+                            - POST
+                            - PUT
+                            - PATCH
+                            - DELETE
+                            - OPTIONS
+                        allowedHeaders: "*"
+                        allowCredentials: true
+
+                    '[/api/user/**]':
+                        allowedOrigins:
+                            - "http://localhost:4200"
+                            - "http://127.0.0.1:4200"
+                            - "http://localhost:5500"
+                            - "http://127.0.0.1:5500"
+                            - "http://localhost:3000"
+                            - "http://127.0.0.1:3000"
+                        allowedMethods:
+                            - GET
+                            - POST
+                            - PUT
+                            - PATCH
+                            - DELETE
+                            - OPTIONS
+                        allowedHeaders: "*"
+                        allowCredentials: true
+
+                    '[/api/auth/**]':
+                        allowedOrigins:
+                            - "http://localhost:4200"
+                            - "http://127.0.0.1:4200"
+                            - "http://localhost:5500"
+                            - "http://127.0.0.1:5500"
+                            - "http://localhost:3000"
+                            - "http://127.0.0.1:3000"
+                        allowedMethods:
+                            - GET
+                            - POST
+                            - PUT
+                            - PATCH
+                            - DELETE
+                            - OPTIONS
+                        allowedHeaders: "*"
+                        allowCredentials: true
+
+                    '[/api/model/**]':
+                        allowedOrigins:
+                            - "http://localhost:4200"
+                            - "http://127.0.0.1:4200"
+                            - "http://localhost:5500"
+                            - "http://127.0.0.1:5500"
+                            - "http://localhost:3000"
+                            - "http://127.0.0.1:3000"
+                        allowedMethods:
+                            - GET
+                            - POST
+                            - PUT
+                            - PATCH
+                            - DELETE
+                            - OPTIONS
+                        allowedHeaders: "*"
+                        allowCredentials: true
+
+            # 🔹 Routes Configuration
+            routes:
+                -   id: ai-model-service
+                    uri: ${AI_MODEL_SERVICE:http://localhost:9997}
+                    predicates:
+                        - Path=/api/model/**
+
+                -   id: user-service
+                    uri: ${USER_SERVICE_URL:http://localhost:8081}
+                    predicates:
+                        - Path=/api/user/**
+                #          filters:
+                #            - name: RequestRateLimiter
+                #              args:
+                #                redis-rate-limiter.replenishRate: 5
+                #                redis-rate-limiter.burstCapacity: 10
+                #                key-resolver: "#{@ipKeyResolver}"
+
+                -   id: taskflow-service
+                    uri: ${TASKFLOW_SERVICE_URL:http://localhost:8082}
+                    predicates:
+                        - Path=/api/taskflow/**
+                #                                        filters:
+                #                                                -       name: RequestRateLimiter
+                #                                                        args:
+                #                                                                redis-rate-limiter.replenishRate: 5
+                #                                                                redis-rate-limiter.burstCapacity: 10
+                #                                                                key-resolver: "#{@ipKeyResolver}"
+
+                -   id: auth-service
+                    uri: ${AUTH_SERVICE_URL:http://localhost:9999}
+                    predicates:
+                        - Path=/api/auth/**
+                #          filters:
+                #            - name: RequestRateLimiter
+                #              args:
+                #                redis-rate-limiter.replenishRate: 10
+                #                redis-rate-limiter.burstCapacity: 20
+                #                key-resolver: "#{@ipKeyResolver}"
+
+                # 🔹 WebSocket route (HTTP/SockJS)
+                -   id: notification-ws
+                    uri: ${NOTIFICATION_SERVICE_URL:http://localhost:9998}
+                    #                                        uri: http://localhost:9998
+                    predicates:
+                        - Path=/api/notification/ws/**
+
+
+                # 🔹 REST route
+                -   id: notification-rest
+                    uri: ${NOTIFICATION_SERVICE_URL:http://localhost:9998}
+                    #                                        uri: http://localhost:9998
+                    predicates:
+                        - Path=/api/notification/**
+    #          filters:
+    #            - name: RequestRateLimiter
+    #              args:
+    #                redis-rate-limiter.replenishRate: 5
+    #                redis-rate-limiter.burstCapacity: 10
+    #                key-resolver: "#{@ipKeyResolver}"
+
+    # =========================
+    # 🧱 Redis Configuration
+    # =========================
+    data:
+        redis:
+            host: redis
+            port: 6379
+            timeout: 6000
+            lettuce:
+                pool:
+                    max-active: 8
+                    max-idle: 8
+                    min-idle: 0
+                    max-wait: -1ms
+
+    # =========================
+    # ⚙️ Management & Monitoring
+    # =========================
+    management:
+        endpoints:
+            web:
+                exposure:
+                    include: "*"
+        endpoint:
+            health:
+                show-details: always
+
+    # =========================
+    # 📊 Logging Configuration
+    # =========================
+    logging:
+        org.springframework.cloud.gateway.filter.ratelimit: DEBUG
+
+        file:
+            name: logs/api-gateway/dev.log
+        level:
+            root: INFO
+            org.springframework.cloud.gateway: INFO
+            org.springframework.web: INFO
+            org.springframework.security.web.access.ExceptionTranslationFilter: WARN
+            aws.todolist.gateway: DEBUG
+        pattern:
+            console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+            file: "%d{yyyy-MM-dd HH:mm:ss} %-5level [%thread] %logger{36} - %msg%n"
+
+    # =========================
+    # 🧭 SpringDoc Swagger UI (multi-service)
+    # =========================
+    springdoc:
+        api-docs:
+            enabled: true
+        swagger-ui:
+            urls:
+                -   name: user-service
+                    url: http://localhost:8081/api/user/v3/api-docs
+                -   name: taskflow-service
+                    url: http://localhost:8082/api/taskflow/v3/api-docs
+                -   name: auth-service
+                    url: http://localhost:9999/api/auth/v3/api-docs
+                -   name: notification-service
+                    url: http://localhost:9998/api/notification/v3/api-docs

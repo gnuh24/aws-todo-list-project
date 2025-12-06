@@ -36,7 +36,7 @@ public class JwtGatewayFilter implements GlobalFilter {
 		if (ApiPath.isPublicPath(path)) {
 			return chain.filter(exchange);
 		}
-
+		
 		String authHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
 
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) {

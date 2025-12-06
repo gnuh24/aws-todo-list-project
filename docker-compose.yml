@@ -117,10 +117,6 @@ services:
             # ==== Kafka ====
             SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka_broker:29092
 
-        # ==== Optional custom env ====
-        # GATEWAY_URL: http://api_gateway:8080
-        # SERVER_PORT: 8081
-
         extra_hosts:
             - "host.docker.internal:host-gateway"
 
@@ -231,9 +227,6 @@ services:
             # ==== Kafka ====
             SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka_broker:29092
 
-        # ==== Optional custom env ====
-        # GATEWAY_URL: http://api_gateway:8080
-        # SERVER_PORT: 8082
 
         extra_hosts:
             - "host.docker.internal:host-gateway"
@@ -269,9 +262,8 @@ services:
         restart: unless-stopped
         depends_on:
             - redis
-            - kafka
-            - user-service # ✅ thêm dòng này để đảm bảo gateway khởi động sau user-service
-            - auth-service # ✅ thêm để đảm bảo gateway load sau auth
+            - user-service 
+            - auth-service
             - taskflow-service
             - ai-model-service
         ports:

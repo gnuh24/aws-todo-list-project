@@ -72,7 +72,7 @@ public class ApiPath {
 	    REFRESH_TOKEN,
 	    SWAGGER_UI,
 	    API_DOCS,
-			WEBSOCKET
+		WEBSOCKET
 	);
 	
 	private static final AntPathMatcher matcher = new AntPathMatcher();
