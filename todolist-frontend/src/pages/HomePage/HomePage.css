@@ -1,10 +1,10 @@
 .button-glow {
-  width: 165px;
+  width: 180px;
   height: 62px;
   cursor: pointer;
   color: #fff;
   font-size: 17px;
-  border-radius: 1rem;
+  border-radius: 0.5px;
   border: none;
   position: relative;
   background: #100720;
@@ -12,7 +12,17 @@
   font-weight: 600;
   margin-top: 15px;
 }
+.custom-button {
+  background: linear-gradient(135deg, #ff9bbf, #ff6f9f);
+  color: white;
+  border: none;
+  border-radius: 9999px;
+  transition: all 0.3s ease;
+}
 
+.custom-button:hover {
+  transform: translateY(-2px);
+}
 .button-glow::after {
   content: "";
   width: 100%;

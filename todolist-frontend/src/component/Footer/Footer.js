@@ -1,10 +1,11 @@
 import React from "react";
 import { FaYoutube, FaLinkedin, FaInstagram, FaWeibo } from "react-icons/fa";
 import { Select } from "antd";
+import LanguageSwitcher from "../LanguageSwitcher/LanguageSwitcher";
 
 const Footer = () => {
   return (
-    <footer className="bg-[#fff8f4] border-t border-gray-200 py-10 px-6 md:px-20">
+    <footer className=" border-t border-gray-200 py-10 px-6 md:px-20">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
         {/* Logo và mô tả */}
         <div>
@@ -83,14 +84,15 @@ const Footer = () => {
           <span>© Doist Inc.</span>
         </div>
 
-        <Select
+        {/* <Select
           defaultValue="French"
           options={[
             { value: "French", label: "French" },
             { value: "English", label: "English" },
           ]}
           className="w-32"
-        />
+        /> */}
+        <LanguageSwitcher></LanguageSwitcher>
       </div>
     </footer>
   );

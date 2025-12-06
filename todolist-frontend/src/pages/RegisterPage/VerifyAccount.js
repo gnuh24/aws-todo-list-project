@@ -21,7 +21,7 @@ export default function VerifyAccount() {
 
       try {
         const response = await axios.post(
-          `http://localhost:8080/api/auth/v1/active-account`,
+          `http://localhost:9999/api/auth/v1/active-account`,
           null, // body trống
           {
             params: { otp },

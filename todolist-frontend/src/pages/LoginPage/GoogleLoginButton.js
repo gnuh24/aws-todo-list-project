@@ -9,7 +9,7 @@ export default function GoogleLoginButton() {
   return (
     <button
       onClick={handleGoogleLogin}
-      className="flex items-center justify-center w-full py-2 mt-3 text-white  hover:bg-gray-50 rounded-lg shadow"
+      className="flex items-center justify-center w-full py-2 mt-3 text-black  hover:bg-gray-50 rounded-lg shadow"
     >
       <img
         src="https://developers.google.com/identity/images/g-logo.png"

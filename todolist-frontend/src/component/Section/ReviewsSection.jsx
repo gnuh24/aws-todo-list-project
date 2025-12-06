@@ -2,7 +2,7 @@ import React from "react";
 
 const ReviewsSection = () => {
   return (
-    <section className="relative bg-[#fffaf7] overflow-hidden">
+    <section className="relative  overflow-hidden">
       {/* Sóng nền */}
       <img
         src="https://res.cloudinary.com/imagist/image/fetch/q_auto,f_auto,c_scale,w_2624/https%3A%2F%2Fwww.todoist.com%2Fstatic%2Fhome%2Fcustomer-logos-bg%402x.png"
