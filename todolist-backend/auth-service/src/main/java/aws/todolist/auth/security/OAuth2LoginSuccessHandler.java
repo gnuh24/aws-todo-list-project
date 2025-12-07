@@ -22,7 +22,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final AuthService authService;
 	
-	@Value("domain.frontend")
+	@Value("${domain.frontend}")
 	private String domainFrontEnd;
 	
 	@Override
@@ -38,7 +38,6 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 		String avatar = (String) attributes.get("picture");
 		
 		AuthResponseDTO loginInfo = authService.loginGoogle(email, name, avatar);
-		
 		
 		// Build query string
 		String redirectUrl = String.format(

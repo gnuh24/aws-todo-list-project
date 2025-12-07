@@ -17,6 +17,7 @@ public class ApiPath {
 	public static final String REGISTER = AUTH + "/v1/register";
 	public static final String ACTIVE_ACCOUNT = AUTH + "/v1/active-account";
 	public static final String CHECK_EMAIL = AUTH + "/v1/check-email";
+	public static final String LOGIN_GOOGLE = AUTH + "/login/oauth2/code/google";
 	
 	public static final String SEND_RESET_PASSWORD_OTP = AUTH + "/v1/send-reset-password-otp/**";
 	public static final String RESET_PASSWORD = AUTH + "/v1/reset-password/**";
@@ -72,7 +73,8 @@ public class ApiPath {
 	    REFRESH_TOKEN,
 	    SWAGGER_UI,
 	    API_DOCS,
-		WEBSOCKET
+		WEBSOCKET,
+		LOGIN_GOOGLE
 	);
 	
 	private static final AntPathMatcher matcher = new AntPathMatcher();

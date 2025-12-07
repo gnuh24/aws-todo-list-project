@@ -114,7 +114,6 @@ public class AuthServiceImpl implements AuthService {
 			// Tạo password ngẫu nhiên
 			String randomPassword = UUID.randomUUID().toString().substring(0, 12);
 			account.setPassword(passwordEncoder.encode(randomPassword));
-			
 			account.setDisplayName(name);
 			account.setAvatar(avatar);
 			account.setStatus(Account.Status.ACTIVE); // vì Google đã verify email
@@ -140,7 +139,10 @@ public class AuthServiceImpl implements AuthService {
 		}
 		
 		// 5️⃣ Trả về response (tạo JWT,...)
-		return authMapper.toAuthResponse(account, jwtTokenProvider);
+		AuthResponseDTO responseDTO = authMapper.toAuthResponse(account, jwtTokenProvider);
+		responseDTO.setTokenExpirationTime("15 phút");
+		responseDTO.setRefreshTokenExpirationTime("7 ngày");
+		return responseDTO;
 	}
 	
 	
