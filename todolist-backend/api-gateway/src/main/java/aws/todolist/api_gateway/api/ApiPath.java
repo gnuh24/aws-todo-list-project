@@ -11,7 +11,6 @@ public class ApiPath {
 	
 	// ---------- AUTH ----------
 	public static final String AUTH = BASE + "/auth";
-	
 	public static final String LOGIN = AUTH + "/v1/login";
 	public static final String STAFF_LOGIN = AUTH + "/v1/staff-login";
 	public static final String REGISTER = AUTH + "/v1/register";
@@ -54,8 +53,17 @@ public class ApiPath {
 	public static final String MEDIA_UPLOAD = BASE + "/media/upload";
 	
 	// ---------- SWAGGER & DOCS ----------
+	public static final String USER = BASE + "/user";
+	public static final String TASKFLOW = BASE + "/taskflow";
+	public static final String NOTIFICATION = BASE + "/notification";
+	
+	
 	public static final String SWAGGER_UI = BASE + "/swagger/**";
 	public static final String API_DOCS = BASE + "/v3/api-docs/**";
+	public static final String SWAGGER_AUTH = AUTH + "/v3/api-docs";
+	public static final String SWAGGER_USER = USER + "/v3/api-docs";
+	public static final String SWAGGER_TASKFLOW = TASKFLOW + "/v3/api-docs";
+	public static final String SWAGGER_NOTIFICATION = NOTIFICATION + "/v3/api-docs";
 
 	// ---------- WEBSOCKET -------------
 	public static final String WEBSOCKET = BASE + "/notification/ws/**";
@@ -74,7 +82,11 @@ public class ApiPath {
 	    SWAGGER_UI,
 	    API_DOCS,
 		WEBSOCKET,
-		LOGIN_GOOGLE
+		LOGIN_GOOGLE,
+		SWAGGER_AUTH,
+		SWAGGER_USER,
+		SWAGGER_TASKFLOW,
+		SWAGGER_NOTIFICATION
 	);
 	
 	private static final AntPathMatcher matcher = new AntPathMatcher();
