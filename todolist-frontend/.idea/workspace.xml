@@ -5,15 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a7719d69-0674-4558-b744-9f01872a3593" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../todolist-backend/api-gateway/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/api-gateway/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/controller/TestWebSocketController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/controller/TestWebSocketController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/dto/notification/NotificationResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/dto/notification/NotificationResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/entity/Notification.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/entity/Notification.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/repository/NotificationRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/repository/NotificationRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/service/NotificationServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/notification-service/src/main/java/aws/todolist/notification/service/NotificationServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../todolist-backend/auth-service/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-backend/auth-service/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../todolist-database/redis-init.sh" beforeDir="false" afterPath="$PROJECT_DIR$/../todolist-database/redis-init.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/component/TaskComment/CommentSection.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/TaskComment/CommentSection.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/AppPage/NotificationsPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/AppPage/NotificationsPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/layout/MainLayout.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/layout/MainLayout.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -117,6 +112,7 @@
       <workItem from="1764683626273" duration="162000" />
       <workItem from="1764729897694" duration="6160000" />
       <workItem from="1764813828676" duration="5696000" />
+      <workItem from="1765031825837" duration="1172000" />
     </task>
     <servers />
   </component>

@@ -1,6 +1,6 @@
 import Sidebar from "../component/Sidebar/Sidebar";
 import {createContext, useContext, useEffect, useState} from "react";
-import {Outlet, useLocation, useNavigate} from "react-router-dom";
+import {Outlet} from "react-router-dom";
 import {https_notification} from "../service/api";
 import NotificationSocket from "../component/Notification/NotificationSocket";
 import ModalNotification from "../component/Notification/ModalNotification";
