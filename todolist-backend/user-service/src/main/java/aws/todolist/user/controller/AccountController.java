@@ -36,6 +36,16 @@ public class AccountController {
 		return ResponseEntity.ok(new ApiResponse<>(200, "Lấy thông tin account thành công", accountDTO1));
 	}
 	
+
+	@GetMapping()
+	public ResponseEntity<ApiResponse<AccountDetailResponseDTO>> getAccountInfoByEmail(
+		@RequestParam("email") String email
+	) throws AccountNotFoundException {
+		Account account = accountService.getAccountByUsername(email);
+		AccountDetailResponseDTO accountDTO1 = accountMapper.entityToDetailDTO(account);
+		return ResponseEntity.ok(new ApiResponse<>(200, "Lấy thông tin account thành công", accountDTO1));
+	}
+	
 	@Operation(summary = "Cập nhật account cá nhân",
 	    description = "Cập nhật thông tin tài khoản của người dùng đang đăng nhập")
 	@PatchMapping("/me")
