@@ -215,7 +215,7 @@ export default function Sidebar() {
   };
 
   return (
-    <div className="w-64 border-r bg-white flex flex-col justify-between shadow-sm">
+      <div className="fixed left-0 top-0 z-20 w-72 h-full border-r bg-white flex flex-col justify-between shadow-sm overflow-y-auto">
       {/* Header */}
       <HeaderSidebar></HeaderSidebar>
 

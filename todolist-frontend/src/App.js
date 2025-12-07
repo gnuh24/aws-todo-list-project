@@ -24,6 +24,8 @@ import SecureGate from "./layout/SecureGate";
 import { Toaster } from "sonner";
 import ArchivePage from "./pages/AppPage/ArchivePage";
 import UnArchivePage from "./pages/AppPage/UnArchivePgae";
+import NotificationsPage from "./pages/AppPage/NotificationsPage";
+import MainLayout from "./layout/MainLayout";
 function App() {
   return (
     <>
@@ -85,7 +87,6 @@ function App() {
                 path="activity"
                 element={<CompletedPage></CompletedPage>}
               ></Route>
-
               <Route
                 path="archive"
                 element={<ArchivePage></ArchivePage>}
@@ -93,6 +94,12 @@ function App() {
             </Route>
             <Route path="testapi" element={<TestAPI></TestAPI>}></Route>
             <Route path="/login-success" element={<LoginSuccess />} />
+            <Route path="/app" element={<MainLayout></MainLayout>}>
+              <Route
+                  path="notifications"
+                  element={<NotificationsPage></NotificationsPage>}
+              ></Route>
+            </Route>
           </Routes>
         </BrowserRouter>
       </GoogleOAuthProvider>
