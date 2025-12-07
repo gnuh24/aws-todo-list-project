@@ -28,6 +28,9 @@ public class MemberResponseDTO {
     @Schema(description = "URL avatar của member", example = "https://example.com/avatar.jpg")
     private String avatar;
 
+    @Schema(description = "email", example = "abv@gmail.com")
+    private String email;
+
     @Schema(description = "Role của member trong project", example = "OWNER")
     private Role role;
 

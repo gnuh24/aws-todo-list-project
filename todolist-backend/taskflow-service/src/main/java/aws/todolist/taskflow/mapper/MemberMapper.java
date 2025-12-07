@@ -13,6 +13,7 @@ public interface MemberMapper {
     @Mapping(target = "accountId", source = "account.id")
     @Mapping(target = "displayName", source = "account.displayName")
     @Mapping(target = "avatar", source = "account.avatar")
+    @Mapping(target = "email", source = "account.email")
     MemberResponseDTO toResponse(Member member);
 
     List<MemberResponseDTO> toResponseList(List<Member> members);
