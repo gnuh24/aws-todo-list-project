@@ -8,6 +8,7 @@ import {https_notification, https_taskflow} from "../../service/api";
 import {useNavigate} from "react-router-dom";
 import {notificationFilterMap} from "../../data/ActivityFilter";
 import { toast } from "sonner";
+import MainLayout from "../../layout/MainLayout";
 
 function formatDateHeader(dateStr) {
   const date = new Date(dateStr);
@@ -92,6 +93,9 @@ export default function CompletedPage() {
 
   return (
       <>
+      <MainLayout>
+
+     
         <div className="px-10 py-6">
           <div className="sticky top-0 z-30 bg-white py-1">
             <ActivityHeader
@@ -231,6 +235,7 @@ export default function CompletedPage() {
             )}
           </div>
         </div>
+         </MainLayout>
       </>
   );
 

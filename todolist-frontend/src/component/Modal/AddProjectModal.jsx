@@ -1,5 +1,6 @@
 import { Modal, Input, Select, Switch, Button } from "antd";
 import { useState } from "react";
+import { toast } from "sonner";
 import { https_taskflow } from "../../service/api";
 import AboutTeamModal from "./AboutTeamModal";
 import CreateTeamModal from "./CreateTeamModal";
@@ -28,12 +29,12 @@ export default function AddProjectModal({ open, onCancel, onAdd }) {
   const [teamName, setTeamName] = useState("");
 
   const handleAdd = async () => {
-    if (!name.trim()) return alert("Please enter a project name");
+    if (!name.trim()) return toast.error("Please enter a project name");
 
     try {
       const payload = {
         name,
-        isArchived: true,
+        isArchived: false,
       };
 
       const res = await https_taskflow.post("/v1/projects", payload);
@@ -43,7 +44,7 @@ export default function AddProjectModal({ open, onCancel, onAdd }) {
         res.status === 200 ||
         res.status === 201
       ) {
-        alert("Project added successfully!");
+        toast.success("Project added successfully!");
         onAdd?.(res.data.data || payload);
         setName("");
         onCancel();

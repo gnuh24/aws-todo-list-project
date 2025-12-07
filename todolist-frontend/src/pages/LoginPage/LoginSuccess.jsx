@@ -36,7 +36,7 @@ export default function LoginSuccess() {
   }, [location, navigate]);
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-900 text-white text-xl">
+    <div className="flex items-center justify-center h-screen bg-gray-900 text-black text-xl">
       Đang đăng nhập bằng Google...
     </div>
   );

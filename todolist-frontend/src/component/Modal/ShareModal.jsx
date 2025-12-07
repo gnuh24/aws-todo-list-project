@@ -1,14 +1,52 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Copy, X } from "lucide-react";
+import { https_user } from "../../service/api";
 
 export default function ShareModal({ onClose, onSelectUser }) {
   const [email, setEmail] = useState("");
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleAddEmail = () => {
-    if (email.trim() === "") return;
+  // ⏳ Debounce tìm email 400ms
+  useEffect(() => {
+    if (!email) {
+      setUser(null);
+      return;
+    }
 
-    if (onSelectUser) onSelectUser(email.trim());
+    const delay = setTimeout(() => {
+      fetchUserByEmail(email);
+    }, 400);
+
+    return () => clearTimeout(delay);
+  }, [email]);
+
+  const fetchUserByEmail = async (emailValue) => {
+    try {
+      setLoading(true);
+
+      const res = await https_user.get(`/v1/accounts?email=${emailValue}`);
+console.log(res)
+      // Nếu API trả về đúng format
+      if (res.data?.status === 200 && res.data?.data) {
+        setUser(res.data.data); // object user
+      } else {
+        setUser(null);
+      }
+    } catch (err) {
+      console.error("Error fetching user:", err);
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSelectUser = () => {
+    if (onSelectUser && user) {
+      onSelectUser(user);
+    }
     setEmail("");
+    setUser(null);
   };
 
   return (
@@ -22,29 +60,43 @@ export default function ShareModal({ onClose, onSelectUser }) {
         </button>
 
         <div className="p-6">
+
+          {/* Input email */}
           <input
             type="text"
             placeholder="Add people by name or email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleAddEmail()}
             className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring focus:ring-gray-300"
           />
 
-          {/* suggestion */}
-          {email && (
+          {/* Loading */}
+          {loading && (
+            <div className="mt-3 text-sm text-gray-500">Searching...</div>
+          )}
+
+          {/* Nếu tìm thấy user */}
+          {user && !loading && (
             <div
               className="mt-3 p-4 bg-white rounded-xl shadow border cursor-pointer hover:bg-gray-50"
-              onClick={handleAddEmail}
+              onClick={handleSelectUser}
             >
-              <div className="text-sm font-semibold mb-3">
-                Invite someone new
-              </div>
-
               <div className="flex items-center gap-3 p-2 border rounded-lg bg-gray-50">
-                <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
-                <span className="text-sm">{email}</span>
+                <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
+                <div>
+                  <div className="text-sm font-semibold">
+                    {user.displayName || "Unknown user"}
+                  </div>
+                  <div className="text-xs text-gray-500">{user.email}</div>
+                </div>
               </div>
+            </div>
+          )}
+
+          {/* Không tìm thấy user */}
+          {!loading && email && !user && (
+            <div className="mt-3 p-4 bg-white rounded-xl border shadow">
+              <div className="text-sm text-gray-600">No user found</div>
             </div>
           )}
 

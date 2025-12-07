@@ -114,6 +114,9 @@ export default function UpcomingPage() {
   }, []);
 
   return (
+    <MainLayout>
+
+ 
       <div className="min-h-screen bg-white px-8 pb-6 flex flex-col">
         {/* Phần header và điều khiển (sẽ được ghim) */}
         <div className="sticky top-0 z-10 bg-white pb-4">
@@ -343,5 +346,6 @@ export default function UpcomingPage() {
           </div>
         </div>
       </div>
+         </MainLayout>
   );
 }

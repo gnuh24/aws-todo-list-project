@@ -1,22 +1,31 @@
 import React, { useState } from "react";
-import { Modal, Input, Button, Dropdown, Menu } from "antd";
-import {
-  CalendarOutlined,
-  FlagOutlined,
-  BellOutlined,
-  MoreOutlined,
-  InboxOutlined,
-} from "@ant-design/icons";
+import { Modal, Input, Button, Dropdown } from "antd";
+import { CalendarOutlined, BellOutlined } from "@ant-design/icons";
+
 import DatePickerDropdown from "../Dropdown/DatePickerDropdown";
 import PriorityDropdown from "../Dropdown/PriorityDropdown";
 import MoreOptionsDropdown from "../Dropdown/MoreOptionsDropdown";
 import ProjectSelectDropdown from "../Dropdown/ProjectSelectDropdown";
 
-export default function AddTaskModal({ open, onCancel, onAdd }) {
+export default function AddTaskModal({
+  onSelectProjectSection,
+  open,
+  onCancel,
+  onAdd,
+}) {
   const [taskName, setTaskName] = useState("");
   const [description, setDescription] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedProject, setSelectedProject] = useState("Inbox");
+
+  // -------------------------
+  // NEW: selected lưu cả object
+  // -------------------------
+  const [selectedProject, setSelectedProject] = useState({
+    projectId: null,
+    projectName: "Inbox",
+    sectionId: null,
+    sectionName: null,
+  });
 
   return (
     <Modal
@@ -56,15 +65,18 @@ export default function AddTaskModal({ open, onCancel, onAdd }) {
             )}
           >
             <Button icon={<CalendarOutlined />} size="small">
-              {selectedDate ? selectedDate.toString() : "Date"}
+              {selectedDate ? selectedDate.format("DD/MM/YYYY") : "Date"}
             </Button>
           </Dropdown>
+
           <PriorityDropdown
             onSelect={(p) => console.log("Priority selected:", p)}
           />
+
           <Button icon={<BellOutlined />} size="small">
             Reminders
           </Button>
+
           <MoreOptionsDropdown
             onSelect={(action) => console.log("Chọn:", action)}
           />
@@ -76,7 +88,11 @@ export default function AddTaskModal({ open, onCancel, onAdd }) {
         <div className="flex justify-between items-center">
           <ProjectSelectDropdown
             selected={selectedProject}
-            onSelect={(project) => setSelectedProject(project)}
+            onSelect={(data) => {
+              // data = { projectId, projectName, sectionId, sectionName }
+              setSelectedProject(data);
+              onSelectProjectSection?.(data);
+            }}
           />
 
           <div className="flex gap-2">
@@ -89,14 +105,17 @@ export default function AddTaskModal({ open, onCancel, onAdd }) {
                 onAdd({
                   title: taskName,
                   description,
-                  deadline: selectedDate, // ✅ đổi selectedDate → deadline
+                  deadline: selectedDate,
+                  project: selectedProject,
                 });
+console.log("Selected:", selectedDate);
+
                 setTaskName("");
                 setDescription("");
                 setSelectedDate(null);
               }}
             >
-              Add task
+              Add task11111111111111
             </Button>
           </div>
         </div>

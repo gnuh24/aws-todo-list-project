@@ -1,14 +1,46 @@
-import React from "react";
+import React, { useState } from "react";
+import { useParams } from "react-router-dom";
+import { https_taskflow } from "../../service/api";
+import { toast } from "sonner";
 
-export default function InviteModal({ user, onClose, onInvite }) {
+export default function InviteModal({ user, onClose, onInviteSuccess,setOpenSettings  }) {
+  const { projectId } = useParams();
+  const [loading, setLoading] = useState(false);
+
+  const handleInvite = async () => {
+    if (!user?.id) return;
+console.log(user.id)
+    try {
+      setLoading(true);
+
+     const res = await https_taskflow.post(
+  `/v1/projects/${projectId}/members`,
+  {
+    idAccount: user.id,
+    role: "MEMBER"
+  },
+  {
+    headers: {
+      "Content-Type": "application/json",
+    }
+  }
+);
+
+
+      toast.success("Mời member thành công!")
+setOpenSettings(true)
+      if (onInviteSuccess) onInviteSuccess(user);
+      onClose();
+    } catch (err) {
+      console.error("Invite failed:", err);
+      alert("Failed to invite user!");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div
-      className=" fixed top-16 right-6 
-    w-[480px] 
-    bg-white rounded-xl shadow-2xl 
-    overflow-y-auto z-50 
-    animate-slideIn"
-    >
+    <div className="fixed top-16 right-6 w-[480px] bg-white rounded-xl shadow-2xl overflow-y-auto z-50 animate-slideIn">
       <div className="bg-white h-[40vh] rounded-xl shadow-xl p-5">
         <div className="border rounded-lg flex items-center gap-3 px-3 py-2">
           <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
@@ -30,10 +62,11 @@ export default function InviteModal({ user, onClose, onInvite }) {
             </button>
 
             <button
-              onClick={onInvite}
+              onClick={handleInvite}
               className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+              disabled={loading}
             >
-              Invite
+              {loading ? "Inviting..." : "Invite"}
             </button>
           </div>
         </div>

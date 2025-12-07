@@ -1,7 +1,7 @@
 import {useEffect, useRef, useState} from "react";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
-import {useAppContext} from "../../layout/MainLayout";
+import {useAppContext} from "../../layout/MainLayoutNoti";
 
 
 export default function NotificationSocket() {

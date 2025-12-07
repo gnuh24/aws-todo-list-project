@@ -6,30 +6,20 @@ import {
   BellOutlined,
   MoreOutlined,
   InboxOutlined,
-  ClockCircleOutlined
 } from "@ant-design/icons";
 import DatePickerDropdown from "../Dropdown/DatePickerDropdown";
 import PriorityDropdown from "../Dropdown/PriorityDropdown";
 import MoreOptionsDropdown from "../Dropdown/MoreOptionsDropdown";
 import ProjectSelectDropdown from "../Dropdown/ProjectSelectDropdown";
-import dayjs from "dayjs";
 
 export default function TaskEditForm({ task, onSave, onCancel }) {
-  const [showFormDatePicker, setShowFormDatePicker] = useState(false);
   const [taskName, setTaskName] = useState(task?.title || "");
   const [description, setDescription] = useState(task?.description || "");
-  const [selectedStartTime, setSelectedStartTime] = useState(task?.startTime || null);
-  const [selectedDeadline, setSelectedDeadline] = useState(task?.deadline || null);
+  const [selectedDate, setSelectedDate] = useState(task?.date || null);
   const [selectedProject, setSelectedProject] = useState(
-      {id: task?.idProject} || {}
+    task?.project || "Inbox"
   );
-  const [selectedSection, setSelectedSection] = useState(
-      {id: task?.idSection} || {}
-  );
-
   const [priority, setPriority] = useState(task?.priority || null);
-  const formatToDisplay = "HH:mm DD/MM/YYYY";
-  const formatToSend = "YYYY-MM-DDTHH:mm:ss";
 
   const handleSave = () => {
     if (!taskName.trim()) return;
@@ -38,9 +28,8 @@ export default function TaskEditForm({ task, onSave, onCancel }) {
       title: taskName,
       description,
       priority,
-      startTime: selectedStartTime ? dayjs(selectedStartTime).format(formatToSend) : null,
-      deadline: selectedDeadline ? dayjs(selectedDeadline).format(formatToSend) : null,
-      idSection: selectedSection.id
+      startTime: selectedDate ? selectedDate.toISOString() : null,
+      deadline: selectedDate ? selectedDate.toISOString() : null,
     });
   };
 
@@ -63,41 +52,22 @@ export default function TaskEditForm({ task, onSave, onCancel }) {
         className="border-none text-[13px] text-gray-500 focus:shadow-none mt-2"
       />
 
-      {/* Deadline hiển thị nếu khác null */}
-      {selectedDeadline && (
-          <div className="text-[13px] text-gray-600 mb-2 flex items-center gap-1">
-            <ClockCircleOutlined className="text-orange-500" />
-            <span className="text-orange-500">Deadline: {selectedDeadline ? dayjs(selectedDeadline).format(formatToDisplay) : ""}</span>
-          </div>
-      )}
-
       {/* Buttons row */}
       <div className="flex items-center gap-2 mt-3 flex-wrap">
         {/* Date picker */}
         <Dropdown
-            trigger={["click"]}
-            open={showFormDatePicker}
-            onOpenChange={(v) => {
-              setShowFormDatePicker(v); // <-- dùng v thay vì true cố định
-            }}
-            dropdownRender={() => (
-                <DatePickerDropdown
-                    isStartTime={true}
-                    showForm={showFormDatePicker}
-                    onSelect={(val) => {
-                      setSelectedStartTime(val);
-                      setShowFormDatePicker(false); // <<< đóng dropdown sau khi chọn
-                    }}
-                />
-            )}
+          trigger={["click"]}
+          dropdownRender={() => (
+            <DatePickerDropdown onSelect={(value) => setSelectedDate(value)} />
+          )}
         >
           <Button icon={<CalendarOutlined />} size="small">
-            {selectedStartTime ? dayjs(selectedStartTime).format(formatToDisplay) : "Date"}
+            {selectedDate ? selectedDate.toString() : "Date"}
           </Button>
         </Dropdown>
 
         {/* Priority */}
-        <PriorityDropdown priority={priority} onSelect={setPriority} />
+        <PriorityDropdown onSelect={(p) => setPriority(p)} />
 
         {/* Reminder */}
         <Button icon={<BellOutlined />} size="small">
@@ -107,7 +77,6 @@ export default function TaskEditForm({ task, onSave, onCancel }) {
         {/* More options */}
         <MoreOptionsDropdown
           onSelect={(action) => console.log("Selected:", action)}
-          setSelectedDateline={setSelectedDeadline}
         />
       </div>
 
@@ -117,35 +86,21 @@ export default function TaskEditForm({ task, onSave, onCancel }) {
       <div className="flex justify-between items-center">
         {/* Project select */}
         <ProjectSelectDropdown
-            selectedSection={selectedSection}
-            selectedProject={selectedProject}
-            onSelectedSection={setSelectedSection}
-            onSelectedProject={setSelectedProject}
+          selected={selectedProject}
+          onSelect={(project) => setSelectedProject(project)}
         />
 
         {/* Action buttons */}
         <div className="flex gap-2">
+          <Button onClick={onCancel}>Cancel</Button>
           <Button
-              onClick={(e) => {
-                e.stopPropagation(); // Ngăn nổi bọt, không trigger onClick của div cha
-                onCancel();
-              }}
-          >
-            Cancel
-          </Button>
-
-          <Button
-              type="primary"
-              danger
-              disabled={!taskName.trim()}
-              onClick={(e) => {
-                e.stopPropagation(); // Ngăn nổi bọt
-                handleSave();
-              }}
+            type="primary"
+            danger
+            disabled={!taskName.trim()}
+            onClick={handleSave}
           >
             Save
           </Button>
-
         </div>
       </div>
     </div>

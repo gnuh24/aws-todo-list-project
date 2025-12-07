@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { X, Info } from "lucide-react";
+import { toast } from "sonner";
 
 export default function AddLabelModal({ onClose, onAdd }) {
   const [name, setName] = useState("");
@@ -15,7 +16,7 @@ export default function AddLabelModal({ onClose, onAdd }) {
   ];
 
   const handleAdd = () => {
-    if (!name.trim()) return alert("Please enter a label name.");
+    if (!name.trim()) return toast.error("Please enter a label name.");
     onAdd({ name, color, favorite });
     onClose();
   };

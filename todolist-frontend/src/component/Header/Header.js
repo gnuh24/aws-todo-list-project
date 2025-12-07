@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 export default function Header() {
   return (
-    <header className="fixed top-0 left-0 w-full z-50 bg-white shadow-sm">
+    <header className="fixed top-0 left-0 w-full z-50 bg-gradient-to-b from-[#e8f3ff] to-[#b0d0ff] shadow-sm">
       <div className="max-w-7xl mx-auto flex items-center justify-between px-8 py-4">
         {/* Logo */}
         <Link to="/">
@@ -67,8 +67,16 @@ export default function Header() {
 
           {/* Resources */}
           <div className="relative group cursor-pointer">
-            <span>Resources ▾</span>
-            <div className="absolute hidden group-hover:block bg-white shadow-md rounded mt-2 p-3 w-40">
+            <span className="group-hover:text-red-600">Resources ▾</span>
+
+            <div
+              className="
+    absolute left-0 mt-2 w-40 bg-white shadow-md rounded-md p-3
+    opacity-0 pointer-events-none
+    group-hover:opacity-100 group-hover:pointer-events-auto
+    transition-all duration-150
+  "
+            >
               <a href="#" className="block px-2 py-1 hover:bg-gray-100 rounded">
                 Blog
               </a>
