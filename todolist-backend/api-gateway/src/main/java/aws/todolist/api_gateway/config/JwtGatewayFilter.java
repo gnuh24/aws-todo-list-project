@@ -31,9 +31,13 @@ public class JwtGatewayFilter implements GlobalFilter {
 	public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 
 		String path = exchange.getRequest().getURI().getPath();
-
+		
+		System.err.println("Path: " + path);
 
 		if (ApiPath.isPublicPath(path)) {
+			System.err.println("No JWT -> Pass");
+			System.err.println("_________________");
+			
 			return chain.filter(exchange);
 		}
 		

@@ -39,6 +39,8 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 		
 		AuthResponseDTO loginInfo = authService.loginGoogle(email, name, avatar);
 		
+		System.err.println("Info: " + loginInfo);
+		
 		// Build query string
 		String redirectUrl = String.format(
 			domainFrontEnd
@@ -63,6 +65,9 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 			URLEncoder.encode(loginInfo.getRefreshToken(), StandardCharsets.UTF_8),
 			URLEncoder.encode(loginInfo.getRefreshTokenExpirationTime(), StandardCharsets.UTF_8)
 		);
+		
+		System.err.println("Redic: " + redirectUrl);
+		
 		
 		response.sendRedirect(redirectUrl);
 	}
