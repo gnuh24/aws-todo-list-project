@@ -62,9 +62,7 @@ function App() {
             <Route
                 path="/app"
                 element={
-                  <SecureGate>
                     <MainLayout />
-                  </SecureGate>
                 }
             >
               <Route path="inbox" element={<InboxPage />} />
