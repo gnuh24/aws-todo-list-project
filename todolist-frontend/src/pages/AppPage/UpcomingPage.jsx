@@ -6,13 +6,23 @@ import "react-day-picker/dist/style.css";
 import InlineAddTaskFormUpComing from "../../component/Modal/InlineAddTaskFormUpComing";
 import { https_taskflow } from "../../service/api";
 import TaskItemForUpComing from "../../component/Task/TaskItemForUpComing";
+import { useLocation } from "react-router-dom";
 
 export default function UpcomingPage() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showAddTaskIndex, setShowAddTaskIndex] = useState(null);
   const [showCalendar, setShowCalendar] = useState(false);
   const [tasksByDate, setTasksByDate] = useState({});
+const location = useLocation();
 
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const token = params.get("token");
+    if (token) {
+      localStorage.setItem("ACCESS_TOKEN", token);
+      window.history.replaceState({}, document.title, "/app/upcoming");
+    }
+  }, [location]);
   // Lấy ra ngày chủ nhật của tuần hiện tại
   const today = new Date();
   today.setHours(0, 0, 0, 0);

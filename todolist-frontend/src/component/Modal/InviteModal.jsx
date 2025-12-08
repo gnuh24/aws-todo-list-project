@@ -32,6 +32,7 @@ setOpenSettings(true)
       if (onInviteSuccess) onInviteSuccess(user);
       onClose();
     } catch (err) {
+      toast.erroṛ̣("Thành viên đã được thêm vào dự án")
       console.error("Invite failed:", err);
       alert("Failed to invite user!");
     } finally {

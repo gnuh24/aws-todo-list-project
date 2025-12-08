@@ -40,7 +40,7 @@ export default function HomePage() {
             <span className="text-gray-700 font-medium">
               374,000+ ★★★★★ reviews
             </span>
-            <h1 className="ml-3">{t("hello")}</h1>
+            {/*<h1 className="ml-3">{t("hello")}</h1>*/}
           </motion.div>
 
           <Link to="/register">

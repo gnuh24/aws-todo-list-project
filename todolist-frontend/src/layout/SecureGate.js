@@ -15,7 +15,7 @@ export default function SecureGate({ children }) {
     // Nếu đã đăng nhập → chuyển đến inbox
     if (window.location.pathname === "/") {
       toast.success("Chào mừng trở lại");
-      window.location.href = "/app/inbox";
+      window.location.href = "/app/upcoming";
     }
   }, []);
 

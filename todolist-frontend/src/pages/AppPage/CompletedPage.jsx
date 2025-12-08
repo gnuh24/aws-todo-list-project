@@ -118,7 +118,7 @@ export default function CompletedPage() {
                       <div key={date} className="mb-8">
 
                         {/* --- Header Ngày --- */}
-                        <div className="sticky top-16 z-20 bg-white mb-2 font-semibold text-gray-800 text-sm border-b border-gray-200 py-1">
+                        <div className="sticky top-20 z-20 bg-white mb-2 font-semibold text-gray-800 text-sm border-b border-gray-200 py-1">
                           {formatDateHeader(date)}
                         </div>
 

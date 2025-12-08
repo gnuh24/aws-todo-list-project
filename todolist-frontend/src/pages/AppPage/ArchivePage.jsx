@@ -32,7 +32,7 @@ export default function MyProjectsPage() {
     : allProjects.filter((p) => p.isArchived === false);
 
   return (
-    <MainLayout>
+    
       <div className="w-full px-20 py-10">
         {/* Title */}
         <div className="flex items-center gap-3 mb-1">
@@ -119,6 +119,6 @@ export default function MyProjectsPage() {
           )}
         </div>
       </div>
-    </MainLayout>
+
   );
 }

@@ -1,33 +1,64 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ShareModal from "../Modal/ShareModal";
 import InviteModal from "../Modal/InviteModal";
 import ShareSettingsModal from "../Modal/ShareSettingsModal";
 import { Share2, LayoutList, MessageSquare } from "lucide-react";
+import { useParams } from "react-router-dom";
+import { https_taskflow } from "../../service/api";
 
 export default function ProjectHeader() {
+  const { projectId } = useParams();
+
   const [openShare, setOpenShare] = useState(false);
   const [openInvite, setOpenInvite] = useState(false);
   const [openSettings, setOpenSettings] = useState(false);
 
+  const [members, setMembers] = useState([]);
+
   const [selectedEmail, setSelectedEmail] = useState("");
- const [selectedId, setSelectedId] = useState("");
- const handleSelectUser = (user) => {
-  setSelectedEmail(user.email);   // lấy email đúng
-  setSelectedId(user.id)
-  setOpenShare(false);
-  setOpenInvite(true);
-};
+  const [selectedId, setSelectedId] = useState("");
 
+  // -----------------------------------
+  // 1. FETCH MEMBERS
+  // -----------------------------------
+  useEffect(() => {
+    const fetchMembers = async () => {
+      try {
+        const res = await https_taskflow.get(
+          `/v1/projects/${projectId}/members`
+        );
 
-  const handleInviteDone = () => {
-    setOpenInvite(false);
-    setOpenSettings(true); // mở share settings
-  };
+        setMembers(res.data?.data || []);
+      } catch (error) {
+        console.error("Lỗi load members:", error);
+      }
+    };
+
+    if (projectId) fetchMembers();
+  }, [projectId]);
+
+  // -----------------------------------
+  // 2. CHECK: có thành viên role MEMBER ?
+  // -----------------------------------
+  const hasMemberRole = members.some((m) => m.role === "MEMBER");
+
+  // -----------------------------------
+  // 3. CLICK SHARE
+  // -----------------------------------
   const handleClickShare = () => {
-    setOpenShare(true);
-    setOpenSettings(false);
-    setOpenInvite(false);
+    if (hasMemberRole) {
+      // Đã có người role MEMBER → mở settings
+      setOpenSettings(true);
+      setOpenShare(false);
+      setOpenInvite(false);
+    } else {
+      // Chưa có member role = MEMBER → mở ShareModal
+      setOpenShare(true);
+      setOpenSettings(false);
+      setOpenInvite(false);
+    }
   };
+
   return (
     <>
       <header className="flex justify-between items-center px-6 py-3 border-b">
@@ -38,14 +69,17 @@ export default function ProjectHeader() {
 
         <div className="flex items-center gap-5 text-gray-700">
           <button
-            onClick={() => handleClickShare()}
+            onClick={handleClickShare}
             className="flex items-center gap-1 hover:text-black"
           >
             <Share2 size={16} />
             <span>Share</span>
           </button>
 
-          <button className="flex items-center gap-1 hover:text-black" onClick={() => setOpenSettings((prev) => !prev)}>
+          <button
+            className="flex items-center gap-1 hover:text-black"
+            onClick={() => setOpenSettings((prev) => !prev)}
+          >
             <LayoutList size={16} />
             <span>Display</span>
           </button>
@@ -63,25 +97,33 @@ export default function ProjectHeader() {
       {openShare && (
         <ShareModal
           onClose={() => setOpenShare(false)}
-          onSelectUser={handleSelectUser}
+          onSelectUser={(user) => {
+            setSelectedEmail(user.email);
+            setSelectedId(user.id);
+            setOpenShare(false);
+            setOpenInvite(true);
+          }}
         />
       )}
 
       {/* INVITE MODAL */}
       {openInvite && (
         <InviteModal
-          user={{ email: selectedEmail,id :selectedId }}
+          user={{ email: selectedEmail, id: selectedId }}
           onClose={() => setOpenInvite(false)}
-          setOpenSettings={setOpenSettings}
-          onInvite={handleInviteDone}
+          onInvite={() => {
+            setOpenInvite(false);
+            setOpenSettings(true);
+          }}
         />
       )}
 
-      {/* SHARE SETTINGS MODAL */}
+      {/* SHARE SETTINGS MODAL — mở nếu có member role MEMBER */}
       {openSettings && (
         <ShareSettingsModal
           onClose={() => setOpenSettings(false)}
           invitedEmail={selectedEmail}
+          members={members}
         />
       )}
     </>
