@@ -44,7 +44,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 		// Build query string
 		String redirectUrl = String.format(
 			domainFrontEnd
-				+ "/app/upcoming"
+				+ "/app/inbox"
 				+ "?id=%s"
 				+ "&email=%s"
 				+ "&displayName=%s"
@@ -66,7 +66,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 			URLEncoder.encode(loginInfo.getRefreshTokenExpirationTime(), StandardCharsets.UTF_8)
 		);
 		
-		System.err.println("Redic: " + redirectUrl);
+		System.err.println("Redirect Url: " + redirectUrl);
 		
 		response.sendRedirect(redirectUrl);
 	}
