@@ -255,12 +255,12 @@ export default function Sidebar() {
               open={openSearch}
               onClose={() => setOpenSearch(false)}
             />
-            {/* <SidebarItem
+            <SidebarItem
               onClick={() => navigate("/app/inbox")}
               icon={<InboxOutlined />}
               label="Inbox"
               active={isActive("/app/inbox")}
-            /> */}
+            />
             <SidebarItem
               onClick={() => navigate("/app/today")}
               icon={<CalendarOutlined />}

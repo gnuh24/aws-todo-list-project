@@ -6,12 +6,10 @@ const BASE_URL = "http://localhost:8080/api";
 // axios instance
 export let https_auth = axios.create({
   baseURL: BASE_URL+"/auth",
-  // headers: {
-  //   TokenCybersoft:
-  //     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5Mb3AiOiJCb290Y2FtcCA2OCIsIkhldEhhblN0cmluZyI6IjE1LzAxLzIwMjUiLCJIZXRIYW5UaW1lIjoiMTczNjg5OTIwMDAwMCIsIm5iZiI6MTcwOTEzOTYwMCwiZXhwIjoxNzM3MDQ2ODAwfQ.15h8Zu___NIMHyUdFGA_OXmW8LeIiC8dEKnAv1v362Q",
-  //   Authorization:
-  //     "Bearer " + JSON.parse(localStorage.getItem("USER_INFO"))?.accessToken,
-  // },
+  headers: {
+    Authorization:
+      "Bearer " + JSON.parse(localStorage.getItem("USER_INFO"))?.token
+  },
 });
 export let https_taskflow = axios.create({
   baseURL: BASE_URL+"/taskflow",
