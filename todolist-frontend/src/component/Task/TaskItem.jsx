@@ -182,6 +182,8 @@ export default function TaskItem({
           <Dropdown
               trigger={["click"]}
               open={showFormDatePicker}
+              onClick={(e) => {
+                  e.stopPropagation()}}
               onOpenChange={(v) => {
                 setShowFormDatePicker(v); // mỗi lần mở lại form
               }}
@@ -213,13 +215,18 @@ export default function TaskItem({
           <div className="relative" ref={menuRef}>
             <button
               className="p-1 hover:text-gray-900 text-gray-500"
-              onClick={() => setMenuOpen(!menuOpen)}
+              onClick={(e) => {
+                  e.stopPropagation()
+                  setMenuOpen(!menuOpen)
+              }}
             >
               <MoreHorizontal size={14} />
             </button>
 
             {menuOpen && (
-              <div className="absolute right-0 mt-1 w-44 bg-white border rounded-md shadow-lg py-1 text-sm animate-fade-in z-50">
+              <div className="absolute right-0 mt-1 w-44 bg-white border rounded-md shadow-lg py-1 text-sm animate-fade-in z-50"
+                   onClick={(e)=>{e.stopPropagation()}}
+              >
                 <button className="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 text-gray-700">
                   <ArrowUp size={14} /> Add task above
                 </button>

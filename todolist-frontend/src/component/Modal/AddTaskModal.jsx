@@ -74,7 +74,7 @@ export default function AddTaskModal({
             )}
           >
             <Button icon={<CalendarOutlined />} size="small">
-              {selectedStartTime? selectedStartTime.format("DD/MM/YYYY") : "Date"}
+              {selectedStartTime? selectedStartTime.format("DD/MM/YYYY") : "Start time"}
             </Button>
           </Dropdown>
 

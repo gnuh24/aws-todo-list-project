@@ -8,18 +8,15 @@ import {
     MoreHorizontal,
     GripVertical,
     Trash2,
-    Copy,
-    ArrowUp,
-    ArrowDown,
     Flag,
 } from "lucide-react";
 import { https_taskflow } from "../../service/api";
 import dayjs from "dayjs";
-import DatePickerDropdown from "../Dropdown/DatePickerDropdown";
 import TaskDetailModal from "../Modal/TaskDetailModal";
 import {toast} from "sonner";
 import TaskEditFormUpComing from "./TaskEditFormUpComing";
 import DatePickerDropdownForUpComing from "../Dropdown/DatePickerDropdownForUpComing";
+import PriorityDropdown from "../Dropdown/PriorityDropdown";
 
 export default function TaskItemForUpComing({
                                                 sectionId,
@@ -27,7 +24,6 @@ export default function TaskItemForUpComing({
                                                 task,
                                                 onDeleteTaskUpComing,
                                                 onUpdateTaskUpComing,
-                                                isOpenFormAddTaskUpComing,
                                             }) {
     const [isEditing, setIsEditing] = useState(false);
     const [isOpenComment, setIsOpenComment] = useState(false);
@@ -120,6 +116,31 @@ export default function TaskItemForUpComing({
                 setNewStatus(task.status);
 
                 return false;
+            }
+
+        } catch (err) {
+            toast.error(err?.response?.data?.message || "Cập nhật thất bại, vui lòng thử lại!")
+            setNewStatus(task.status);
+        }
+    }
+
+    const handleUpdatePriority = async (priority) => {
+        try {
+            const res = await https_taskflow.patch(
+                `/v1/projects/${projectId}/tasks/${task.id}/update-priority`,
+                {
+                    priority: priority,
+                }
+            );
+
+            if (res.status === 200) {
+                console.log(res.data);
+                const updatedTask = res.data.data;
+
+                // Nếu là cập nhật taskUpComing thì reload lại list
+                onUpdateTaskUpComing?.(updatedTask);
+
+                return true;
             }
 
         } catch (err) {
@@ -226,21 +247,27 @@ export default function TaskItemForUpComing({
                         </button>
 
                         {menuOpen && (
-                            <div className="absolute right-0 mt-1 w-44 bg-white border rounded-md shadow-lg py-1 text-sm animate-fade-in z-50">
-                                <button className="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 text-gray-700">
-                                    <ArrowUp size={14} /> Add task above
-                                </button>
-                                <button className="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 text-gray-700">
-                                    <ArrowDown size={14} /> Add task below
-                                </button>
-                                <button className="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 text-gray-700">
-                                    <Flag size={14} /> Priority
-                                </button>
-                                <button className="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 text-gray-700">
-                                    <Copy size={14} /> Duplicate
-                                </button>
+                            <div className="absolute right-0 mt-1 w-44 bg-white border rounded-md shadow-lg py-1 text-sm animate-fade-in z-50"
+                                 onClick={(e)=>{e.stopPropagation()}}>
+                                {/*<button className="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 text-gray-700">*/}
+                                {/*    <ArrowUp size={14} /> Add task above*/}
+                                {/*</button>*/}
+                                {/*<button className="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 text-gray-700">*/}
+                                {/*    <ArrowDown size={14} /> Add task below*/}
+                                {/*</button>*/}
+                                {/*<div className="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 text-gray-700">*/}
+                                {/*    <Flag size={14} />*/}
+                                {/*    <span>Priority</span>*/}
+                                {/*    <PriorityDropdown priority={task.priority} onSelect={handleUpdatePriority}/>*/}
+                                {/*</div>*/}
+                                {/*<button className="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 text-gray-700">*/}
+                                {/*    <Copy size={14} /> Duplicate*/}
+                                {/*</button>*/}
                                 <button
-                                    onClick={handleDelete}
+                                    onClick={(e)=>{
+                                        e.stopPropagation()
+                                        handleDelete()
+                                    }}
                                     className="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 text-red-600"
                                 >
                                     <Trash2 size={14} /> Delete
