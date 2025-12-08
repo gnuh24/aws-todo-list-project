@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Modal, Input, Button, Dropdown } from "antd";
-import { CalendarOutlined, BellOutlined } from "@ant-design/icons";
+import {CalendarOutlined, BellOutlined, ClockCircleOutlined} from "@ant-design/icons";
 
 import DatePickerDropdown from "../Dropdown/DatePickerDropdown";
 import PriorityDropdown from "../Dropdown/PriorityDropdown";
@@ -17,6 +17,7 @@ export default function AddTaskModal({
   const [description, setDescription] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
   const [priority, setPriority] = useState("LOW");
+  const [selectedStartTime, setSelectedStartTime] = useState(null);
 
   // -------------------------
   // NEW: selected lưu cả object
@@ -55,18 +56,25 @@ export default function AddTaskModal({
           className="border-none text-[13px] text-gray-500 focus:shadow-none"
         />
 
+          {selectedDate && (
+              <div className="text-[13px] text-gray-600 mb-2 flex items-center gap-1">
+                  <ClockCircleOutlined className="text-orange-500" />
+                  <span className="text-orange-500">Deadline: {selectedDate ? selectedDate.format("DD/MM/YYYY") : ""}</span>
+              </div>
+          )}
+
         {/* Buttons row */}
         <div className="flex items-center gap-2">
           <Dropdown
             trigger={["click"]}
             dropdownRender={() => (
               <DatePickerDropdown
-                onSelect={(value) => setSelectedDate(value)}
+                onSelect={(value) => setSelectedStartTime(value)}
               />
             )}
           >
             <Button icon={<CalendarOutlined />} size="small">
-              {selectedDate ? selectedDate.format("DD/MM/YYYY") : "Date"}
+              {selectedStartTime? selectedStartTime.format("DD/MM/YYYY") : "Date"}
             </Button>
           </Dropdown>
 
@@ -75,12 +83,8 @@ export default function AddTaskModal({
             onSelect={setPriority}
           />
 
-          <Button icon={<BellOutlined />} size="small">
-            Reminders
-          </Button>
-
           <MoreOptionsDropdown
-            onSelect={(action) => console.log("Chọn:", action)}
+            setSelectedDateline={setSelectedDate} onSelect={(action) => console.log("Chọn:", action)}
           />
         </div>
 
@@ -108,7 +112,9 @@ export default function AddTaskModal({
                   title: taskName,
                   description,
                   deadline: selectedDate,
-                  project: selectedProject, priority: priority,
+                  project: selectedProject,
+                    priority: priority,
+                    startTime: selectedStartTime,
                 });
 console.log("Selected:", selectedDate);
 
