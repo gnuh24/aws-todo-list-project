@@ -76,20 +76,20 @@ export default function ProjectHeader() {
             <span>Share</span>
           </button>
 
-          <button
+          {/* <button
             className="flex items-center gap-1 hover:text-black"
             onClick={() => setOpenSettings((prev) => !prev)}
           >
             <LayoutList size={16} />
             <span>Display</span>
-          </button>
+          </button> */}
 
-          <button className="flex items-center gap-1 hover:text-black">
+          {/* <button className="flex items-center gap-1 hover:text-black">
             <MessageSquare size={16} />
             <span>1</span>
           </button>
 
-          <button className="hover:text-black">⋯</button>
+          <button className="hover:text-black">⋯</button> */}
         </div>
       </header>
 

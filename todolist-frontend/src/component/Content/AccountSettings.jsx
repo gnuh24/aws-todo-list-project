@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import { useState } from "react";
 import { Switch } from "antd";
 import { https_user } from "../../service/api";
 
@@ -7,12 +7,11 @@ export default function AccountSettings({
   onGotoChangeEmail,
 }) {
   const dataUser = JSON.parse(localStorage.getItem("USER_INFO")) || {};
-  const { id, displayName, email, avatarUrl } = dataUser;
+  const { displayName, email, avatar } = dataUser;
 
   const [name, setName] = useState(displayName || "");
   const [tempName, setTempName] = useState(displayName || "");
   const [editing, setEditing] = useState(false);
-  const [isNotificationEmail, setIsNotificationEmail] = useState(false);
 
   const handleCancel = () => {
     setTempName(name);
@@ -24,7 +23,7 @@ export default function AccountSettings({
       setEditing(false);
 
       const payload = {
-        avatar: avatarUrl || null, // hoặc state bạn đang dùng để lưu avatar
+        avatar: avatar || null, // hoặc state bạn đang dùng để lưu avatar
         displayName: tempName,
       };
 
@@ -43,38 +42,6 @@ export default function AccountSettings({
       console.error("Update failed:", error);
     }
   };
-
-  const handleUpdateNotificationEmail = async (value) => {
-    console.log(value)
-    try {
-
-      // Gọi API cập nhật
-      await https_user.patch(`/v1/accounts/me`, {
-        receiveEmail: value,
-      });
-
-      // Cập nhật lại UI
-      setIsNotificationEmail(value)
-
-      console.log(value)
-
-    } catch (error) {
-      console.error("Update failed:", error);
-    }
-  }
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await https_user.get("/v1/accounts/me"); // phải await
-        setIsNotificationEmail(res.data.data.receiveEmail);
-      } catch (e) {
-        console.error(e);
-      }
-    };
-
-    fetchUser();
-  }, []);
 
   return (
     <div className="text-gray-700">
@@ -98,7 +65,8 @@ export default function AccountSettings({
 
         <div className="flex items-center gap-5">
           <img
-            src={avatarUrl || "https://i.pravatar.cc/80"}
+            src={avatar || "https://i.pravatar.cc/80"}
+            referrerPolicy="no-referrer"
             className="w-20 h-20 rounded-full object-cover"
           />
 
@@ -191,24 +159,6 @@ export default function AccountSettings({
           2FA is disabled on your Todoist account.
         </p>
       </div>
-
-      {/* Email Notifications */}
-      <div className="mb-8">
-        <h3 className="text-sm text-gray-500 mb-1">
-          Email notifications
-        </h3>
-
-        <Switch
-            checked={isNotificationEmail}
-            onChange={(value) => handleUpdateNotificationEmail(value)}
-        />
-
-
-        <p className="text-xs text-gray-500 mt-1">
-          You will receive updates and alerts via email.
-        </p>
-      </div>
-
     </div>
   );
 }
