@@ -54,7 +54,7 @@ export default function SearchCommandModal({ open, onClose }) {
   ];
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-start justify-center pt-24 z-60">
+    <div className="fixed inset-0 bg-black/40 flex items-start justify-center pt-24">
       <div className="bg-white w-full max-w-lg rounded-lg shadow-xl overflow-hidden">
         {/* Search bar */}
         <div className="flex items-center gap-2 border-b px-4 py-3">

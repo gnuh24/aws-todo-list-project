@@ -255,7 +255,7 @@ useEffect(() => {
   };
 
   return (
-    <div className="fixed left-0 top-0 z-20 w-72 h-full border-r bg-white flex flex-col justify-between shadow-sm overflow-y-auto">
+    <div className="fixed left-0 top-0 z-50 w-72 h-full border-r bg-white flex flex-col justify-between shadow-sm overflow-y-auto">
       {/* Header */}
       <HeaderSidebar></HeaderSidebar>
 
