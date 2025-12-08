@@ -7,7 +7,7 @@ export default function AccountSettings({
   onGotoChangeEmail,
 }) {
   const dataUser = JSON.parse(localStorage.getItem("USER_INFO")) || {};
-  const { id, displayName, email, avatarUrl } = dataUser;
+  const { id, displayName, email, avatar } = dataUser;
 
   const [name, setName] = useState(displayName || "");
   const [tempName, setTempName] = useState(displayName || "");
@@ -81,16 +81,16 @@ export default function AccountSettings({
       {/* HEADER */}
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold">Account</h2>
-        <button className="px-4 py-1.5 rounded border text-sm hover:bg-gray-100">
+        {/* <button className="px-4 py-1.5 rounded border text-sm hover:bg-gray-100">
           Manage plan
-        </button>
+        </button> */}
       </div>
 
-      {/* PLAN */}
+      {/* PLAN
       <div className="mb-8">
         <h3 className="text-sm text-gray-500">Plan</h3>
         <p className="text-lg font-medium">Beginner</p>
-      </div>
+      </div> */}
 
       {/* PHOTO */}
       <div className="mb-8">
@@ -180,7 +180,7 @@ export default function AccountSettings({
         </button>
       </div>
 
-      {/* 2FA */}
+      {/* 2FA
       <div className="mb-8">
         <h3 className="text-sm text-gray-500 mb-1">
           Two-factor authentication
@@ -191,7 +191,7 @@ export default function AccountSettings({
         <p className="text-xs text-gray-500 mt-1">
           2FA is disabled on your Todoist account.
         </p>
-      </div>
+      </div> */}
 
       {/* Email Notifications */}
       <div className="mb-8">
