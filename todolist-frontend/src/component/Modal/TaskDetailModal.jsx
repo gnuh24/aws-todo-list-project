@@ -207,22 +207,22 @@ export default function TaskDetailModal({
 
           {/* RIGHT SIDEBAR */}
           <div className="w-72 bg-[#fcfaf8] p-4 space-y-2 border-l">
-            <SidebarItem
-              label="Project"
-              icon={<LockOutlined />}
-              value="Inbox"
-            />
-            {/* Date */}
-            <SidebarItem label="Date" value="+"
-                         onClick={() => console.log("Open date picker")}
-            />
+            {/*<SidebarItem*/}
+            {/*  label="Project"*/}
+            {/*  icon={<LockOutlined />}*/}
+            {/*  value="Inbox"*/}
+            {/*/>*/}
+            {/*/!* Date *!/*/}
+            {/*<SidebarItem label="Date" value="+"*/}
+            {/*             onClick={() => console.log("Open date picker")}*/}
+            {/*/>*/}
 
             {/* Deadline */}
-            <SidebarItem
-                label="Deadline"
-                icon={<LockOutlined />}
-                onClick={() => console.log("Deadline locked")}
-            />
+            {/*<SidebarItem*/}
+            {/*    label="Deadline"*/}
+            {/*    icon={<LockOutlined />}*/}
+            {/*    onClick={() => console.log("Deadline locked")}*/}
+            {/*/>*/}
 
             {/* Priority */}
             <SidebarItem
@@ -235,19 +235,19 @@ export default function TaskDetailModal({
             {/* Labels with dropdown */}
             <LabelsSection taskDetail={taskDetail}></LabelsSection>
 
-            {/* Reminders */}
-            <SidebarItem
-                label="Reminders"
-                value="+"
-                onClick={() => console.log("Reminders")}
-            />
+            {/*/!* Reminders *!/*/}
+            {/*<SidebarItem*/}
+            {/*    label="Reminders"*/}
+            {/*    value="+"*/}
+            {/*    onClick={() => console.log("Reminders")}*/}
+            {/*/>*/}
 
-            {/* Location */}
-            <SidebarItem
-                label="Location"
-                icon={<LockOutlined />}
-                onClick={() => console.log("Location locked")}
-            />
+            {/*/!* Location *!/*/}
+            {/*<SidebarItem*/}
+            {/*    label="Location"*/}
+            {/*    icon={<LockOutlined />}*/}
+            {/*    onClick={() => console.log("Location locked")}*/}
+            {/*/>*/}
           </div>
         </div>
       )}

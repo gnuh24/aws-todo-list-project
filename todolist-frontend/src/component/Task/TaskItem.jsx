@@ -155,8 +155,8 @@ export default function TaskItem({
               checked={newStatus === "COMPLETED"}
               type="checkbox"
               className="rounded-full cursor-pointer accent-red-500 w-4 h-4l"
-              onChange={(e) => {
-                e.stopPropagation();
+              onClick={(e)=>e.stopPropagation()}
+              onChange={() => {
                 setNewStatus(prev => {
                   const updatedStatus = prev !== "COMPLETED" ? "COMPLETED" : "PENDING"
                   handleUpdateStatus(updatedStatus);

@@ -108,9 +108,9 @@ export default function InlineAddTaskFormUpComing({ initialDate, onCancel, onAdd
 
 
         <PriorityDropdown priority={priority} onSelect={setPriority} />
-        <Button icon={<BellOutlined />} size="small">
-          Reminders
-        </Button>
+        {/*<Button icon={<BellOutlined />} size="small">*/}
+        {/*  Reminders*/}
+        {/*</Button>*/}
         <MoreOptionsDropdown
             setSelectedDateline={setSelectedDeadline}
         />

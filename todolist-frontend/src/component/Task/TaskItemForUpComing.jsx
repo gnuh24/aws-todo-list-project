@@ -19,6 +19,7 @@ import DatePickerDropdown from "../Dropdown/DatePickerDropdown";
 import TaskDetailModal from "../Modal/TaskDetailModal";
 import {toast} from "sonner";
 import TaskEditFormUpComing from "./TaskEditFormUpComing";
+import DatePickerDropdownForUpComing from "../Dropdown/DatePickerDropdownForUpComing";
 
 export default function TaskItemForUpComing({
                                                 sectionId,
@@ -181,9 +182,10 @@ export default function TaskItemForUpComing({
                     <Dropdown
                         trigger={["click"]}
                         open={showFormDatePicker}
+                        onClick={(e)=>e.stopPropagation()}
                         onOpenChange={(v) => setShowFormDatePicker(v)}
                         dropdownRender={() => (
-                            <DatePickerDropdown
+                            <DatePickerDropdownForUpComing
                                 isStartTime={true}
                                 onSelect={(newStartTime) => {
                                     const taskUpdate = { ...task, startTime: dayjs(newStartTime).format(formatToSend) };
