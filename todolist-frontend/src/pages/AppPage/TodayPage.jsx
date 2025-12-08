@@ -83,7 +83,7 @@ export default function TodayPage() {
   }).format(new Date());
 
   return (
-    <MainLayout>
+    <>
       <div className="min-h-screen bg-white px-6 pb-10">
         <TodayHeader />
  
@@ -123,6 +123,6 @@ export default function TodayPage() {
           ))}
         </div>
       </div>
-    </MainLayout>
+    </>
   );
 }

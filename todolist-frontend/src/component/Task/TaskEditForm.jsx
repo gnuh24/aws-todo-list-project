@@ -67,7 +67,7 @@ export default function TaskEditForm({ task, onSave, onCancel }) {
         </Dropdown>
 
         {/* Priority */}
-        <PriorityDropdown onSelect={(p) => setPriority(p)} />
+        <PriorityDropdown priority={priority} onSelect={setPriority} />
 
         {/* Reminder */}
         <Button icon={<BellOutlined />} size="small">

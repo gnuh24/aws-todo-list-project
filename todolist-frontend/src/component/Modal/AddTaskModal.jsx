@@ -16,6 +16,7 @@ export default function AddTaskModal({
   const [taskName, setTaskName] = useState("");
   const [description, setDescription] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
+  const [priority, setPriority] = useState("LOW");
 
   // -------------------------
   // NEW: selected lưu cả object
@@ -70,7 +71,8 @@ export default function AddTaskModal({
           </Dropdown>
 
           <PriorityDropdown
-            onSelect={(p) => console.log("Priority selected:", p)}
+              priority={priority}
+            onSelect={setPriority}
           />
 
           <Button icon={<BellOutlined />} size="small">
@@ -106,7 +108,7 @@ export default function AddTaskModal({
                   title: taskName,
                   description,
                   deadline: selectedDate,
-                  project: selectedProject,
+                  project: selectedProject, priority: priority,
                 });
 console.log("Selected:", selectedDate);
 

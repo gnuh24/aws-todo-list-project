@@ -7,7 +7,7 @@ import { Share2, LayoutList, MessageSquare } from "lucide-react";
 export default function ProjectHeader() {
   const [openShare, setOpenShare] = useState(false);
   const [openInvite, setOpenInvite] = useState(false);
-  const [openSettings, setOpenSettings] = useState(true);
+  const [openSettings, setOpenSettings] = useState(false);
 
   const [selectedEmail, setSelectedEmail] = useState("");
  const [selectedId, setSelectedId] = useState("");
@@ -45,7 +45,7 @@ export default function ProjectHeader() {
             <span>Share</span>
           </button>
 
-          <button className="flex items-center gap-1 hover:text-black">
+          <button className="flex items-center gap-1 hover:text-black" onClick={() => setOpenSettings((prev) => !prev)}>
             <LayoutList size={16} />
             <span>Display</span>
           </button>

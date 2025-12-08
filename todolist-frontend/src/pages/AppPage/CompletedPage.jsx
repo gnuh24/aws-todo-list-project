@@ -93,9 +93,6 @@ export default function CompletedPage() {
 
   return (
       <>
-      <MainLayout>
-
-     
         <div className="px-10 py-6">
           <div className="sticky top-0 z-30 bg-white py-1">
             <ActivityHeader
@@ -235,7 +232,6 @@ export default function CompletedPage() {
             )}
           </div>
         </div>
-         </MainLayout>
       </>
   );
 

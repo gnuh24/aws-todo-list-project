@@ -25,6 +25,7 @@ import { Toaster } from "sonner";
 import ArchivePage from "./pages/AppPage/ArchivePage";
 import UnArchivePage from "./pages/AppPage/UnArchivePgae";
 import NotificationsPage from "./pages/AppPage/NotificationPage";
+import MainLayout from "./layout/MainLayout";
 function App() {
   return (
     <>
@@ -55,51 +56,35 @@ function App() {
             ></Route>
             <Route path="/auth/verify-account" element={<VerifyAccount />} />
             <Route
-              path="/app"
-              element={
-                
-                <SecureGate>
-                <Outlet />
-                </SecureGate>
-              }
+                path="/app"
+                element={
+                  <SecureGate>
+                    <MainLayout />
+                  </SecureGate>
+                }
             >
-              <Route path="inbox" element={<InboxPage></InboxPage>}></Route>
-              <Route path="today" element={<TodayPage></TodayPage>}></Route>
-              <Route
-                path="filters"
-                element={<FiltersPage></FiltersPage>}
-              ></Route>
-              <Route
-                path="projects/:projectName/:projectId"
-                element={<ProjectPage></ProjectPage>}
-              ></Route>
+              <Route path="inbox" element={<InboxPage />} />
+              <Route path="today" element={<TodayPage />} />
+              <Route path="filters" element={<FiltersPage />} />
 
-              <Route
-                path="archive/:projectName/:projectId"
-                element={<UnArchivePage></UnArchivePage>}
-              ></Route>
+              <Route path="projects/:projectName/:projectId" element={<ProjectPage />} />
+              <Route path="archive/:projectName/:projectId" element={<UnArchivePage />} />
+              <Route path="upcoming" element={<UpcomingPage />} />
+              <Route path="activity" element={<CompletedPage />} />
+              <Route path="archive" element={<ArchivePage />} />
 
-              <Route
-                path="upcoming"
-                element={<UpcomingPage></UpcomingPage>}
-              ></Route>
-               <Route
-                                path="notifications"
-                                element={<NotificationsPage></NotificationsPage>}
-                            ></Route>
-              <Route
-                path="activity"
-                element={<CompletedPage></CompletedPage>}
-              ></Route>
-
-              <Route
-                path="archive"
-                element={<ArchivePage></ArchivePage>}
-              ></Route>
+              {/* Notifications nằm trong MainLayout (có context) */}
+              <Route path="notifications" element={<NotificationsPage />} />
             </Route>
             <Route path="testapi" element={<TestAPI></TestAPI>}></Route>
             <Route path="/login-success" element={<LoginSuccess />} />
           </Routes>
+          {/*<Route path="/app" element={<MainLayout></MainLayout>}>*/}
+          {/*  <Route*/}
+          {/*      path="notifications"*/}
+          {/*      element={<NotificationsPage></NotificationsPage>}*/}
+          {/*  ></Route>*/}
+          {/*</Route>*/}
         </BrowserRouter>
       </GoogleOAuthProvider>
     </>

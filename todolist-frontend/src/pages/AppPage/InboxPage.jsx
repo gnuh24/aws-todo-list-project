@@ -27,7 +27,7 @@ export default function InboxPage() {
   };
 
   return (
-    <MainLayout>
+      <>
       <InboxHeader />
       <div className="flex-1 flex flex-col bg p-8">
         {/* Khi nhấn + Add task */}
@@ -97,6 +97,6 @@ export default function InboxPage() {
           </div>
         )}
       </div>
-    </MainLayout>
+    </>
   );
 }

@@ -1,4 +1,5 @@
 import {https_taskflow} from "../../service/api";
+import {toast} from "sonner";
 
 export default function NotificationItem({ notification, handleClickOnNotification, handleUpdateStatus }) {
 
@@ -7,8 +8,6 @@ export default function NotificationItem({ notification, handleClickOnNotificati
         accepted: "ACCEPTED",
         declined: "DECLINED",
     }
-
-    const idUserLogging = JSON.parse(localStorage.getItem("USER_INFO"))?.id
 
     const handleAcceptInvite = async (notification) => {
         try{
@@ -20,8 +19,14 @@ export default function NotificationItem({ notification, handleClickOnNotificati
                await handleUpdateStatus(!notification.read, notification.id)
            }
         }
-        catch(error) {
-            console.error("Fetch notifications failed:", error);
+        catch(err) {
+            // Kiểm tra xem server có trả lỗi dạng JSON không
+            if (err.response && err.response.data) {
+                const msg = err.response.data.message || err.response.data.detailMessage || "Đã xảy ra lỗi không xác định";
+                toast.error(msg);
+            } else {
+                toast.info("Không thể kết nối đến server. Vui lòng thử lại.");
+            }
         }
     }
 
@@ -35,8 +40,14 @@ export default function NotificationItem({ notification, handleClickOnNotificati
                 await handleUpdateStatus(!notification.read, notification.id)
             }
         }
-        catch(error) {
-            console.error("Fetch notifications failed:", error);
+        catch(err) {
+            // Kiểm tra xem server có trả lỗi dạng JSON không
+            if (err.response && err.response.data) {
+                const msg = err.response.data.message || err.response.data.detailMessage || "Đã xảy ra lỗi không xác định";
+                toast.error(msg);
+            } else {
+                toast.info("Không thể kết nối đến server. Vui lòng thử lại.");
+            }
         }
     }
 

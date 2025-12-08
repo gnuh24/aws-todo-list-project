@@ -230,7 +230,7 @@ export default function ProjectPage() {
   };
 
   return (
-    <MainLayout>
+    <>
       <div className="min-h-screen bg-white">
         {/* HEADER */}
         <ProjectHeader></ProjectHeader>
@@ -284,6 +284,6 @@ export default function ProjectPage() {
           }}
         />
       </div>
-    </MainLayout>
+    </>
   );
 }
