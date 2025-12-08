@@ -188,14 +188,16 @@ export default function TaskItem({
                 setShowFormDatePicker(v); // mỗi lần mở lại form
               }}
               dropdownRender={() => (
-                  <DatePickerDropdown
-                      isStartTime={true}
-                      onSelect={(newStartTime) => {
-                        const taskUpdate = { ...task, startTime: dayjs(newStartTime).format(formatToSend) };
-                        handleUpdateTaskAPI(taskUpdate);
-                      }}
-                      showForm={showFormDatePicker}
-                  />
+                  <div onClick={(e) => e.stopPropagation()}>
+                      <DatePickerDropdown
+                          isStartTime={true}
+                          onSelect={(newStartTime) => {
+                              const taskUpdate = { ...task, startTime: dayjs(newStartTime).format(formatToSend) };
+                              handleUpdateTaskAPI(taskUpdate);
+                          }}
+                          showForm={showFormDatePicker}
+                      />
+                  </div>
               )}
           >
             <button className="p-1 hover:text-gray-900 text-gray-500">
