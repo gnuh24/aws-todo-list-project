@@ -16,7 +16,7 @@ spring:
                             - "http://127.0.0.1:5500"
                             - "http://localhost:3000"
                             - "http://127.0.0.1:3000"
-                            - "https://sgutodolist.com/:3000"
+                            - "https://sgutodolist.com"
 
                         allowedMethods:
                             - GET
@@ -36,7 +36,7 @@ spring:
                             - "http://127.0.0.1:5500"
                             - "http://localhost:3000"
                             - "http://127.0.0.1:3000"
-                            - "https://sgutodolist.com/:3000"
+                            - "https://sgutodolist.com"
 
                         allowedMethods:
                             - GET
@@ -56,7 +56,7 @@ spring:
                             - "http://127.0.0.1:5500"
                             - "http://localhost:3000"
                             - "http://127.0.0.1:3000"
-                            - "https://sgutodolist.com/:3000"
+                            - "https://sgutodolist.com"
                         allowedMethods:
                             - GET
                             - POST
@@ -75,7 +75,7 @@ spring:
                             - "http://127.0.0.1:5500"
                             - "http://localhost:3000"
                             - "http://127.0.0.1:3000"
-                            - "https://sgutodolist.com/:3000"
+                            - "https://sgutodolist.com"
                             
                         allowedMethods:
                             - GET
@@ -95,6 +95,7 @@ spring:
                             - "http://127.0.0.1:5500"
                             - "http://localhost:3000"
                             - "http://127.0.0.1:3000"
+                            - "https://sgutodolist.com"
                         allowedMethods:
                             - GET
                             - POST
