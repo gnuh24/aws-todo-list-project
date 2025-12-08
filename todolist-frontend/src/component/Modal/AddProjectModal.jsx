@@ -84,7 +84,7 @@ export default function AddProjectModal({ open, onCancel, onAdd }) {
         </div>
 
         {/* Color */}
-        <div>
+        {/* <div>
           <label className="text-[13px] text-gray-700 font-medium mb-1 block">
             Color
           </label>
@@ -95,10 +95,10 @@ export default function AddProjectModal({ open, onCancel, onAdd }) {
             className="w-full text-[13px]"
             dropdownStyle={{ fontSize: 13 }}
           />
-        </div>
+        </div> */}
 
         {/* Workspace */}
-        <div>
+        {/* <div>
           <label className="text-[13px] text-gray-700 font-medium mb-1 block">
             Workspace
           </label>
@@ -133,10 +133,10 @@ export default function AddProjectModal({ open, onCancel, onAdd }) {
               },
             ]}
           />
-        </div>
+        </div> */}
 
         {/* Parent project */}
-        <div>
+        {/* <div>
           <label className="text-[13px] text-gray-700 font-medium mb-1 block">
             Parent project
           </label>
@@ -160,10 +160,10 @@ export default function AddProjectModal({ open, onCancel, onAdd }) {
               value: item.value,
             }))}
           />
-        </div>
+        </div> */}
 
         {/* Add to favorites */}
-        <div className="flex items-center justify-between">
+        {/* <div className="flex items-center justify-between">
           <label className="text-[13px] text-gray-700 font-medium">
             Add to favorites
           </label>
@@ -173,7 +173,7 @@ export default function AddProjectModal({ open, onCancel, onAdd }) {
             size="small"
             className="custom-switch"
           />
-        </div>
+        </div> */}
 
         {/* Buttons */}
         <div className="flex justify-end gap-2 pt-4">

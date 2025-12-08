@@ -10,16 +10,16 @@ export default function TodayHeader() {
 
       {/* Bên phải */}
       <Space size="middle">
-        <Button
+        {/* <Button
           type="default"
           icon={<CalendarOutlined />}
           className="flex items-center"
         >
           Connect calendar
-        </Button>
-        <Button type="text" icon={<CloseOutlined />}>
+        </Button> */}
+        {/* <Button type="text" icon={<CloseOutlined />}>
           Display
-        </Button>
+        </Button> */}
       </Space>
     </div>
   );

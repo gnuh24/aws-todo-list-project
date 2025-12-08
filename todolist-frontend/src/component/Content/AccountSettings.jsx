@@ -7,7 +7,7 @@ export default function AccountSettings({
   onGotoChangeEmail,
 }) {
   const dataUser = JSON.parse(localStorage.getItem("USER_INFO")) || {};
-  const { displayName, email, avatarUrl } = dataUser;
+  const { displayName, email, avatar } = dataUser;
 
   const [name, setName] = useState(displayName || "");
   const [tempName, setTempName] = useState(displayName || "");
@@ -23,7 +23,7 @@ export default function AccountSettings({
       setEditing(false);
 
       const payload = {
-        avatar: avatarUrl || null, // hoặc state bạn đang dùng để lưu avatar
+        avatar: avatar || null, // hoặc state bạn đang dùng để lưu avatar
         displayName: tempName,
       };
 
@@ -65,7 +65,8 @@ export default function AccountSettings({
 
         <div className="flex items-center gap-5">
           <img
-            src={avatarUrl || "https://i.pravatar.cc/80"}
+            src={avatar || "https://i.pravatar.cc/80"}
+            referrerPolicy="no-referrer"
             className="w-20 h-20 rounded-full object-cover"
           />
 

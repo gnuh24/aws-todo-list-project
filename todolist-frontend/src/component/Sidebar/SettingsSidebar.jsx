@@ -14,17 +14,17 @@ import {
 export default function SettingsSidebar() {
   const menuItems = [
     { label: "Account", icon: <UserOutlined />, active: true },
-    { label: "General", icon: <DashboardOutlined /> },
-    { label: "Subscription", icon: <CloudOutlined /> },
-    { label: "Theme", icon: <BgColorsOutlined /> },
-    { label: "Sidebar", icon: <AppstoreOutlined /> },
-    { label: "Quick Add", icon: <CheckSquareOutlined /> },
-    { label: "Productivity", icon: <DatabaseOutlined /> },
-    { label: "Reminders", icon: <BellOutlined /> },
-    { label: "Notifications", icon: <BellOutlined /> },
-    { label: "Backups", icon: <CloudOutlined /> },
-    { label: "Integrations", icon: <AppstoreOutlined /> },
-    { label: "Calendars", icon: <CalendarOutlined /> },
+    // { label: "General", icon: <DashboardOutlined /> },
+    // { label: "Subscription", icon: <CloudOutlined /> },
+    // { label: "Theme", icon: <BgColorsOutlined /> },
+    // { label: "Sidebar", icon: <AppstoreOutlined /> },
+    // { label: "Quick Add", icon: <CheckSquareOutlined /> },
+    // { label: "Productivity", icon: <DatabaseOutlined /> },
+    // { label: "Reminders", icon: <BellOutlined /> },
+    // { label: "Notifications", icon: <BellOutlined /> },
+    // { label: "Backups", icon: <CloudOutlined /> },
+    // { label: "Integrations", icon: <AppstoreOutlined /> },
+    // { label: "Calendars", icon: <CalendarOutlined /> },
   ];
 
   return (
@@ -46,7 +46,7 @@ export default function SettingsSidebar() {
         </div>
       ))}
 
-      <div className="mt-6">
+      {/* <div className="mt-6">
         <h4 className="text-xs uppercase text-gray-500 px-3 mb-2">
           Hút hầm cầu Quang Hồng
         </h4>
@@ -66,7 +66,7 @@ export default function SettingsSidebar() {
         <div className="flex items-center gap-3 px-3 py-2 cursor-pointer rounded-md hover:bg-gray-200">
           <span className="text-gray-600">+ Add team</span>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }
