@@ -92,7 +92,7 @@ const Footer = () => {
           ]}
           className="w-32"
         /> */}
-        <LanguageSwitcher></LanguageSwitcher>
+        {/*<LanguageSwitcher></LanguageSwitcher>*/}
       </div>
     </footer>
   );

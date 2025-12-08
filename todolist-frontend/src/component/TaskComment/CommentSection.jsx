@@ -161,19 +161,17 @@ export default function CommentSection({ isOpenComment, comments, handleComment,
                 <div
                     ref={containerRef}
                     className={`space-y-4 mb-4 pr-2 transition-all duration-300 overflow-y-auto ${
-                        showComments ? "max-h-80" : "max-h-0"
+                        showComments ? "max-h-80" : "max-h-0 overflow-hidden"
                     }`}
+
                 >
-                    {comments.map((c) => {
+                {comments.map((c) => {
                         const isMe = c.accountId === auth.id;
 
                         return (
                             <div
                                 key={c.id}
                                 className="flex gap-2 py-2 rounded-lg"
-                                onMouseLeave={() => {
-                                    setOpenMenu(null);
-                                }}
                             >
 
                                 {/* Avatar */}
@@ -202,10 +200,10 @@ export default function CommentSection({ isOpenComment, comments, handleComment,
                                             {!!c.commentAttach?.length && <CommentAttachItem commentAttach={c.commentAttach} />}
 
                                             {/* Menu button */}
-                                            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                            <div className="absolute top-2 right-2">
                                                 <button
                                                     onClick={() => setOpenMenu(openMenu === c.id ? null : c.id)}
-                                                    className="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-gray-800 bg-gray-100 hover:bg-green-100 rounded-md text-2xl shadow-md focus:outline-none transition-colors duration-200"
+                                                    className="w-8 h-8 flex items-center justify-center text-gray-600 bg-gray-100  rounded-md text-2xl"
                                                 >
                                                     ⋯
                                                 </button>
@@ -219,6 +217,7 @@ export default function CommentSection({ isOpenComment, comments, handleComment,
                                                                     onClick={() => {
                                                                         setShowEditForm(c.id);
                                                                         setNewComment('');
+                                                                        setOpenMenu(null);
                                                                     }}
                                                                 >
                                                                     <EditOutlined className="text-base" /> Edit
@@ -229,6 +228,7 @@ export default function CommentSection({ isOpenComment, comments, handleComment,
                                                                         setShowEditForm(null);
                                                                         setNewComment('');
                                                                         handleDelete(c.id);
+                                                                        setOpenMenu(null);
                                                                     }}
                                                                 >
                                                                     <DeleteOutlined className="text-base" /> Delete
@@ -240,6 +240,7 @@ export default function CommentSection({ isOpenComment, comments, handleComment,
                                                             onClick={() => {
                                                                 navigator.clipboard.writeText(c.comment);
                                                                 toast.success('Copied to clipboard!');
+                                                                setOpenMenu(null);
                                                             }}
                                                         >
                                                             <CopyOutlined className="text-base" /> Copy text
