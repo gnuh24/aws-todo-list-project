@@ -107,7 +107,7 @@ export default function Sidebar() {
         const res = await https_taskflow.get("/v1/projects");
         if (res.data?.status === 200 && Array.isArray(res.data.data)) {
           setProjects(res.data.data);
-          console.log("res.data.data: ", res.data.data);
+          // console.log("res.data.data: ", res.data.data);
         } else {
         }
       } catch (err) {
