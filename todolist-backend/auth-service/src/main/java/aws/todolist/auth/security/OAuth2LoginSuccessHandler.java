@@ -44,7 +44,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 		// Build query string
 		String redirectUrl = String.format(
 			domainFrontEnd
-				+ "/app/inbox"
+				+ "/app/upcoming"
 				+ "?id=%s"
 				+ "&email=%s"
 				+ "&displayName=%s"
