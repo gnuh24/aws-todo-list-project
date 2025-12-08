@@ -3,7 +3,6 @@ import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import {useAppContext} from "../../layout/MainLayout";
 
-
 export default function NotificationSocket() {
     
     const { setCountNotificationsUnRead, setNotifications, pageSizeNotification, setTotalPagesNotification, setNewNotificationFormWebsocket, pageNumberNotification } = useAppContext();

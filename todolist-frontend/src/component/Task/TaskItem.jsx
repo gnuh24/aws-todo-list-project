@@ -25,10 +25,7 @@ export default function TaskItem({
   sectionId,
   projectId,
   task,
-  onUpdate,
-  onDeleteTaskUpComing,
-  onUpdateTaskUpComing,
-  isOpenFormAddTaskUpComing,
+  onUpdate
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [isOpenComment, setIsOpenComment] = useState(false);
@@ -64,9 +61,6 @@ export default function TaskItem({
       // ✅ cập nhật UI không cần reload
       onDeleteTask?.(sectionId, task.id);
 
-      // Dùng cho việc xóa task trong phần upcoming
-      onDeleteTaskUpComing?.(response.data.data);
-
       toast.success("Xoá task thành công!");
     } catch (error) {
         toast.error(error?.response?.data?.message || "Xóa thất bại, vui lòng thử lại!");
@@ -98,9 +92,6 @@ export default function TaskItem({
       // ✅ notify parent to update UI
       onUpdate?.(sectionId, { ...task, ...updatedTask });
 
-      // Nếu là cập nhật taskUpComing thì reload lại list
-      onUpdateTaskUpComing?.(res.data.data);
-
       setIsEditing(false);
     } catch (err) {
       toast.error(err?.response?.data?.message || "Cập nhật thất bại, vui lòng thử lại!");
@@ -121,8 +112,6 @@ export default function TaskItem({
 
         onUpdate?.(sectionId, { ...task, ...updatedTask });
 
-        // Nếu là cập nhật taskUpComing thì reload lại list
-        onUpdateTaskUpComing?.(updatedTask);
 
         setNewStatus(updatedTask.status);
 
@@ -140,7 +129,7 @@ export default function TaskItem({
   }
 
   // Nếu có gửi isOpenFormAddTaskUpComing thì phải null mới cho chạy
-  if (isEditing && (typeof isOpenFormAddTaskUpComing === "undefined" || isOpenFormAddTaskUpComing === null)) {
+  if (isEditing) {
     return (
       <TaskEditForm
         onSave={(data) => handleUpdateTaskAPI(data)}

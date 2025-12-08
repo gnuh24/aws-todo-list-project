@@ -11,38 +11,36 @@ export default function PriorityDropdown({ priority, onSelect }) {
         { id: "LOW",      color: "text-blue-500", label: "Low" }        // Thấp
     ];
 
-
-
     const menu = (
-    <Menu
-      className="rounded-lg shadow-lg p-1"
-      items={priorities.map((p) => ({
-        key: p.id,
-        label: (
-          <div
-            className="flex justify-between items-center w-36 px-2 py-1 rounded-md hover:bg-gray-100 cursor-pointer"
-            onClick={() => {
-                onSelect?.(p.id);
-            }}
-          >
+        <Menu
+            className="rounded-lg shadow-lg p-1"
+            items={priorities.map((p) => ({
+                key: p.id,
+                label: (
+                    <div
+                        className="flex justify-between items-center w-36 px-2 py-1 rounded-md hover:bg-gray-100 cursor-pointer"
+                        onClick={() => {
+                            onSelect?.(p.id);
+                        }}
+                    >
             <span className="flex items-center gap-2">
               <FlagOutlined className={p.color} />
-              {p.label}
+                {p.label}
             </span>
-            { priority === p.id && <CheckOutlined className="text-red-500" />}
-          </div>
-        ),
-      }))}
-    />
-  );
+                        { priority === p.id && <CheckOutlined className="text-red-500" />}
+                    </div>
+                ),
+            }))}
+        />
+    );
 
-  const current = priorities.find((p) => p.id === priority);
+    const current = priorities.find((p) => p.id === priority);
 
-  return (
-    <Dropdown overlay={menu} trigger={["click"]} placement="bottomLeft">
-      <Button icon={<FlagOutlined className={current.color} />} size="small">
-          {current.label}
-      </Button>
-    </Dropdown>
-  );
+    return (
+        <Dropdown overlay={menu} trigger={["click"]} placement="bottomLeft">
+            <Button icon={<FlagOutlined className={current.color} />} size="small">
+                {current.label}
+            </Button>
+        </Dropdown>
+    );
 }

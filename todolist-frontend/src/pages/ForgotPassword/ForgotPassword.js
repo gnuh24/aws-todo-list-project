@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { https_auth } from "../../service/api";
 
 export default function ForgotPassword() {
@@ -29,7 +30,7 @@ export default function ForgotPassword() {
           `/v1/send-reset-password-otp/${encodeURIComponent(email)}`
         );
 
-        alert(" Mã OTP đã được gửi tới email của bạn!");
+        toast.error(" Mã OTP đã được gửi tới email của bạn!");
 
         //  Chuyển sang trang nhập OTP (ví dụ: /ResetPassword)
         navigate("/ResetPassword");

@@ -1,22 +1,17 @@
 import { useRef, useState, useEffect } from "react";
-import MainLayout from "../../layout/MainLayout";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import { ChevronDown } from "lucide-react";
-import { DayPicker, getDefaultClassNames } from "react-day-picker";
+import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import InlineAddTaskFormUpComing from "../../component/Modal/InlineAddTaskFormUpComing";
-import TaskItem from "../../component/Task/TaskItem";
 import { https_taskflow } from "../../service/api";
+import TaskItemForUpComing from "../../component/Task/TaskItemForUpComing";
 
 export default function UpcomingPage() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showAddTaskIndex, setShowAddTaskIndex] = useState(null);
   const [showCalendar, setShowCalendar] = useState(false);
   const [tasksByDate, setTasksByDate] = useState({});
-
-  const [selected, setSelected] = useState();
-
-  const defaultClassNames = getDefaultClassNames();
 
   // Lấy ra ngày chủ nhật của tuần hiện tại
   const today = new Date();
@@ -114,6 +109,7 @@ export default function UpcomingPage() {
   }, []);
 
   return (
+    <>
       <div className="min-h-screen bg-white px-8 pb-6 flex flex-col">
         {/* Phần header và điều khiển (sẽ được ghim) */}
         <div className="sticky top-0 z-10 bg-white pb-4">
@@ -254,7 +250,7 @@ export default function UpcomingPage() {
                           key={idx}
                           onClick={() => setShowAddTaskIndex(null)}
                         >
-                          <TaskItem
+                          <TaskItemForUpComing
                             task={task}
                             projectId={task.idProject}
                             sectionId={task.idSection}
@@ -343,5 +339,6 @@ export default function UpcomingPage() {
           </div>
         </div>
       </div>
+         </>
   );
 }

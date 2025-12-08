@@ -8,6 +8,7 @@ import MoreOptionsDropdown from "../Dropdown/MoreOptionsDropdown";
 import ProjectSelectDropdown from "../Dropdown/ProjectSelectDropdown";
 import {https_taskflow} from "../../service/api";
 import {toast} from "sonner";
+import ProjectSelectForUpComing from "../Dropdown/ProjectSelectForUpComing";
 
 export default function InlineAddTaskFormUpComing({ initialDate, onCancel, onAdd }) {
   const [taskName, setTaskName] = useState("");
@@ -119,7 +120,7 @@ export default function InlineAddTaskFormUpComing({ initialDate, onCancel, onAdd
 
       {/* Footer actions */}
       <div className="flex justify-between items-center mt-3">
-        <ProjectSelectDropdown
+        <ProjectSelectForUpComing
           selectedSection={selectedSection}
           selectedProject={selectedProject}
           onSelectedSection={setSelectedSection}

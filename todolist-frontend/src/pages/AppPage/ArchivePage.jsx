@@ -41,7 +41,7 @@ export default function MyProjectsPage() {
             alt=""
             className="w-6 h-6 rounded-full"
           />
-          <h1 className="text-2xl font-semibold">My Projects</h1>
+          <h1 className="text-2xl font-semibold">My Projects   </h1>
         </div>
 
         <p className="text-sm text-gray-500 mb-6">Free</p>

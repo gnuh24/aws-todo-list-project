@@ -57,7 +57,7 @@ export default function UnArchivePage() {
   const isArchived = true;
 
   return (
-    <MainLayout>
+    <>
       <div className="min-h-screen bg-white">
         <ProjectHeader />
 
@@ -121,6 +121,6 @@ export default function UnArchivePage() {
           </div>
         </main>
       </div>
-    </MainLayout>
+    </>
   );
 }

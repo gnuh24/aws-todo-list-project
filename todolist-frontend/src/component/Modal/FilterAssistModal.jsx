@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { X, Info, ArrowRight } from "lucide-react";
+import { toast } from "sonner";
 
 export default function FilterAssistModal({ onClose, onSend }) {
   const [filterRequest, setFilterRequest] = useState("");
 
   const handleSend = () => {
-    if (!filterRequest.trim()) return alert("Please describe your filter.");
+    if (!filterRequest.trim())
+      return toast.error("Please describe your filter.");
     onSend(filterRequest);
     onClose();
   };

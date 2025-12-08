@@ -6,6 +6,7 @@ import EditFilterModal from "../../component/Modal/EditFilterModal";
 import FilterDropdown from "../../component/Dropdown/FilterDropdown";
 import AddFilterModal from "../../component/Modal/AddFilterModal";
 import AddLabelModal from "../../component/Modal/AddLabelModal";
+import { toast } from "sonner";
 
 export default function FiltersPage() {
   const [filters, setFilters] = useState([
@@ -117,10 +118,12 @@ export default function FiltersPage() {
                             setEditingFilter(f);
                             setOpenDropdownId(null);
                           }}
-                          onAddAbove={() => alert("Add above")}
-                          onAddBelow={() => alert("Add below")}
-                          onAddFavorite={() => alert("Added to favorites")}
-                          onCopyLink={() => alert("Link copied")}
+                          onAddAbove={() => toast.error("Add above")}
+                          onAddBelow={() => toast.error("Add below")}
+                          onAddFavorite={() =>
+                            toast.error("Added to favorites")
+                          }
+                          onCopyLink={() => toast.error("Link copied")}
                           onDelete={() => handleDelete(f.id)}
                           onClose={() => setOpenDropdownId(null)}
                         />

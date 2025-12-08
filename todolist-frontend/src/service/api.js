@@ -46,9 +46,20 @@ export let https_model = axios.create({
   },
 });
 
+export const https_authupdate = axios.create({
+  baseURL: "http://localhost:9999/api/auth",
+});
 
+// luôn lấy token mới nhất từ localStorage khi gọi API
+https_authupdate.interceptors.request.use((config) => {
+  const token = JSON.parse(localStorage.getItem("USER_INFO"))?.token;
 
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
 
+  return config;
+});
 // // Add a request interceptor
 // https.interceptors.request.use(
 //   function (config) {

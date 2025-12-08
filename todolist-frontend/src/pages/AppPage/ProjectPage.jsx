@@ -8,6 +8,7 @@ import SectionItem from "../../component/Section/SectionItem";
 import { useParams } from "react-router-dom";
 import { https_taskflow } from "../../service/api";
 import { message } from "antd";
+import { toast } from "sonner";
 
 export default function ProjectPage() {
   const [showModal, setShowModal] = useState(false);
@@ -18,9 +19,8 @@ export default function ProjectPage() {
   const [loading, setLoading] = useState(false);
   const [newSectionName, setNewSectionName] = useState("");
   const { projectName, projectId } = useParams();
-
-  const idUser = JSON.parse(localStorage.getItem("USER_INFO"));
-  const { id } = idUser;
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [selectedSection, setSelectedSection] = useState(null);
 
   // ✅ Thêm Task vào section cụ thể
 
@@ -51,6 +51,21 @@ export default function ProjectPage() {
 
     fetchSections();
   }, [projectId]);
+  const userInfo = localStorage.getItem("USER_INFO");
+
+  if (!userInfo) {
+    console.warn("Không có USER_INFO trong localStorage");
+    return; // ⛔ dừng hàm và không lỗi
+  }
+
+  const parsed = JSON.parse(userInfo);
+
+  if (!parsed || !parsed.id) {
+    console.warn("USER_INFO không hợp lệ hoặc không có id");
+    return; // ⛔ dừng hàm
+  }
+
+  const { id } = parsed; // ✔ an toàn
 
   const handleDeleteTask = (sectionId, taskId) => {
     setSections((prev) =>
@@ -65,44 +80,51 @@ export default function ProjectPage() {
     );
   };
   const handleAddTask = async (newTask) => {
-    if (!currentSection) {
+    if (!currentSection && !selectedSection) {
       message.warning("Vui lòng chọn Section để thêm Task!");
       return;
     }
 
+    // ❗ Nếu user chọn section trong modal → dùng selectedSection
+    // ❗ Nếu không chọn gì → dùng section nơi họ bấm nút Add → currentSection
+    const finalSectionId = selectedSection || currentSection;
+    const finalProjectId = selectedProject || projectId;
+
     try {
-      // ✅ Gọi API POST /v1/projects/:projectId/tasks
-      const res = await https_taskflow.post(`/v1/projects/${projectId}/tasks`, {
-        title: newTask.title,
-        description: newTask.description || "",
-        sectionId: currentSection,
-        deadline: newTask.deadline || null,
-        priority: newTask.priority || "MEDIUM",
-        idAccountAssign: "22222222-2222-2222-2222-222222222222",
-      });
+      const res = await https_taskflow.post(
+        `/v1/projects/${finalProjectId}/tasks`,
+        {
+          title: newTask.title,
+          description: newTask.description || "",
+          sectionId: finalSectionId,
+          deadline: newTask.deadline || null,
+          priority: newTask.priority || "MEDIUM",
+          idAccountAssign: id,
+        }
+      );
 
       if (res.status === 200 && res.data?.data) {
         const createdTask = res.data.data;
 
-        // ✅ Cập nhật UI (thêm task mới vào section tương ứng)
+        // 🟢 Cập nhật UI
         setSections((prev) =>
           prev.map((section) =>
-            section.id === currentSection
+            section.id === finalSectionId
               ? { ...section, tasks: [...section.tasks, createdTask] }
               : section
           )
         );
 
-        alert("✅ Thêm task thành công!");
-      } else {
-        alert("❌ Không thể thêm task!");
+        toast.success("Thêm task thành công!");
       }
     } catch (error) {
-      console.error("❌ Lỗi khi thêm task:", error);
-      message.error("Lỗi khi thêm task!");
+      console.error("Lỗi khi thêm task:", error);
+      toast.error("Lỗi khi thêm task!");
     } finally {
       setShowModal(false);
       setCurrentSection(null);
+      setSelectedSection(null); // reset để modal không bị nhớ section cũ
+      setSelectedProject(null);
     }
   };
 
@@ -125,12 +147,12 @@ export default function ProjectPage() {
         // ✅ Cập nhật lại danh sách section trong UI
         setSections((prev) => [...prev, newSection]);
 
-        console.log("✅ Section added:", newSection);
+        toast.success("Section added");
       } else {
         console.warn("⚠️ API không trả về thành công:", res);
       }
     } catch (error) {
-      console.error("❌ Lỗi khi thêm section:", error);
+      toast.error("Lỗi khi thêm section");
     } finally {
       // ✅ Reset form
       setNewSectionName("");
@@ -166,7 +188,49 @@ export default function ProjectPage() {
     );
   };
 
+  const handleSaveEdit = async (sectionId, newName, projectId) => {
+    console.log("newName: ", newName);
+    console.log("projectId: ", projectId.projectId);
+    console.log("sectionId: ", sectionId);
+
+    try {
+      const res = await https_taskflow.patch(
+        `/v1/project/${projectId.projectId}/sections/${sectionId}/update-name`,
+        {
+          name: newName,
+        }
+      );
+
+      if (res.status === 200) {
+        setSections((prev) =>
+          prev.map((s) => (s.id === sectionId ? { ...s, name: newName } : s))
+        );
+      }
+    } catch (err) {
+      toast.error("Lỗi update section:", err);
+    }
+  };
+  const handleDeleteSection = async (sectionId) => {
+    try {
+      const res = await https_taskflow.delete(
+        `/v1/projects/${projectId}/sections/${sectionId}`
+      );
+
+      if (res.status === 200) {
+        // Xóa ngay trong UI
+        setSections((prev) => prev.filter((sec) => sec.id !== sectionId));
+        toast.success("Section deleted successfully!");
+      } else {
+        toast.error("Failed to delete section!");
+      }
+    } catch (err) {
+      console.error("❌ Error deleting section:", err);
+      toast.error("Error deleting section!");
+    }
+  };
+
   return (
+    <>
       <div className="min-h-screen bg-white">
         {/* HEADER */}
         <ProjectHeader></ProjectHeader>
@@ -180,6 +244,8 @@ export default function ProjectPage() {
           <div className="space-y-4">
             {sections.map((section) => (
               <SectionItem
+                handleSaveEdit={handleSaveEdit}
+                handleDeleteSection={handleDeleteSection}
                 handleDeleteTask={handleDeleteTask}
                 projectId={projectId}
                 handleUpdateTask={handleUpdateTask}
@@ -209,7 +275,15 @@ export default function ProjectPage() {
             setCurrentSection(null);
           }}
           onAdd={handleAddTask}
+          onSelectProjectSection={(data) => {
+            console.log("📌 PROJECT:", data.projectId);
+            console.log("📌 SECTION:", data.sectionId);
+
+            setSelectedProject(data.projectId);
+            setSelectedSection(data.sectionId);
+          }}
         />
       </div>
+    </>
   );
 }
