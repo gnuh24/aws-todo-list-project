@@ -132,7 +132,7 @@ export default function CommentSection({ isOpenComment, comments, handleComment,
 
 
     return (
-        <div className="w-full border-t pt-10">
+        <div className="w-full border-t pt-10"  ref={menuRef}>
 
             {loading && (
                 <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-70 z-50">
