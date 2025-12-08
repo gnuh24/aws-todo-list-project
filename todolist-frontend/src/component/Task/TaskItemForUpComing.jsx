@@ -206,14 +206,16 @@ export default function TaskItemForUpComing({
                         onClick={(e)=>e.stopPropagation()}
                         onOpenChange={(v) => setShowFormDatePicker(v)}
                         dropdownRender={() => (
-                            <DatePickerDropdownForUpComing
-                                isStartTime={true}
-                                onSelect={(newStartTime) => {
-                                    const taskUpdate = { ...task, startTime: dayjs(newStartTime).format(formatToSend) };
-                                    handleUpdateTaskAPI(taskUpdate);
-                                }}
-                                showForm={showFormDatePicker}
-                            />
+                            <div onClick={(e) => e.stopPropagation()}>
+                                <DatePickerDropdownForUpComing
+                                    isStartTime={true}
+                                    onSelect={(newStartTime) => {
+                                        const taskUpdate = { ...task, startTime: dayjs(newStartTime).format(formatToSend) };
+                                        handleUpdateTaskAPI(taskUpdate);
+                                    }}
+                                    showForm={showFormDatePicker}
+                                />
+                            </div>
                         )}
                     >
                         <button
