@@ -62,6 +62,8 @@ function App() {
             <Route
                 path="/app"
                 element={
+                  // <SecureGate>
+                  // </SecureGate>
                     <MainLayout />
                 }
             >
