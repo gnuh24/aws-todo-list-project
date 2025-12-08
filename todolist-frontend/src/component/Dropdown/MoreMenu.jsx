@@ -44,38 +44,38 @@ export default function MoreMenu({ onEdit, onDelete, onArchive }) {
             <Edit2 size={14} /> <span className="ml-2">Edit</span>
           </button>
 
-          <button
+          {/* <button
             onClick={() => toast.error("Move to...")}
             className="flex items-center w-full px-4 py-2 text-gray-700 hover:bg-gray-50"
           >
             <MoveRight size={14} /> <span className="ml-2">Move to…</span>
-          </button>
+          </button> */}
 
-          <button
+          {/* <button
             onClick={() => toast.error("Duplicate")}
             className="flex items-center w-full px-4 py-2 text-gray-700 hover:bg-gray-50"
           >
             <CopyPlus size={14} />
             <span className="ml-2">Duplicate</span>
-          </button>
+          </button> */}
 
-          <button
+          {/* <button
             onClick={() => navigator.clipboard.writeText("link-to-section")}
             className="flex items-center w-full px-4 py-2 text-gray-700 hover:bg-gray-50"
           >
             <Copy size={14} />
             <span className="ml-2">Copy link to section</span>
-          </button>
+          </button> */}
 
           <div className="border-t my-2"></div>
-
+{/* 
           <button
             onClick={onArchive}
             className="flex items-center w-full px-4 py-2 text-gray-700 hover:bg-gray-50"
           >
             <ArchiveRestore size={14} />
             <span className="ml-2">Archive</span>
-          </button>
+          </button> */}
 
           <button
             onClick={onDelete}

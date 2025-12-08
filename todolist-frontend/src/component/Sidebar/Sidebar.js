@@ -118,6 +118,46 @@ export default function Sidebar() {
 
     fetchProjects();
   }, []);
+  // --- THÊM STATE ---
+const [taskCount, setTaskCount] = useState(0);
+
+// --- HÀM ĐẾM TASK ---
+const fetchTaskCount = async () => {
+  try {
+    // 1. Lấy toàn bộ projects
+    const res = await https_taskflow.get("/v1/projects");
+    const projects = res.data?.data || [];
+
+    let allTasks = [];
+
+    // 2. Lấy detail từng project
+    for (const p of projects) {
+      try {
+        const detail = await https_taskflow.get(`/v1/projects/${p.id}`);
+
+        const sections = detail.data?.data?.sections || [];
+
+        sections.forEach((sec) => {
+          if (Array.isArray(sec.tasks)) {
+            allTasks.push(...sec.tasks);
+          }
+        });
+      } catch (err) {
+        console.error("❌ Lỗi project detail:", p.id, err);
+      }
+    }
+
+    // 3. Gán vào state
+    setTaskCount(allTasks.length);
+  } catch (err) {
+    console.error("❌ Lỗi fetch task count:", err);
+  }
+};
+
+// --- CALL API KHI LOAD SIDEBAR ---
+useEffect(() => {
+  fetchTaskCount();
+}, []);
   const userInfo = localStorage.getItem("USER_INFO");
 
   if (!userInfo) {
@@ -255,17 +295,17 @@ export default function Sidebar() {
               open={openSearch}
               onClose={() => setOpenSearch(false)}
             />
-            <SidebarItem
+            {/* <SidebarItem
               onClick={() => navigate("/app/inbox")}
               icon={<InboxOutlined />}
               label="Inbox"
               active={isActive("/app/inbox")}
-            />
+            /> */}
             <SidebarItem
               onClick={() => navigate("/app/today")}
               icon={<CalendarOutlined />}
               label="Today"
-              count={2}
+              count={taskCount}
               active={isActive("/app/today")}
               countClass="text-[11px] text-red-500 font-medium"
             />

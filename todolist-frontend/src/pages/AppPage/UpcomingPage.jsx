@@ -6,23 +6,54 @@ import "react-day-picker/dist/style.css";
 import InlineAddTaskFormUpComing from "../../component/Modal/InlineAddTaskFormUpComing";
 import { https_taskflow } from "../../service/api";
 import TaskItemForUpComing from "../../component/Task/TaskItemForUpComing";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { toast } from "sonner";
 
 export default function UpcomingPage() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showAddTaskIndex, setShowAddTaskIndex] = useState(null);
   const [showCalendar, setShowCalendar] = useState(false);
   const [tasksByDate, setTasksByDate] = useState({});
-const location = useLocation();
+  const [params] = useSearchParams();
+  const navigate = useNavigate();
 
+  // ============================
+  // 🔥 XỬ LÝ GOOGLE LOGIN CALLBACK
+  // ============================
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
+    const id = params.get("id");
+    const email = params.get("email");
+    const displayName = params.get("displayName");
+    const avatar = params.get("avatar");
+    const role = params.get("role");
     const token = params.get("token");
-    if (token) {
-      localStorage.setItem("ACCESS_TOKEN", token);
-      window.history.replaceState({}, document.title, "/app/upcoming");
-    }
-  }, [location]);
+    const refreshToken = params.get("refreshToken");
+
+    if (!token) return; // Không phải callback OAuth → bỏ qua
+
+    const userData = {
+      id,
+      email,
+      displayName,
+      avatar,
+      role,
+      token,
+      refreshToken,
+    };
+
+    // Lưu vào localStorage
+    localStorage.setItem("USER_INFO", JSON.stringify(userData));
+    localStorage.setItem("accessToken", token);
+    localStorage.setItem("refreshToken", refreshToken);
+
+    toast.success("Đăng nhập thành công!");
+
+    // Chuyển hướng sang /app/inbox (hoặc /home)
+    setTimeout(() => {
+      navigate("/app/coming");
+    }, 800);
+  }, [params, navigate]);
+
   // Lấy ra ngày chủ nhật của tuần hiện tại
   const today = new Date();
   today.setHours(0, 0, 0, 0);

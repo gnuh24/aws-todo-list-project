@@ -98,6 +98,7 @@ export default function ProjectPage() {
           description: newTask.description || "",
           sectionId: finalSectionId,
           deadline: newTask.deadline || null,
+          startTime: newTask.startTime || null,
           priority: newTask.priority || "MEDIUM",
           idAccountAssign: id,
         }

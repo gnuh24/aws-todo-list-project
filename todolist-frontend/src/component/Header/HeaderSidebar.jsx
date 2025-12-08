@@ -12,7 +12,7 @@ import {useAppContext} from "../../layout/MainLayout";
 
 export default function HeaderSidebar() {
   const dataUser = JSON.parse(localStorage.getItem("USER_INFO"));
-  const { displayName } = dataUser;
+  const { displayName,avatar } = dataUser;
 
     const location = useLocation();
     const navigate = useNavigate();
@@ -27,10 +27,11 @@ export default function HeaderSidebar() {
         overlayClassName="rounded-xl shadow-lg"
       >
         <div className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 px-2 py-1 rounded-md">
-          <img
-            src="https://i.pravatar.cc/30"
-            alt="avatar"
-            className="rounded-full w-6 h-6"
+         
+           <img
+            src={avatar || "https://i.pravatar.cc/80"}
+            referrerPolicy="no-referrer"
+               className="rounded-full w-6 h-6"
           />
           <span className="font-medium text-sm text-gray-700 truncate">
             {displayName}
@@ -58,7 +59,7 @@ export default function HeaderSidebar() {
 
 
 
-            <div
+            {/* <div
                 onClick={() => navigate("")}
                 className={`flex items-center justify-center w-7 h-7 rounded-lg cursor-pointer transition-all
                 ${location.pathname === ""
@@ -66,7 +67,7 @@ export default function HeaderSidebar() {
                     : "bg-white text-gray-700 hover:bg-gray-50"}`}
             >
                 <AppstoreOutlined className="text-lg" />
-            </div>
+            </div> */}
 
         </div>
     </div>

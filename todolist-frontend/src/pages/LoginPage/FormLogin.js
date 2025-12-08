@@ -29,7 +29,7 @@ export default function FormLogin() {
 
         localStorage.setItem("USER_INFO", JSON.stringify(userData));
 
-        toast.error("Đăng nhập thành công!");
+        toast.success("Đăng nhập thành công!");
 
         window.location.href = "/app/upcoming";
       }
