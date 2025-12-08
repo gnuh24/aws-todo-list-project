@@ -197,7 +197,7 @@ export default function CommentSection({ isOpenComment, comments, handleComment,
                                             <div className="text-sm font-semibold text-gray-600 mb-1">{c.authorName}</div>
                                             <div className="text-xs text-gray-600 mb-1">{dayjs(c.updatedAt).format(formatToDisplay)}</div>
                                             <div className="text-sm text-gray-700 whitespace-pre-line pt-3">{c.comment}</div>
-                                            {!!c.commentAttach?.length && <CommentAttachItem commentAttach={c.commentAttach} />}
+                                            {/*{!!c.commentAttach?.length && <CommentAttachItem commentAttach={c.commentAttach} />}*/}
 
                                             {/* Menu button */}
                                             <div className="absolute top-2 right-2">
@@ -258,13 +258,13 @@ export default function CommentSection({ isOpenComment, comments, handleComment,
                                                 className="border-none focus:ring-0 resize-none w-full"
                                                 autoFocus
                                             />
-                                            {!!c.commentAttach?.length && (
-                                                <CommentAttachItem
-                                                    commentAttach={c.commentAttach}
-                                                    onDeleteCommentAttach={onDeleteCommentAttach}
-                                                    isEditing
-                                                />
-                                            )}
+                                            {/*{!!c.commentAttach?.length && (*/}
+                                            {/*    <CommentAttachItem*/}
+                                            {/*        commentAttach={c.commentAttach}*/}
+                                            {/*        onDeleteCommentAttach={onDeleteCommentAttach}*/}
+                                            {/*        isEditing*/}
+                                            {/*    />*/}
+                                            {/*)}*/}
                                             <div className="flex justify-end gap-2 mt-2">
                                                 <Button onClick={() => setShowEditForm(null)}>Cancel</Button>
                                                 <Button type="primary" danger onClick={() => handleUpdate(c.id)}>
@@ -336,12 +336,12 @@ export default function CommentSection({ isOpenComment, comments, handleComment,
                         )}
 
                         <div className="flex justify-between items-center mt-2">
-                        <div className="flex gap-3 text-gray-400 text-lg">
-                            <PaperClipOutlined
-                                className="cursor-pointer text-gray-500 hover:text-gray-700"
-                                onClick={() => fileInputRef.current?.click()}
-                            />
-                        </div>
+                        {/*<div className="flex gap-3 text-gray-400 text-lg">*/}
+                        {/*    <PaperClipOutlined*/}
+                        {/*        className="cursor-pointer text-gray-500 hover:text-gray-700"*/}
+                        {/*        onClick={() => fileInputRef.current?.click()}*/}
+                        {/*    />*/}
+                        {/*</div>*/}
                         <div className="flex gap-2">
                           <Button onClick={()=> {
                               setIsExpanded(false)
