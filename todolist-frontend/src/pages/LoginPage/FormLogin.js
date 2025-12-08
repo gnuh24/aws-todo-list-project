@@ -31,7 +31,7 @@ export default function FormLogin() {
 
         toast.error("Đăng nhập thành công!");
 
-        window.location.href = "/app/inbox";
+        window.location.href = "/app/upcoming";
       }
     } catch (error) {
       console.error("❌ Login failed:", error.response?.data || error.message);

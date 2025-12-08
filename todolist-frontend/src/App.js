@@ -26,6 +26,7 @@ import ArchivePage from "./pages/AppPage/ArchivePage";
 import UnArchivePage from "./pages/AppPage/UnArchivePgae";
 import NotificationsPage from "./pages/AppPage/NotificationPage";
 import MainLayout from "./layout/MainLayout";
+import NotFound from "./pages/AppPage/NotFound";
 function App() {
   return (
     <>
@@ -35,7 +36,10 @@ function App() {
           <Spinner></Spinner>
           <Routes>
             <Route path="/" element={<Layout></Layout>}>
+            
+
               <Route path="/" element={<HomePage></HomePage>}></Route>
+           
             </Route>
             <Route
               path="/register"
@@ -78,6 +82,8 @@ function App() {
             </Route>
             <Route path="testapi" element={<TestAPI></TestAPI>}></Route>
             <Route path="/login-success" element={<LoginSuccess />} />
+            <Route path="*" element={<NotFound />} />
+
           </Routes>
           {/*<Route path="/app" element={<MainLayout></MainLayout>}>*/}
           {/*  <Route*/}

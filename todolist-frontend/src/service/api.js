@@ -31,7 +31,7 @@ export let https_notification = axios.create({
 });
 
 export let https_user = axios.create({
-  baseURL: BASE_URL+"/user/v1",
+  baseURL: BASE_URL+"/user",
   headers: {
     Authorization:
         "Bearer " + JSON.parse(localStorage.getItem("USER_INFO"))?.token

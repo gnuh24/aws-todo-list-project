@@ -9,16 +9,7 @@ const { Title, Paragraph } = Typography;
 export default function InboxPage() {
   const [showAddTask, setShowAddTask] = useState(false);
   const [taskName, setTaskName] = useState("");
-  const location = useLocation();
-
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const token = params.get("token");
-    if (token) {
-      localStorage.setItem("ACCESS_TOKEN", token);
-      window.history.replaceState({}, document.title, "/app/inbox");
-    }
-  }, [location]);
+  
   const handleAddTask = () => {
     if (!taskName.trim()) return;
     console.log("New task:", taskName);

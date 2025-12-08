@@ -3,7 +3,7 @@ import React from "react";
 export default function GoogleLoginButton() {
   const handleGoogleLogin = () => {
     window.location.href =
-      "https://api.sgutodolist.com/api/auth/login/oauth2/code/google";
+      "http://localhost:9999/api/auth/oauth2/authorization/google";
   };
 
   return (
