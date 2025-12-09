@@ -7,8 +7,7 @@ import java.util.List;
 public class ApiPath {
 	
 	public static final String BASE = "/api";
-	public static final String MODEL = BASE + "/model/**";
-	
+	public static final String MODEL = BASE + "/model/predict";
 	// ---------- AUTH ----------
 	public static final String AUTH = BASE + "/auth";
 	public static final String LOGIN = AUTH + "/v1/login";
@@ -98,4 +97,5 @@ public class ApiPath {
 		    .anyMatch(pattern -> matcher.match(pattern, path));
 	}
 }
+
 
