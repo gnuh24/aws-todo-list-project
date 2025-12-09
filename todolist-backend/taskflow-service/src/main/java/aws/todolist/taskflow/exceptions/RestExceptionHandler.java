@@ -1,0 +1,194 @@
+package aws.todolist.taskflow.exceptions;
+
+import aws.todolist.taskflow.aop.AppLogger;
+import aws.todolist.taskflow.exceptions.AuthException.StepUpAuthenticationException;
+import aws.todolist.taskflow.exceptions.ProjectException.BadRequestException;
+import aws.todolist.taskflow.exceptions.ProjectException.ForbiddenException;
+import aws.todolist.taskflow.exceptions.ProjectException.ResourceNotFoundException;
+import aws.todolist.taskflow.exceptions.errorCode.SystemErrorCode;
+import aws.todolist.taskflow.utils.EnvironmentUtils;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import lombok.NonNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
+
+@ControllerAdvice
+public class RestExceptionHandler extends ResponseEntityExceptionHandler {
+
+    @Autowired
+    private AppLogger appLogger;
+
+    @Autowired
+    private EnvironmentUtils environmentUtils;
+
+    private ResponseEntity<Object> buildErrorResponse(HttpServletRequest request, HttpStatus status, String code, String message, Exception ex, List<DetailError> errors) {
+        ErrorResponse response = new ErrorResponse(status.value(), code, message, null, errors);
+        if (environmentUtils.isDevMode()) {
+            response.setDetailMessage(ex.toString());
+        }
+
+//        appLogger.error(request, "❌ [{}] {} - {}", code, message, ex.getMessage());
+        return new ResponseEntity<>(response, status);
+    }
+
+    private HttpServletRequest getRequest(WebRequest webRequest) {
+        return (HttpServletRequest) webRequest.resolveReference(WebRequest.REFERENCE_REQUEST);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, @NonNull HttpHeaders headers, @NonNull HttpStatusCode status, @NonNull WebRequest request) {
+        return buildErrorResponse(getRequest(request), HttpStatus.NOT_FOUND, SystemErrorCode.API_NOT_FOUND, "API không tồn tại", ex, null);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex, @NonNull HttpHeaders headers, @NonNull HttpStatusCode status, @NonNull WebRequest request) {
+        return buildErrorResponse(getRequest(request), HttpStatus.METHOD_NOT_ALLOWED, SystemErrorCode.API_METHOD_NOT_ALLOWED, "Phương thức không được hỗ trợ", ex, null);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex, @NonNull HttpHeaders headers, @NonNull HttpStatusCode status, @NonNull WebRequest request) {
+        return buildErrorResponse(getRequest(request), HttpStatus.UNSUPPORTED_MEDIA_TYPE, SystemErrorCode.API_UNSUPPORTED_MEDIA_TYPE, "Không hỗ trợ định dạng gửi lên", ex, null);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+            MethodArgumentNotValidException ex,
+            @NonNull HttpHeaders headers,
+            @NonNull HttpStatusCode status,
+            @NonNull WebRequest request
+    ) {
+        List<DetailError> details = new ArrayList<>();
+        for (FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
+            String detail = fieldError.getField() + ": " + fieldError.getDefaultMessage();
+            details.add(new DetailError(SystemErrorCode.SYS_VALIDATION_ERROR, detail));
+        }
+
+        HttpServletRequest servletRequest = getRequest(request);
+//        appLogger.warn(servletRequest, "🟠 Validation failed: {}", ex.getMessage());
+
+        return buildErrorResponse(
+                servletRequest,
+                HttpStatus.BAD_REQUEST,
+                SystemErrorCode.SYS_VALIDATION_ERROR,
+                "Dữ liệu đầu vào không hợp lệ",
+                ex,
+                details
+        );
+    }
+
+
+    @Override
+    protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex, @NonNull HttpHeaders headers, @NonNull HttpStatusCode status, @NonNull WebRequest request) {
+        return buildErrorResponse(getRequest(request), HttpStatus.BAD_REQUEST, SystemErrorCode.SYS_MISSING_REQUIRED_FIELD, "Thiếu tham số bắt buộc", ex, null);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<Object> handleConstraintViolation(HttpServletRequest request, ConstraintViolationException ex) {
+        List<DetailError> details = new ArrayList<>();
+        for (ConstraintViolation<?> v : ex.getConstraintViolations()) {
+            details.add(new DetailError(SystemErrorCode.SYS_CONSTRAINT_VIOLATION, v.getPropertyPath() + ": " + v.getMessage()));
+        }
+        return buildErrorResponse(request, HttpStatus.BAD_REQUEST, SystemErrorCode.SYS_CONSTRAINT_VIOLATION, "Vi phạm ràng buộc dữ liệu", ex, details);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Object> handleTypeMismatch(HttpServletRequest request, MethodArgumentTypeMismatchException ex) {
+        return buildErrorResponse(request, HttpStatus.BAD_REQUEST, SystemErrorCode.SYS_INVALID_FORMAT, "Kiểu dữ liệu không hợp lệ", ex, null);
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<Object> handleEntityNotFound(HttpServletRequest request, EntityNotFoundException ex) {
+        return buildErrorResponse(request, HttpStatus.NOT_FOUND, SystemErrorCode.SYS_FILE_NOT_FOUND, ex.getMessage(), ex, null);
+    }
+
+    @ExceptionHandler(FileNotFoundException.class)
+    public ResponseEntity<Object> handleFileNotFound(HttpServletRequest request, FileNotFoundException ex) {
+        return buildErrorResponse(request, HttpStatus.NOT_FOUND, SystemErrorCode.SYS_FILE_NOT_FOUND, "Không tìm thấy tệp", ex, null);
+    }
+
+ 
+
+
+   
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Object> handleGeneric(HttpServletRequest request, Exception ex) {
+        return buildErrorResponse(request, HttpStatus.INTERNAL_SERVER_ERROR, SystemErrorCode.SYSTEM_UNKNOWN_ERROR, "Lỗi không xác định", ex, null);
+    }
+    
+
+    @ExceptionHandler(StepUpAuthenticationException.class)
+    public ResponseEntity<Object> handleStepUpAuthFail(HttpServletRequest request, StepUpAuthenticationException ex) {
+        return buildErrorResponse(request, HttpStatus.UNAUTHORIZED,
+                SystemErrorCode.AUTH_2FA_FAILED,
+                "Xác thực bổ sung không thành công. Vui lòng kiểm tra lại mật khẩu.",
+                ex,
+                null);
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ErrorResponse> handleForbidden(HttpServletRequest request, ForbiddenException ex) {
+        ErrorResponse error = ErrorResponse.builder()
+                .status(HttpStatus.FORBIDDEN.value())
+                .code(ex.getCode())
+                .message(ex.getMessage())
+                .detailMessage(ex.toString())  // hoặc ex.toString() nếu muốn chi tiết
+                .errors(null)         // nếu không có validation errors
+                .build();
+
+//        appLogger.warn(request, "🛑 [{}] {} - {}", ex.getCode(), ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleResourceNotFound(HttpServletRequest request, ResourceNotFoundException ex) {
+        ErrorResponse error = ErrorResponse.builder()
+                .status(HttpStatus.NOT_FOUND.value())
+                .code(ex.getCode())
+                .message(ex.getMessage())
+                .detailMessage(ex.toString())
+                .errors(null)
+                .build();
+
+//        appLogger.warn(request, "🛑 [{}] {} - {}", ex.getCode(), ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponse> handleBadRequest(HttpServletRequest request, BadRequestException ex) {
+        ErrorResponse error = ErrorResponse.builder()
+                .status(HttpStatus.BAD_REQUEST.value())
+                .code(ex.getCode())
+                .message(ex.getMessage())
+                .detailMessage(ex.toString())
+                .errors(null)
+                .build();
+
+//        appLogger.warn(request, "🛑 [{}] {} - {}", ex.getCode(), ex.getMessage());
+
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+}

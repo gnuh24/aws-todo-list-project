@@ -1,0 +1,313 @@
+package aws.todolist.auth.service;
+
+import aws.todolist.auth.aop.AppLogger;
+import aws.todolist.auth.dto.account.AccountCreateForm;
+import aws.todolist.auth.dto.account.AccountRedisDTO;
+import aws.todolist.auth.dto.auth.*;
+import aws.todolist.auth.entity.Account;
+import aws.todolist.auth.exceptions.AuthException.AuthExceptionHandler;
+import aws.todolist.auth.exceptions.AuthException.StepUpAuthenticationException;
+import aws.todolist.auth.exceptions.JwtException.*;
+import aws.todolist.auth.exceptions.otpException.OtpNotFoundException;
+import aws.todolist.auth.integration.redis.RedisConstants;
+import aws.todolist.auth.integration.redis.RedisService;
+import aws.todolist.auth.mapper.AuthMapper;
+import aws.todolist.auth.messaging.kafka.producer.KafkaProducerService;
+import aws.todolist.auth.security.JwtTokenProvider;
+import aws.todolist.auth.utils.EnvironmentUtils;
+import aws.todolist.auth.utils.IdGenerator;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.security.SignatureException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
+@Service
+public class AuthServiceImpl implements AuthService {
+	
+	@Autowired
+	private AccountService accountService;
+	
+	@Autowired
+	private JwtTokenProvider jwtTokenProvider;
+	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+	
+	@Autowired
+	private RedisService redisService;
+	
+	@Autowired
+	private KafkaProducerService kafkaProducerService;
+	
+	@Autowired
+	private AuthMapper authMapper;
+	
+	
+	@Override
+	@Transactional
+	public Account activeAccount(String otp) {
+		
+		AccountRedisDTO account = (AccountRedisDTO) redisService.get(RedisConstants.OTP_VERIFY_ACCOUNT + ":" + otp);
+		
+		if (account == null) {
+			throw new OtpNotFoundException("OTP không tồn tại hoặc đã hết hạn sử dụng !");
+		}
+		
+		AccountCreateForm accountCreateForm = authMapper.toAccountCreateForm(account);
+		
+		redisService.set(RedisConstants.EMAIL_EXIST + ":" + accountCreateForm.getEmail(), "true");
+		
+		return accountService.saveAccount(accountCreateForm);
+		
+	}
+	
+	@Override
+	public boolean isEmailExists(String email) {
+		return redisService.exists(RedisConstants.EMAIL_EXIST + ":" + email);
+	}
+	
+	@Override
+	public AuthResponseDTO login(LoginRequestForm request) {
+		Account account = accountService.getAccountByUsername(request.getEmail());
+		
+		if (account == null || !passwordEncoder.matches(request.getPassword(), account.getPassword())) {
+			throw new BadCredentialsException("Email hoặc mật khẩu không đúng!");
+		}
+		
+//		if (account.getRole() != Account.Role.USER) {
+//			throw new BadCredentialsException("Email hoặc mật khẩu không đúng!");
+//		}
+		
+		if (account.getStatus().toString().equals("INACTIVE")) {
+			throw new DisabledException("Tài khoản của bạn chưa được kích hoạt, hãy kiểm tra email " + request.getEmail());
+		}
+		
+		if (account.getStatus().toString().equals("BANNED")) {
+			throw new LockedException("Tài khoản của bạn đã bị khóa! Nếu có vấn đề, vui lòng liên hệ Admin.");
+		}
+		
+		// Tạo và trả về AuthResponseDTO
+		return authMapper.toAuthResponse(account, jwtTokenProvider);
+	}
+	
+	@Override
+	@Transactional
+	public AuthResponseDTO loginGoogle(String email, String name, String avatar) {
+		// 1️⃣ Tìm account theo email
+		Account account = accountService.getAccountByUsername(email);
+		
+		// 2️⃣ Nếu chưa tồn tại → tạo mới
+		if (account == null) {
+			account = new Account();
+			account.setId(UUID.randomUUID().toString());
+			account.setEmail(email);
+			
+			// Tạo password ngẫu nhiên
+			String randomPassword = UUID.randomUUID().toString().substring(0, 12);
+			account.setPassword(passwordEncoder.encode(randomPassword));
+			account.setDisplayName(name);
+			account.setAvatar(avatar);
+			account.setStatus(Account.Status.ACTIVE); // vì Google đã verify email
+			account.setRole(Account.Role.USER);
+			
+			// Lưu DB
+			accountService.saveAccount(account);
+			redisService.set(RedisConstants.EMAIL_EXIST + ":" + account.getEmail(), "true");
+			
+		}
+		else {
+			// 3️⃣ User đã tồn tại → update thông tin nếu cần
+			if (account.getAvatar() == null || !account.getAvatar().equals(avatar)) {
+				account.setAvatar(avatar);
+			}
+			
+			accountService.saveAccount(account);
+		}
+		
+		
+		if (account.getStatus() == Account.Status.BANNED) {
+			throw new LockedException("Tài khoản của bạn đã bị khóa! Nếu có vấn đề, vui lòng liên hệ Admin.");
+		}
+		
+		// 5️⃣ Trả về response (tạo JWT,...)
+		AuthResponseDTO responseDTO = authMapper.toAuthResponse(account, jwtTokenProvider);
+		responseDTO.setTokenExpirationTime("15 phút");
+		responseDTO.setRefreshTokenExpirationTime("7 ngày");
+		return responseDTO;
+	}
+	
+	
+	@Override
+	public AuthResponseDTO staffLogin(LoginRequestForm request) {
+		Account account = accountService.getAccountByUsername(request.getEmail());
+		
+		if (account == null || account.getRole().equals(Account.Role.USER) || !passwordEncoder.matches(request.getPassword(), account.getPassword())) {
+			throw new BadCredentialsException("Email hoặc mật khẩu không đúng!");
+		}
+		
+		if (account.getStatus().toString().equals("INACTIVE")) {
+			throw new DisabledException("Tài khoản của bạn chưa được kích hoạt, hãy kiểm tra email " + request.getEmail());
+		}
+		
+		if (account.getStatus().toString().equals("BANNED")) {
+			throw new LockedException("Tài khoản của bạn đã bị khóa! Nếu có vấn đề, vui lòng liên hệ Admin.");
+		}
+		
+		// Tạo và trả về AuthResponseDTO
+		return authMapper.toAuthResponse(account, jwtTokenProvider);
+	}
+	
+
+	
+	@Override
+	@Transactional
+	public AccountRedisDTO register(UserRegistrationForm userRegistrationForm) {
+//		if (accountService.isEmailExists(userRegistrationForm.getEmail())) {
+//			throw new RuntimeException("Email :" + userRegistrationForm.getEmail() + " đã tồn tại trong hệ thống !");
+//		}
+		
+		String accountId = UUID.randomUUID().toString();
+		redisService.set(RedisConstants.EMAIL_EXIST + ":" + userRegistrationForm.getEmail(), "true", 5, TimeUnit.MINUTES);
+		
+		
+		AccountRedisDTO account = new AccountRedisDTO();
+		account.setId(accountId);
+		account.setEmail(userRegistrationForm.getEmail());
+		account.setPassword(
+		    passwordEncoder.encode(
+			userRegistrationForm.getPassword()
+		    )
+		);
+		String otp = IdGenerator.generateOTP();
+		redisService.setObjectWithTTL(RedisConstants.OTP_VERIFY_ACCOUNT + ":" + otp, account, 5, TimeUnit.MINUTES);
+		
+		kafkaProducerService.sendRegisterEmail(userRegistrationForm.getEmail(), otp);
+		return account;
+	}
+	
+	@Override
+	public void sendOtpResetPassword(String email) {
+		redisService.delete(RedisConstants.OTP_FORGOT_PASSWORD + ":" + email);
+		String otp = IdGenerator.generateOTP();
+		redisService.set(RedisConstants.OTP_FORGOT_PASSWORD + ":" + email, otp, 3, TimeUnit.MINUTES);
+		kafkaProducerService.sendResetPasswordEmail(email, otp);
+	}
+	
+	@Override
+	public Account resetPassword(String username, ResetPasswordForm form) {
+		String otpRedis = redisService.get(RedisConstants.OTP_FORGOT_PASSWORD + ":" + username).toString();
+		
+		if (!otpRedis.equals(form.getOtp())) {
+			throw new OtpNotFoundException("OTP không hợp lệ hoặc đã hết hạn!");
+		}
+		
+		redisService.delete(RedisConstants.OTP_FORGOT_PASSWORD + ":" + username);
+		return accountService.updatePassword(username, form.getNewPassword());
+	}
+	
+	@Override
+	public Account updatePassword(String accountId, UpdatePasswordForm form) {
+		
+		Account account = accountService.getAccountById(accountId);
+		if (!passwordEncoder.matches(form.getOldPassword(), account.getPassword())) {
+			throw new StepUpAuthenticationException("Mật khẩu hiện không đúng !!");
+		}
+		
+		return accountService.updatePassword(account, form.getNewPassword());
+		
+	}
+	
+	@Override
+	public void sendOtpUpdateEmail(String newEmail) {
+		redisService.delete(RedisConstants.OTP_CHANGE_EMAIL + ":" + newEmail);
+		String otp = IdGenerator.generateOTP();
+		redisService.set(RedisConstants.OTP_CHANGE_EMAIL + ":" + newEmail, otp, 3, TimeUnit.MINUTES);
+		kafkaProducerService.sendUpdateEmail(newEmail, otp);
+	}
+	
+	@Override
+	public Account updateEmail(String accountId, UpdateEmailForm form) {
+		
+		Account account = accountService.getAccountById(accountId);
+		if (!passwordEncoder.matches(form.getCurrentPassword(), account.getPassword())) {
+			throw new StepUpAuthenticationException("Mật khẩu hiện tại không đúng.");
+		}
+		
+		String otpRedis = redisService.get(RedisConstants.OTP_CHANGE_EMAIL + ":" + form.getNewEmail()).toString();
+		if (!otpRedis.equals(form.getOtp())) {
+			throw new OtpNotFoundException("OTP không hợp lệ hoặc đã hết hạn!");
+		}
+		
+		redisService.delete(RedisConstants.OTP_CHANGE_EMAIL + ":" + form.getNewEmail());
+
+		
+		String currentEmail = account.getUsername();
+		redisService.delete(RedisConstants.EMAIL_EXIST + ":" + currentEmail);
+		redisService.set(RedisConstants.EMAIL_EXIST + ":" + form.getNewEmail(), "true");
+		
+		accountService.updateEmail(account, form.getNewEmail());
+		return account;
+	}
+	
+	@Override
+	public AuthResponseDTO refreshToken(String refreshToken) {
+		
+		if (refreshToken.isEmpty()) {
+			throw new RefreshTokenNotFound("Không tìm thấy refresh token");
+		}
+		
+		AuthResponseDTO response = new AuthResponseDTO();
+		String errorString = "Token không hợp lệ hoặc đã hết hạn sử dụng.";
+		
+		try {
+			String typeToken = jwtTokenProvider.getTokenType(refreshToken);
+			if (typeToken == null || !typeToken.equals("refresh")) {
+				throw new InvalidTokenTypeException("Token có type không hợp lệ.");
+			}
+			
+			String emailFromRefreshToken = jwtTokenProvider.getUsername(refreshToken);
+			
+			//Tìm tài khoản dựa trên Email
+			Account account = accountService.getAccountByUsername(emailFromRefreshToken);
+			
+			response.setId(account.getId());
+			response.setEmail(account.getEmail());
+			response.setRole(account.getRole().toString());
+			response.setDisplayName(account.getDisplayName());
+			response.setAvatar(account.getAvatar());
+			
+			// Tạo Token
+			String jwt = jwtTokenProvider.generateToken(account);
+			response.setToken(jwt);
+			response.setTokenExpirationTime("30 phút");
+			
+			// Tạo Refresh Token
+			response.setRefreshToken(refreshToken);
+			response.setRefreshTokenExpirationTime("7 ngày");
+			
+		} catch (ExpiredJwtException e) {
+			throw new RefreshTokenExpiredException(errorString);
+			
+		} catch (SignatureException e) {
+			throw new InvalidJWTSignatureException(errorString);
+			
+		} catch (UsernameNotFoundException e) {
+			throw new UsernameNotFound(errorString);
+			
+		} catch (InvalidTokenTypeException e) {
+			throw new InvalidTokenTypeException(errorString);
+		}
+		
+		return response;
+	}
+	
+}

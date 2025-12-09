@@ -1,0 +1,194 @@
+package aws.todolist.taskflow.controller;
+
+
+import aws.todolist.taskflow.annotation.RequireProjectRole;
+import aws.todolist.taskflow.api.ApiResponse;
+import aws.todolist.taskflow.dto.task.*;
+import aws.todolist.taskflow.entity.Account;
+import aws.todolist.taskflow.enums.Role;
+import aws.todolist.taskflow.service.AccountService;
+import aws.todolist.taskflow.service.TaskService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/v1/projects")
+@Tag(name = "Task API", description = "CRUD của task")
+// TODO: Quyền OWNER, MEMBER
+public class TaskController {
+	
+	@Autowired
+	private TaskService taskService;
+	
+	@Autowired
+	private AccountService accountService;
+	
+	@Operation(summary = "Lấy ra toàn bộ task sắp đến", description = "Lấy ra toàn bộ các task chuẩn bị cần thực hiện")
+	@GetMapping("/taskUpComing")
+	public ResponseEntity<ApiResponse<List<TaskResponseDTO>>> getTaskUpComing(
+	    @RequestHeader("X-User-Id") String accountId
+	) {
+		
+		Account account = accountService.getAccountById(accountId);
+		List<TaskResponseDTO> listTask = taskService.getTaskUpComing(account);
+		
+		ApiResponse<List<TaskResponseDTO>> response = new ApiResponse<>(200, "Danh sách task sắp đến đã được lấy thành công", listTask);
+		
+		return ResponseEntity.ok(response);
+	}
+	
+	@Operation(summary = "Lấy ra chi tiết task", description = "Lấy ra thông tin chi tiết của task")
+	@GetMapping("/{idProject}/tasks/{idTask}")
+	@RequireProjectRole({Role.OWNER, Role.ADMIN, Role.MEMBER, Role.VIEWER})
+	public ResponseEntity<ApiResponse<TaskDetailResponseDTO>> getTaskByTaskId(@PathVariable("idProject") String idProject, @PathVariable("idTask") String idTask) {
+		
+		TaskDetailResponseDTO taskDetailResponseDTO = taskService.getTaskById(idTask);
+		
+		ApiResponse<TaskDetailResponseDTO> response = new ApiResponse<>(200, "Thông tin task đã được lấy thành công", taskDetailResponseDTO);
+		
+		return ResponseEntity.ok(response);
+	}
+	
+	@Operation(summary = "Tạo task mới", description = "Tạo thêm một task mới")
+	@PostMapping("/{idProject}/tasks")
+	@RequireProjectRole({Role.OWNER, Role.MEMBER})
+	public ResponseEntity<ApiResponse<TaskResponseDTO>> addNewTask(@PathVariable("idProject") String idProject, @RequestBody @Valid TaskCreateRequestDTO requestDTO, @RequestHeader("X-User-Id") String accountId) {
+		
+		Account account = accountService.getAccountById(accountId);
+		
+		TaskResponseDTO taskResponseDTO = taskService.addTask(idProject, requestDTO, account);
+		
+		ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Task đã được tạo thành công", taskResponseDTO);
+		
+		return ResponseEntity.ok(response);
+	}
+	
+	@Operation(summary = "Chỉnh sửa độ ưu tiên", description = "Thay đổi độ ưu tiên cho task")
+	@PatchMapping("/{idProject}/tasks/{idTask}/update-priority")
+	@RequireProjectRole({Role.OWNER, Role.MEMBER})
+	public ResponseEntity<ApiResponse<TaskResponseDTO>> updatePriority(@PathVariable("idProject") String idProject, @PathVariable("idTask") String idTask, @RequestBody @Valid TaskUpdatePriorityRequestDTO requestDTO) {
+		
+		TaskResponseDTO taskResponseDTO = taskService.updatePriority(idTask, requestDTO);
+		
+		ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Độ ưu tiên task đã được cập nhật thành công", taskResponseDTO);
+		
+		return ResponseEntity.ok(response);
+	}
+	
+	@Operation(summary = "Chỉnh sửa mối quan hệ của task", description = "Thay đổi mối quan hệ của task với task khác")
+	@PatchMapping("/{idProject}/tasks/{idTask}/update-relationship")
+	@RequireProjectRole({Role.OWNER, Role.MEMBER})
+	public ResponseEntity<ApiResponse<TaskResponseDTO>> updateRelationship(@PathVariable("idProject") String idProject, @PathVariable("idTask") String idTask, @RequestBody @Valid TaskUpdateRelationshipRequestDTO requestDTO) {
+		
+		TaskResponseDTO taskResponseDTO = taskService.updateRelationship(idTask, requestDTO);
+		
+		ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Mối quan hệ task đã được cập nhật thành công", taskResponseDTO);
+		
+		return ResponseEntity.ok(response);
+	}
+	
+	@Operation(summary = "Chỉnh sửa trạng thái của task", description = "Thay đổi trạng thái của task")
+	@PatchMapping("/{idProject}/tasks/{idTask}/update-status")
+	@RequireProjectRole({Role.OWNER, Role.MEMBER})
+	public ResponseEntity<ApiResponse<TaskResponseDTO>> updateStatus(@PathVariable("idProject") String idProject, @PathVariable("idTask") String idTask, @RequestBody @Valid TaskUpdateStatusRequestDTO requestDTO, @RequestHeader("X-User-Id") String accountId) {
+		Account account = accountService.getAccountById(accountId);
+		
+		TaskResponseDTO taskResponseDTO = taskService.updateStatus(idTask, requestDTO, account);
+		
+		ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Trạng thái task đã được cập nhật thành công", taskResponseDTO);
+		
+		return ResponseEntity.ok(response);
+	}
+	
+	@Operation(summary = "Phân công task", description = "Phân công task cho account trong nhóm member của project")
+	@PatchMapping("/{idProject}/tasks/{idTask}/assign")
+	@RequireProjectRole({Role.OWNER, Role.MEMBER})
+	public ResponseEntity<ApiResponse<TaskResponseDTO>> assignAccount(@PathVariable("idProject") String idProject, @PathVariable("idTask") String idTask, @RequestBody @Valid TaskAssignRequestDTO requestDTO) {
+		
+		TaskResponseDTO taskResponseDTO = taskService.assignTask(idTask, idProject, requestDTO);
+		
+		ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Task đã được phân công thành công", taskResponseDTO);
+		
+		return ResponseEntity.ok(response);
+	}
+	
+	@Operation(summary = "Chuyển section cho task", description = "Thay đổi section cho task")
+	@PatchMapping("/{idProject}/tasks/{idTask}/update-section")
+	@RequireProjectRole({Role.OWNER, Role.MEMBER})
+	public ResponseEntity<ApiResponse<TaskResponseDTO>> updateSection(@PathVariable("idProject") String idProject, @PathVariable("idTask") String idTask, @RequestBody @Valid TaskUpdateSectionRequestDTO requestDTO) {
+		
+		TaskResponseDTO taskResponseDTO = taskService.updateSectionForTask(idTask, requestDTO);
+		
+		ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Section của task đã được cập nhật thành công", taskResponseDTO);
+		
+		return ResponseEntity.ok(response);
+	}
+	
+	@Operation(summary = "Cập nhật thông tin chung cho task", description = "Thay đổi một số thông tin không ảnh hưởng tới logic code cho task")
+	@PatchMapping("/{idProject}/tasks/{idTask}")
+	@RequireProjectRole({Role.OWNER, Role.MEMBER})
+	public ResponseEntity<ApiResponse<TaskResponseDTO>> updateTask(@PathVariable("idProject") String idProject, @PathVariable("idTask") String idTask, @RequestBody @Valid TaskUpdateRequestDTO requestDTO) {
+		
+		TaskResponseDTO taskResponseDTO = taskService.updateTask(idTask, requestDTO);
+		
+		ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Thông tin task đã được cập nhật thành công", taskResponseDTO);
+		
+		return ResponseEntity.ok(response);
+	}
+	
+	@Operation(summary = "Đánh dấu lưu task", description = "Cập nhật trạng thái isArchived cho task")
+	@PatchMapping("/{idProject}/tasks/{idTask}/archive")
+	@RequireProjectRole({Role.OWNER, Role.MEMBER})
+	public ResponseEntity<ApiResponse<TaskResponseDTO>> archiveTask(@PathVariable("idProject") String idProject, @PathVariable("idTask") String idTask, @RequestBody @Valid TaskArchivedRequestDTO requestDTO) {
+		
+		TaskResponseDTO taskResponseDTO = taskService.archiveTask(idTask, requestDTO);
+		
+		ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Task đã được lưu/archived thành công", taskResponseDTO);
+		
+		return ResponseEntity.ok(response);
+	}
+	
+	@Operation(summary = "Xóa task", description = "Cập nhật trạng thái task về đã xóa")
+	@DeleteMapping("/{idProject}/tasks/{idTask}")
+	@RequireProjectRole({Role.OWNER, Role.MEMBER})
+	public ResponseEntity<ApiResponse<TaskResponseDTO>> deleteTask(@PathVariable("idProject") String idProject, @PathVariable("idTask") String idTask) {
+		
+		TaskResponseDTO taskResponseDTO = taskService.deleteTask(idTask);
+		
+		ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Task đã được xóa thành công", taskResponseDTO);
+		
+		return ResponseEntity.ok(response);
+	}
+	
+	@Operation(summary = "Phục hồi task đã xóa", description = "Cập nhật trạng thái")
+	@PatchMapping("/{idProject}/tasks/{idTask}/restore")
+	@RequireProjectRole({Role.OWNER, Role.MEMBER})
+	public ResponseEntity<ApiResponse<TaskResponseDTO>> restoreTask(@PathVariable("idProject") String idProject, @PathVariable("idTask") String idTask) {
+		
+		TaskResponseDTO taskResponseDTO = taskService.restore(idTask, idProject);
+		
+		ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Task đã được phục hồi thành công", taskResponseDTO);
+		
+		return ResponseEntity.ok(response);
+	}
+	
+	@Operation(summary = "Gỡ nhiệm vụ khỏi user", description = "Hủy phân công cho user")
+	@DeleteMapping("/{idProject}/tasks/{idTask}/assignee")
+	@RequireProjectRole({Role.OWNER, Role.MEMBER})
+	public ResponseEntity<ApiResponse<TaskResponseDTO>> assigneeTask(@PathVariable("idProject") String idProject, @PathVariable("idTask") String idTask) {
+		
+		TaskResponseDTO taskResponseDTO = taskService.assigneeTask(idTask);
+		
+		ApiResponse<TaskResponseDTO> response = new ApiResponse<>(200, "Task đã được hủy phân công thành công", taskResponseDTO);
+		
+		return ResponseEntity.ok(response);
+	}
+	
+	
+}
