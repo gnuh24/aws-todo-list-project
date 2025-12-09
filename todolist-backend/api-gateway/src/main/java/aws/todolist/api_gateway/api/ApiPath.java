@@ -16,7 +16,8 @@ public class ApiPath {
 	public static final String REGISTER = AUTH + "/v1/register";
 	public static final String ACTIVE_ACCOUNT = AUTH + "/v1/active-account";
 	public static final String CHECK_EMAIL = AUTH + "/v1/check-email";
-	public static final String LOGIN_GOOGLE = AUTH + "/login/oauth2/code/google";
+	public static final String LOGIN_GOOGLE_RETURNED = AUTH + "/login/oauth2/code/google";
+	public static final String LOGIN_GOOGLE = AUTH + "/oauth2/authorization/google";
 	
 	public static final String SEND_RESET_PASSWORD_OTP = AUTH + "/v1/send-reset-password-otp/**";
 	public static final String RESET_PASSWORD = AUTH + "/v1/reset-password/**";
@@ -83,6 +84,7 @@ public class ApiPath {
 	    API_DOCS,
 		WEBSOCKET,
 		LOGIN_GOOGLE,
+		LOGIN_GOOGLE_RETURNED,
 		SWAGGER_AUTH,
 		SWAGGER_USER,
 		SWAGGER_TASKFLOW,
@@ -96,3 +98,4 @@ public class ApiPath {
 		    .anyMatch(pattern -> matcher.match(pattern, path));
 	}
 }
+
