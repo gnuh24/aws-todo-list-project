@@ -36,7 +36,7 @@ export default function NotificationSocket() {
 
     useEffect(() => {
         // 1️⃣ Tạo kết nối SockJS
-        const socket = new SockJS("http://localhost:8080/api/notification/ws");
+        const socket = new SockJS("https://sgutodolist.com/api/notification/ws");
 
         // 2️⃣ Tạo STOMP client
         const client = new Client({

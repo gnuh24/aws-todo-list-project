@@ -11,7 +11,7 @@ function TestAPI() {
 
   const domain =
     process.env.REACT_APP_TASKFLOW_SERVICE_DOMAIN ||
-    "http://localhost:8082/api/taskflow";
+    "https://sgutodolist.com/api/taskflow";
 
   useEffect(() => {
     const fetchProjects = async () => {
