@@ -64,7 +64,7 @@ const handleCopyLink = () => {
       try {
         setLoading(true);
         const res = await https_user.get(`/v1/accounts?email=${email}`);
-console.log(res.data.data.id)
+        console.log(res.data.data.id)
         if (res.data?.data) {
           setUserFound(res.data.data);
           console.log(userFound)
