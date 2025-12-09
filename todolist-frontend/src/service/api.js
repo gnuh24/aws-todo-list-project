@@ -1,7 +1,7 @@
 import axios from "axios";
 import { store } from "..";
 
-const BASE_URL = "http://sgutodolist.com/api";
+const BASE_URL = "https://sgutodolist.com/api";
 
 // axios instance
 export let https_auth = axios.create({
