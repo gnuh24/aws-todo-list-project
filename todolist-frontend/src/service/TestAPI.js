@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { BASE_URL } from "./api";
 
 function TestAPI() {
   const [projects, setProjects] = useState([]);
@@ -11,7 +12,7 @@ function TestAPI() {
 
   const domain =
     process.env.REACT_APP_TASKFLOW_SERVICE_DOMAIN ||
-    "https://sgutodolist.com/api/taskflow";
+    BASE_URL+"/taskflow";
 
   useEffect(() => {
     const fetchProjects = async () => {

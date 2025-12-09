@@ -1,7 +1,7 @@
 import axios from "axios";
 import { store } from "..";
 
-const BASE_URL = "https://sgutodolist.com/api";
+export const BASE_URL = "https://sgutodolist.com/api";
 
 // axios instance
 export let https_auth = axios.create({
@@ -45,7 +45,7 @@ export let https_model = axios.create({
 });
 
 export const https_authupdate = axios.create({
-  baseURL: "https://sgutodolist.com/api/auth",
+  baseURL: BASE_URL+"/auth",
 });
 
 // luôn lấy token mới nhất từ localStorage khi gọi API

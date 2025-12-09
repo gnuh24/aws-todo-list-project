@@ -1,9 +1,10 @@
 import React from "react";
+import { BASE_URL } from "../../service/api";
 
 export default function GoogleLoginButton() {
   const handleGoogleLogin = () => {
     window.location.href =
-      "https://sgutodolist.com/api/auth/oauth2/authorization/google";
+      BASE_URL+"/auth/oauth2/authorization/google";
   };
 
   return (

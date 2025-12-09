@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Result, Spin, message } from "antd";
 import axios from "axios";
+import { BASE_URL } from "../../service/api";
 
 export default function VerifyAccount() {
   const [searchParams] = useSearchParams();
@@ -21,7 +22,7 @@ export default function VerifyAccount() {
 
       try {
         const response = await axios.post(
-          `https://sgutodolist.com/api/auth/v1/active-account`,
+          BASE_URL+`/auth/v1/active-account`,
           null, // body trống
           {
             params: { otp },
