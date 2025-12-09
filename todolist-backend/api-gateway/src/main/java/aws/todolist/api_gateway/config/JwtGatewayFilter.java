@@ -35,6 +35,8 @@ public class JwtGatewayFilter implements GlobalFilter {
 		System.err.println("Path: " + path);
 
 		if (ApiPath.isPublicPath(path)) {
+			System.err.println("Path: " + path + " - đã pass jwt");
+			System.err.println("___________________");
 			return chain.filter(exchange);
 		}
 		
