@@ -4,6 +4,7 @@ import aws.todolist.notification.entity.Notification;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -19,9 +20,15 @@ public class EmailServiceImpl implements EmailService {
 	@Autowired
 	private JavaMailSender mailSender;
 	
+	@Value("${domain.frontend}")
+	private String domainFrontEnd;
+	
 	@Override
 	public void sendRegistrationUserConfirm(String email, String otp) {
-		String confirmationUrl = "https://sgutodolist.com/auth/verify-account?otp=" + otp;
+		
+		
+		
+		String confirmationUrl = domainFrontEnd + "/auth/verify-account?otp=" + otp;
 		
 		String subject = "Xác Nhận Đăng Ký Tài khoản";
 		String content = getEmailContentForRegistration(confirmationUrl);
