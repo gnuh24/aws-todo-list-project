@@ -1,70 +1,152 @@
-# Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+---
 
-## Available Scripts
+# 📝 AWS TODOLIST 1.0 — Microservices Project
 
-In the project directory, you can run:
+## 🚀 Giới thiệu
 
-### `npm start`
+**AWS TODOLIST** là hệ thống quản lý công việc được xây dựng theo kiến trúc **Microservices**, kết hợp backend Spring Boot, frontend React và hạ tầng AWS ECS Fargate.
+Dự án hướng đến khả năng mở rộng, CI/CD hoàn chỉnh và mô hình triển khai chuẩn hóa trên AWS.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+📌 *Bản hiện tại: **v1.0** — Một số tính năng còn hạn chế và có thể phát sinh lỗi. Các phiên bản sau sẽ tiếp tục cải thiện.*
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+🎥 **Video demo YouTube**: [https://youtu.be/gOVHkb54aeM](https://youtu.be/gOVHkb54aeM)
 
-### `npm test`
+📄 **Hướng dẫn cài đặt (setup.md)**: [Xem tại đây](./setup.md)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+---
 
-### `npm run build`
+## 🏠 Home
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+<img src="./static/images/thumbnal_video.png" alt="Home" width="900"/>
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+---
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## 🧱 Kiến trúc tổng quan
 
-### `npm run eject`
+<img src="./static/images/todolist-cloud-architecture.jpg" alt="Architecture Diagram" width="900"/>
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+---
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## 🖥️ Microservices Backend
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### 🔐 **Auth Service**
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+* Đăng ký, đăng nhập, refresh token
+* JWT + Redis blacklist cho logout
+* OAuth2 (Google)
 
-## Learn More
+### 📋 **Taskflow Service**
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+* CRUD Task/Todo
+* Lọc, sort, phân trang
+* **JPA Specifications** + Custom Filters
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### 🔔 **Notification Service**
 
-### Code Splitting
+* Gửi email thông báo
+* Gửi thông báo nội bộ của app
+* Kafka làm message broker giữa các service
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### 👤 **User Service**
 
-### Analyzing the Bundle Size
+* Các API liên quan đến người dùng
+* Thông tin cá nhân, avatar, cập nhật hồ sơ
+* Tách service để tối ưu mở rộng
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### 🤖 **Model AI Service**
 
-### Making a Progressive Web App
+* Viết bằng **Flask**
+* Phân loại nhãn / gợi ý tag cho task
+* Nhận input từ Taskflow Service và trả prediction
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### 🌐 **API Gateway**
 
-### Advanced Configuration
+* Spring Cloud Gateway
+* Xác thực JWT trước khi định tuyến
+* Entry point duy nhất của toàn hệ thống
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+---
 
-### Deployment
+## 🎨 Frontend
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+* **React + Vite**
+* **Redux Toolkit**
+* Axios Client + AxiosAdmin
+* UI hỗ trợ phân trang, sort, filter
+* Upload file qua form-data
 
-### `npm run build` fails to minify
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## ☁️ Hạ tầng AWS
+
+* **ECS Fargate** chạy từng microservice
+* **Application Load Balancer** → API Gateway
+* **ECR** lưu Docker images
+* **RDS** (MySQL/PostgreSQL)
+* **S3** (lưu file – optional)
+* **CloudWatch Logs**
+* **GitHub Actions** build & deploy tự động
+
+---
+
+## ⚙️ Công nghệ chính
+
+### Backend
+
+* Java **21**
+* Spring Boot **3.4**
+* Spring Security 6 (JWT + OAuth2)
+* Spring Data JPA + Specifications
+* Redis Cache
+* Docker
+
+### Frontend
+
+* React
+* Redux Toolkit
+* TailwindCSS
+* Axios
+
+### DevOps
+
+* AWS ECS Fargate
+* AWS ECR
+* AWS RDS
+* Docker
+* GitHub Actions CI/CD
+
+---
+
+Dưới đây là mục **Cấu trúc thư mục** đã được bổ sung đầy đủ và format đẹp để đồng bộ với README:
+
+## 🗂 Cấu trúc thư mục
+
+```
+
+aws-todo-list-project/
+│
+├── todolist-backend/
+│   ├── auth-service/
+│   ├── taskflow-service/
+│   ├── notification-service/
+│   ├── user-service/
+│   ├── model-ai-service/
+│   ├── api-gateway/
+│
+├── todolist-frontend/
+│
+├── model/                # Các file liên quan đến train AI + code Model Service
+├── docs/                 # Tài liệu (đa số lỗi thời, sẽ được cập nhật sau)
+├── infrac/               # Bộ Postman, test, script setup linh tinh
+│
+└── setup.md
+
+```
+
+## 📄 Hướng dẫn cài đặt
+
+👉 Xem chi tiết tại: **[./setup.md](./setup.md)**
+
+---
+

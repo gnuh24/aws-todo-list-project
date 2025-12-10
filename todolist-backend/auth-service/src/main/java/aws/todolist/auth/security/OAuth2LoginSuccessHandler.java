@@ -5,6 +5,7 @@ import aws.todolist.auth.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -21,6 +22,9 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final AuthService authService;
 	
+	@Value("${domain.frontend}")
+	private String domainFrontEnd;
+	
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request,
 										HttpServletResponse response,
@@ -35,9 +39,12 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 		
 		AuthResponseDTO loginInfo = authService.loginGoogle(email, name, avatar);
 		
+		System.err.println("Info: " + loginInfo);
+		
 		// Build query string
 		String redirectUrl = String.format(
-			"http://localhost:3000/app/inbox"
+			domainFrontEnd
+				+ "/app/upcoming"
 				+ "?id=%s"
 				+ "&email=%s"
 				+ "&displayName=%s"
@@ -58,6 +65,8 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 			URLEncoder.encode(loginInfo.getRefreshToken(), StandardCharsets.UTF_8),
 			URLEncoder.encode(loginInfo.getRefreshTokenExpirationTime(), StandardCharsets.UTF_8)
 		);
+		
+		System.err.println("Redirect Url: " + redirectUrl);
 		
 		response.sendRedirect(redirectUrl);
 	}

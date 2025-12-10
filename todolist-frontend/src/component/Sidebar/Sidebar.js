@@ -286,11 +286,11 @@ useEffect(() => {
               }}
             />
 
-            <SidebarItem
+            {/* <SidebarItem
               onClick={() => setOpenSearch(true)}
               icon={<SearchOutlined />}
               label="Search"
-            />
+            /> */}
             <SearchCommandModal
               open={openSearch}
               onClose={() => setOpenSearch(false)}

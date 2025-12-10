@@ -97,9 +97,9 @@ export default function TaskEditFormUpComing({ task, onSave, onCancel }) {
                 <PriorityDropdown priority={priority} onSelect={setPriority} />
 
                 {/* Reminder */}
-                <Button icon={<BellOutlined />} size="small">
-                    Reminder
-                </Button>
+                {/*<Button icon={<BellOutlined />} size="small">*/}
+                {/*    Reminder*/}
+                {/*</Button>*/}
 
                 {/* More options */}
                 <MoreOptionsDropdown

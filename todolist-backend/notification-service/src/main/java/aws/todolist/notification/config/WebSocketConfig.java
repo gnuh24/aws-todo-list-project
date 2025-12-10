@@ -19,12 +19,15 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")  // endpoint WebSocket
-                .setAllowedOriginPatterns("http://localhost:4200"
+                .setAllowedOriginPatterns(
+                        "http://localhost:4200"
                         ,"http://127.0.0.1:4200"
                         ,"http://localhost:5500"
                         ,"http://127.0.0.1:5500"
                         ,"http://localhost:3000"
-                        ,"http://127.0.0.1:3000")
+                        ,"http://127.0.0.1:3000"
+                        ,"https://sgutodolist.com"
+                )
                 .withSockJS();
     }
 

@@ -7,16 +7,16 @@ import java.util.List;
 public class ApiPath {
 	
 	public static final String BASE = "/api";
-	public static final String MODEL = BASE + "/model/**";
-	
+	public static final String MODEL = BASE + "/model/predict";
 	// ---------- AUTH ----------
 	public static final String AUTH = BASE + "/auth";
-	
 	public static final String LOGIN = AUTH + "/v1/login";
 	public static final String STAFF_LOGIN = AUTH + "/v1/staff-login";
 	public static final String REGISTER = AUTH + "/v1/register";
 	public static final String ACTIVE_ACCOUNT = AUTH + "/v1/active-account";
 	public static final String CHECK_EMAIL = AUTH + "/v1/check-email";
+	public static final String LOGIN_GOOGLE_RETURNED = AUTH + "/login/oauth2/code/google";
+	public static final String LOGIN_GOOGLE = AUTH + "/oauth2/authorization/google";
 	
 	public static final String SEND_RESET_PASSWORD_OTP = AUTH + "/v1/send-reset-password-otp/**";
 	public static final String RESET_PASSWORD = AUTH + "/v1/reset-password/**";
@@ -53,8 +53,17 @@ public class ApiPath {
 	public static final String MEDIA_UPLOAD = BASE + "/media/upload";
 	
 	// ---------- SWAGGER & DOCS ----------
+	public static final String USER = BASE + "/user";
+	public static final String TASKFLOW = BASE + "/taskflow";
+	public static final String NOTIFICATION = BASE + "/notification";
+	
+	
 	public static final String SWAGGER_UI = BASE + "/swagger/**";
 	public static final String API_DOCS = BASE + "/v3/api-docs/**";
+	public static final String SWAGGER_AUTH = AUTH + "/v3/api-docs";
+	public static final String SWAGGER_USER = USER + "/v3/api-docs";
+	public static final String SWAGGER_TASKFLOW = TASKFLOW + "/v3/api-docs";
+	public static final String SWAGGER_NOTIFICATION = NOTIFICATION + "/v3/api-docs";
 
 	// ---------- WEBSOCKET -------------
 	public static final String WEBSOCKET = BASE + "/notification/ws/**";
@@ -72,7 +81,13 @@ public class ApiPath {
 	    REFRESH_TOKEN,
 	    SWAGGER_UI,
 	    API_DOCS,
-			WEBSOCKET
+		WEBSOCKET,
+		LOGIN_GOOGLE,
+		LOGIN_GOOGLE_RETURNED,
+		SWAGGER_AUTH,
+		SWAGGER_USER,
+		SWAGGER_TASKFLOW,
+		SWAGGER_NOTIFICATION
 	);
 	
 	private static final AntPathMatcher matcher = new AntPathMatcher();
@@ -82,3 +97,5 @@ public class ApiPath {
 		    .anyMatch(pattern -> matcher.match(pattern, path));
 	}
 }
+
+

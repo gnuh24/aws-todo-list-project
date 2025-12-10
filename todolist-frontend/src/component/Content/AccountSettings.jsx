@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import { Switch } from "antd";
 import { https_user } from "../../service/api";
 
@@ -7,11 +7,12 @@ export default function AccountSettings({
   onGotoChangeEmail,
 }) {
   const dataUser = JSON.parse(localStorage.getItem("USER_INFO")) || {};
-  const { displayName, email, avatar } = dataUser;
+  const { id, displayName, email, avatar } = dataUser;
 
   const [name, setName] = useState(displayName || "");
   const [tempName, setTempName] = useState(displayName || "");
   const [editing, setEditing] = useState(false);
+  const [isNotificationEmail, setIsNotificationEmail] = useState(false);
 
   const handleCancel = () => {
     setTempName(name);
@@ -43,21 +44,53 @@ export default function AccountSettings({
     }
   };
 
+  const handleUpdateNotificationEmail = async (value) => {
+    console.log(value)
+    try {
+
+      // Gọi API cập nhật
+      await https_user.patch(`/v1/accounts/me`, {
+        receiveEmail: value,
+      });
+
+      // Cập nhật lại UI
+      setIsNotificationEmail(value)
+
+      console.log(value)
+
+    } catch (error) {
+      console.error("Update failed:", error);
+    }
+  }
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await https_user.get("/v1/accounts/me"); // phải await
+        setIsNotificationEmail(res.data.data.receiveEmail);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
   return (
     <div className="text-gray-700">
       {/* HEADER */}
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold">Account</h2>
-        <button className="px-4 py-1.5 rounded border text-sm hover:bg-gray-100">
+        {/* <button className="px-4 py-1.5 rounded border text-sm hover:bg-gray-100">
           Manage plan
-        </button>
+        </button> */}
       </div>
 
-      {/* PLAN */}
+      {/* PLAN
       <div className="mb-8">
         <h3 className="text-sm text-gray-500">Plan</h3>
         <p className="text-lg font-medium">Beginner</p>
-      </div>
+      </div> */}
 
       {/* PHOTO */}
       <div className="mb-8">
@@ -147,7 +180,7 @@ export default function AccountSettings({
         </button>
       </div>
 
-      {/* 2FA */}
+      {/* 2FA
       <div className="mb-8">
         <h3 className="text-sm text-gray-500 mb-1">
           Two-factor authentication
@@ -158,7 +191,25 @@ export default function AccountSettings({
         <p className="text-xs text-gray-500 mt-1">
           2FA is disabled on your Todoist account.
         </p>
+      </div> */}
+
+      {/* Email Notifications */}
+      <div className="mb-8">
+        <h3 className="text-sm text-gray-500 mb-1">
+          Email notifications
+        </h3>
+
+        <Switch
+            checked={isNotificationEmail}
+            onChange={(value) => handleUpdateNotificationEmail(value)}
+        />
+
+
+        <p className="text-xs text-gray-500 mt-1">
+          You will receive updates and alerts via email.
+        </p>
       </div>
+
     </div>
   );
 }

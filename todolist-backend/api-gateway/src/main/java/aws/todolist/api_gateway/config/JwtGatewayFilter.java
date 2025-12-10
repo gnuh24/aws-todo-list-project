@@ -31,12 +31,15 @@ public class JwtGatewayFilter implements GlobalFilter {
 	public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 
 		String path = exchange.getRequest().getURI().getPath();
-
+		
+		System.err.println("Path: " + path);
 
 		if (ApiPath.isPublicPath(path)) {
+			System.err.println("Path: " + path + " - đã pass jwt");
+			System.err.println("___________________");
 			return chain.filter(exchange);
 		}
-
+		
 		String authHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
 
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -60,8 +63,6 @@ public class JwtGatewayFilter implements GlobalFilter {
 			    .header("X-User-Role", role)
 			    .header("X-Token-Type", type)
 			    .build();
-			
-			System.err.println("Đã pass qua: " + email);
 			return chain.filter(exchange.mutate().request(modifiedRequest).build());
 			
 		} catch (ExpiredJwtException e) {

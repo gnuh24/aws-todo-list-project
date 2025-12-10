@@ -79,7 +79,7 @@ export default function SectionItem({
                   sectionId={section.id}
                   projectId={projectId}
                   onDeleteTask={handleDeleteTask}
-                  handleUpdateTask={handleUpdateTask}
+                  onUpdate={handleUpdateTask}
                 />
               ))
           ) : (

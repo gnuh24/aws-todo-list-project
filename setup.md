@@ -1,4 +1,4 @@
-# AWS ToDo List Project - Setup Database (MySQL + Redis) bằng VSC
+# AWS ToDo List Project - Setup Database (MySQL + Redis + Fullbackend) bằng VSC
 
 ## **Bước 1: Cấu trúc project cần thiết**
 **Lưu ý:** Folder của project **BẮT BUỘC** phải tên là `"aws-todo-list-project"` -> Nếu sai, lệnh CLI sẽ không nhận path -> lỗi.
@@ -46,3 +46,22 @@ docker compose down -v
 # Chạy lại toàn bộ container theo docker-compose.yml
 docker compose up -d
 ```
+
+**Toàn bộ hạ tầng và backend đều sẽ được chạy trong docker khi bạn làm theo thao tác trên**
+
+
+# ▶️ Chạy Frontend
+
+```bash
+npm install
+npm start
+````
+
+Frontend sẽ chạy tại:
+
+👉 **[http://localhost:3000](http://localhost:3000)**
+
+
+
+
+

@@ -117,9 +117,6 @@ public class Account implements Serializable, UserDetails {
 		if (status == null) {
 			status = Status.ACTIVE;
 		}
-		if (avatar == null || avatar.isEmpty()) {
-			avatar = "avatar-default-icon.png";
-		}
 		isDeleted = false;
 		receiveEmail = false;
 	}
