@@ -1,6 +1,6 @@
 package aws.todolist.taskflow.security;
 
-import aws.todolist.taskflow.aop.RequestLoggingFilter;
+import aws.todolist.taskflow.logging.RequestLoggingFilter;
 import aws.todolist.taskflow.exceptions.AuthException.AuthExceptionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

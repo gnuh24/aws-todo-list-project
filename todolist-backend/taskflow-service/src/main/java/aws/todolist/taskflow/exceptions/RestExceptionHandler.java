@@ -1,6 +1,6 @@
 package aws.todolist.taskflow.exceptions;
 
-import aws.todolist.taskflow.aop.AppLogger;
+import aws.todolist.taskflow.logging.AppLogger;
 import aws.todolist.taskflow.exceptions.AuthException.StepUpAuthenticationException;
 import aws.todolist.taskflow.exceptions.ProjectException.BadRequestException;
 import aws.todolist.taskflow.exceptions.ProjectException.ForbiddenException;

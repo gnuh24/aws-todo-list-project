@@ -1,6 +1,6 @@
 package aws.todolist.auth.exceptions;
 
-import aws.todolist.auth.aop.AppLogger;
+import aws.todolist.auth.logging.AppLogger;
 import aws.todolist.auth.exceptions.AuthException.HmacVerificationException;
 import aws.todolist.auth.exceptions.AuthException.StepUpAuthenticationException;
 import aws.todolist.auth.exceptions.JwtException.*;

@@ -1,4 +1,4 @@
-package aws.todolist.notification.aop;
+package aws.todolist.auth.logging;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

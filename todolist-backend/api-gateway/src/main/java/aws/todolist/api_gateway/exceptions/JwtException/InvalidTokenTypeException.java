@@ -1,7 +1,7 @@
 package aws.todolist.api_gateway.exceptions.JwtException;
 
 
-public class InvalidTokenTypeException extends AuthenticationException {
+public class InvalidTokenTypeException extends GenericJwtException {
 	public InvalidTokenTypeException(String message) {
 		super(message);
 	}

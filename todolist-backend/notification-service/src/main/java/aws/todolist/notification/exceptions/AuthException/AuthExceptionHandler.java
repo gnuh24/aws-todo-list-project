@@ -1,6 +1,6 @@
 package aws.todolist.notification.exceptions.AuthException;
 
-import aws.todolist.notification.aop.AppLogger;
+import aws.todolist.notification.logging.AppLogger;
 import aws.todolist.notification.api.ApiResponse;
 import aws.todolist.notification.exceptions.DetailError;
 import aws.todolist.notification.exceptions.ErrorResponse;

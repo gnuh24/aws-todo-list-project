@@ -1,6 +1,6 @@
 package aws.todolist.taskflow.exceptions.AuthException;
 
-import aws.todolist.taskflow.aop.AppLogger;
+import aws.todolist.taskflow.logging.AppLogger;
 import aws.todolist.taskflow.api.ApiResponse;
 import aws.todolist.taskflow.exceptions.DetailError;
 import aws.todolist.taskflow.exceptions.ErrorResponse;

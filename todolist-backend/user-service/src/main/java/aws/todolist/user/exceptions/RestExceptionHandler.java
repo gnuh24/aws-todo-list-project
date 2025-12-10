@@ -1,6 +1,6 @@
 package aws.todolist.user.exceptions;
 
-import aws.todolist.user.aop.AppLogger;
+import aws.todolist.user.logging.AppLogger;
 import aws.todolist.user.exceptions.errorCode.SystemErrorCode;
 import aws.todolist.user.utils.EnvironmentUtils;
 
@@ -10,8 +10,6 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;

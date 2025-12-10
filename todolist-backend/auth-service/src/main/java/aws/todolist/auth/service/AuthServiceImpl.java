@@ -1,11 +1,9 @@
 package aws.todolist.auth.service;
 
-import aws.todolist.auth.aop.AppLogger;
 import aws.todolist.auth.dto.account.AccountCreateForm;
 import aws.todolist.auth.dto.account.AccountRedisDTO;
 import aws.todolist.auth.dto.auth.*;
 import aws.todolist.auth.entity.Account;
-import aws.todolist.auth.exceptions.AuthException.AuthExceptionHandler;
 import aws.todolist.auth.exceptions.AuthException.StepUpAuthenticationException;
 import aws.todolist.auth.exceptions.JwtException.*;
 import aws.todolist.auth.exceptions.otpException.OtpNotFoundException;
@@ -14,7 +12,6 @@ import aws.todolist.auth.integration.redis.RedisService;
 import aws.todolist.auth.mapper.AuthMapper;
 import aws.todolist.auth.messaging.kafka.producer.KafkaProducerService;
 import aws.todolist.auth.security.JwtTokenProvider;
-import aws.todolist.auth.utils.EnvironmentUtils;
 import aws.todolist.auth.utils.IdGenerator;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;

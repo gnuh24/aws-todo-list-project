@@ -1,4 +1,4 @@
-package aws.todolist.auth.aop;
+package aws.todolist.auth.logging;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;

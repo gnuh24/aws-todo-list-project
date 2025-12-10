@@ -8,5 +8,10 @@ done
 redis-cli SET email_exist:admin@gmail.com 1
 redis-cli SET email_exist:user1@gmail.com 1
 redis-cli SET email_exist:user2@gmail.com 1
+redis-cli SET email_exist:user3@gmail.com 1
+redis-cli SET email_exist:user4@gmail.com 1
+redis-cli SET email_exist:user5@gmail.com 1
+
+redis-cli SET banlist:accountId:user5@gmail.com 1
 
 wait

@@ -1,6 +1,6 @@
 package aws.todolist.notification.exceptions;
 
-import aws.todolist.notification.aop.AppLogger;
+import aws.todolist.notification.logging.AppLogger;
 import aws.todolist.notification.exceptions.AuthException.HmacVerificationException;
 import aws.todolist.notification.exceptions.AuthException.StepUpAuthenticationException;
 import aws.todolist.notification.exceptions.JwtException.*;

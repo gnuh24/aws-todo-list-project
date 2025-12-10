@@ -1,7 +1,7 @@
 package aws.todolist.notification.service;
 
 
-import aws.todolist.notification.aop.AppLogger;
+import aws.todolist.notification.logging.AppLogger;
 import aws.todolist.notification.entity.Account;
 import aws.todolist.notification.entity.Notification;
 import aws.todolist.notification.messaging.kafka.message.NotificationMessage;

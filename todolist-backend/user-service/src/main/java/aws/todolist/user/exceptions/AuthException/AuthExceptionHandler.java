@@ -1,6 +1,6 @@
 package aws.todolist.user.exceptions.AuthException;
 
-import aws.todolist.user.aop.AppLogger;
+import aws.todolist.user.logging.AppLogger;
 import aws.todolist.user.api.ApiResponse;
 import aws.todolist.user.exceptions.DetailError;
 import aws.todolist.user.exceptions.ErrorResponse;
