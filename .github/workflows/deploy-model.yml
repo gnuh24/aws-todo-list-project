@@ -1,0 +1,70 @@
+name: Deploy AI Model 🧠
+
+on:
+  push:
+    branches: [ "main", "pre-production" ]
+    paths:
+      - 'model/**'
+      - '.github/workflows/deploy-model.yml'
+
+env:
+  AWS_REGION: ap-southeast-1
+  ECR_REPOSITORY: ai-model-service
+  ECS_SERVICE: ai-model-service
+  ECS_CLUSTER: SGUTodolist-Cluster
+  WORKING_DIRECTORY: ./model
+
+jobs:
+  deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+    - name: Checkout Code
+      id: checkout
+      uses: actions/checkout@v3
+
+    # Python không cần cài JDK, Docker sẽ lo hết
+
+    - name: Configure AWS Credentials
+      id: aws-creds
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build, Tag, and Push Image
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        cd ${{ env.WORKING_DIRECTORY }}
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+    - name: Force ECS Update
+      id: ecs-update
+      run: |
+        aws ecs update-service --cluster ${{ env.ECS_CLUSTER }} --service ${{ env.ECS_SERVICE }} --force-new-deployment
+
+    - name: Success Notification
+      if: success()
+      run: echo "🎉 DEPLOY AI MODEL THÀNH CÔNG!"
+
+    - name: ⛔ ERROR HANDLER
+      if: failure()
+      run: |
+        echo "🚨 LỖI DEPLOY AI MODEL!"
+        if [[ "${{ steps.checkout.outcome }}" == 'failure' ]]; then echo "❌ Lỗi: Checkout Code"; fi
+        if [[ "${{ steps.aws-creds.outcome }}" == 'failure' ]]; then echo "❌ Lỗi: AWS Credentials"; fi
+        if [[ "${{ steps.build-image.outcome }}" == 'failure' ]]; then echo "❌ Lỗi: Docker Build/Push"; fi
+        if [[ "${{ steps.ecs-update.outcome }}" == 'failure' ]]; then echo "❌ Lỗi: ECS Update"; fi
+        exit 1

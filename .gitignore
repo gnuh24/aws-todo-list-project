@@ -61,3 +61,5 @@ todolist-frontend/node_modules/
 *~
 Thumbs.db
 .vscode/settings.json
+*.zip
+todolist-frontend.zip
