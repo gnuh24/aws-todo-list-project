@@ -200,7 +200,7 @@ services:
       - default
 
   # =====================
-  # 🌐 TaskFlow Service (Spring Boot)
+  # 🌐 Notification Service (Spring Boot)
   # =====================
   notification-service:
     build:
@@ -265,6 +265,7 @@ services:
       - user-service 
       - auth-service
       - taskflow-service
+      - notification-service
       - ai-model-service
     ports:
       - "8080:8080"

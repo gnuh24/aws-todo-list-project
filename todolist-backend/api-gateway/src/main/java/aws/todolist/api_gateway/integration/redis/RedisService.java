@@ -1,42 +1,22 @@
 package aws.todolist.api_gateway.integration.redis;
 
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Service
 public interface RedisService {
-	void set(String key, Object value);
 	
-	void setObjectWithTTL(String key, Object value, long timeout, TimeUnit unit);
+	Mono<Boolean> set(String key, String value, Duration ttl);
 	
-	void set(String key, String value);
+	Mono<Optional<String>> get(String key);
 	
-	void set(String key, String value, long timeout, TimeUnit unit);
-	
-	void setTimeToLive(String key, long timeoutInDays);
-	
-	void hashSet(String key, String field, Object value);
-	
-	boolean exists(String key);
-	
-	<T> List<T> hashGetAll(String key, Class<T> type);
-	
-	boolean hashExists(String key, String field);
-	
-	Object get(String key);
-	
-	public Map<String, Object> getField(String key);
-	
-	Object hashGet(String key, String field);
-	
-	void delete(String key);
-	
-	void delete(String key, String field);
-	
-	void delete(String key, List<String> fields);
-	
+	Mono<Boolean> hasKey(String key);
 }
 

@@ -117,39 +117,23 @@ spring:
                     uri: ${USER_SERVICE_URL:http://localhost:8081}
                     predicates:
                         - Path=/api/user/**
-                #          filters:
-                #            - name: RequestRateLimiter
-                #              args:
-                #                redis-rate-limiter.replenishRate: 5
-                #                redis-rate-limiter.burstCapacity: 10
-                #                key-resolver: "#{@ipKeyResolver}"
+
 
                 -   id: taskflow-service
                     uri: ${TASKFLOW_SERVICE_URL:http://localhost:8082}
                     predicates:
                         - Path=/api/taskflow/**
-                #                                        filters:
-                #                                                -       name: RequestRateLimiter
-                #                                                        args:
-                #                                                                redis-rate-limiter.replenishRate: 5
-                #                                                                redis-rate-limiter.burstCapacity: 10
-                #                                                                key-resolver: "#{@ipKeyResolver}"
+
 
                 -   id: auth-service
                     uri: ${AUTH_SERVICE_URL:http://localhost:9999}
                     predicates:
                         - Path=/api/auth/**
-                #          filters:
-                #            - name: RequestRateLimiter
-                #              args:
-                #                redis-rate-limiter.replenishRate: 10
-                #                redis-rate-limiter.burstCapacity: 20
-                #                key-resolver: "#{@ipKeyResolver}"
+
 
                 # 🔹 WebSocket route (HTTP/SockJS)
                 -   id: notification-ws
                     uri: ${NOTIFICATION_SERVICE_URL:http://localhost:9998}
-                    #                                        uri: http://localhost:9998
                     predicates:
                         - Path=/api/notification/ws/**
 
@@ -160,20 +144,15 @@ spring:
                     #                                        uri: http://localhost:9998
                     predicates:
                         - Path=/api/notification/**
-    #          filters:
-    #            - name: RequestRateLimiter
-    #              args:
-    #                redis-rate-limiter.replenishRate: 5
-    #                redis-rate-limiter.burstCapacity: 10
-    #                key-resolver: "#{@ipKeyResolver}"
+
 
     # =========================
     # 🧱 Redis Configuration
     # =========================
     data:
         redis:
-            host: redis
-            port: 6379
+            host: ${SPRING_DATA_REDIS_HOST:localhost}
+            port: ${SPRING_DATA_REDIS_PORT:6379}
             password:
 
     # =========================

@@ -13,6 +13,7 @@ import io.jsonwebtoken.security.SignatureException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
+import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
@@ -23,7 +24,8 @@ public class JwtGatewayFilter implements GlobalFilter {
 	
 	@Autowired
 	private JwtTokenProvider jwtTokenProvider;
-	
+	@Autowired
+	private ReactiveRedisTemplate<String, String> redisTemplate;
 	@Autowired
 	private RedisService redisService;
 	
@@ -55,24 +57,34 @@ public class JwtGatewayFilter implements GlobalFilter {
 			String email  = jwtTokenProvider.getUsername(jwt);
 			String userId = jwtTokenProvider.getAccountId(jwt);
 			String role   = jwtTokenProvider.getRole(jwt);
-			
+
 			// Check trong blacklist
-//			System.err.println("KEY: " + RedisConstants.BANLIST_ACCOUNT_ID + ":" + userId);
-//			Object redisValue = redisService.get(RedisConstants.BANLIST_ACCOUNT_ID + ":" + userId).toString();
-//			System.err.println("Value = " + redisValue);
-//
-//			if(redisService.exists(RedisConstants.BANLIST_ACCOUNT_ID + ":" + userId)){
-//				return Mono.error(new AccessTokenBlacklistedException("Invalid token type"));
-//			}
+			String redisKey = RedisConstants.BANLIST_ACCOUNT_ID + ":" + userId;
 			
-			ServerHttpRequest modified = exchange.getRequest().mutate()
-				.header("X-User-Email", email)
-				.header("X-User-Id", userId)
-				.header("X-User-Role", role)
-				.header("X-Token-Type", type)
-				.build();
-			
-			return chain.filter(exchange.mutate().request(modified).build());
+			return redisService.get(redisKey)
+				.flatMap(optionalValue -> {
+					
+					// Nếu Redis có key → token bị blacklist
+					if (optionalValue.isPresent()) {
+						return Mono.error(new AccessTokenBlacklistedException("Token đã bị thu hồi"));
+					}
+					
+					// Không bị blacklist → Inject header và tiếp tục
+					ServerHttpRequest modified = exchange.getRequest().mutate()
+						.header("X-User-Email", email)
+						.header("X-User-Id", userId)
+						.header("X-User-Role", role)
+						.header("X-Token-Type", type)
+						.build();
+					
+					return chain.filter(exchange.mutate().request(modified).build());
+				})
+				.onErrorResume(ex -> {
+					// Nếu bạn muốn: Redis bị tắt/offline → vẫn cho qua hoặc block toàn bộ
+					// Tùy bạn cấu hình tiếp
+					return Mono.error(ex);
+				});
+
 			
 		} catch (ExpiredJwtException e) {
 			return Mono.error(new TokenExpiredException("Token đã hết hạn"));
