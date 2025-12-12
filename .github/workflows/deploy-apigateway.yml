@@ -1,76 +1,96 @@
+# ========================================================
+# WORKFLOW: DEPLOY API GATEWAY
+# ========================================================
 name: Deploy API Gateway
 
+# 1. KÍCH HOẠT (TRIGGER)
 on:
   push:
-    branches: [ "main", "pre-production" ]
+    branches: [ "main", "pre-production" ] # Chỉ chạy khi push vào 2 nhánh này
     paths:
-      - 'api-gateway/**'
-      - '.github/workflows/deploy-apigateway.yml'
+      - 'api-gateway/**'                   # Chỉ chạy khi sửa code trong thư mục api-gateway
+      - '.github/workflows/deploy-apigateway.yml' # Hoặc khi sửa file cấu hình này
 
+# 2. BIẾN MÔI TRƯỜNG (CONSTANTS)
 env:
-  AWS_REGION: ap-southeast-1
-  ECR_REPOSITORY: api-gateway
-  ECS_SERVICE: api-gateway
-  ECS_CLUSTER: SGUTodolist-Cluster
-  WORKING_DIRECTORY: ./api-gateway
+  AWS_REGION: ap-southeast-1          # Khu vực server (Singapore)
+  ECR_REPOSITORY: api-gateway         # Tên kho chứa ảnh trên ECR
+  ECS_SERVICE: api-gateway            # Tên Service trên ECS
+  ECS_CLUSTER: SGUTodolist-Cluster    # Tên Cluster
+  WORKING_DIRECTORY: ./api-gateway    # Đường dẫn thư mục code
 
+# 3. CÔNG VIỆC (JOBS)
 jobs:
   deploy:
     name: Build & Deploy
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest            # Chạy trên máy ảo Ubuntu mới nhất
 
     steps:
+    # BƯỚC 1: Tải code về máy ảo
     - name: Checkout Code
       id: checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4       # ✅ Đã nâng cấp lên v4 (Mới nhất)
 
+    # BƯỚC 2: Cài đặt Java 17 (Để môi trường build sạch sẽ)
     - name: Set up JDK 17
       id: setup-jdk
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4     # ✅ Đã nâng cấp lên v4
       with:
         java-version: '17'
         distribution: 'temurin'
 
+    # BƯỚC 3: Đăng nhập AWS (Dùng IAM User Key - Không cần Session Token)
     - name: Configure AWS Credentials
       id: aws-creds
-      uses: aws-actions/configure-aws-credentials@v1
+      uses: aws-actions/configure-aws-credentials@v4 # ✅ Đã nâng cấp lên v4 (Hết cảnh báo cũ)
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ env.AWS_REGION }}
 
+    # BƯỚC 4: Đăng nhập Docker vào ECR
     - name: Login to Amazon ECR
       id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+      uses: aws-actions/amazon-ecr-login@v2 # ✅ Đã nâng cấp lên v2 (Hết cảnh báo docker password)
 
+    # BƯỚC 5: Build và Đẩy ảnh lên ECR
     - name: Build, Tag, and Push Image
       id: build-image
       env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        IMAGE_TAG: ${{ github.sha }}
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }} # Lấy URL registry
+        IMAGE_TAG: ${{ github.sha }}                          # Lấy mã commit làm tag
       run: |
         cd ${{ env.WORKING_DIRECTORY }}
+        
+        # Build ảnh với 2 tag: commit-hash và latest
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+        
+        # Đẩy cả 2 tag lên ECR
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
-        # ✅ Cập nhật cú pháp mới để hết báo lỗi deprecated
+        
+        # Ghi output (nếu cần dùng sau này)
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
+    # BƯỚC 6: Cập nhật ECS (Ép chạy phiên bản mới)
     - name: Force ECS Update
       id: ecs-update
       run: |
         aws ecs update-service --cluster ${{ env.ECS_CLUSTER }} --service ${{ env.ECS_SERVICE }} --force-new-deployment
 
+    # BƯỚC 7: Thông báo thành công
     - name: Success Notification
       if: success()
       run: echo "🎉 DEPLOY API GATEWAY THÀNH CÔNG!"
 
+    # BƯỚC 8: Xử lý lỗi (Chỉ chạy khi có lỗi)
     - name: ⛔ ERROR HANDLER
       if: failure()
       run: |
         echo "🚨 LỖI DEPLOY GATEWAY!"
         if [[ "${{ steps.checkout.outcome }}" == 'failure' ]]; then echo "❌ Lỗi: Checkout Code"; fi
-        if [[ "${{ steps.aws-creds.outcome }}" == 'failure' ]]; then echo "❌ Lỗi: AWS Credentials (Key sai/hết hạn)"; fi
+        if [[ "${{ steps.aws-creds.outcome }}" == 'failure' ]]; then echo "❌ Lỗi: AWS Credentials (Key sai hoặc thiếu quyền IAM)"; fi
+        if [[ "${{ steps.login-ecr.outcome }}" == 'failure' ]]; then echo "❌ Lỗi: Login ECR (Thiếu quyền ECR)"; fi
         if [[ "${{ steps.build-image.outcome }}" == 'failure' ]]; then echo "❌ Lỗi: Docker Build/Push"; fi
         if [[ "${{ steps.ecs-update.outcome }}" == 'failure' ]]; then echo "❌ Lỗi: Không tìm thấy ECS Service"; fi
         exit 1

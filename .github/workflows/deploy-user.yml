@@ -1,5 +1,9 @@
-name: Deploy User Service 👤
+# ========================================================
+# WORKFLOW: DEPLOY USER SERVICE
+# ========================================================
+name: Deploy User Service
 
+# 1. KÍCH HOẠT (TRIGGER)
 on:
   push:
     branches: [ "main", "pre-production" ]
@@ -7,6 +11,7 @@ on:
       - 'user-service/**'
       - '.github/workflows/deploy-user.yml'
 
+# 2. BIẾN MÔI TRƯỜNG (CONSTANTS)
 env:
   AWS_REGION: ap-southeast-1
   ECR_REPOSITORY: user-service
@@ -14,35 +19,41 @@ env:
   ECS_CLUSTER: SGUTodolist-Cluster
   WORKING_DIRECTORY: ./user-service
 
+# 3. CÔNG VIỆC (JOBS)
 jobs:
   deploy:
     name: Build & Deploy
     runs-on: ubuntu-latest
 
     steps:
+    # BƯỚC 1: Tải code
     - name: Checkout Code
       id: checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4       # ✅ Đã nâng cấp v4
 
+    # BƯỚC 2: Cài đặt Java
     - name: Set up JDK 17
       id: setup-jdk
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4     # ✅ Đã nâng cấp v4
       with:
         java-version: '17'
         distribution: 'temurin'
 
+    # BƯỚC 3: Đăng nhập AWS
     - name: Configure AWS Credentials
       id: aws-creds
-      uses: aws-actions/configure-aws-credentials@v1
+      uses: aws-actions/configure-aws-credentials@v4 # ✅ Đã nâng cấp v4
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ env.AWS_REGION }}
 
+    # BƯỚC 4: Đăng nhập Docker vào ECR
     - name: Login to Amazon ECR
       id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+      uses: aws-actions/amazon-ecr-login@v2 # ✅ Đã nâng cấp v2
 
+    # BƯỚC 5: Build và Đẩy ảnh lên ECR
     - name: Build, Tag, and Push Image
       id: build-image
       env:
@@ -53,24 +64,27 @@ jobs:
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
-        # ✅ Cập nhật cú pháp mới để hết báo lỗi deprecated
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
+    # BƯỚC 6: Cập nhật ECS
     - name: Force ECS Update
       id: ecs-update
       run: |
         aws ecs update-service --cluster ${{ env.ECS_CLUSTER }} --service ${{ env.ECS_SERVICE }} --force-new-deployment
 
+    # BƯỚC 7: Thông báo thành công
     - name: Success Notification
       if: success()
       run: echo "🎉 DEPLOY USER SERVICE THÀNH CÔNG!"
 
+    # BƯỚC 8: Xử lý lỗi
     - name: ⛔ ERROR HANDLER
       if: failure()
       run: |
         echo "🚨 LỖI DEPLOY USER!"
         if [[ "${{ steps.checkout.outcome }}" == 'failure' ]]; then echo "❌ Lỗi: Checkout Code"; fi
         if [[ "${{ steps.aws-creds.outcome }}" == 'failure' ]]; then echo "❌ Lỗi: AWS Credentials"; fi
-        if [[ "${{ steps.build-image.outcome }}" == 'failure' ]]; then echo "❌ Lỗi: Docker Build"; fi
-        if [[ "${{ steps.ecs-update.outcome }}" == 'failure' ]]; then echo "❌ Lỗi: Không tìm thấy ECS Service"; fi
+        if [[ "${{ steps.login-ecr.outcome }}" == 'failure' ]]; then echo "❌ Lỗi: Login ECR"; fi
+        if [[ "${{ steps.build-image.outcome }}" == 'failure' ]]; then echo "❌ Lỗi: Docker Build/Push"; fi
+        if [[ "${{ steps.ecs-update.outcome }}" == 'failure' ]]; then echo "❌ Lỗi: ECS Update"; fi
         exit 1
