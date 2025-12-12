@@ -17,7 +17,7 @@ env:
   ECR_REPOSITORY: notification-service
   ECS_SERVICE: notification-service
   ECS_CLUSTER: SGUTodolist-Cluster
-  WORKING_DIRECTORY: ./notification-service
+  WORKING_DIRECTORY: ./todolist-backend/notification-service
 
 # 3. CÔNG VIỆC (JOBS)
 jobs:

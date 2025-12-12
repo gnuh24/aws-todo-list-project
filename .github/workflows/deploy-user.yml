@@ -17,7 +17,7 @@ env:
   ECR_REPOSITORY: user-service
   ECS_SERVICE: user-service
   ECS_CLUSTER: SGUTodolist-Cluster
-  WORKING_DIRECTORY: ./user-service
+  WORKING_DIRECTORY: ./todolist-backend/user-service
 
 # 3. CÔNG VIỆC (JOBS)
 jobs:

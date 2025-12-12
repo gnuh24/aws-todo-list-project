@@ -17,7 +17,7 @@ env:
   ECR_REPOSITORY: api-gateway         # Tên kho chứa ảnh trên ECR
   ECS_SERVICE: api-gateway            # Tên Service trên ECS
   ECS_CLUSTER: SGUTodolist-Cluster    # Tên Cluster
-  WORKING_DIRECTORY: ./api-gateway    # Đường dẫn thư mục code
+  WORKING_DIRECTORY: ./todolist-backend/api-gateway    # Đường dẫn thư mục code
 
 # 3. CÔNG VIỆC (JOBS)
 jobs:

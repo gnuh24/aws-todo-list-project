@@ -17,7 +17,7 @@ env:
   ECR_REPOSITORY: taskflow-service
   ECS_SERVICE: taskflow-service
   ECS_CLUSTER: SGUTodolist-Cluster
-  WORKING_DIRECTORY: ./taskflow-service
+  WORKING_DIRECTORY: ./todolist-backend/taskflow-service
 
 # 3. CÔNG VIỆC (JOBS)
 jobs:
