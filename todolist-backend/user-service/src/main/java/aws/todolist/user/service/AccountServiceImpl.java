@@ -5,7 +5,7 @@ import aws.todolist.user.dto.account.AccountUpdateForm;
 import aws.todolist.user.entity.Account;
 import aws.todolist.user.integration.redis.RedisService;
 import aws.todolist.user.repository.AccountRepository;
-import aws.todolist.user.exceptions.AccountNotFoundException;
+import aws.todolist.user.exceptionHandler.exceptions.AccountNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

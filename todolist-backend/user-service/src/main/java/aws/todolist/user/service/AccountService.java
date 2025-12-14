@@ -9,7 +9,7 @@ package aws.todolist.user.service;
 import aws.todolist.user.dto.account.AccountUpdateForm;
 import aws.todolist.user.entity.Account;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import aws.todolist.user.exceptions.AccountNotFoundException;
+import aws.todolist.user.exceptionHandler.exceptions.AccountNotFoundException;
 
 public interface AccountService extends UserDetailsService {
 	

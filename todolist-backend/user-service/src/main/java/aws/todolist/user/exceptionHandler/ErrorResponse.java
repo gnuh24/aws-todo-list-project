@@ -1,6 +1,9 @@
-package aws.todolist.user.exceptions;
+package aws.todolist.user.exceptionHandler;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 import java.util.List;
 

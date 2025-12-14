@@ -1,4 +1,4 @@
-package aws.todolist.user.exceptions;
+package aws.todolist.user.exceptionHandler.exceptions;
 
 import jakarta.persistence.EntityNotFoundException;
 

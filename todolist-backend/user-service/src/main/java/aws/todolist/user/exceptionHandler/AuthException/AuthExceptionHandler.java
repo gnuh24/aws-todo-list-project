@@ -1,10 +1,10 @@
-package aws.todolist.user.exceptions.AuthException;
+package aws.todolist.user.exceptionHandler.AuthException;
 
-import aws.todolist.user.logging.AppLogger;
 import aws.todolist.user.api.ApiResponse;
-import aws.todolist.user.exceptions.DetailError;
-import aws.todolist.user.exceptions.ErrorResponse;
-import aws.todolist.user.exceptions.errorCode.SystemErrorCode;
+import aws.todolist.user.exceptionHandler.DetailError;
+import aws.todolist.user.exceptionHandler.ErrorResponse;
+import aws.todolist.user.exceptionHandler.errorCode.SystemErrorCode;
+import aws.todolist.user.logging.AppLogger;
 import aws.todolist.user.utils.EnvironmentUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -54,9 +54,6 @@ public class AuthExceptionHandler implements AuthenticationEntryPoint, AccessDen
 		String detailMessage = ex.toString();
 		String errorCode = SystemErrorCode.AUTH_MISSING_TOKEN; // default fallback
 		HttpStatus status = HttpStatus.UNAUTHORIZED;
-		
-//		appLogger.warn(request, "🛑 [{}] {} - {}", errorCode, message, ex.getMessage());
-	
 		writeJsonResponse(response, status, errorCode, message, detailMessage, null);
 	}
 	
@@ -67,8 +64,6 @@ public class AuthExceptionHandler implements AuthenticationEntryPoint, AccessDen
 		String detailMessage = ex.toString();
 		String errorCode = SystemErrorCode.AUTH_ACCESS_DENIED;
 		HttpStatus status = HttpStatus.FORBIDDEN;
-//		appLogger.warn(request, "🛑 [{}] {} - {}", errorCode, message, ex.getMessage());
-		
 		writeJsonResponse(response, status, errorCode, message, detailMessage, null);
 	}
 }
