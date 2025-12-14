@@ -1,14 +1,10 @@
-package aws.todolist.auth.exceptions.AuthException;
+package aws.todolist.auth.exceptionHandler.AuthException;
 
 import aws.todolist.auth.logging.AppLogger;
 import aws.todolist.auth.api.ApiResponse;
-import aws.todolist.auth.exceptions.DetailError;
-import aws.todolist.auth.exceptions.ErrorResponse;
-import aws.todolist.auth.exceptions.JwtException.AccessTokenBlacklistedException;
-import aws.todolist.auth.exceptions.JwtException.AccessTokenExpiredException;
-import aws.todolist.auth.exceptions.JwtException.InvalidJWTSignatureException;
-import aws.todolist.auth.exceptions.JwtException.InvalidTokenTypeException;
-import aws.todolist.auth.exceptions.errorCode.SystemErrorCode;
+import aws.todolist.auth.exceptionHandler.DetailError;
+import aws.todolist.auth.exceptionHandler.ErrorResponse;
+import aws.todolist.auth.exceptionHandler.errorCode.SystemErrorCode;
 import aws.todolist.auth.utils.EnvironmentUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -64,19 +60,19 @@ public class AuthExceptionHandler implements AuthenticationEntryPoint, AccessDen
 		// Có thể refine ở đây nếu có loại cụ thể (JWT expired, malformed, etc.)
 		// Ví dụ nếu exception instanceof CustomAuthException thì lấy errorCode cụ thể
 		// ==== NHÓM: TOKEN KHÁC ====
-		if (ex instanceof AccessTokenExpiredException) {
-			errorCode = SystemErrorCode.AUTH_EXPIRED_TOKEN;
-			message = "Access token đã hết hạn.";
-		} else if (ex instanceof AccessTokenBlacklistedException) {
-			errorCode = SystemErrorCode.AUTH_TOKEN_BLACKLISTED;
-			message = "Access token đã bị thu hồi hoặc không hợp lệ.";
-		}else if (ex instanceof InvalidTokenTypeException) {
-			errorCode = SystemErrorCode.AUTH_REFRESH_TOKEN_INVALID_TYP;
-			message = "Token chứa type không hợp lệ.";
-		} else if (ex instanceof InvalidJWTSignatureException) {
-			errorCode = SystemErrorCode.AUTH_REFRESH_TOKEN_INVALID_SIGNATURE;
-			message = "Token có chữ ký không hợp lệ.";
-		}
+//		if (ex instanceof AccessTokenExpiredException) {
+//			errorCode = SystemErrorCode.AUTH_EXPIRED_TOKEN;
+//			message = "Access token đã hết hạn.";
+//		} else if (ex instanceof AccessTokenBlacklistedException) {
+//			errorCode = SystemErrorCode.AUTH_TOKEN_BLACKLISTED;
+//			message = "Access token đã bị thu hồi hoặc không hợp lệ.";
+//		}else if (ex instanceof InvalidTokenTypeException) {
+//			errorCode = SystemErrorCode.AUTH_REFRESH_TOKEN_INVALID_TYP;
+//			message = "Token chứa type không hợp lệ.";
+//		} else if (ex instanceof InvalidJWTSignatureException) {
+//			errorCode = SystemErrorCode.AUTH_REFRESH_TOKEN_INVALID_SIGNATURE;
+//			message = "Token có chữ ký không hợp lệ.";
+//		}
 		
 		writeJsonResponse(response, status, errorCode, message, detailMessage, null);
 	}
@@ -88,8 +84,6 @@ public class AuthExceptionHandler implements AuthenticationEntryPoint, AccessDen
 		String detailMessage = ex.toString();
 		String errorCode = SystemErrorCode.AUTH_ACCESS_DENIED;
 		HttpStatus status = HttpStatus.FORBIDDEN;
-//		appLogger.warn(request, "🛑 [{}] {} - {}", errorCode, message, ex.getMessage());
-		
 		writeJsonResponse(response, status, errorCode, message, detailMessage, null);
 	}
 }

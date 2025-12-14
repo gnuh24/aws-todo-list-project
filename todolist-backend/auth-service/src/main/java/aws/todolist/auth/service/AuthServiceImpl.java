@@ -4,9 +4,12 @@ import aws.todolist.auth.dto.account.AccountCreateForm;
 import aws.todolist.auth.dto.account.AccountRedisDTO;
 import aws.todolist.auth.dto.auth.*;
 import aws.todolist.auth.entity.Account;
-import aws.todolist.auth.exceptions.AuthException.StepUpAuthenticationException;
-import aws.todolist.auth.exceptions.JwtException.*;
-import aws.todolist.auth.exceptions.otpException.OtpNotFoundException;
+import aws.todolist.auth.exceptionHandler.exceptions.TwoFactorFailedException;
+import aws.todolist.auth.exceptionHandler.exceptions.jwtException.*;
+import aws.todolist.auth.exceptionHandler.exceptions.loginException.AccountInactiveException;
+import aws.todolist.auth.exceptionHandler.exceptions.loginException.AccountLockedException;
+import aws.todolist.auth.exceptionHandler.exceptions.loginException.InvalidCredentialsException;
+import aws.todolist.auth.exceptionHandler.exceptions.otpException.OtpNotFoundException;
 import aws.todolist.auth.integration.redis.RedisConstants;
 import aws.todolist.auth.integration.redis.RedisService;
 import aws.todolist.auth.mapper.AuthMapper;
@@ -14,6 +17,8 @@ import aws.todolist.auth.messaging.kafka.producer.KafkaProducerService;
 import aws.todolist.auth.security.JwtTokenProvider;
 import aws.todolist.auth.utils.IdGenerator;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -56,7 +61,7 @@ public class AuthServiceImpl implements AuthService {
 		AccountRedisDTO account = (AccountRedisDTO) redisService.get(RedisConstants.OTP_VERIFY_ACCOUNT + ":" + otp);
 		
 		if (account == null) {
-			throw new OtpNotFoundException("OTP không tồn tại hoặc đã hết hạn sử dụng !");
+			throw new OtpNotFoundException();
 		}
 		
 		AccountCreateForm accountCreateForm = authMapper.toAccountCreateForm(account);
@@ -77,20 +82,20 @@ public class AuthServiceImpl implements AuthService {
 		Account account = accountService.getAccountByUsername(request.getEmail());
 		
 		if (account == null || !passwordEncoder.matches(request.getPassword(), account.getPassword())) {
-			throw new BadCredentialsException("Email hoặc mật khẩu không đúng!");
+			throw new InvalidCredentialsException();
+		}
+		
+		if (account.getStatus() == Account.Status.INACTIVE) {
+			throw new AccountInactiveException();
+		}
+		
+		if (account.getStatus() == Account.Status.BANNED) {
+			throw new AccountLockedException();
 		}
 		
 //		if (account.getRole() != Account.Role.USER) {
 //			throw new BadCredentialsException("Email hoặc mật khẩu không đúng!");
 //		}
-		
-		if (account.getStatus().toString().equals("INACTIVE")) {
-			throw new DisabledException("Tài khoản của bạn chưa được kích hoạt, hãy kiểm tra email " + request.getEmail());
-		}
-		
-		if (account.getStatus().toString().equals("BANNED")) {
-			throw new LockedException("Tài khoản của bạn đã bị khóa! Nếu có vấn đề, vui lòng liên hệ Admin.");
-		}
 		
 		// Tạo và trả về AuthResponseDTO
 		return authMapper.toAuthResponse(account, jwtTokenProvider);
@@ -204,7 +209,7 @@ public class AuthServiceImpl implements AuthService {
 		String otpRedis = redisService.get(RedisConstants.OTP_FORGOT_PASSWORD + ":" + username).toString();
 		
 		if (!otpRedis.equals(form.getOtp())) {
-			throw new OtpNotFoundException("OTP không hợp lệ hoặc đã hết hạn!");
+			throw new OtpNotFoundException();
 		}
 		
 		redisService.delete(RedisConstants.OTP_FORGOT_PASSWORD + ":" + username);
@@ -216,7 +221,7 @@ public class AuthServiceImpl implements AuthService {
 		
 		Account account = accountService.getAccountById(accountId);
 		if (!passwordEncoder.matches(form.getOldPassword(), account.getPassword())) {
-			throw new StepUpAuthenticationException("Mật khẩu hiện không đúng !!");
+			throw new TwoFactorFailedException("Mật khẩu hiện không đúng !!");
 		}
 		
 		return accountService.updatePassword(account, form.getNewPassword());
@@ -236,12 +241,12 @@ public class AuthServiceImpl implements AuthService {
 		
 		Account account = accountService.getAccountById(accountId);
 		if (!passwordEncoder.matches(form.getCurrentPassword(), account.getPassword())) {
-			throw new StepUpAuthenticationException("Mật khẩu hiện tại không đúng.");
+			throw new TwoFactorFailedException("Mật khẩu hiện tại không đúng.");
 		}
 		
 		String otpRedis = redisService.get(RedisConstants.OTP_CHANGE_EMAIL + ":" + form.getNewEmail()).toString();
 		if (!otpRedis.equals(form.getOtp())) {
-			throw new OtpNotFoundException("OTP không hợp lệ hoặc đã hết hạn!");
+			throw new OtpNotFoundException();
 		}
 		
 		redisService.delete(RedisConstants.OTP_CHANGE_EMAIL + ":" + form.getNewEmail());
@@ -259,16 +264,15 @@ public class AuthServiceImpl implements AuthService {
 	public AuthResponseDTO refreshToken(String refreshToken) {
 		
 		if (refreshToken.isEmpty()) {
-			throw new RefreshTokenNotFound("Không tìm thấy refresh token");
+			throw new RefreshTokenNotFoundException();
 		}
 		
 		AuthResponseDTO response = new AuthResponseDTO();
-		String errorString = "Token không hợp lệ hoặc đã hết hạn sử dụng.";
 		
 		try {
 			String typeToken = jwtTokenProvider.getTokenType(refreshToken);
 			if (typeToken == null || !typeToken.equals("refresh")) {
-				throw new InvalidTokenTypeException("Token có type không hợp lệ.");
+				throw new InvalidTokenTypeException();
 			}
 			
 			String emailFromRefreshToken = jwtTokenProvider.getUsername(refreshToken);
@@ -292,16 +296,19 @@ public class AuthServiceImpl implements AuthService {
 			response.setRefreshTokenExpirationTime("7 ngày");
 			
 		} catch (ExpiredJwtException e) {
-			throw new RefreshTokenExpiredException(errorString);
-			
+			throw new RefreshTokenExpiredException();
 		} catch (SignatureException e) {
-			throw new InvalidJWTSignatureException(errorString);
-			
+			throw new InvalidJWTSignatureException();
+		} catch (MalformedJwtException e) {
+			throw new RefreshTokenMalformedException();
+		} catch (UnsupportedJwtException e) {
+			throw new RefreshTokenUnsupportedException();
 		} catch (UsernameNotFoundException e) {
-			throw new UsernameNotFound(errorString);
-			
+			throw new RefreshTokenUnknownSubjectException();
 		} catch (InvalidTokenTypeException e) {
-			throw new InvalidTokenTypeException(errorString);
+			throw new InvalidTokenTypeException();
+		} catch (Exception e) {
+			throw new RefreshTokenUnknownErrorException();
 		}
 		
 		return response;

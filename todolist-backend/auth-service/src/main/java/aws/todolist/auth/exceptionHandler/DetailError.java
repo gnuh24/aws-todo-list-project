@@ -1,4 +1,4 @@
-package aws.todolist.auth.exceptions;
+package aws.todolist.auth.exceptionHandler;
 
 import lombok.*;
 

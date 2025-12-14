@@ -4,7 +4,6 @@ import aws.todolist.auth.api.ApiResponse;
 import aws.todolist.auth.dto.account.AccountRedisDTO;
 import aws.todolist.auth.dto.auth.*;
 import aws.todolist.auth.entity.Account;
-import aws.todolist.auth.exceptions.JwtException.RefreshTokenNotFound;
 import aws.todolist.auth.security.JwtTokenProvider;
 import aws.todolist.auth.service.AccountService;
 import aws.todolist.auth.service.AuthService;
@@ -179,10 +178,6 @@ public class AuthController {
 	@PostMapping("/refresh-token")
 	public ResponseEntity<ApiResponse<AuthResponseDTO>> refreshToken(
 	    @CookieValue(value = "refresh_token", required = false) String refreshToken) {
-		
-		if (refreshToken == null) {
-			throw new RefreshTokenNotFound("Thiếu refresh token!");
-		}
 		
 		// Gọi service để xử lý refresh token và nhận AuthResponseDTO
 		AuthResponseDTO authResponse = authService.refreshToken(refreshToken);
