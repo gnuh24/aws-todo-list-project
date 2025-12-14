@@ -27,7 +27,7 @@ export default function ResetPassword() {
         `/v1/reset-password/${emailUser}`,
         {
           otp: OTP,
-          password: password,
+          newPassword: password,
         }
       );
 
