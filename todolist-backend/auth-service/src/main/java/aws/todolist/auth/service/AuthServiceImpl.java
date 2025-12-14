@@ -10,6 +10,7 @@ import aws.todolist.auth.exceptionHandler.exceptions.jwtException.*;
 import aws.todolist.auth.exceptionHandler.exceptions.loginException.AccountInactiveException;
 import aws.todolist.auth.exceptionHandler.exceptions.loginException.AccountLockedException;
 import aws.todolist.auth.exceptionHandler.exceptions.loginException.InvalidCredentialsException;
+import aws.todolist.auth.exceptionHandler.exceptions.otpException.OtpInvalidException;
 import aws.todolist.auth.exceptionHandler.exceptions.otpException.OtpNotFoundException;
 import aws.todolist.auth.integration.redis.RedisConstants;
 import aws.todolist.auth.integration.redis.RedisService;
@@ -201,21 +202,37 @@ public class AuthServiceImpl implements AuthService {
 	public void sendOtpResetPassword(String email) {
 		redisService.delete(RedisConstants.OTP_FORGOT_PASSWORD + ":" + email);
 		String otp = IdGenerator.generateOTP();
-		redisService.set(RedisConstants.OTP_FORGOT_PASSWORD + ":" + email, otp, 3, TimeUnit.MINUTES);
+		String key = RedisConstants.OTP_FORGOT_PASSWORD + ":" + email;
+		redisService.set(key, otp, 3, TimeUnit.MINUTES);
 		kafkaProducerService.sendResetPasswordEmail(email, otp);
 	}
 	
 	@Override
 	public Account resetPassword(String username, ResetPasswordForm form) {
-		String otpRedis = redisService.get(RedisConstants.OTP_FORGOT_PASSWORD + ":" + username).toString();
 		
+		String key = RedisConstants.OTP_FORGOT_PASSWORD + ":" + username;
+		
+		Object otpObj = redisService.get(key);
+		
+		// 1. OTP không tồn tại (hết hạn hoặc chưa gửi)
+		if (otpObj == null) {
+			throw new OtpNotFoundException();
+		}
+		
+		String otpRedis = otpObj.toString();
+		
+		// 2. OTP tồn tại nhưng sai
 		if (!otpRedis.equals(form.getOtp())) {
 			throw new OtpNotFoundException();
 		}
 		
-		redisService.delete(RedisConstants.OTP_FORGOT_PASSWORD + ":" + username);
+		// 3. OTP đúng → xóa ngay (one-time)
+		redisService.delete(key);
+		
+		// 4. Update password
 		return accountService.updatePassword(username, form.getNewPassword());
 	}
+	
 	
 	@Override
 	public Account updatePassword(String accountId, UpdatePasswordForm form) {
