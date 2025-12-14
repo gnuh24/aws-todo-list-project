@@ -73,11 +73,11 @@ public final class SystemErrorCode {
 	public static final String SYS_INVALID_FORMAT            				= "SYS-VALID-003"; // Định dạng không hợp lệ
 	public static final String SYS_CONSTRAINT_VIOLATION      				= "SYS-VALID-004"; // Vi phạm ràng buộc dữ liệu
 	
-//	// ==== FILE / MEDIA ====
-//	public static final String SYS_FILE_TOO_LARGE             				= "SYS-FILE-001"; // File vượt quá dung lượng cho phép
-//	public static final String SYS_FILE_UNSUPPORTED_TYPE      				= "SYS-FILE-002"; // File không đúng định dạng cho phép
-//	public static final String SYS_FILE_UPLOAD_FAILED         				= "SYS-FILE-003"; // Lỗi trong quá trình upload file
-//	public static final String SYS_FILE_NOT_FOUND            				= "SYS-FILE-004"; // Không tìm thấy file yêu cầu
+	// ==== FILE / MEDIA ====
+	public static final String SYS_FILE_TOO_LARGE             				= "SYS-FILE-001"; // File vượt quá dung lượng cho phép
+	public static final String SYS_FILE_UNSUPPORTED_TYPE      				= "SYS-FILE-002"; // File không đúng định dạng cho phép
+	public static final String SYS_FILE_UPLOAD_FAILED         				= "SYS-FILE-003"; // Lỗi trong quá trình upload file
+	public static final String SYS_FILE_NOT_FOUND            				= "SYS-FILE-004"; // Không tìm thấy file yêu cầu
 	
 	
 	

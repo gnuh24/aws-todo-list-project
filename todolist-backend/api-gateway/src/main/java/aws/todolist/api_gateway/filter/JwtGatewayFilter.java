@@ -42,7 +42,7 @@ public class JwtGatewayFilter implements GlobalFilter {
 		String authHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
 		
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-			return Mono.error(new MissingTokenException("Missing Authorization header"));
+			return Mono.error(new MissingTokenException());
 		}
 		
 		String jwt = authHeader.substring(7);
@@ -51,7 +51,7 @@ public class JwtGatewayFilter implements GlobalFilter {
 			
 			String type = jwtTokenProvider.getTokenType(jwt);
 			if (!"access".equals(type)){
-				return Mono.error(new InvalidTokenTypeException("Invalid token type"));
+				return Mono.error(new InvalidTokenTypeException());
 			}
 			
 			String email  = jwtTokenProvider.getUsername(jwt);
@@ -66,7 +66,7 @@ public class JwtGatewayFilter implements GlobalFilter {
 					
 					// Nếu Redis có key → token bị blacklist
 					if (optionalValue.isPresent()) {
-						return Mono.error(new AccessTokenBlacklistedException("Token đã bị thu hồi"));
+						return Mono.error(new AccessTokenBlacklistedException());
 					}
 					
 					// Không bị blacklist → Inject header và tiếp tục
@@ -87,17 +87,15 @@ public class JwtGatewayFilter implements GlobalFilter {
 
 			
 		} catch (ExpiredJwtException e) {
-			return Mono.error(new TokenExpiredException("Token đã hết hạn"));
+			return Mono.error(new TokenExpiredException());
 		} catch (SignatureException e) {
-			return Mono.error(new InvalidJWTSignatureException("Chữ ký JWT không hợp lệ"));
-		} catch (MalformedJwtException e) {
-			return Mono.error(new MalformedTokenException("Token sai cấu trúc"));
+			return Mono.error(new InvalidJWTSignatureException());
+		} catch (MalformedJwtException | IllegalArgumentException e) {
+			return Mono.error(new MalformedTokenException());
 		} catch (UnsupportedJwtException e) {
-			return Mono.error(new UnsupportedTokenException("Thuật toán không hỗ trợ"));
-		} catch (IllegalArgumentException e) {
-			return Mono.error(new MalformedTokenException("Token rỗng hoặc sai định dạng"));
+			return Mono.error(new UnsupportedTokenException());
 		} catch (JwtException e) {
-			return Mono.error(new GenericJwtException("Lỗi JWT không xác định"));
+			return Mono.error(new TokenUnknownErrorException());
 		}
 	}
 	

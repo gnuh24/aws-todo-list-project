@@ -4,6 +4,7 @@ import aws.todolist.auth.dto.account.AccountCreateForm;
 import aws.todolist.auth.dto.account.AccountRedisDTO;
 import aws.todolist.auth.dto.auth.*;
 import aws.todolist.auth.entity.Account;
+import aws.todolist.auth.exceptionHandler.errorCode.SystemErrorCode;
 import aws.todolist.auth.exceptionHandler.exceptions.TwoFactorFailedException;
 import aws.todolist.auth.exceptionHandler.exceptions.jwtException.*;
 import aws.todolist.auth.exceptionHandler.exceptions.loginException.AccountInactiveException;
@@ -263,7 +264,7 @@ public class AuthServiceImpl implements AuthService {
 	@Override
 	public AuthResponseDTO refreshToken(String refreshToken) {
 		
-		if (refreshToken.isEmpty()) {
+		if (refreshToken == null || refreshToken.isEmpty()) {
 			throw new RefreshTokenNotFoundException();
 		}
 		
@@ -277,8 +278,17 @@ public class AuthServiceImpl implements AuthService {
 			
 			String emailFromRefreshToken = jwtTokenProvider.getUsername(refreshToken);
 			
+			
 			//Tìm tài khoản dựa trên Email
 			Account account = accountService.getAccountByUsername(emailFromRefreshToken);
+			
+			String redisKey = RedisConstants.BANLIST_ACCOUNT_ID + ":" + account.getId();
+			
+			if (redisService.get(redisKey) != null) {
+				throw new RefreshTokenBlacklistedException();
+			}
+			
+			
 			
 			response.setId(account.getId());
 			response.setEmail(account.getEmail());
@@ -295,6 +305,10 @@ public class AuthServiceImpl implements AuthService {
 			response.setRefreshToken(refreshToken);
 			response.setRefreshTokenExpirationTime("7 ngày");
 			
+		} catch (RefreshTokenNotFoundException e){
+			throw new RefreshTokenNotFoundException();
+		} catch (RefreshTokenBlacklistedException e) {
+			throw new RefreshTokenBlacklistedException();
 		} catch (ExpiredJwtException e) {
 			throw new RefreshTokenExpiredException();
 		} catch (SignatureException e) {

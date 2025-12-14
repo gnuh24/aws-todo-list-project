@@ -18,9 +18,6 @@ public class RedisConstants {
 	public static final String TEMP_ORDER = "temp:order";
 	
 	// 6. Ban list access token
-	public static final String BANLIST_ACCESS_TOKEN = "banlist:access-token";
-	
-	// 7. Ban list refresh token
-	public static final String BANLIST_REFRESH_TOKEN = "banlist:refresh-token";
+	public static final String BANLIST_ACCOUNT_ID = "banlist:accountId";
 	
 }
