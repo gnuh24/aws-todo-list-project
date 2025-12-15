@@ -6,7 +6,11 @@
   <component name="ChangeListManager">
     <list default="true" id="ce06006f-955d-442e-ac05-6aeb6b1bdc85" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/../notification-service/src/main/java/aws/todolist/notification/mapper/NotificationMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/../notification-service/src/main/java/aws/todolist/notification/mapper/NotificationMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../taskflow-service/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../notification-service/src/main/resources/application-dev.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../notification-service/src/main/resources/application-dev.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../notification-service/src/main/resources/application-prod.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../notification-service/src/main/resources/application-prod.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/resources/application-dev.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/resources/application-dev.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/resources/application-prod.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/resources/application-prod.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -16,8 +20,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Class" />
         <option value="Enum" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -34,14 +38,14 @@
     <option name="showLibraryContents" value="true" />
     <option name="showModules" value="false" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "kiên",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/Worker/FCJ/To-doList/aws-todo-list-project/todolist-backend/websocket-service/src/main/java/aws/todoist/websocket"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;kiên&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Worker/FCJ/To-doList/aws-todo-list-project/todolist-backend/websocket-service/src/main/java/aws/todoist/websocket&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\Worker\FCJ\To-doList\aws-todo-list-project\todolist-backend\websocket-service\src\main\java\aws\todoist\websocket" />

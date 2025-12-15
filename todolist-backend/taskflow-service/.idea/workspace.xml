@@ -5,7 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="aafb8b93-6ddf-44d9-bc7c-02d1e2b5b281" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../notification-service/src/main/java/aws/todolist/notification/exceptions/errorCode/SystemErrorCode.java" beforeDir="false" afterPath="$PROJECT_DIR$/../notification-service/src/main/java/aws/todolist/notification/exceptions/errorCode/SystemErrorCode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../notification-service/src/main/java/aws/todolist/notification/mapper/NotificationMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/../notification-service/src/main/java/aws/todolist/notification/mapper/NotificationMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../notification-service/src/main/resources/application-dev.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../notification-service/src/main/resources/application-dev.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../notification-service/src/main/resources/application-prod.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../notification-service/src/main/resources/application-prod.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application-dev.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application-dev.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application-prod.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application-prod.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../websocket-service/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../websocket-service/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../websocket-service/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../websocket-service/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,7 +52,7 @@
     "Application.TaskService.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "code.cleanup.on.save": "true",
-    "git-widget-placeholder": "developer",
+    "git-widget-placeholder": "kiên",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "D:/Worker/FCJ/To-doList/aws-todo-list-project/todolist-backend/taskflow-service/src/main/java/aws/todolist/taskflow/exceptions",
     "project.structure.last.edited": "Modules",

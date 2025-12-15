@@ -1,6 +1,7 @@
 package aws.todolist.notification.mapper;
 
 import aws.todolist.notification.dto.notification.NotificationResponse;
+import aws.todolist.notification.dto.notification.WebSocketResponse;
 import aws.todolist.notification.entity.Notification;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -14,7 +15,7 @@ import java.util.List;
 public interface NotificationMapper {
 	
 	NotificationResponse toResponse(Notification notification);
-	
+
 	@AfterMapping
 	default void handleActorFields(Notification notification, @MappingTarget NotificationResponse dto) {
 		if (notification.getActor() != null) {
@@ -23,6 +24,7 @@ public interface NotificationMapper {
 			dto.setAvatar(notification.getActor().getAvatar());
 		}
 	}
+
 	
 	// Map List<Notification> → List<NotificationResponse>
 	List<NotificationResponse> toResponseList(List<Notification> notifications);
@@ -32,4 +34,19 @@ public interface NotificationMapper {
 		List<NotificationResponse> dtoList = toResponseList(page.getContent());
 		return new PageImpl<>(dtoList, page.getPageable(), page.getTotalElements());
 	}
+
+
+	WebSocketResponse toWebSocketResponse(Notification notification);
+
+	@AfterMapping
+	default void handleActorFieldsWebSocket(Notification notification, @MappingTarget WebSocketResponse dto) {
+		if (notification.getActor() != null) {
+			dto.setActorId(notification.getActor().getId());
+			dto.setDisplayName(notification.getActor().getDisplayName());
+			dto.setAvatar(notification.getActor().getAvatar());
+			dto.setReceiverId(notification.getReceiver().getId());
+		}
+	}
+
+
 }
