@@ -7,6 +7,7 @@ import aws.todolist.taskflow.entity.Task;
 import aws.todolist.taskflow.entity.TaskComment;
 import aws.todolist.taskflow.exceptions.ProjectException.BadRequestException;
 import aws.todolist.taskflow.exceptions.ProjectException.ResourceNotFoundException;
+import aws.todolist.taskflow.exceptions.errorCode.BusinessErrorCode;
 import aws.todolist.taskflow.exceptions.errorCode.SystemErrorCode;
 import aws.todolist.taskflow.mapper.SectionMapper;
 import aws.todolist.taskflow.repository.ProjectRepository;
@@ -57,7 +58,7 @@ public class SectionServiceImpl implements SectionService {
         if (optProject.isPresent()) {
             project = optProject.get();
         } else {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Dự án không tồn tại hoặc đã bị xóa");
+            throw new ResourceNotFoundException(BusinessErrorCode.TASKFLOW_NOT_FOUND, "Dự án không tồn tại hoặc đã bị xóa");
         }
 
         Integer nextPosition = sectionRepository.findMaxPositionByProjectId(project.getId()) + 1;
@@ -75,7 +76,7 @@ public class SectionServiceImpl implements SectionService {
         Section section = sectionRepository.findByIdAndIsDeletedFalse(idSection);
 
         if (section == null) {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Section không tồn tại hoặc đã bị xóa");
+            throw new ResourceNotFoundException(BusinessErrorCode.TASKFLOW_NOT_FOUND, "Section không tồn tại hoặc đã bị xóa");
         }
 
         int oldPosition = section.getPosition();
@@ -98,7 +99,7 @@ public class SectionServiceImpl implements SectionService {
         Section section = sectionRepository.findByIdAndIsDeletedFalse(idSection);
 
         if (section == null) {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Section không tồn tại hoặc đã bị xóa");
+            throw new ResourceNotFoundException(BusinessErrorCode.TASKFLOW_NOT_FOUND, "Section không tồn tại hoặc đã bị xóa");
         }
 
         section.setName(requestDTO.getName());
@@ -114,7 +115,7 @@ public class SectionServiceImpl implements SectionService {
         Section section = sectionRepository.findByIdAndIsDeletedFalse(idSection);
 
         if (section == null) {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Section không tồn tại hoặc đã bị xóa");
+            throw new ResourceNotFoundException(BusinessErrorCode.TASKFLOW_NOT_FOUND, "Section không tồn tại hoặc đã bị xóa");
         }
 
         // Kiểm tra xem project của section còn bao nhiêu section để tránh xóa hết section
@@ -151,13 +152,13 @@ public class SectionServiceImpl implements SectionService {
         Section sectionSource = sectionRepository.findByIdAndIsDeletedFalse(requestDTO.getIdSectionSource());
 
         if (sectionSource == null) {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Section nguồn không tồn tại hoặc đã bị xóa");
+            throw new ResourceNotFoundException(BusinessErrorCode.TASKFLOW_NOT_FOUND, "Section nguồn không tồn tại hoặc đã bị xóa");
         }
 
         Section sectionDestination = sectionRepository.findByIdAndIsDeletedFalse(requestDTO.getIdSectionDestination());
 
         if (sectionDestination == null) {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Section đích không tồn tại hoặc đã bị xóa");
+            throw new ResourceNotFoundException(BusinessErrorCode.TASKFLOW_NOT_FOUND, "Section đích không tồn tại hoặc đã bị xóa");
         }
 
 

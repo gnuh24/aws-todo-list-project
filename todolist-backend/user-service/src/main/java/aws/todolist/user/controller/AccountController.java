@@ -12,7 +12,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import aws.todolist.user.exceptions.AccountNotFoundException;
+import aws.todolist.user.exceptionHandler.exceptions.AccountNotFoundException;
 
 @RestController
 @RequestMapping("/v1/accounts")

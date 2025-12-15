@@ -1,7 +1,6 @@
 package aws.todolist.api_gateway.exceptions.handler;
 
 import aws.todolist.api_gateway.exceptions.errorCode.SystemErrorCode;
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -6,7 +6,7 @@ import aws.todolist.taskflow.entity.Account;
 import aws.todolist.taskflow.entity.Task;
 import aws.todolist.taskflow.entity.TaskComment;
 import aws.todolist.taskflow.exceptions.ProjectException.ResourceNotFoundException;
-import aws.todolist.taskflow.exceptions.errorCode.SystemErrorCode;
+import aws.todolist.taskflow.exceptions.errorCode.BusinessErrorCode;
 import aws.todolist.taskflow.mapper.TaskCommentMapper;
 import aws.todolist.taskflow.messaging.kafka.message.NotificationType;
 import aws.todolist.taskflow.repository.TaskCommentRepository;
@@ -122,7 +122,7 @@ public class TaskCommentServiceImpl implements TaskCommentService {
         Task task = taskRepository.findByIdAndIsDeletedFalse(idTask);
 
         if (task == null) {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Task không tồn tại hoặc đã bị xóa");
+            throw new ResourceNotFoundException(BusinessErrorCode.TASKFLOW_NOT_FOUND, "Task không tồn tại hoặc đã bị xóa");
         }
 
         return task;

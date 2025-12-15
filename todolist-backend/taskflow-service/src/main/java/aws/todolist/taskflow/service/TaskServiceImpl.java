@@ -10,6 +10,7 @@ import aws.todolist.taskflow.enums.StatusMember;
 import aws.todolist.taskflow.exceptions.ProjectException.BadRequestException;
 import aws.todolist.taskflow.exceptions.ProjectException.ForbiddenException;
 import aws.todolist.taskflow.exceptions.ProjectException.ResourceNotFoundException;
+import aws.todolist.taskflow.exceptions.errorCode.BusinessErrorCode;
 import aws.todolist.taskflow.exceptions.errorCode.SystemErrorCode;
 import aws.todolist.taskflow.mapper.TaskMapper;
 import aws.todolist.taskflow.messaging.kafka.message.NotificationType;
@@ -53,7 +54,7 @@ public class TaskServiceImpl implements TaskService {
         Task task = taskRepository.findByIdAndIsDeletedFalse(idTask);
 
         if (task == null) {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Task không tồn tại hoặc đã bị xóa");
+            throw new ResourceNotFoundException(BusinessErrorCode.TASKFLOW_NOT_FOUND, "Task không tồn tại hoặc đã bị xóa");
         }
 
         return taskMapper.toDetailResponse(task);
@@ -74,7 +75,7 @@ public class TaskServiceImpl implements TaskService {
         Section section = sectionRepository.findByIdAndIsDeletedFalse(requestDTO.getSectionId());
 
         if (section == null) {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Section không tồn tại hoặc đã bị xóa");
+            throw new ResourceNotFoundException(BusinessErrorCode.TASKFLOW_NOT_FOUND, "Section không tồn tại hoặc đã bị xóa");
         }
 
         // Kiểm tra section được dùng có đúng của project không
@@ -124,15 +125,15 @@ public class TaskServiceImpl implements TaskService {
         Member member = null;
 
         if (requestDTO.getIdAccountAssign() != null) {
-            member = memberRepository.findFirstByAccountIdAndProjectIdAndIsDeletedFalse(requestDTO.getIdAccountAssign(), idProject).orElseThrow(() -> new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Tài khoản này không phải là thành viên của dự án"));
+            member = memberRepository.findFirstByAccountIdAndProjectIdAndIsDeletedFalse(requestDTO.getIdAccountAssign(), idProject).orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCode.TASKFLOW_NOT_FOUND, "Tài khoản này không phải là thành viên của dự án"));
 
             if (member.getStatus() != StatusMember.ACCEPTED) {
-                throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED, "Tài khoản này chưa chấp nhật là thành viên của dự án");
+                throw new ForbiddenException(BusinessErrorCode.TASKFLOW_ACCESS_DENIED, "Tài khoản này chưa chấp nhật là thành viên của dự án");
             }
 
             // Kiểm tra quyền của accountLogging
             if (member.getRole() == Role.ADMIN || member.getRole() == Role.VIEWER) {
-                throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED, "Tài khoản này không có quyền hoàn thành task");
+                throw new ForbiddenException(BusinessErrorCode.TASKFLOW_ACCESS_DENIED, "Tài khoản này không có quyền hoàn thành task");
             }
 
         }
@@ -235,7 +236,7 @@ public class TaskServiceImpl implements TaskService {
 
         // Kiểm tra xem task có được phân công chưa nếu có thì kiểm tra xem tài khoản đang thực thi có phải người được phân công không
         if (task.getAccountAssign() != null && !task.getAccountAssign().getId().equals(accountLogging.getId())) {
-            throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED, "Task đã được phân công cho người khác. Bạn không thể thay đổi trạng thái của nó");
+            throw new ForbiddenException(BusinessErrorCode.TASKFLOW_ACCESS_DENIED, "Task đã được phân công cho người khác. Bạn không thể thay đổi trạng thái của nó");
         }
 
         // Kiểm tra thời gian thực hiện
@@ -311,13 +312,13 @@ public class TaskServiceImpl implements TaskService {
         Member member = memberRepository
                 .findFirstByAccountIdAndProjectIdAndIsDeletedFalse(requestDTO.getIdAccount(), idProject)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        SystemErrorCode.SYS_OBJECT_NOT_FOUND,
+                        BusinessErrorCode.TASKFLOW_NOT_FOUND,
                         "Tài khoản này không phải là thành viên của dự án"
                 ));
 
         // ====== Kiểm tra quyền ======
         if (member.getRole() == Role.ADMIN || member.getRole() == Role.VIEWER) {
-            throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED,
+            throw new ForbiddenException(BusinessErrorCode.TASKFLOW_ACCESS_DENIED,
                     "Tài khoản này không có quyền hoàn thành task");
         }
 
@@ -453,7 +454,7 @@ public class TaskServiceImpl implements TaskService {
         Task task = taskRepository.findByIdAndIsDeletedFalse(idTask);
 
         if (task == null) {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Task không tồn tại hoặc đã bị xóa");
+            throw new ResourceNotFoundException(BusinessErrorCode.TASKFLOW_NOT_FOUND, "Task không tồn tại hoặc đã bị xóa");
         }
 
         task.setIsArchived(requestDTO.getIsArchived());
@@ -502,7 +503,7 @@ public class TaskServiceImpl implements TaskService {
         Task task = taskRepository.findByIdAndIsDeletedTrue(idTask);
 
         if (task == null) {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Task không tồn tại");
+            throw new ResourceNotFoundException(BusinessErrorCode.TASKFLOW_NOT_FOUND, "Task không tồn tại");
         }
 
         // Kiểm tra lại section của task hiện tại xem còn không nếu không còn thì lấy 1 section trong project
@@ -562,7 +563,7 @@ public class TaskServiceImpl implements TaskService {
         Task task = taskRepository.findByIdAndIsDeletedFalse(idTask);
 
         if (task == null) {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Task không tồn tại hoặc đã bị xóa");
+            throw new ResourceNotFoundException(BusinessErrorCode.TASKFLOW_NOT_FOUND, "Task không tồn tại hoặc đã bị xóa");
         }
 
         if (task.getIsArchived()) {
@@ -577,7 +578,7 @@ public class TaskServiceImpl implements TaskService {
         Section section = sectionRepository.findByIdAndIsDeletedFalse(idSection);
 
         if (section == null) {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Section không tồn tại hoặc đã bị xóa");
+            throw new ResourceNotFoundException(BusinessErrorCode.TASKFLOW_NOT_FOUND, "Section không tồn tại hoặc đã bị xóa");
         }
 
         // Hủy mối quan hệ cha con của task khi chuyển section (Sẽ bao phủ được 2 trường hợp là task con và task cha)

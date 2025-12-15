@@ -5,7 +5,7 @@ import aws.todolist.taskflow.entity.Account;
 import aws.todolist.taskflow.entity.CommentAttach;
 import aws.todolist.taskflow.entity.TaskComment;
 import aws.todolist.taskflow.exceptions.ProjectException.ResourceNotFoundException;
-import aws.todolist.taskflow.exceptions.errorCode.SystemErrorCode;
+import aws.todolist.taskflow.exceptions.errorCode.BusinessErrorCode;
 import aws.todolist.taskflow.mapper.CommentAttachMapper;
 import aws.todolist.taskflow.repository.CommentAttachRepository;
 import aws.todolist.taskflow.utils.TaskCommentUtils;
@@ -56,7 +56,7 @@ public class CommentAttachImpl implements CommentAttachService {
         CommentAttach commentAttach = commentAttachRepository.findByAttachmentUrl(url);
 
         if (commentAttach == null) {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Không tìm thấy comment attach này");
+            throw new ResourceNotFoundException(BusinessErrorCode.TASKFLOW_NOT_FOUND, "Không tìm thấy comment attach này");
         }
 
         awsService.deleteFile(url);

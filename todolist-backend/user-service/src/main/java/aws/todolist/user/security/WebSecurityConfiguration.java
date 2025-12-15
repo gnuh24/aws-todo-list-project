@@ -1,7 +1,7 @@
 package aws.todolist.user.security;
 
 import aws.todolist.user.logging.RequestLoggingFilter;
-import aws.todolist.user.exceptions.AuthException.AuthExceptionHandler;
+import aws.todolist.user.exceptionHandler.AuthException.AuthExceptionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
