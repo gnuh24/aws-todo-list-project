@@ -12,6 +12,7 @@ import aws.todolist.taskflow.enums.StatusMember;
 import aws.todolist.taskflow.exceptions.ProjectException.BadRequestException;
 import aws.todolist.taskflow.exceptions.ProjectException.ForbiddenException;
 import aws.todolist.taskflow.exceptions.ProjectException.ResourceNotFoundException;
+import aws.todolist.taskflow.exceptions.errorCode.BusinessErrorCode;
 import aws.todolist.taskflow.exceptions.errorCode.SystemErrorCode;
 import aws.todolist.taskflow.mapper.MemberMapper;
 import aws.todolist.taskflow.messaging.kafka.message.NotificationType;
@@ -80,13 +81,13 @@ public class MemberServiceImpl implements MemberService {
         if (OptProject.isPresent()) {
             project = OptProject.get();
         } else {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Dự án không tồn tại");
+            throw new ResourceNotFoundException(BusinessErrorCode.TASKFLOW_NOT_FOUND, "Dự án không tồn tại");
         }
 
         if (OptAccount.isPresent()) {
             account = OptAccount.get();
         } else {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Tài khoản không tồn tại.");
+            throw new ResourceNotFoundException(BusinessErrorCode.TASKFLOW_NOT_FOUND, "Tài khoản không tồn tại.");
         }
 
         // Kiểm tra người dùng có phân quyền làm owner không
@@ -120,7 +121,7 @@ public class MemberServiceImpl implements MemberService {
         if (OptMember.isPresent()) {
             member = OptMember.get();
         } else {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Member không tồn tại");
+            throw new ResourceNotFoundException(BusinessErrorCode.TASKFLOW_NOT_FOUND, "Member không tồn tại");
         }
 
         if (member.getRole() == Role.OWNER) {
@@ -163,7 +164,7 @@ public class MemberServiceImpl implements MemberService {
         if (OptMember.isPresent()) {
             member = OptMember.get();
         } else {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Member không tồn tại");
+            throw new ResourceNotFoundException(BusinessErrorCode.TASKFLOW_NOT_FOUND, "Member không tồn tại");
         }
 
         if (member.getRole() == Role.OWNER) {
@@ -189,14 +190,14 @@ public class MemberServiceImpl implements MemberService {
         Optional<Member> optMember = memberRepository.findFirstByAccountIdAndProjectIdAndIsDeletedFalse(account.getId(), idProject);
 
         if (optMember.isEmpty()) {
-            throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED,
+            throw new ForbiddenException(BusinessErrorCode.TASKFLOW_ACCESS_DENIED,
                     "Bạn không được mời vào project.");
         }
 
         Member member = optMember.get();
 
         if (member.getStatus() != StatusMember.PENDING) {
-            throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED,
+            throw new ForbiddenException(BusinessErrorCode.TASKFLOW_ACCESS_DENIED,
                     "Bạn đã phản hồi lời mời rồi.");
         }
 

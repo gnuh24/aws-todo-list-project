@@ -12,6 +12,7 @@ import aws.todolist.taskflow.enums.Role;
 import aws.todolist.taskflow.enums.StatusMember;
 import aws.todolist.taskflow.exceptions.ProjectException.BadRequestException;
 import aws.todolist.taskflow.exceptions.ProjectException.ResourceNotFoundException;
+import aws.todolist.taskflow.exceptions.errorCode.BusinessErrorCode;
 import aws.todolist.taskflow.exceptions.errorCode.SystemErrorCode;
 import aws.todolist.taskflow.mapper.ProjectMapper;
 import aws.todolist.taskflow.messaging.kafka.message.NotificationType;
@@ -70,7 +71,7 @@ public class ProjectServiceImpl implements ProjectService {
         if (optProject.isPresent()) {
             project = optProject.get();
         } else {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Dự án không tồn tại hoặc đã bị xóa.");
+            throw new ResourceNotFoundException(BusinessErrorCode.TASKFLOW_NOT_FOUND, "Dự án không tồn tại hoặc đã bị xóa.");
         }
 
         return projectMapper.toDetailResponse(project);
@@ -124,7 +125,7 @@ public class ProjectServiceImpl implements ProjectService {
         if (optProject.isPresent()) {
             project = optProject.get();
         } else {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Dự án không tồn tại hoặc đã bị xóa.");
+            throw new ResourceNotFoundException(BusinessErrorCode.TASKFLOW_NOT_FOUND, "Dự án không tồn tại hoặc đã bị xóa.");
         }
 
         if (projectUpdateRequestDTO.getName() != null) {
@@ -151,7 +152,7 @@ public class ProjectServiceImpl implements ProjectService {
         if (optProject.isPresent()) {
             project = optProject.get();
         } else {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Dự án không tồn tại hoặc đã bị xóa.");
+            throw new ResourceNotFoundException(BusinessErrorCode.TASKFLOW_NOT_FOUND, "Dự án không tồn tại hoặc đã bị xóa.");
         }
 
         // Kiểm tra project có phải là default không
@@ -165,7 +166,7 @@ public class ProjectServiceImpl implements ProjectService {
         Project defaultProject = projectRepository.findProjectIsDefault(accountLogging.getId());
 
         if (defaultProject == null) {
-            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Account không có project mặc định");
+            throw new ResourceNotFoundException(BusinessErrorCode.TASKFLOW_NOT_FOUND, "Account không có project mặc định");
         }
 
         Section sectionDefault = defaultProject.getSections().getFirst();

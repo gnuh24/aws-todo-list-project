@@ -5,7 +5,7 @@ import aws.todolist.taskflow.entity.Member;
 import aws.todolist.taskflow.enums.Role;
 import aws.todolist.taskflow.enums.StatusMember;
 import aws.todolist.taskflow.exceptions.ProjectException.ForbiddenException;
-import aws.todolist.taskflow.exceptions.errorCode.SystemErrorCode;
+import aws.todolist.taskflow.exceptions.errorCode.BusinessErrorCode;
 import aws.todolist.taskflow.repository.MemberRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -77,7 +77,7 @@ public class ProjectRoleAspect {
         // kiểm tra quyền
         List<Role> allowedRoles = Arrays.asList(requireProjectRole.value());
         if (role == null || !allowedRoles.contains(role)) {
-            throw new ForbiddenException(SystemErrorCode.SYS_TASKFLOW_ACCESS_DENIED,
+            throw new ForbiddenException(BusinessErrorCode.TASKFLOW_ACCESS_DENIED,
                     "Bạn không có quyền truy cập");
         }
     }

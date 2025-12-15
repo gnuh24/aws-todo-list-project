@@ -1,4 +1,4 @@
-package aws.todolist.taskflow.exceptions;
+package aws.todolist.taskflow.exceptions.handler;
 
 import aws.todolist.taskflow.api.ApiResponse;
 import org.springframework.http.HttpStatus;
