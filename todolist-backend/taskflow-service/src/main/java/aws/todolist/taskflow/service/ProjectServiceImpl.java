@@ -1,5 +1,6 @@
 package aws.todolist.taskflow.service;
 
+import aws.todolist.taskflow.dto.event.payload.ProjectPayload;
 import aws.todolist.taskflow.dto.project.ProjectCreateRequestDTO;
 import aws.todolist.taskflow.dto.project.ProjectDetailResponseDTO;
 import aws.todolist.taskflow.dto.project.ProjectResponseDTO;
@@ -8,14 +9,17 @@ import aws.todolist.taskflow.entity.Account;
 import aws.todolist.taskflow.entity.Member;
 import aws.todolist.taskflow.entity.Project;
 import aws.todolist.taskflow.entity.Section;
+import aws.todolist.taskflow.enums.EventType;
 import aws.todolist.taskflow.enums.Role;
 import aws.todolist.taskflow.enums.StatusMember;
 import aws.todolist.taskflow.exceptions.ProjectException.BadRequestException;
 import aws.todolist.taskflow.exceptions.ProjectException.ResourceNotFoundException;
 import aws.todolist.taskflow.exceptions.errorCode.BusinessErrorCode;
 import aws.todolist.taskflow.exceptions.errorCode.SystemErrorCode;
+import aws.todolist.taskflow.mapper.ActorMapper;
 import aws.todolist.taskflow.mapper.ProjectMapper;
 import aws.todolist.taskflow.messaging.kafka.message.NotificationType;
+import aws.todolist.taskflow.messaging.kafka.producer.GenericEventPublisher;
 import aws.todolist.taskflow.repository.MemberRepository;
 import aws.todolist.taskflow.repository.ProjectRepository;
 import aws.todolist.taskflow.repository.SectionRepository;
@@ -38,6 +42,10 @@ public class ProjectServiceImpl implements ProjectService {
     @Autowired
     private ProjectMapper projectMapper;
 
+
+    @Autowired
+    private ActorMapper actorMapper;
+
     @Autowired
     private MemberRepository memberRepository;
 
@@ -52,6 +60,10 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Autowired
     private NotificationUtils notificationUtils;
+
+    @Autowired
+    private GenericEventPublisher eventPublisher;
+
 
     @Override
     public List<ProjectResponseDTO> getAllProject(String accountID) {
@@ -111,6 +123,14 @@ public class ProjectServiceImpl implements ProjectService {
 
         saved.getSections().add(section);
 
+        // ------------------------------------------
+        // Gửi event kafka cho websocket
+        // ------------------------------------------
+
+
+        ProjectPayload payload = projectMapper.toPayload(project, actorMapper.toActorDto(account), memberRepository.findAccountIdsByProjectId(project.getId()));
+        eventPublisher.publishProjectEvent(project.getId(), payload, EventType.PROJECT_CREATED);
+
         return projectMapper.toResponse(saved);
     }
 
@@ -137,6 +157,10 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         Project saved = projectRepository.saveAndFlush(project);
+
+        // Gửi event kafka cho websocket
+        ProjectPayload payload = projectMapper.toPayload(project, null, memberRepository.findAccountIdsByProjectId(project.getId()));
+        eventPublisher.publishProjectEvent(project.getId(), payload, EventType.PROJECT_UPDATED);
 
         return projectMapper.toResponse(saved);
     }

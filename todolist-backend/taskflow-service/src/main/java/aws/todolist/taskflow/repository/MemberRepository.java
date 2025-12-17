@@ -39,4 +39,14 @@ public interface MemberRepository extends JpaRepository<Member, String>, JpaSpec
             String Id
     );
 
+    @Query("""
+                SELECT m.account.email
+                FROM Member m
+                WHERE m.project.id = :projectId
+                  AND (m.isDeleted = false OR m.isDeleted IS NULL)
+                  AND status = ACCEPTED
+            """)
+    List<String> findAccountIdsByProjectId(@Param("projectId") String projectId);
+
+
 }

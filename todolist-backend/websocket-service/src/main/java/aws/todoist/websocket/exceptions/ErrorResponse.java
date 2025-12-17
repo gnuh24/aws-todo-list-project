@@ -1,28 +1,26 @@
 package aws.todoist.websocket.exceptions;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
 
 import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class ErrorResponse {
-	
-	@NonNull
-	private Integer status;         // HTTP status (vd: 400, 401, 500)
-	
-	@NonNull
-	private String code;           // Mã lỗi chính (dành cho FE tra tài liệu & xử lý logic)
-	
-	@NonNull
-	private String message;         // Thông báo chung (cho người dùng)
-	
-	private String detailMessage;   // Mô tả chi tiết kỹ thuật (cho dev)
-	
-	private List<DetailError> errors;   // Danh sách lỗi cụ thể (mỗi lỗi có code & message)
+
+    @NonNull
+    private Integer status;         // HTTP status (vd: 400, 401, 500)
+
+    @NonNull
+    private String code;           // Mã lỗi chính (dành cho FE tra tài liệu & xử lý logic)
+
+    @NonNull
+    private String message;         // Thông báo chung (cho người dùng)
+
+    private String detailMessage;   // Mô tả chi tiết kỹ thuật (cho dev)
+
+    private List<DetailError> errors;   // Danh sách lỗi cụ thể (mỗi lỗi có code & message)
 
 }

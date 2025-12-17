@@ -5,13 +5,44 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="aafb8b93-6ddf-44d9-bc7c-02d1e2b5b281" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../notification-service/src/main/java/aws/todolist/notification/mapper/NotificationMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/../notification-service/src/main/java/aws/todolist/notification/mapper/NotificationMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../notification-service/src/main/resources/application-dev.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../notification-service/src/main/resources/application-dev.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../notification-service/src/main/resources/application-prod.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../notification-service/src/main/resources/application-prod.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../websocket-service/.idea/uiDesigner.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../api-gateway/src/main/resources/application-dev.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../api-gateway/src/main/resources/application-dev.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/mapper/ProjectMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/mapper/ProjectMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/repository/MemberRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/repository/MemberRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/ProjectServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/ProjectServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/application-dev.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application-dev.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/application-prod.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application-prod.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../websocket-service/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../websocket-service/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../websocket-service/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../websocket-service/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../websocket-service/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../websocket-service/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/config/WebSocketConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/config/WebSocketConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/dto/event/EventEnvelope.java" beforeDir="false" afterPath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/dto/event/EventEnvelope.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/dto/event/PayloadBase.java" beforeDir="false" afterPath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/dto/event/payload/PayloadBase.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/enums/EventType.java" beforeDir="false" afterPath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/enums/eventDto/EventType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/enums/NotificationType.java" beforeDir="false" afterPath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/enums/eventDto/NotificationType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/exceptions/AuthException/AuthExceptionHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/exceptions/AuthException/HmacVerificationException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/exceptions/AuthException/StepUpAuthenticationException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/exceptions/DetailError.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/exceptions/ErrorResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/exceptions/JwtException/AccessTokenBlacklistedException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/exceptions/JwtException/AccessTokenExpiredException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/exceptions/JwtException/InvalidJWTSignatureException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/exceptions/JwtException/InvalidTokenTypeException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/exceptions/JwtException/RefreshTokenBlacklistedException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/exceptions/JwtException/RefreshTokenExpiredException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/exceptions/JwtException/RefreshTokenNotFound.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/exceptions/JwtException/TokenExpiredException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/exceptions/JwtException/UsernameNotFound.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/exceptions/RestExceptionHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/exceptions/errorCode/SystemErrorCode.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/exceptions/otpException/OtpNotFoundException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/security/JwtTokenProvider.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/security/WebSecurityConfiguration.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/service/WebSocketService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/service/WebSocketService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/service/WebSocketServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/service/WebSocketServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../websocket-service/src/main/resources/application-dev.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../websocket-service/src/main/resources/application-dev.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../websocket-service/src/main/resources/application-prod.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../websocket-service/src/main/resources/application-prod.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,8 +54,8 @@
       <list>
         <option value="AnnotationType" />
         <option value="Enum" />
-        <option value="Interface" />
         <option value="Class" />
+        <option value="Interface" />
       </list>
     </option>
   </component>
@@ -47,33 +78,34 @@
     <option name="showLibraryContents" value="true" />
     <option name="showModules" value="false" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.TaskService.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "code.cleanup.on.save": "true",
-    "git-widget-placeholder": "kiên",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/Worker/FCJ/To-doList/aws-todo-list-project/todolist-backend/taskflow-service/src/main/java/aws/todolist/taskflow/exceptions",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2",
-    "rearrange.code.on.save": "true",
-    "settings.editor.selected.configurable": "editor.preferences.fonts.default"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.TaskService.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;code.cleanup.on.save&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;kiên&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Worker/FCJ/To-doList/aws-todo-list-project/todolist-backend/taskflow-service/src/main/java/aws/todolist/taskflow/dto&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;rearrange.code.on.save&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.fonts.default&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\Worker\FCJ\To-doList\aws-todo-list-project\todolist-backend\taskflow-service\src\main\java\aws\todolist\taskflow\dto" />
       <recent name="D:\Worker\FCJ\To-doList\aws-todo-list-project\todolist-backend\taskflow-service\src\main\java\aws\todolist\taskflow\exceptions" />
       <recent name="D:\Worker\FCJ\To-doList\aws-todo-list-project\todolist-backend\taskflow-service\src\main\java\aws\todolist\taskflow\service" />
       <recent name="D:\Worker\FCJ\To-doList\aws-todo-list-project\todolist-backend\taskflow-service\src\main\java\aws\todolist\taskflow\repository" />
       <recent name="D:\Worker\FCJ\To-doList\aws-todo-list-project\todolist-backend\taskflow-service\src\main\java\aws\todolist\taskflow\entity" />
-      <recent name="D:\Worker\FCJ\To-doList\aws-todo-list-project\todolist-backend\taskflow-service\src\main\java\aws\todolist\taskflow" />
     </key>
     <key name="MoveMembersDialog.RECENTS_KEY">
       <recent name="aws.todolist.taskflow.exceptions.errorCode.BusinessErrorCode" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="aws.todolist.taskflow.enums" />
       <recent name="aws.todolist.taskflow.exceptions.handler" />
       <recent name="aws.todolist.taskflow.exceptions.errorCode" />
     </key>

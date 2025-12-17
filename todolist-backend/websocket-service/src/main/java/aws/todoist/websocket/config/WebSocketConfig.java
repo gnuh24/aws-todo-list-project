@@ -34,8 +34,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.enableSimpleBroker(
-                "/topic/project",
-                "/topic/notification"
+                "/topic",        // project / task / section / member / comment
+                "/queue"         // user notification
         );
     }
 

@@ -1,7 +1,7 @@
 package aws.todoist.websocket.dto.event;
 
 
-import aws.todoist.websocket.enums.EventType;
+import aws.todoist.websocket.enums.eventDto.EventType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
