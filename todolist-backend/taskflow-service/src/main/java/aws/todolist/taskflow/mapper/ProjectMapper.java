@@ -29,8 +29,6 @@ public interface ProjectMapper {
         payload.setProjectId(project.getId());
         payload.setActor(actor);
         payload.setReceivers(receivers);
-        payload.setNotification(null); // project event thường không notify
-
         payload.setProject(toDto(project));
 
         return payload;

@@ -27,7 +27,7 @@ public class MemberController {
 
     @Autowired
     private MemberService memberService;
-    
+
     @Autowired
     private AccountService accountService;
 
@@ -47,9 +47,10 @@ public class MemberController {
     @RequireProjectRole({Role.ADMIN, Role.OWNER})
     public ResponseEntity<ApiResponse<MemberResponseDTO>> addNewMember(
             @PathVariable("idProject") String id,
-            @RequestBody @Valid MemberCreateRequestDTO request) {
+            @RequestBody @Valid MemberCreateRequestDTO request,
+            @RequestHeader("X-User-Id") String accountId) {
 
-        MemberResponseDTO memberResponseDTO = memberService.addNewMember(id, request);
+        MemberResponseDTO memberResponseDTO = memberService.addNewMember(id, request, accountId);
 
         ApiResponse<MemberResponseDTO> response = new ApiResponse<>(
                 200,
@@ -66,9 +67,9 @@ public class MemberController {
     public ResponseEntity<ApiResponse<MemberResponseDTO>> updateMember(
             @PathVariable("idProject") String id,
             @PathVariable("idMember") String idMember,
-            @RequestBody @Valid MemberUpdateRoleRequestDTO request) {
+            @RequestBody @Valid MemberUpdateRoleRequestDTO request, @RequestHeader("X-User-Id") String accountId) {
 
-        MemberResponseDTO memberResponseDTO = memberService.updateRoleMember(idMember, request);
+        MemberResponseDTO memberResponseDTO = memberService.updateRoleMember(idMember, request, accountId);
 
         ApiResponse<MemberResponseDTO> response = new ApiResponse<>(
                 200,
@@ -84,11 +85,11 @@ public class MemberController {
     public ResponseEntity<ApiResponse<MemberResponseDTO>> updateStatusMember(
             @PathVariable("idProject") String id,
             @RequestBody @Valid MemberUpdateStatusRequestDTO request,
-	    @RequestHeader("X-User-Id") String accountId
+            @RequestHeader("X-User-Id") String accountId
     ) {
-	    
-	    Account account = accountService.getAccountById(accountId);
-	    MemberResponseDTO memberResponseDTO = memberService.responseRequestMember(id, request, account);
+
+        Account account = accountService.getAccountById(accountId);
+        MemberResponseDTO memberResponseDTO = memberService.responseRequestMember(id, request, account);
 
         String message;
         if (memberResponseDTO.getStatus() == StatusMember.ACCEPTED) {

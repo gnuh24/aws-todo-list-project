@@ -12,9 +12,9 @@ public interface MemberService {
 
     List<MemberResponseDTO> getAllMember(String idProject);
 
-    MemberResponseDTO addNewMember(String idProject, MemberCreateRequestDTO requestDTO);
+    MemberResponseDTO addNewMember(String idProject, MemberCreateRequestDTO requestDTO, String actorId);
 
-    MemberResponseDTO updateRoleMember(String idMember, MemberUpdateRoleRequestDTO requestDTO);
+    MemberResponseDTO updateRoleMember(String idMember, MemberUpdateRoleRequestDTO requestDTO, String actorId);
 
     MemberResponseDTO deleteMember(String idMember);
 

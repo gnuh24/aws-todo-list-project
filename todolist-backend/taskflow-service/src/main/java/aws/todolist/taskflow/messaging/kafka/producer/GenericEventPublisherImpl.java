@@ -59,24 +59,24 @@ public class GenericEventPublisherImpl implements GenericEventPublisher {
     @Override
     @Transactional
     public void publishCommentEvent(String projectId, CommentPayload payload, EventType eventType) {
-        var event = createEvent(payload, eventType);
-        kafkaTemplate.send(commentEventsTopic, projectId, event);
+        String eventJson = createEvent(payload, eventType);
+        kafkaTemplate.send(commentEventsTopic, projectId, eventJson);
         log.info("Published {} for comment {}", eventType, projectId);
     }
 
     @Override
     @Transactional
     public void publishSectionEvent(String projectId, SectionPayload payload, EventType eventType) {
-        var event = createEvent(payload, eventType);
-        kafkaTemplate.send(sectionEventsTopic, projectId, event);
+        String eventJson = createEvent(payload, eventType);
+        kafkaTemplate.send(sectionEventsTopic, projectId, eventJson);
         log.info("Published {} for section {}", eventType, projectId);
     }
 
     @Override
     @Transactional
     public void publishMemberEvent(String projectId, MemberPayload payload, EventType eventType) {
-        var event = createEvent(payload, eventType);
-        kafkaTemplate.send(memberEventsTopic, projectId, event);
+        String eventJson = createEvent(payload, eventType);
+        kafkaTemplate.send(memberEventsTopic, projectId, eventJson);
         log.info("Published {} for member {}", eventType, projectId);
     }
 

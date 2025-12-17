@@ -18,7 +18,6 @@ import aws.todolist.taskflow.exceptions.errorCode.BusinessErrorCode;
 import aws.todolist.taskflow.exceptions.errorCode.SystemErrorCode;
 import aws.todolist.taskflow.mapper.ActorMapper;
 import aws.todolist.taskflow.mapper.ProjectMapper;
-import aws.todolist.taskflow.messaging.kafka.message.NotificationType;
 import aws.todolist.taskflow.messaging.kafka.producer.GenericEventPublisher;
 import aws.todolist.taskflow.repository.MemberRepository;
 import aws.todolist.taskflow.repository.ProjectRepository;
@@ -206,6 +205,13 @@ public class ProjectServiceImpl implements ProjectService {
             });
         });
 
+        // -------------------------------
+        // Gửi event lên kafka để cập nhật
+        // -------------------------------
+        ProjectPayload payload = projectMapper.toPayload(project, null, memberRepository.findAccountIdsByProjectId(project.getId()));
+        eventPublisher.publishProjectEvent(project.getId(), payload, EventType.PROJECT_DELETED);
+
+
         // Cập nhật các member về deleted
         project.getMembers().forEach(Member::softDelete);
 
@@ -214,17 +220,6 @@ public class ProjectServiceImpl implements ProjectService {
         Project saved = projectRepository.saveAndFlush(project);
 
 
-        System.err.println("Check");
-        // ====== Gửi Kafka Notification ======
-
-
-        String content = String.format(
-                "Dự án \"%s\" đã bị \"%s\" xóa khỏi hệ thống.",
-                project.getName(),
-                accountLogging.getDisplayName()
-        );
-
-        notificationUtils.sendNotification(null, project, accountLogging, notificationUtils.getReceiversForProject(project.getMembers()), NotificationType.PROJECT_DELETED);
         return projectMapper.toResponse(saved);
     }
 

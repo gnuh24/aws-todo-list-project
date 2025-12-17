@@ -13,6 +13,4 @@ public abstract class PayloadBase {
     private ActorDto actor;     // ai gây ra event
 
     private List<String> receivers;   // null nếu không cần notification
-
-    private NotificationDto notification; // null nếu không notify
 }

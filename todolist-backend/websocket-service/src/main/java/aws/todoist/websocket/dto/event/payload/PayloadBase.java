@@ -1,7 +1,6 @@
 package aws.todoist.websocket.dto.event.payload;
 
 import aws.todoist.websocket.dto.event.ActorDto;
-import aws.todoist.websocket.dto.event.NotificationDto;
 import lombok.Data;
 
 import java.util.List;
@@ -14,6 +13,4 @@ public abstract class PayloadBase {
     private ActorDto actor;     // ai gây ra event
 
     private List<String> receivers;   // null nếu không cần notification
-
-    private NotificationDto notification; // null nếu không notify
 }

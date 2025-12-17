@@ -2,6 +2,7 @@ package aws.todoist.websocket.messaging.kafka.consumer;
 
 import aws.todoist.websocket.dto.event.EventEnvelope;
 import aws.todoist.websocket.dto.event.payload.*;
+import aws.todoist.websocket.enums.eventDto.EventType;
 import aws.todoist.websocket.service.WebSocketService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,9 +39,9 @@ public class EventProjectConsumer {
 
         // 2️⃣ update project summary (sidebar)
         if (payload.getReceivers() != null) {
-            for (String userId : payload.getReceivers()) {
+            for (String email : payload.getReceivers()) {
                 webSocketService.sendProjectSummaryToUser(
-                        userId,
+                        email,
                         event   // hoặc DTO gọn hơn
                 );
             }
@@ -95,10 +96,16 @@ public class EventProjectConsumer {
                         }
                 );
 
-        webSocketService.sendMemberEvent(
-                event.getPayload().getProjectId(),
-                event
-        );
+        MemberPayload payload = event.getPayload();
+        String projectId = payload.getProjectId();
+
+        // 1️⃣ realtime member detail
+        webSocketService.sendMemberEvent(projectId, event);
+
+        // 2. kiểm tra xem event có phải là accept ko thì update giao diện sidebar
+        if(event.getEventType() == EventType.PROJECT_MEMBER_ACCEPTED){
+            webSocketService.sendProjectSummaryToUser(event.getPayload().getMemberEventDto().getEmail(), event);
+        }
     }
 
     // ================= COMMENT =================

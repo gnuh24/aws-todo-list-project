@@ -1,5 +1,6 @@
 package aws.todolist.taskflow.service;
 
+import aws.todolist.taskflow.dto.event.payload.MemberPayload;
 import aws.todolist.taskflow.dto.member.MemberCreateRequestDTO;
 import aws.todolist.taskflow.dto.member.MemberResponseDTO;
 import aws.todolist.taskflow.dto.member.MemberUpdateRoleRequestDTO;
@@ -7,6 +8,7 @@ import aws.todolist.taskflow.dto.member.MemberUpdateStatusRequestDTO;
 import aws.todolist.taskflow.entity.Account;
 import aws.todolist.taskflow.entity.Member;
 import aws.todolist.taskflow.entity.Project;
+import aws.todolist.taskflow.enums.EventType;
 import aws.todolist.taskflow.enums.Role;
 import aws.todolist.taskflow.enums.StatusMember;
 import aws.todolist.taskflow.exceptions.ProjectException.BadRequestException;
@@ -14,8 +16,9 @@ import aws.todolist.taskflow.exceptions.ProjectException.ForbiddenException;
 import aws.todolist.taskflow.exceptions.ProjectException.ResourceNotFoundException;
 import aws.todolist.taskflow.exceptions.errorCode.BusinessErrorCode;
 import aws.todolist.taskflow.exceptions.errorCode.SystemErrorCode;
+import aws.todolist.taskflow.mapper.ActorMapper;
 import aws.todolist.taskflow.mapper.MemberMapper;
-import aws.todolist.taskflow.messaging.kafka.message.NotificationType;
+import aws.todolist.taskflow.messaging.kafka.producer.GenericEventPublisher;
 import aws.todolist.taskflow.repository.AccountRepository;
 import aws.todolist.taskflow.repository.MemberRepository;
 import aws.todolist.taskflow.repository.ProjectRepository;
@@ -39,6 +42,9 @@ public class MemberServiceImpl implements MemberService {
     private MemberMapper memberMapper;
 
     @Autowired
+    private ActorMapper actorMapper;
+
+    @Autowired
     private ProjectRepository projectRepository;
 
     @Autowired
@@ -50,6 +56,12 @@ public class MemberServiceImpl implements MemberService {
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
+    @Autowired
+    private GenericEventPublisher genericEventPublisher;
+
+    @Autowired
+    private AccountService accountService;
+
     @Override
     public List<MemberResponseDTO> getAllMember(String idProject) {
         List<Member> members = memberRepository.findAllByProjectId(idProject);
@@ -59,7 +71,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Transactional
     @Override
-    public MemberResponseDTO addNewMember(String idProject, MemberCreateRequestDTO requestDTO) {
+    public MemberResponseDTO addNewMember(String idProject, MemberCreateRequestDTO requestDTO, String accountId) {
 
         // Kiểm tra xem member của account và project đã được tạo chưa
         Optional<Member> OptMember = memberRepository.findFirstByAccountIdAndProjectIdAndIsDeletedFalse(requestDTO.getIdAccount(), idProject);
@@ -103,8 +115,10 @@ public class MemberServiceImpl implements MemberService {
         // =============================
         // 🔔 GỬI KAFKA NOTIFICATION
         // =============================
-
-        notificationUtils.sendNotification(null, project, null, notificationUtils.getReceiversForMemberAdd(member_saved), NotificationType.PROJECT_MEMBER_ADDED);
+        Account actor = accountService.getAccountById(accountId);
+        List<String> listReceiver = memberRepository.findAccountIdsByProjectId(member_saved.getProject().getId());
+        MemberPayload payload = memberMapper.toPayload(member_saved, actorMapper.toActorDto(actor), listReceiver);
+        genericEventPublisher.publishMemberEvent(member_saved.getProject().getId(), payload, EventType.PROJECT_MEMBER_ADDED);
 
         // =============================
 
@@ -113,7 +127,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public MemberResponseDTO updateRoleMember(String idMember, MemberUpdateRoleRequestDTO requestDTO) {
+    public MemberResponseDTO updateRoleMember(String idMember, MemberUpdateRoleRequestDTO requestDTO, String accountId) {
         Optional<Member> OptMember = memberRepository.findFirstByIdAndIsDeletedFalse(idMember);
 
         Member member = null;
@@ -147,9 +161,10 @@ public class MemberServiceImpl implements MemberService {
         // 🔔 Gửi Kafka Notification
         // =============================
 
-
-        notificationUtils.sendNotification(null, member_saved.getProject(), null, notificationUtils.getReceiversForMemberUpdate(member_saved), NotificationType.PROJECT_MEMBER_ROLE_UPDATED);
-
+        Account actor = accountService.getAccountById(accountId);
+        List<String> listReceiver = memberRepository.findAccountIdsByProjectId(member_saved.getProject().getId());
+        MemberPayload payload = memberMapper.toPayload(member_saved, actorMapper.toActorDto(actor), listReceiver);
+        genericEventPublisher.publishMemberEvent(member_saved.getProject().getId(), payload, EventType.PROJECT_MEMBER_ROLE_UPDATED);
 
         return memberMapper.toResponse(member_saved);
     }
@@ -180,6 +195,12 @@ public class MemberServiceImpl implements MemberService {
         String key = "user:" + member.getAccount().getId() + ":project:" + member.getProject().getId() + ":permissions";
 
         redisTemplate.delete(key);
+
+        // Gửi kafka cho event
+
+        List<String> listReceiver = memberRepository.findAccountIdsByProjectId(member_saved.getProject().getId());
+        MemberPayload payload = memberMapper.toPayload(member_saved, null, listReceiver);
+        genericEventPublisher.publishMemberEvent(member_saved.getProject().getId(), payload, EventType.PROJECT_MEMBER_REMOVED);
 
         return memberMapper.toResponse(member_saved);
     }
@@ -229,11 +250,13 @@ public class MemberServiceImpl implements MemberService {
         // 🔔 Gửi Kafka Notification
         // =============================
 
+        List<String> listReceiver = memberRepository.findAccountIdsByProjectId(idProject);
+        MemberPayload payload = memberMapper.toPayload(member, actorMapper.toActorDto(account), listReceiver);
         if (member.getStatus() == StatusMember.ACCEPTED) {
-            notificationUtils.sendNotification(null, member.getProject(), null, notificationUtils.getReceiversForMemberUpdate(member), NotificationType.REQUEST_ACCEPTED);
+            genericEventPublisher.publishMemberEvent(idProject, payload, EventType.PROJECT_MEMBER_ACCEPTED);
 
         } else {
-            notificationUtils.sendNotification(null, member.getProject(), null, notificationUtils.getReceiversForMemberUpdate(member), NotificationType.REQUEST_DECLINED);
+            genericEventPublisher.publishMemberEvent(idProject, payload, EventType.PROJECT_MEMBER_DECLINED);
 
         }
 

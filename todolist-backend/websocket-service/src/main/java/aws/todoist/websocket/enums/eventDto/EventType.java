@@ -17,6 +17,8 @@ public enum EventType {
     PROJECT_MEMBER_ADDED,
     PROJECT_MEMBER_REMOVED,
     PROJECT_MEMBER_ROLE_UPDATED,
+    PROJECT_MEMBER_ACCEPTED,
+    PROJECT_MEMBER_DECLINED,
 
     // =========================
     // 🧩 SECTION EVENTS

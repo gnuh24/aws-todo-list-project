@@ -5,44 +5,25 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ce06006f-955d-442e-ac05-6aeb6b1bdc85" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../api-gateway/src/main/resources/application-dev.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../api-gateway/src/main/resources/application-dev.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../taskflow-service/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/controller/MemberController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/controller/MemberController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/dto/event/NotificationDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/dto/event/PayloadBase.java" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/dto/event/PayloadBase.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/dto/event/payload/MemberPayload.java" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/dto/event/payload/MemberPayload.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/enums/EventType.java" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/enums/EventType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/mapper/MemberMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/mapper/MemberMapper.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/mapper/ProjectMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/mapper/ProjectMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/repository/MemberRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/repository/MemberRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/messaging/kafka/producer/GenericEventPublisherImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/messaging/kafka/producer/GenericEventPublisherImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/service/MemberService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/service/MemberService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/service/MemberServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/service/MemberServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/service/ProjectServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/service/ProjectServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/resources/application-dev.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/resources/application-dev.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/resources/application-prod.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/resources/application-prod.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/config/WebSocketConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/config/WebSocketConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/dto/event/EventEnvelope.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/dto/event/EventEnvelope.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/dto/event/PayloadBase.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/dto/event/payload/PayloadBase.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/enums/EventType.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/enums/eventDto/EventType.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/enums/NotificationType.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/enums/eventDto/NotificationType.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/exceptions/AuthException/AuthExceptionHandler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/exceptions/AuthException/HmacVerificationException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/exceptions/AuthException/StepUpAuthenticationException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/exceptions/DetailError.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/exceptions/ErrorResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/exceptions/JwtException/AccessTokenBlacklistedException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/exceptions/JwtException/AccessTokenExpiredException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/exceptions/JwtException/InvalidJWTSignatureException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/exceptions/JwtException/InvalidTokenTypeException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/exceptions/JwtException/RefreshTokenBlacklistedException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/exceptions/JwtException/RefreshTokenExpiredException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/exceptions/JwtException/RefreshTokenNotFound.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/exceptions/JwtException/TokenExpiredException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/exceptions/JwtException/UsernameNotFound.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/exceptions/RestExceptionHandler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/exceptions/errorCode/SystemErrorCode.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/exceptions/otpException/OtpNotFoundException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/security/JwtTokenProvider.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/security/WebSecurityConfiguration.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/service/WebSocketService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/service/WebSocketService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/service/WebSocketServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/service/WebSocketServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application-dev.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application-dev.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application-prod.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application-prod.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/dto/event/NotificationDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/dto/event/payload/MemberPayload.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/dto/event/payload/MemberPayload.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/dto/event/payload/PayloadBase.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/dto/event/payload/PayloadBase.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/enums/eventDto/EventType.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/enums/eventDto/EventType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/messaging/kafka/consumer/EventProjectConsumer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/messaging/kafka/consumer/EventProjectConsumer.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
