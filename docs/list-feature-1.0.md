@@ -1,7 +1,7 @@
 
 ---
 
-# 📌 **Danh sách chức năng hệ thống – v0.1.0.0 (Beta – 09/12/2025)**
+# 📌 **Danh sách chức năng hệ thống – v1.0 (Beta – 09/12/2025)**
 
 ## I. 🔐 **Authentication & User Profile**
 
@@ -75,71 +75,103 @@
 * Xem các deadline sắp tới
 * Đồng bộ với project/task
 * Tạo sự kiện hoặc reminder thủ công
-* (Tuỳ chọn mở rộng) Đồng bộ Google Calendar / Outlook
 
 ---
 
-## VII. 🔔 **Thông báo (Notification)**
+## VII. Thông báo (Notification)
 
-**Các đối tượng có thể xuất hiện trong thông báo:**
-`@Admin`, `@User`, `@Role`, `@Project`, `@Task`
+@Admin: Người tạo
 
-### 1. Thêm vào project
+@User: Người nhận
 
-* Khi một user được thêm vào project
-* **Người nhận:** User vừa được thêm
-* **Thông điệp:**
+@Role: Quyền
 
-  * Người được thêm: “Bạn vừa được @Admin thêm vào @Project với quyền @Role”
-  * Thành viên còn lại: “@User vừa được @Admin thêm vào @Project”
+@Project: Project
 
-### 2. Cập nhật quyền
+@Task
 
-* Khi Admin đổi quyền của user
-* **Người nhận:** User được đổi quyền
-* **Ví dụ:** “@User vừa được @Admin cập nhật quyền thành @Role”
 
-### 3. Giao task
+- Được thành vào project với quyền gì đó. ( ví dụ 2 sai vì chỉ thông báo đến user được thêm vào)
 
-* Khi user được giao task mới
-* **Người nhận:** Assignee + người tạo task
-* **Ví dụ:** “@Admin vừa giao cho bạn 1 task mới”
+  + Mô tả: Khi 1 user nào đó được thêm vào project
 
-### 4. Task được cập nhật
+  + Đối tượng nhận thông báo: Người được thêm vào.
 
-* Khi task bị chỉnh sửa (deadline, status, mô tả…)
-* **Người nhận:** Assignee + Creator
-* **Ví dụ:** “@Admin vừa cập nhật mô tả của task @Task mà bạn được giao”
+  + VD:
 
-### 5. Task hoàn thành
+    1. Người được thêm vào: "Bạn vừa được @Admin thêm vào @Project với quyền @Quyền"
 
-* Khi task được đánh dấu “Completed”
-* **Người nhận:** Assignee + Creator
-* **Ví dụ:** “Task @Task vừa được @User hoàn thành”
+    2. Các người dùng còn lại: "@User vừa được @Admin thêm vào @Project"
 
-### 6. Task sắp tới hạn
 
-* Hệ thống tự gửi trước deadline
-* **Người nhận:** Assignee + Creator
-* **Ví dụ:** “Task @Task còn 4 giờ nữa đến hạn (10:00 – 11/11/2025)”
+- Được cập nhật quyền (gửi đến toàn bộ member trong project)
 
-### 7. Task quá hạn
+  + Mô tả: Khi 1 user được Admin cập nhật quyền
 
-* Khi task bị trễ deadline
-* **Người nhận:** Assignee + Creator
-* **Ví dụ:** “Task @Task đã bị trễ deadline”
+  + Đối tượng nhận thông báo: Người được cập nhật quyền
 
-### 8. Comment mới trong task
+  + VD: @User vừa được @Admin cập nhật quyền thành @Quyền
 
-* Khi có comment mới
-* **Người nhận:** Assignee + Creator + Người đã từng comment
-* **Ví dụ:** “@User vừa thêm comment mới vào task @Task”
 
-### 9. Dự án bị xóa
 
-* Khi project bị xóa khỏi hệ thống
-* **Người nhận:** toàn bộ thành viên
-* **Ví dụ:** “Dự án @Project vừa bị @Admin xóa”
+- Được giao task gì đó (@Admin vừa giao cho bạn 1 task mới) (sai ví dụ)
 
+  + Mô tả: Khi 1 user được admin giao task
+
+  + Đối tượng nhận thông báo: Người được giao task, người tạo task
+
+  + VD: @User vừa được @Admin cập nhật quyền thành @Quyền
+
+
+- Task được update (Task mà bạn được giao vừa được cập nhật bởi @Admin) (Cập nhật ví dụ)
+
+  + Mô tả: Khi Task được giao cho người dùng bị thay đổi nội dung (deadline, status) bởi người khác.
+
+  + Đối tượng: Người được giao Task (Assignee), Người tạo Task (Creator).
+
+  + Ví dụ: @Tên_Task trong dự án @Project vừa được chỉnh sửa.
+
+
+- Task hoàn thành (Đúng)
+
+  + Mô tả: Khi Task được đánh dấu là hoàn thành (Completed) bởi bất kỳ User nào có quyền.
+
+  + Đối tượng: Người được giao Task (Assignee), Người tạo Task (Creator).
+
+  + Vd: Task @Tên_Task vừa được @User_Thực_hiện đánh dấu Hoàn thành.
+
+
+- Task sắp tới hẹn (Cập nhật ví dụ)
+
+  + Mô tả: Hệ thống tự động gửi thông báo khi Task còn N ngày/giờ nữa là đến Deadline.
+
+  + Đối tượng: Người được giao Task (Assignee), Người tạo Task (Creator).
+
+  + Ví dụ: Nhiệm vụ @Tên_Task trong dự án @Project sẽ sắp tới hạn vào lúc 10:00, 11/11/2025.
+
+
+- Task trễ deadline (Cập nhật ví dụ)
+
+  + Mô tả: Hệ thống tự động gửi thông báo khi Task đã quá hạn (sau Deadline).
+
+  + Đối tượng: Người được giao Task (Assignee), Người tạo Task (Creator).
+
+  + Ví dụ: Nhiệm vụ @Tên_Task trong dự án @Project đã hết hạn thực hiện vào lúc 10:00, 11/11/2025.
+
+
+- Các comment trong task (Không có gửi cho người được giao do code thiếu)
+
+  + Mô tả: Khi có một bình luận mới được thêm vào Task.
+
+  + Đối tượng: Người được giao Task (Assignee), Người tạo Task (Creator), Những người đã từng comment trong Task (để tiện theo dõi luồng trao đổi).
+
+  + VÍ dụ: @User_Comment vừa thêm một comment mới vào Task @Tên_Task.
+
+
+- Dự án bị xóa (đúng)
+
+  + Mô tả: Khi Project bị xóa khỏi hệ thống.
+
+  + Đối tượng: Toàn bộ User là thành viên của Project (trước khi xóa). + VÍ dụ: Dự án @Project cũ vừa bị @Admin xóa
 ---
 

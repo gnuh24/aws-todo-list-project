@@ -3,10 +3,13 @@ package aws.todolist.auth.controller;
 import aws.todolist.auth.api.ApiResponse;
 import aws.todolist.auth.dto.account.AccountRedisDTO;
 import aws.todolist.auth.dto.auth.*;
+import aws.todolist.auth.dto.twoFactor.TwoFactorSetupResponse;
 import aws.todolist.auth.entity.Account;
+import aws.todolist.auth.exceptionHandler.exceptions.twoFactorException.TwoFactorException;
 import aws.todolist.auth.security.JwtTokenProvider;
 import aws.todolist.auth.service.AccountService;
 import aws.todolist.auth.service.AuthService;
+import aws.todolist.auth.service.TwoFactorService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,6 +33,9 @@ public class AuthController {
 	@Autowired
 	private JwtTokenProvider jwtTokenProvider;
 	
+	@Autowired
+	private TwoFactorService twoFactorService;
+	
 	/**
 	 * 📌 Kiểm tra email đã tồn tại chưa
 	 *
@@ -45,6 +51,22 @@ public class AuthController {
 		boolean exists = authService.isEmailExists(email);
 		ApiResponse<Boolean> response = new ApiResponse<>(200, "Email existence check completed successfully", exists);
 		return ResponseEntity.ok(response);
+	}
+	
+	@PostMapping("/2fa/setup")
+	public ResponseEntity<ApiResponse<TwoFactorSetupResponse>> setup2FA(
+		@RequestHeader("X-User-Email") String email
+	) {
+	
+//		if (account.isTwoFactorEnabled()) {
+//			throw new TwoFactorException("Tài khoản đã bật 2FA");
+//		}
+		
+		TwoFactorSetupResponse response = twoFactorService.setup2FA(email);
+		
+		return ResponseEntity.ok(
+			new ApiResponse<>(200, "Tạo thông tin 2FA thành công", response)
+		);
 	}
 	
 	
