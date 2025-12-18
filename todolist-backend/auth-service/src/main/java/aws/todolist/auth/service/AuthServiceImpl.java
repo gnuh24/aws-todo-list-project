@@ -4,13 +4,12 @@ import aws.todolist.auth.dto.account.AccountCreateForm;
 import aws.todolist.auth.dto.account.AccountRedisDTO;
 import aws.todolist.auth.dto.auth.*;
 import aws.todolist.auth.entity.Account;
-import aws.todolist.auth.exceptionHandler.errorCode.SystemErrorCode;
-import aws.todolist.auth.exceptionHandler.exceptions.TwoFactorFailedException;
+import aws.todolist.auth.exceptionHandler.exceptions.DeleteConfirmationRequiredException;
+import aws.todolist.auth.exceptionHandler.exceptions.twoFactorException.TwoFactorFailedException;
 import aws.todolist.auth.exceptionHandler.exceptions.jwtException.*;
 import aws.todolist.auth.exceptionHandler.exceptions.loginException.AccountInactiveException;
 import aws.todolist.auth.exceptionHandler.exceptions.loginException.AccountLockedException;
 import aws.todolist.auth.exceptionHandler.exceptions.loginException.InvalidCredentialsException;
-import aws.todolist.auth.exceptionHandler.exceptions.otpException.OtpInvalidException;
 import aws.todolist.auth.exceptionHandler.exceptions.otpException.OtpNotFoundException;
 import aws.todolist.auth.integration.redis.RedisConstants;
 import aws.todolist.auth.integration.redis.RedisService;
@@ -83,7 +82,7 @@ public class AuthServiceImpl implements AuthService {
 	public AuthResponseDTO login(LoginRequestForm request) {
 		Account account = accountService.getAccountByUsername(request.getEmail());
 		
-		if (account == null || !passwordEncoder.matches(request.getPassword(), account.getPassword())) {
+		if (account == null || account.isEnabled() || !passwordEncoder.matches(request.getPassword(), account.getPassword())) {
 			throw new InvalidCredentialsException();
 		}
 		
@@ -94,7 +93,7 @@ public class AuthServiceImpl implements AuthService {
 		if (account.getStatus() == Account.Status.BANNED) {
 			throw new AccountLockedException();
 		}
-		
+
 //		if (account.getRole() != Account.Role.USER) {
 //			throw new BadCredentialsException("Email hoặc mật khẩu không đúng!");
 //		}
@@ -127,8 +126,7 @@ public class AuthServiceImpl implements AuthService {
 			accountService.saveAccount(account);
 			redisService.set(RedisConstants.EMAIL_EXIST + ":" + account.getEmail(), "true");
 			
-		}
-		else {
+		} else {
 			// 3️⃣ User đã tồn tại → update thông tin nếu cần
 			if (account.getAvatar() == null || !account.getAvatar().equals(avatar)) {
 				account.setAvatar(avatar);
@@ -154,7 +152,7 @@ public class AuthServiceImpl implements AuthService {
 	public AuthResponseDTO staffLogin(LoginRequestForm request) {
 		Account account = accountService.getAccountByUsername(request.getEmail());
 		
-		if (account == null || account.getRole().equals(Account.Role.USER) || !passwordEncoder.matches(request.getPassword(), account.getPassword())) {
+		if (account == null || account.isEnabled() || account.getRole().equals(Account.Role.USER) || !passwordEncoder.matches(request.getPassword(), account.getPassword())) {
 			throw new BadCredentialsException("Email hoặc mật khẩu không đúng!");
 		}
 		
@@ -170,7 +168,6 @@ public class AuthServiceImpl implements AuthService {
 		return authMapper.toAuthResponse(account, jwtTokenProvider);
 	}
 	
-
 	
 	@Override
 	@Transactional
@@ -187,9 +184,9 @@ public class AuthServiceImpl implements AuthService {
 		account.setId(accountId);
 		account.setEmail(userRegistrationForm.getEmail());
 		account.setPassword(
-		    passwordEncoder.encode(
-			userRegistrationForm.getPassword()
-		    )
+			passwordEncoder.encode(
+				userRegistrationForm.getPassword()
+			)
 		);
 		String otp = IdGenerator.generateOTP();
 		redisService.setObjectWithTTL(RedisConstants.OTP_VERIFY_ACCOUNT + ":" + otp, account, 5, TimeUnit.MINUTES);
@@ -255,6 +252,25 @@ public class AuthServiceImpl implements AuthService {
 	}
 	
 	@Override
+	public void sendOtpDeleteAccount(String email) {
+		
+		String redisKey = RedisConstants.OTP_DELETE_ACCOUNT + ":" + email;
+		
+		// Clear OTP cũ (nếu có)
+		redisService.delete(redisKey);
+		
+		// Generate OTP
+		String otp = IdGenerator.generateOTP();
+		
+		// TTL 3 phút (giống update email)
+		redisService.set(redisKey, otp, 3, TimeUnit.MINUTES);
+		
+		// Send OTP via Kafka (email)
+		kafkaProducerService.sendDeleteAccount(email, otp);
+	}
+	
+	
+	@Override
 	public Account updateEmail(String accountId, UpdateEmailForm form) {
 		
 		Account account = accountService.getAccountById(accountId);
@@ -268,7 +284,7 @@ public class AuthServiceImpl implements AuthService {
 		}
 		
 		redisService.delete(RedisConstants.OTP_CHANGE_EMAIL + ":" + form.getNewEmail());
-
+		
 		
 		String currentEmail = account.getUsername();
 		redisService.delete(RedisConstants.EMAIL_EXIST + ":" + currentEmail);
@@ -306,7 +322,6 @@ public class AuthServiceImpl implements AuthService {
 			}
 			
 			
-			
 			response.setId(account.getId());
 			response.setEmail(account.getEmail());
 			response.setRole(account.getRole().toString());
@@ -322,7 +337,7 @@ public class AuthServiceImpl implements AuthService {
 			response.setRefreshToken(refreshToken);
 			response.setRefreshTokenExpirationTime("7 ngày");
 			
-		} catch (RefreshTokenNotFoundException e){
+		} catch (RefreshTokenNotFoundException e) {
 			throw new RefreshTokenNotFoundException();
 		} catch (RefreshTokenBlacklistedException e) {
 			throw new RefreshTokenBlacklistedException();
@@ -344,5 +359,65 @@ public class AuthServiceImpl implements AuthService {
 		
 		return response;
 	}
+	
+	@Override
+	@Transactional
+	public Account deleteAccount(String accountId, DeleteAccountForm form) {
+		
+		Account account = accountService.getAccountById(accountId);
+		
+		/* =====================================================
+		 * 1. Confirm text
+		 * ===================================================== */
+		String expectedConfirm = "delete";
+		if (form.getConfirmText() == null ||
+			!expectedConfirm.equalsIgnoreCase(form.getConfirmText().trim())) {
+			throw new DeleteConfirmationRequiredException();
+		}
+		
+		/* =====================================================
+		 * 2. Verify password
+		 * ===================================================== */
+		if (!passwordEncoder.matches(form.getPassword(), account.getPassword())) {
+			throw new TwoFactorFailedException("Mật khẩu không đúng.");
+		}
+		
+		/* =====================================================
+		 * 3. Verify OTP (default – chưa dùng TOTP)
+		 * ===================================================== */
+		String redisDeleteOtpKey =
+			RedisConstants.OTP_DELETE_ACCOUNT + ":" + account.getEmail();
+		
+		Object otpObj = redisService.get(redisDeleteOtpKey);
+		
+		// OTP không tồn tại (chưa gửi hoặc đã hết hạn)
+		if (otpObj == null) {
+			throw new OtpNotFoundException();
+		}
+		
+		String otpRedis = otpObj.toString();
+		
+		// OTP không khớp
+		if (!otpRedis.equals(form.getOtp())) {
+			throw new OtpNotFoundException();
+		}
+		
+		// Clear OTP sau khi verify thành công
+		redisService.delete(redisDeleteOtpKey);
+		
+		/* =====================================================
+		 * 4. Revoke token (force logout)
+		 * ===================================================== */
+		String redisBanlistAccountIdKey =
+			RedisConstants.BANLIST_ACCOUNT_ID + ":" + account.getId();
+		redisService.set(redisBanlistAccountIdKey, true);
+		
+		/* =====================================================
+		 * 5. Soft delete account
+		 * ===================================================== */
+		return accountService.deleteAccount(account);
+	}
+	
+	
 	
 }

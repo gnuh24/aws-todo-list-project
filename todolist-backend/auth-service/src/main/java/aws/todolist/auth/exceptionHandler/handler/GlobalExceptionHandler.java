@@ -12,6 +12,7 @@ import jakarta.validation.ConstraintViolationException;
 import lombok.NonNull;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.*;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -160,7 +161,25 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 ex,
                 null);
     }
-
+	/* =====================================================
+	 *           BAD REQUEST (INVALID JSON)
+	 * ===================================================== */
+	
+//	@ExceptionHandler(HttpMessageNotReadableException.class)
+//	public ResponseEntity<Object> handleInvalidJson(
+//		HttpServletRequest request,
+//		HttpMessageNotReadableException ex) {
+//
+//		return build(
+//			request,
+//			HttpStatus.BAD_REQUEST,
+//			SystemErrorCode.API_BAD_REQUEST,
+//			"Request body không hợp lệ",
+//			ex,
+//			null
+//		);
+//	}
+	
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<Object> handleConstraintViolation(
             HttpServletRequest request,

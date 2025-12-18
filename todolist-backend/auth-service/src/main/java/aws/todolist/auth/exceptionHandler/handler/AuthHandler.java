@@ -1,9 +1,11 @@
 package aws.todolist.auth.exceptionHandler.handler;
 
 import aws.todolist.auth.exceptionHandler.ErrorResponse;
+import aws.todolist.auth.exceptionHandler.exceptions.DeleteConfirmationRequiredException;
 import aws.todolist.auth.exceptionHandler.exceptions.jwtException.GenericJwtException;
 import aws.todolist.auth.exceptionHandler.exceptions.loginException.LoginException;
 import aws.todolist.auth.exceptionHandler.exceptions.otpException.OtpException;
+import aws.todolist.auth.exceptionHandler.exceptions.twoFactorException.TwoFactorException;
 import aws.todolist.auth.utils.EnvironmentUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,6 +98,45 @@ public class AuthHandler {
 			ex
 		);
 	}
+	
+	/* =====================================================
+	 *               TWO FACTOR AUTHENTICATION
+	 * ===================================================== */
+	
+	@ExceptionHandler(TwoFactorException.class)
+	public ResponseEntity<Object> handleTwoFactorException(
+		HttpServletRequest request,
+		TwoFactorException ex) {
+		
+		return build(
+			request,
+			HttpStatus.BAD_REQUEST,
+			ex.getCode(),
+			ex.getMessage(),
+			ex
+		);
+	}
+	
+	
+	/* =====================================================
+	 *           DELETE ACCOUNT – CONFIRMATION
+	 * ===================================================== */
+	
+	@ExceptionHandler(DeleteConfirmationRequiredException.class)
+	public ResponseEntity<Object> handleDeleteConfirmationRequired(
+		HttpServletRequest request,
+		DeleteConfirmationRequiredException ex) {
+		
+		return build(
+			request,
+			HttpStatus.BAD_REQUEST,
+			ex.getCode(),
+			ex.getMessage(),
+			ex
+		);
+	}
+	
+	
 	
 	
 }

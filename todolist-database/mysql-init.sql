@@ -169,6 +169,7 @@ VALUES
 ('33333333-3333-3333-3333-333333333333', 'user2@gmail.com', '$2a$10$W2neF9.6Agi6kAKVq8q3fec5dHW8KUA.b0VSIGdIZyUravfLpyIFi', NULL, 'User Two', 'USER', 'ACTIVE', NOW(), NOW(), NULL, 0, 0),
 ('0c78b06c-9597-4b88-b5aa-f3c13dbf1a44', 'user3@gmail.com', '$2a$10$W2neF9.6Agi6kAKVq8q3fec5dHW8KUA.b0VSIGdIZyUravfLpyIFi', NULL, 'User Three', 'USER', 'INACTIVE', NOW(), NOW(), NULL, 0, 1),
 ('c4f6d12b-5e84-4d1a-8ca4-421e83a4e555', 'user4@gmail.com', '$2a$10$W2neF9.6Agi6kAKVq8q3fec5dHW8KUA.b0VSIGdIZyUravfLpyIFi', NULL, 'User Four', 'USER', 'BANNED', NOW(), NOW(), NULL, 0, 1);
+-- ('c5f6d12b-5e84-4d1a-8ca4-421e83a4e555', 'user5@gmail.com', '$2a$10$W2neF9.6Agi6kAKVq8q3fec5dHW8KUA.b0VSIGdIZyUravfLpyIFi', NULL, 'User Five', 'USER', 'DELETED', NOW(), NOW(), NOW(), 1, 1);
 
 -- 2. Dữ liệu mẫu cho bảng `personal_label`
 INSERT INTO `personal_label` (`id`, `account_id`, `name`, `description`, `created_at`, `updated_at`, `deleted_at`, `is_deleted`)

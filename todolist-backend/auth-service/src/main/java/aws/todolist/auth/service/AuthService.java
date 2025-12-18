@@ -4,8 +4,6 @@ package aws.todolist.auth.service;
 import aws.todolist.auth.dto.account.AccountRedisDTO;
 import aws.todolist.auth.dto.auth.*;
 import aws.todolist.auth.entity.Account;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.security.core.userdetails.UserDetails;
 
 public interface AuthService {
 	
@@ -22,7 +20,7 @@ public interface AuthService {
 	AccountRedisDTO register(UserRegistrationForm userRegistrationForm);
 
 	void sendOtpResetPassword(String username);
-	
+	void sendOtpDeleteAccount(String email);
 	Account resetPassword(String username, ResetPasswordForm form);
 	
 	Account updatePassword(String accountId, UpdatePasswordForm form);
@@ -31,4 +29,6 @@ public interface AuthService {
 	
 	Account updateEmail(String accountId,  UpdateEmailForm form);
 	AuthResponseDTO refreshToken(String refreshToken);
+	Account deleteAccount(String accountId, DeleteAccountForm form);
+	
 }
