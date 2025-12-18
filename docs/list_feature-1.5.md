@@ -1,18 +1,20 @@
-# 📌 Danh sách chức năng hệ thống – v0.1.0.0 - beta (23/09/2025)
+# 📌 Danh sách chức năng hệ thống – v1.5 (23/09/2025)
 
 ## I. Authentication & User Profile  
 ### 1. Đăng nhập / Đăng ký
 - Login (User)  
     + Login truyền thống
     + Login google
-    + Login facebook
 - Register  
 - Forget password  
 
 ### 2. Quản lý thông tin cá nhân
 - Cập nhật mật khẩu  
 - Cập nhật email  
-- Cập nhật thông tin cá nhân (display_name, avatar)
+- Cập nhật thông tin cá nhân (display_name, avatar, notification-alert)
+
+- Xác thực 2FA (Mới)
+- Xóa tài khoản (Mới)
 
 ## II. Quản lý Project & Task Collaboration  
 ### 1. Quản lý Project  

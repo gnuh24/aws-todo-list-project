@@ -16,6 +16,7 @@ public class RedisConstants {
 	// 4. OTP đổi email
 	public static final String OTP_CHANGE_EMAIL = "otp:change_email";
 	
+	public static final String TWO_FA_PENDING_SECRET = "2fa-pending-secret";
 	
 	// 6. Ban list access token
 	public static final String BANLIST_ACCOUNT_ID = "banlist:accountId";
