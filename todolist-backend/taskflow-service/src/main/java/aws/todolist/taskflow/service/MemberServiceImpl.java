@@ -88,7 +88,7 @@ public class MemberServiceImpl implements MemberService {
 
         Project project;
 
-        Account account;
+        Account accountReceiveInvite;
 
         if (OptProject.isPresent()) {
             project = OptProject.get();
@@ -97,7 +97,7 @@ public class MemberServiceImpl implements MemberService {
         }
 
         if (OptAccount.isPresent()) {
-            account = OptAccount.get();
+            accountReceiveInvite = OptAccount.get();
         } else {
             throw new ResourceNotFoundException(BusinessErrorCode.TASKFLOW_NOT_FOUND, "Tài khoản không tồn tại.");
         }
@@ -108,7 +108,7 @@ public class MemberServiceImpl implements MemberService {
             throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Không thể phân quyền OWNER cho các thành viên khác.");
         }
 
-        Member member = Member.builder().account(account).project(project).role(requestDTO.getRole()).status(StatusMember.PENDING).build();
+        Member member = Member.builder().account(accountReceiveInvite).project(project).role(requestDTO.getRole()).status(StatusMember.PENDING).build();
 
         Member member_saved = memberRepository.saveAndFlush(member);
 
@@ -116,8 +116,8 @@ public class MemberServiceImpl implements MemberService {
         // 🔔 GỬI KAFKA NOTIFICATION
         // =============================
         Account actor = accountService.getAccountById(accountId);
-        List<String> listReceiver = memberRepository.findAccountIdsByProjectId(member_saved.getProject().getId());
-        MemberPayload payload = memberMapper.toPayload(member_saved, actorMapper.toActorDto(actor), listReceiver);
+
+        MemberPayload payload = memberMapper.toPayload(member_saved, actorMapper.toActorDto(actor), List.of(accountReceiveInvite.getId()));
         genericEventPublisher.publishMemberEvent(member_saved.getProject().getId(), payload, EventType.PROJECT_MEMBER_ADDED);
 
         // =============================
@@ -198,8 +198,7 @@ public class MemberServiceImpl implements MemberService {
 
         // Gửi kafka cho event
 
-        List<String> listReceiver = memberRepository.findAccountIdsByProjectId(member_saved.getProject().getId());
-        MemberPayload payload = memberMapper.toPayload(member_saved, null, listReceiver);
+        MemberPayload payload = memberMapper.toPayload(member_saved, null, null);
         genericEventPublisher.publishMemberEvent(member_saved.getProject().getId(), payload, EventType.PROJECT_MEMBER_REMOVED);
 
         return memberMapper.toResponse(member_saved);

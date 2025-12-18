@@ -5,22 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="aafb8b93-6ddf-44d9-bc7c-02d1e2b5b281" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../../infrac/TestWebSocket_V2.html" beforeDir="false" afterPath="$PROJECT_DIR$/../../infrac/TestWebSocket_V2.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../api-gateway/src/main/resources/application-dev.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../api-gateway/src/main/resources/application-dev.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/controller/MemberController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/controller/MemberController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/dto/event/NotificationDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/dto/event/PayloadBase.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/dto/event/PayloadBase.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/dto/event/payload/MemberPayload.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/dto/event/payload/MemberPayload.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/dto/event/dto/CommentEventDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/dto/event/dto/CommentEventDto.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/enums/EventType.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/enums/EventType.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/mapper/MemberMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/mapper/MemberMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/mapper/ProjectMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/mapper/ProjectMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/messaging/kafka/producer/GenericEventPublisherImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/messaging/kafka/producer/GenericEventPublisherImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/MemberService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/MemberService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/mapper/SectionMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/mapper/SectionMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/mapper/TaskCommentMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/mapper/TaskCommentMapper.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/MemberServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/MemberServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/ProjectServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/ProjectServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/SectionServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/SectionServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/TaskCommentServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/TaskCommentServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../websocket-service/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../websocket-service/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/dto/event/NotificationDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/dto/event/dto/CommentEventDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/dto/event/dto/CommentEventDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/enums/eventDto/EventType.java" beforeDir="false" afterPath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/enums/eventDto/EventType.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/messaging/kafka/consumer/EventProjectConsumer.java" beforeDir="false" afterPath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/messaging/kafka/consumer/EventProjectConsumer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/service/WebSocketService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/service/WebSocketService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/service/WebSocketServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/service/WebSocketServiceImpl.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

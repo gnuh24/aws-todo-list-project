@@ -17,7 +17,7 @@ public interface WebSocketService {
     void sendMemberEvent(String projectId, Object event);
 
     // ===== Comment =====
-    void sendCommentEvent(String projectId, String taskId, Object event);
+    void sendCommentEvent(String projectId, Object event);
 
     // ===== Notification (private) =====
     void sendNotificationToUser(String userId, WebSocketResponse notification);

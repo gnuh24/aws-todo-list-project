@@ -140,7 +140,7 @@
         <input id="email" placeholder="user@email.com" />
 
         <label>Password</label>
-        <input id="password" type="password" placeholder="••••••" />
+        <input id="password" type="password" />
 
         <div class="row">
           <button class="btn-primary" onclick="connect()">Connect</button>
@@ -233,9 +233,12 @@
             log("Subscribed personal notifications");
 
             // subscribe personal notification
-            stompClient.subscribe("/user/queue/project-summary", (msg) =>
-              log(msg.body, "private")
-            );
+            stompClient.subscribe("/user/queue/project-summary", (msg) => {
+              log(msg.body, "project summary");
+              const event = JSON.parse(msg.body);
+              handleProjectSummaryEvent(event);
+            });
+
             log("Subscribed personal project summary");
 
             await loadMyProjects();
@@ -286,17 +289,81 @@
         const container = document.getElementById("projectList");
         container.innerHTML = "";
 
-        json.data.forEach((project) => {
+        renderProjectList(json.data);
+
+        log("Loaded project list");
+      }
+
+      function renderProjectList(projects) {
+        const container = document.getElementById("projectList");
+        container.innerHTML = "";
+
+        projects.forEach((project) => {
           const div = document.createElement("div");
           div.className = "project-item";
+          div.dataset.projectId = project.id; // ⭐ key chính
           div.textContent = project.name;
-
           div.onclick = () => selectProject(project.id, div);
 
           container.appendChild(div);
         });
+      }
 
-        log("Loaded project list");
+      function handleProjectSummaryEvent(event) {
+        const type = event.eventType;
+        const project = event.payload?.project;
+        if (!project) return;
+
+        switch (type) {
+          case "PROJECT_CREATED":
+            addProjectToList(project);
+            break;
+
+          case "PROJECT_UPDATED":
+            updateProjectInList(project);
+            break;
+
+          case "PROJECT_ARCHIVED":
+          case "PROJECT_DELETED":
+            removeProjectFromList(project.id);
+            break;
+        }
+
+        log(`Project summary updated: ${type}`, "private");
+      }
+
+      function addProjectToList(project) {
+        const container = document.getElementById("projectList");
+
+        // tránh add trùng
+        if (container.querySelector(`[data-project-id="${project.id}"]`))
+          return;
+
+        const div = document.createElement("div");
+        div.className = "project-item";
+        div.dataset.projectId = project.id;
+        div.textContent = project.name;
+        div.onclick = () => selectProject(project.id, div);
+
+        container.appendChild(div);
+      }
+
+      function updateProjectInList(project) {
+        const el = document.querySelector(
+          `.project-item[data-project-id="${project.id}"]`
+        );
+
+        if (!el) return;
+
+        el.textContent = project.name;
+      }
+
+      function removeProjectFromList(projectId) {
+        const el = document.querySelector(
+          `.project-item[data-project-id="${projectId}"]`
+        );
+
+        if (el) el.remove();
       }
 
       function selectProject(projectId, element) {

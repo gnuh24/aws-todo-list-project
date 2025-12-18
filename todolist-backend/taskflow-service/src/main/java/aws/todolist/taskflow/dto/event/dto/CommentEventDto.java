@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class CommentEventDto {
 
     private String id;
-    private String content;
+    private String comment;
 
     private String taskId;
 

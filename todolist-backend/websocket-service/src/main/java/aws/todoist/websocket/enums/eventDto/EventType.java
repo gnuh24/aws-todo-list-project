@@ -24,7 +24,7 @@ public enum EventType {
     // 🧩 SECTION EVENTS
     // =========================
     SECTION_CREATED,
-    SECTION_UPDATED,
+    SECTION_NAME_UPDATED,
     SECTION_DELETED,
     SECTION_MOVED,
 

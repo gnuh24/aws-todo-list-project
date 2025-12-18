@@ -1,5 +1,8 @@
 package aws.todolist.taskflow.mapper;
 
+import aws.todolist.taskflow.dto.event.ActorDto;
+import aws.todolist.taskflow.dto.event.dto.CommentEventDto;
+import aws.todolist.taskflow.dto.event.payload.CommentPayload;
 import aws.todolist.taskflow.dto.taskComment.TaskCommentResponseDTO;
 import aws.todolist.taskflow.entity.TaskComment;
 import org.mapstruct.AfterMapping;
@@ -38,5 +41,31 @@ public interface TaskCommentMapper {
                 .filter(tc -> tc.getIsDeleted() == null || !tc.getIsDeleted())
                 .map(this::toResponse)
                 .collect(Collectors.toList());
+    }
+
+    @Mapping(source = "task.id", target = "taskId")
+    @Mapping(source = "account.id", target = "authorId")
+    @Mapping(source = "account.displayName", target = "authorName")
+    CommentEventDto toEventDto(TaskComment comment);
+
+    default CommentPayload toPayload(
+            TaskComment comment,
+            ActorDto actor,
+            List<String> receivers
+    ) {
+        CommentPayload payload = new CommentPayload();
+
+        payload.setProjectId(
+                comment.getTask()
+                        .getSection()
+                        .getProject()
+                        .getId()
+        ); // ⭐ route WS theo project
+
+        payload.setActor(actor);
+        payload.setReceivers(receivers);
+        payload.setComment(toEventDto(comment));
+
+        return payload;
     }
 }

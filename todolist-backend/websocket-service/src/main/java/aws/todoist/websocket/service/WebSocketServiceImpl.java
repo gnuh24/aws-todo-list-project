@@ -70,9 +70,9 @@ public class WebSocketServiceImpl implements WebSocketService{
      * Comment realtime UI (theo task)
      */
     @Override
-    public void sendCommentEvent(String projectId, String taskId, Object event) {
+    public void sendCommentEvent(String projectId, Object event) {
         messagingTemplate.convertAndSend(
-                "/topic/project/" + projectId + "/comment/" + taskId,
+                "/topic/project/" + projectId + "/comment",
                 event
         );
     }

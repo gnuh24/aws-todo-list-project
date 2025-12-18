@@ -1,15 +1,19 @@
 package aws.todolist.taskflow.service;
 
+import aws.todolist.taskflow.dto.event.payload.SectionPayload;
 import aws.todolist.taskflow.dto.section.*;
 import aws.todolist.taskflow.entity.Project;
 import aws.todolist.taskflow.entity.Section;
 import aws.todolist.taskflow.entity.Task;
 import aws.todolist.taskflow.entity.TaskComment;
+import aws.todolist.taskflow.enums.EventType;
 import aws.todolist.taskflow.exceptions.ProjectException.BadRequestException;
 import aws.todolist.taskflow.exceptions.ProjectException.ResourceNotFoundException;
 import aws.todolist.taskflow.exceptions.errorCode.BusinessErrorCode;
 import aws.todolist.taskflow.exceptions.errorCode.SystemErrorCode;
 import aws.todolist.taskflow.mapper.SectionMapper;
+import aws.todolist.taskflow.messaging.kafka.producer.GenericEventPublisher;
+import aws.todolist.taskflow.repository.MemberRepository;
 import aws.todolist.taskflow.repository.ProjectRepository;
 import aws.todolist.taskflow.repository.SectionRepository;
 import aws.todolist.taskflow.repository.TaskRepository;
@@ -39,6 +43,12 @@ public class SectionServiceImpl implements SectionService {
     @Autowired
     private TaskServiceImpl taskService;
 
+    @Autowired
+    private GenericEventPublisher genericEventPublisher;
+
+    @Autowired
+    private MemberRepository memberRepository;
+
     @Override
     public List<SectionResponseDTO> getAllSection(String idProject) {
 
@@ -67,6 +77,13 @@ public class SectionServiceImpl implements SectionService {
 
         Section saved_section = sectionRepository.saveAndFlush(section);
 
+
+        // =============================
+        // 🔔 Gửi Kafka Notification
+        // =============================
+        SectionPayload sectionPayload = sectionMapper.toPayload(saved_section, null, null);
+        genericEventPublisher.publishSectionEvent(saved_section.getProject().getId(), sectionPayload, EventType.SECTION_CREATED);
+
         return sectionMapper.toResponse(saved_section);
     }
 
@@ -89,9 +106,13 @@ public class SectionServiceImpl implements SectionService {
         section.setPosition(newPosition);
 
 
-        Section saved = sectionRepository.saveAndFlush(section);
+        Section saved_section = sectionRepository.saveAndFlush(section);
 
-        return sectionMapper.toResponse(saved);
+        SectionPayload sectionPayload = sectionMapper.toPayload(saved_section, null, null);
+        genericEventPublisher.publishSectionEvent(saved_section.getProject().getId(), sectionPayload, EventType.SECTION_MOVED);
+
+
+        return sectionMapper.toResponse(saved_section);
     }
 
     @Override
@@ -104,9 +125,13 @@ public class SectionServiceImpl implements SectionService {
 
         section.setName(requestDTO.getName());
 
-        Section saved = sectionRepository.saveAndFlush(section);
+        Section saved_section = sectionRepository.saveAndFlush(section);
 
-        return sectionMapper.toResponse(saved);
+        SectionPayload sectionPayload = sectionMapper.toPayload(saved_section, null, null);
+        genericEventPublisher.publishSectionEvent(saved_section.getProject().getId(), sectionPayload, EventType.SECTION_NAME_UPDATED);
+
+
+        return sectionMapper.toResponse(saved_section);
     }
 
     @Override
@@ -139,9 +164,13 @@ public class SectionServiceImpl implements SectionService {
         // Chuyển position các section còn lại
         sectionRepository.shiftPositionsAfterDelete(section.getProject().getId(), section.getPosition());
 
-        Section saved = sectionRepository.save(section);
+        Section saved_section = sectionRepository.save(section);
 
-        return sectionMapper.toResponse(saved);
+        SectionPayload sectionPayload = sectionMapper.toPayload(saved_section, null, null);
+        genericEventPublisher.publishSectionEvent(saved_section.getProject().getId(), sectionPayload, EventType.SECTION_DELETED);
+
+
+        return sectionMapper.toResponse(saved_section);
     }
 
     @Override

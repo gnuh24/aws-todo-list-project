@@ -120,9 +120,10 @@ public class EventProjectConsumer {
                         }
                 );
 
+        System.err.println(event);
+
         webSocketService.sendCommentEvent(
                 event.getPayload().getProjectId(),
-                event.getPayload().getComment().getTaskId(),
                 event
         );
     }

@@ -1,5 +1,8 @@
 package aws.todolist.taskflow.mapper;
 
+import aws.todolist.taskflow.dto.event.ActorDto;
+import aws.todolist.taskflow.dto.event.dto.SectionEventDto;
+import aws.todolist.taskflow.dto.event.payload.SectionPayload;
 import aws.todolist.taskflow.dto.section.SectionResponseDTO;
 import aws.todolist.taskflow.entity.Section;
 import org.mapstruct.Mapper;
@@ -38,5 +41,24 @@ public interface SectionMapper {
                 .filter(section -> section.getIsDeleted() == null || !section.getIsDeleted())
                 .map(this::toResponseNameAndId)
                 .collect(Collectors.toList());
+    }
+
+    SectionEventDto toEventDto(Section section);
+
+    default SectionPayload toPayload(
+            Section section,
+            ActorDto actor,
+            List<String> receivers
+    ) {
+        SectionPayload payload = new SectionPayload();
+
+        // rất quan trọng để route WS đúng project
+        payload.setProjectId(section.getProject().getId());
+
+        payload.setActor(actor);
+        payload.setReceivers(receivers);
+        payload.setSection(toEventDto(section));
+
+        return payload;
     }
 }
