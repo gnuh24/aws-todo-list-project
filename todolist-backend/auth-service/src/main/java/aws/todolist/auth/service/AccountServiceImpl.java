@@ -10,6 +10,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 public class AccountServiceImpl implements AccountService {
 	
@@ -86,6 +88,17 @@ public class AccountServiceImpl implements AccountService {
 		return accountRepository.save(account);
 	}
 	
+	@Override
+	public Account deleteAccount(Account account) {
+		if (account.isDeleted()) {
+			return account;
+		}
+		
+		account.setDeleted(true);
+		account.setDeletedAt(LocalDateTime.now());
+		
+		return accountRepository.save(account);
+	}
 
 
 //    @Override

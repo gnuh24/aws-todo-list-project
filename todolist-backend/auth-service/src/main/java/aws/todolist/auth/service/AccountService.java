@@ -21,7 +21,7 @@ public interface AccountService extends UserDetailsService {
 	Account updatePassword(Account account, String newPassword);
 	
 	Account updateEmail(Account account, String newEmail);
-
+	Account deleteAccount(Account account);
 //    Page<Account> getAllAccounts(Pageable pageable, AccountFilterForm filterForm);
 //
 //    Account getAccountByEmail(String username);

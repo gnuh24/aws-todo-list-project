@@ -39,15 +39,16 @@ public final class SystemErrorCode {
 	public static final String AUTH_OTP_NOT_FOUND                  			= "SYS-AUTH-028"; // Không tìm thấy OTP
 	
 	// ==== AUTHENTICATION / TWO FACTOR ====
-		
-		public static final String AUTH_2FA_REQUIRED     = "SYS-AUTH-029";
-	// Cần xác thực bổ sung (OTP / password cũ / step-up đơn giản)
-		
-		public static final String AUTH_2FA_FAILED       = "SYS-AUTH-030";
-	// Xác thực bổ sung thất bại (sai password cũ / sai OTP)
-		
-		public static final String AUTH_HMAC_MISMATCH    = "SYS-AUTH-031";
-	// Dữ liệu xác thực bị sai hoặc bị can thiệp (kỹ thuật)
+	
+	public static final String AUTH_2FA_REQUIRED  = "SYS-AUTH-029";
+// Cần xác thực bổ sung (OTP / password cũ / step-up)
+	
+	public static final String AUTH_2FA_FAILED    = "SYS-AUTH-030";
+// Xác thực bổ sung thất bại (sai password cũ / sai OTP / sai TOTP)
+	
+	public static final String AUTH_HMAC_MISMATCH = "SYS-AUTH-031";
+// Dữ liệu xác thực bị sai hoặc bị can thiệp (kỹ thuật)
+
 
 	
 	

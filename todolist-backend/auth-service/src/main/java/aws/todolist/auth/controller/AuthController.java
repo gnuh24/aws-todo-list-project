@@ -142,6 +142,23 @@ public class AuthController {
 		);
 	}
 	
+	@PostMapping("/send-delete-account-otp")
+	public ResponseEntity<ApiResponse<String>> sendOtpForDeleteAccount(
+		@RequestHeader("X-User-Email") String email
+	) {
+		
+		authService.sendOtpDeleteAccount(email);
+		
+		return ResponseEntity.ok(
+			new ApiResponse<>(
+				200,
+				"Hệ thống đã gửi OTP xác nhận xóa tài khoản vào email của bạn. Mã có hiệu lực trong 3 phút.",
+				null
+			)
+		);
+	}
+	
+	
 	
 	@PatchMapping("/update-email")
 	public ResponseEntity<ApiResponse<String>> updateEmail(
@@ -187,6 +204,23 @@ public class AuthController {
 		    "Refresh token thành công",
 		    authResponse
 		));
+	}
+	
+	
+	@DeleteMapping("/delete-account")
+	public ResponseEntity<ApiResponse<String>> deleteAccount(
+		@RequestBody @Valid DeleteAccountForm form,
+		@RequestHeader("X-User-Id") String accountId
+	) {
+		authService.deleteAccount(accountId, form);
+		
+		return ResponseEntity.ok(
+			new ApiResponse<>(
+				200,
+				"Account deleted successfully",
+				null
+			)
+		);
 	}
 	
 	
