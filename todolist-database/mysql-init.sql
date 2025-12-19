@@ -11,6 +11,12 @@ CREATE TABLE `account` (
     `role`              ENUM('ADMIN', 'USER') NOT NULL,
     `status`            ENUM('ACTIVE', 'INACTIVE', 'BANNED') NOT NULL,
     `receive_email`     BOOLEAN NOT NULL,
+    
+        -- ==== TWO FACTOR AUTHENTICATION ====
+    `two_factor_enabled`       BOOLEAN NOT NULL DEFAULT FALSE,
+    `two_factor_secret`        VARCHAR(64),
+    `two_factor_verified_at`   TIMESTAMP NULL,
+    
     `created_at`        TIMESTAMP NOT NULL,
     `updated_at`        TIMESTAMP NOT NULL,
     `deleted_at`        TIMESTAMP,

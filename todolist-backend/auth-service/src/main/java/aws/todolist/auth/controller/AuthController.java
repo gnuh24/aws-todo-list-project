@@ -4,6 +4,7 @@ import aws.todolist.auth.api.ApiResponse;
 import aws.todolist.auth.dto.account.AccountRedisDTO;
 import aws.todolist.auth.dto.auth.*;
 import aws.todolist.auth.dto.twoFactor.TwoFactorSetupResponse;
+import aws.todolist.auth.dto.twoFactor.TwoFactorVerifyForm;
 import aws.todolist.auth.entity.Account;
 import aws.todolist.auth.exceptionHandler.exceptions.twoFactorException.TwoFactorException;
 import aws.todolist.auth.security.JwtTokenProvider;
@@ -68,6 +69,19 @@ public class AuthController {
 			new ApiResponse<>(200, "Tạo thông tin 2FA thành công", response)
 		);
 	}
+	
+	@PostMapping("/2fa/verify")
+	public ResponseEntity<ApiResponse<Void>> verify2FA(
+		@RequestHeader("X-User-Id") String accountId,
+		@Valid @RequestBody TwoFactorVerifyForm form
+	) {
+		twoFactorService.verify2FA(accountId, form.getOtp());
+		
+		return ResponseEntity.ok(
+			new ApiResponse<>(200, "Xác thực 2FA thành công", null)
+		);
+	}
+
 	
 	
 	/**

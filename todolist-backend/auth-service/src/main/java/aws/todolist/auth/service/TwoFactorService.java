@@ -9,11 +9,11 @@ public interface TwoFactorService {
 	 * Tạo secret tạm thời + QR URL
 	 */
 	TwoFactorSetupResponse setup2FA(String email);
-//	/**
-//	 * Verify OTP và bật 2FA cho account
-//	 */
-//	void verify2FA(Account account, int otp);
-//
+	/**
+	 * Verify OTP và bật 2FA cho account
+	 */
+	void verify2FA(String accountId, int otp);
+
 //	/**
 //	 * Verify OTP khi login
 //	 */

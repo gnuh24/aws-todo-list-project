@@ -62,6 +62,16 @@ public class Account implements Serializable, UserDetails {
 	@Column(name = "receive_email", nullable = false)
 	private boolean receiveEmail;
 	
+	@Column(name = "two_factor_enabled", nullable = false)
+	private boolean twoFactorEnabled;
+	
+	@Column(name = "two_factor_secret", length = 64)
+	private String twoFactorSecret;
+	
+	@Column(name = "two_factor_verified_at")
+	private LocalDateTime twoFactorVerifiedAt;
+	
+	
 	// --- ENUMS ---
 	public enum Role {
 		ADMIN, USER
@@ -117,6 +127,8 @@ public class Account implements Serializable, UserDetails {
 		if (status == null) {
 			status = Status.ACTIVE;
 		}
+		
+		twoFactorEnabled = false;
 		isDeleted = false;
 		receiveEmail = false;
 	}
