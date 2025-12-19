@@ -1,6 +1,6 @@
 package aws.todolist.taskflow.service;
 
-import aws.todolist.taskflow.dto.event.payload.ProjectPayload;
+import aws.todolist.taskflow.context.RequestContext;
 import aws.todolist.taskflow.dto.project.ProjectCreateRequestDTO;
 import aws.todolist.taskflow.dto.project.ProjectDetailResponseDTO;
 import aws.todolist.taskflow.dto.project.ProjectResponseDTO;
@@ -9,7 +9,6 @@ import aws.todolist.taskflow.entity.Account;
 import aws.todolist.taskflow.entity.Member;
 import aws.todolist.taskflow.entity.Project;
 import aws.todolist.taskflow.entity.Section;
-import aws.todolist.taskflow.enums.EventType;
 import aws.todolist.taskflow.enums.Role;
 import aws.todolist.taskflow.enums.StatusMember;
 import aws.todolist.taskflow.exceptions.ProjectException.BadRequestException;
@@ -23,6 +22,8 @@ import aws.todolist.taskflow.repository.MemberRepository;
 import aws.todolist.taskflow.repository.ProjectRepository;
 import aws.todolist.taskflow.repository.SectionRepository;
 import aws.todolist.taskflow.repository.TaskRepository;
+import aws.todolist.taskflow.service.ServiceEventKafka.ProjectEventService;
+import aws.todolist.taskflow.service.ServiceInterface.ProjectService;
 import aws.todolist.taskflow.utils.NotificationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -63,19 +64,25 @@ public class ProjectServiceImpl implements ProjectService {
     @Autowired
     private GenericEventPublisher eventPublisher;
 
+    @Autowired
+    private ProjectEventService projectEventService;
+
 
     @Override
-    public List<ProjectResponseDTO> getAllProject(String accountID) {
-        List<Project> projects = projectRepository.findAllByAccountId(accountID);
+    public List<ProjectResponseDTO> getAllProject() {
+
+        Account account = RequestContext.getAccount();
+
+        List<Project> projects = projectRepository.findAllByAccountId(account.getId());
 
         return projectMapper.toResponseList(projects);
 
     }
 
     @Override
-    public ProjectDetailResponseDTO getProjectById(String id) {
+    public ProjectDetailResponseDTO getProjectById(String projectId) {
 
-        Optional<Project> optProject = projectRepository.findByIdAndIsDeletedFalse(id);
+        Optional<Project> optProject = projectRepository.findByIdAndIsDeletedFalse(projectId);
 
         Project project;
 
@@ -91,9 +98,11 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Transactional
     @Override
-    public ProjectResponseDTO addProject(ProjectCreateRequestDTO projectCreateRequestDTO, Account account) {
+    public ProjectResponseDTO addProject(ProjectCreateRequestDTO projectCreateRequestDTO) {
 
-        Project OptProjectDefault = projectRepository.findProjectIsDefault(account.getId());
+        Account actor = RequestContext.getAccount();
+
+        Project OptProjectDefault = projectRepository.findProjectIsDefault(actor.getId());
 
         // Kiểm tra dự án default
         if (projectCreateRequestDTO.getIsDefault() && OptProjectDefault != null) {
@@ -108,29 +117,28 @@ public class ProjectServiceImpl implements ProjectService {
                 .build();
 
 
-        Project saved = projectRepository.saveAndFlush(project);
+        Project saved_project = projectRepository.saveAndFlush(project);
 
-        Member member = Member.builder().account(account).project(saved).role(Role.OWNER).status(StatusMember.ACCEPTED).build();
+        Member member = Member.builder().account(actor).project(saved_project).role(Role.OWNER).status(StatusMember.ACCEPTED).build();
 
-        Section section = Section.builder().project(saved).name("Section default").position(1).build();
+        Section section = Section.builder().project(saved_project).name("Section default").position(1).build();
 
         memberRepository.save(member);
 
         sectionRepository.save(section);
 
-        saved.getMembers().add(member);
+        saved_project.getMembers().add(member);
 
-        saved.getSections().add(section);
+        saved_project.getSections().add(section);
 
         // ------------------------------------------
         // Gửi event kafka cho websocket
         // ------------------------------------------
 
+        projectEventService.publishProjectCreated(saved_project);
 
-        ProjectPayload payload = projectMapper.toPayload(project, actorMapper.toActorDto(account), memberRepository.findAccountIdsByProjectId(project.getId()));
-        eventPublisher.publishProjectEvent(project.getId(), payload, EventType.PROJECT_CREATED);
 
-        return projectMapper.toResponse(saved);
+        return projectMapper.toResponse(saved_project);
     }
 
     @Transactional
@@ -155,18 +163,17 @@ public class ProjectServiceImpl implements ProjectService {
             project.setIsArchived(projectUpdateRequestDTO.getIsArchived());
         }
 
-        Project saved = projectRepository.saveAndFlush(project);
+        Project saved_project = projectRepository.saveAndFlush(project);
 
         // Gửi event kafka cho websocket
-        ProjectPayload payload = projectMapper.toPayload(project, null, memberRepository.findAccountIdsByProjectId(project.getId()));
-        eventPublisher.publishProjectEvent(project.getId(), payload, EventType.PROJECT_UPDATED);
+        projectEventService.publishProjectUpdated(saved_project);
 
-        return projectMapper.toResponse(saved);
+        return projectMapper.toResponse(saved_project);
     }
 
     @Transactional
     @Override
-    public ProjectResponseDTO removeProject(String id, Account accountLogging) {
+    public ProjectResponseDTO removeProject(String id) {
 
         Optional<Project> optProject = projectRepository.findByIdAndIsDeletedFalse(id);
 
@@ -186,7 +193,9 @@ public class ProjectServiceImpl implements ProjectService {
 
         // Chạy vòng lặp để cập nhật các section thành deleted và chuyển task về project default
 
-        Project defaultProject = projectRepository.findProjectIsDefault(accountLogging.getId());
+        Account actor = RequestContext.getAccount();
+
+        Project defaultProject = projectRepository.findProjectIsDefault(actor.getId());
 
         if (defaultProject == null) {
             throw new ResourceNotFoundException(BusinessErrorCode.TASKFLOW_NOT_FOUND, "Account không có project mặc định");
@@ -208,8 +217,7 @@ public class ProjectServiceImpl implements ProjectService {
         // -------------------------------
         // Gửi event lên kafka để cập nhật
         // -------------------------------
-        ProjectPayload payload = projectMapper.toPayload(project, null, memberRepository.findAccountIdsByProjectId(project.getId()));
-        eventPublisher.publishProjectEvent(project.getId(), payload, EventType.PROJECT_DELETED);
+        projectEventService.publishProjectDeleted(project);
 
 
         // Cập nhật các member về deleted
@@ -222,33 +230,4 @@ public class ProjectServiceImpl implements ProjectService {
 
         return projectMapper.toResponse(saved);
     }
-
-//    @Transactional
-//    @Override
-//    public ProjectResponseDTO restoreProject(String id) {
-//
-//        Optional<Project> optProject = projectRepository.findById(id);
-//
-//        Project project;
-//
-//        if (optProject.isPresent()) {
-//            project = optProject.get();
-//        } else {
-//            throw new ResourceNotFoundException(SystemErrorCode.SYS_OBJECT_NOT_FOUND, "Project không tồn tại");
-//        }
-//
-//        project.getSections().forEach(section -> {
-//            section.restore();
-//            section.getTasks().forEach(task -> {
-//                task.restore();
-//                task.getTaskComments().forEach(TaskComment::restore);
-//            });
-//        });
-//
-//        project.restore();
-//
-//        Project saved = projectRepository.saveAndFlush(project);
-//        return projectMapper.ResponseDTO(saved);
-//
-//    }
 }

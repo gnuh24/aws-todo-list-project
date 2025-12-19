@@ -1,6 +1,7 @@
 package aws.todolist.taskflow.service;
 
 
+import aws.todolist.taskflow.context.RequestContext;
 import aws.todolist.taskflow.dto.task.*;
 import aws.todolist.taskflow.entity.*;
 import aws.todolist.taskflow.enums.Priority;
@@ -13,12 +14,12 @@ import aws.todolist.taskflow.exceptions.ProjectException.ResourceNotFoundExcepti
 import aws.todolist.taskflow.exceptions.errorCode.BusinessErrorCode;
 import aws.todolist.taskflow.exceptions.errorCode.SystemErrorCode;
 import aws.todolist.taskflow.mapper.TaskMapper;
-import aws.todolist.taskflow.messaging.kafka.message.NotificationType;
 import aws.todolist.taskflow.quartzScheduler.TaskSchedulerService;
 import aws.todolist.taskflow.repository.MemberRepository;
 import aws.todolist.taskflow.repository.SectionRepository;
 import aws.todolist.taskflow.repository.TaskRepository;
-import aws.todolist.taskflow.utils.NotificationUtils;
+import aws.todolist.taskflow.service.ServiceEventKafka.TaskEventService;
+import aws.todolist.taskflow.service.ServiceInterface.TaskService;
 import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,7 +47,8 @@ public class TaskServiceImpl implements TaskService {
     @Autowired
     private TaskSchedulerService taskSchedulerService;
     @Autowired
-    private NotificationUtils notificationUtils;
+    private TaskEventService taskEventService;
+
 
     @Override
     public TaskDetailResponseDTO getTaskById(String idTask) {
@@ -61,14 +63,18 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<TaskResponseDTO> getTaskUpComing(Account account) {
-        System.err.println(todayStart);
-        return taskMapper.toResponseList(taskRepository.findByTaskUpComingByAccount(todayStart, account.getId()));
+    public List<TaskResponseDTO> getTaskUpComing() {
+
+        Account actor = RequestContext.getAccount();
+
+        return taskMapper.toResponseList(taskRepository.findByTaskUpComingByAccount(todayStart, actor.getId()));
     }
 
     @Override
     @Transactional
-    public TaskResponseDTO addTask(String idProject, TaskCreateRequestDTO requestDTO, Account accountLogging) {
+    public TaskResponseDTO addTask(String idProject, TaskCreateRequestDTO requestDTO) {
+
+        Account actor = RequestContext.getAccount();
 
         Task taskFather = null;
 
@@ -147,7 +153,7 @@ public class TaskServiceImpl implements TaskService {
                 .isPinned(requestDTO.getIsPinned() != null ? requestDTO.getIsPinned() : false)
                 .isArchived(requestDTO.getIsArchived() != null ? requestDTO.getIsArchived() : false)
                 .taskFather(taskFather)
-                .createdByAccount(accountLogging)
+                .createdByAccount(actor)
                 .accountAssign(member != null ? member.getAccount() : null)
                 .section(section)
                 .build();
@@ -156,15 +162,10 @@ public class TaskServiceImpl implements TaskService {
 
         // Thông báo kafka nếu task được phân công luôn
 
-        System.out.println(task.getId());
-
-
         if (task.getAccountAssign() != null) {
             // Thông báo kafka
+            taskEventService.publishAssigned(task);
 
-
-            // Đặt actor là người tạo task
-            notificationUtils.sendNotification(task, task.getSection().getProject(), accountLogging, notificationUtils.getReceiversForTask(task), NotificationType.TASK_ASSIGNED);
         }
 
         // === Đặt scheduler nếu task mới tạo có đặt deadline
@@ -176,6 +177,9 @@ public class TaskServiceImpl implements TaskService {
                 throw new RuntimeException(e);
             }
         }
+
+        // ====== Gửi event ======
+        taskEventService.publishTaskCreated(task);
 
         return taskMapper.toResponse(task);
     }
@@ -189,6 +193,11 @@ public class TaskServiceImpl implements TaskService {
         task.setPriority(requestDTO.getPriority());
 
         task = taskRepository.save(task);
+
+        // ==================================================
+        // 🔔 EVENT: TASK_PRIORITY_UPDATED
+        // ==================================================
+        taskEventService.publishPriorityUpdated(task);
 
         return taskMapper.toResponse(task);
     }
@@ -224,18 +233,26 @@ public class TaskServiceImpl implements TaskService {
 
         task = taskRepository.save(task);
 
+        // ==================================================
+        // 🔔 EVENT: TASK_RELATIONSHIP_UPDATED
+        // ==================================================
+        taskEventService.publishRelationshipUpdated(task);
+
+
         return taskMapper.toResponse(task);
     }
 
     @Override
     @Transactional
     // Phải lên lịch nhắc hẹn vì có dùng tới trạng thái hoàn thành của task
-    public TaskResponseDTO updateStatus(String idTask, TaskUpdateStatusRequestDTO requestDTO, Account accountLogging) {
+    public TaskResponseDTO updateStatus(String idTask, TaskUpdateStatusRequestDTO requestDTO) {
+
+        Account actor = RequestContext.getAccount();
 
         Task task = this.getTaskAndCheck(idTask);
 
         // Kiểm tra xem task có được phân công chưa nếu có thì kiểm tra xem tài khoản đang thực thi có phải người được phân công không
-        if (task.getAccountAssign() != null && !task.getAccountAssign().getId().equals(accountLogging.getId())) {
+        if (task.getAccountAssign() != null && !task.getAccountAssign().getId().equals(actor.getId())) {
             throw new ForbiddenException(BusinessErrorCode.TASKFLOW_ACCESS_DENIED, "Task đã được phân công cho người khác. Bạn không thể thay đổi trạng thái của nó");
         }
 
@@ -261,9 +278,6 @@ public class TaskServiceImpl implements TaskService {
             task.setCompletedAt(now);
 
             // Thông báo kafka
-
-            // Actor để null để hàm sendNotification tự lấy accountLogging đang đăng nhập
-            notificationUtils.sendNotification(task, task.getSection().getProject(), null, notificationUtils.getReceiversForTask(task), NotificationType.TASK_COMPLETED);
 
 
             // Nếu task có deadline thì xóa lịch thông báo
@@ -299,6 +313,11 @@ public class TaskServiceImpl implements TaskService {
 
         task = taskRepository.save(task);
 
+        // ==================================================
+        // 🔔 EVENT
+        // ==================================================
+        taskEventService.publishStatusUpdated(task);
+
         return taskMapper.toResponse(task);
     }
 
@@ -333,10 +352,7 @@ public class TaskServiceImpl implements TaskService {
 
 
         // Thông báo kafka
-
-
-        notificationUtils.sendNotification(task, task.getSection().getProject(), null, notificationUtils.getReceiversForTask(task), NotificationType.TASK_ASSIGNED);
-
+        taskEventService.publishAssigned(task);
 
         return taskMapper.toResponse(task);
     }
@@ -354,6 +370,10 @@ public class TaskServiceImpl implements TaskService {
 
         task = taskRepository.save(task);
 
+        // gửi event
+
+        taskEventService.publishUnassigned(task);
+
         return taskMapper.toResponse(task);
     }
 
@@ -366,6 +386,10 @@ public class TaskServiceImpl implements TaskService {
         updateSection(task, requestDTO.getIdSection());
 
         task = taskRepository.save(task);
+
+        // gửi event
+
+        taskEventService.publishSectionUpdated(task);
 
 
         return taskMapper.toResponse(task);
@@ -414,9 +438,9 @@ public class TaskServiceImpl implements TaskService {
         task = taskRepository.save(task);
 
 
-        // Thông báo kafka
+        // gửi event
 
-        notificationUtils.sendNotification(task, task.getSection().getProject(), null, notificationUtils.getReceiversForTask(task), NotificationType.TASK_UPDATED);
+        taskEventService.publishTaskUpdated(task);
 
 
         // ====== Kiểm tra xem task có deadline ko nếu có thì cập nhật lại việc lên lịch
@@ -465,6 +489,10 @@ public class TaskServiceImpl implements TaskService {
 
         task = taskRepository.save(task);
 
+        // gửi event
+
+        taskEventService.publishTaskArchived(task);
+
         return taskMapper.toResponse(task);
     }
 
@@ -491,6 +519,10 @@ public class TaskServiceImpl implements TaskService {
         } catch (SchedulerException e) {
             throw new RuntimeException(e);
         }
+
+        // gửi event
+
+        taskEventService.publishTaskDeleted(task);
 
 
         return taskMapper.toResponse(task);
@@ -530,6 +562,9 @@ public class TaskServiceImpl implements TaskService {
             }
         }
 
+        // gửi event
+
+        taskEventService.publishTaskRestored(task);
 
         return taskMapper.toResponse(task);
     }

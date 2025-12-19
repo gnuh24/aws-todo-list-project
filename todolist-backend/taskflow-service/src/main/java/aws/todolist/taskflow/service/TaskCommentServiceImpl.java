@@ -1,19 +1,19 @@
 package aws.todolist.taskflow.service;
 
-import aws.todolist.taskflow.dto.event.payload.CommentPayload;
+import aws.todolist.taskflow.context.RequestContext;
 import aws.todolist.taskflow.dto.taskComment.TaskCommentRequestDTO;
 import aws.todolist.taskflow.dto.taskComment.TaskCommentResponseDTO;
 import aws.todolist.taskflow.entity.Account;
 import aws.todolist.taskflow.entity.Task;
 import aws.todolist.taskflow.entity.TaskComment;
-import aws.todolist.taskflow.enums.EventType;
 import aws.todolist.taskflow.exceptions.ProjectException.ResourceNotFoundException;
 import aws.todolist.taskflow.exceptions.errorCode.BusinessErrorCode;
-import aws.todolist.taskflow.mapper.ActorMapper;
 import aws.todolist.taskflow.mapper.TaskCommentMapper;
-import aws.todolist.taskflow.messaging.kafka.producer.GenericEventPublisher;
 import aws.todolist.taskflow.repository.TaskCommentRepository;
 import aws.todolist.taskflow.repository.TaskRepository;
+import aws.todolist.taskflow.service.ServiceEventKafka.CommentEventService;
+import aws.todolist.taskflow.service.ServiceInterface.CommentAttachService;
+import aws.todolist.taskflow.service.ServiceInterface.TaskCommentService;
 import aws.todolist.taskflow.utils.NotificationUtils;
 import aws.todolist.taskflow.utils.TaskCommentUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 @Service
 public class TaskCommentServiceImpl implements TaskCommentService {
@@ -49,18 +45,18 @@ public class TaskCommentServiceImpl implements TaskCommentService {
     private CommentAttachService commentAttachService;
 
     @Autowired
-    private GenericEventPublisher genericEventPublisher;
+    private CommentEventService commentEventService;
 
-    @Autowired
-    private ActorMapper actorMapper;
 
     @Override
     @Transactional
-    public TaskCommentResponseDTO addNewComment(TaskCommentRequestDTO requestDTO, String idTask, Account accountLogging) {
+    public TaskCommentResponseDTO addNewComment(TaskCommentRequestDTO requestDTO, String idTask) {
 
         Task task = getTaskAndCheck(idTask);
 
-        TaskComment taskComment = TaskComment.builder().task(task).account(accountLogging).comment(requestDTO.getComment()).build();
+        Account actor = RequestContext.getAccount();
+
+        TaskComment taskComment = TaskComment.builder().task(task).account(actor).comment(requestDTO.getComment()).build();
 
         taskComment = taskCommentRepository.saveAndFlush(taskComment);
 
@@ -68,30 +64,26 @@ public class TaskCommentServiceImpl implements TaskCommentService {
         if (requestDTO.getUrls() != null) {
             for (String url : requestDTO.getUrls()) {
                 try {
-                    taskComment.getCommentAttaches().add(commentAttachService.addNewCommentAttach(url, taskComment.getId(), accountLogging));
+                    taskComment.getCommentAttaches().add(commentAttachService.addNewCommentAttach(url, taskComment.getId(), actor));
                 } catch (URISyntaxException e) {
                     throw new RuntimeException(e);
                 }
             }
         }
 
-        Set<String> receiverSet = new HashSet<>();
+        // Gửi event
 
-        for (TaskComment taskCommentInTask : task.getTaskComments()) {
-            receiverSet.add(taskCommentInTask.getAccount().getId());
-        }
+        commentEventService.publishCommentCreated(taskComment);
 
-        List<String> receivers = new ArrayList<>(receiverSet);
-
-        CommentPayload payload = taskCommentMapper.toPayload(taskComment, actorMapper.toActorDto(accountLogging), receivers);
-        genericEventPublisher.publishCommentEvent(task.getSection().getProject().getId(), payload, EventType.COMMENT_CREATED);
 
         return taskCommentMapper.toResponse(taskComment);
     }
 
     @Override
     @Transactional
-    public TaskCommentResponseDTO updateComment(TaskCommentRequestDTO requestDTO, String idComment, Account actor) {
+    public TaskCommentResponseDTO updateComment(TaskCommentRequestDTO requestDTO, String idComment) {
+
+        Account actor = RequestContext.getAccount();
 
         TaskComment taskComment = taskCommentUtils.getCommentAndCheck(idComment, actor);
 
@@ -114,8 +106,9 @@ public class TaskCommentServiceImpl implements TaskCommentService {
         taskComment = taskCommentRepository.saveAndFlush(taskComment);
 
 
-        CommentPayload payload = taskCommentMapper.toPayload(taskComment, actorMapper.toActorDto(actor), null);
-        genericEventPublisher.publishCommentEvent(taskComment.getTask().getSection().getProject().getId(), payload, EventType.COMMENT_UPDATED);
+        // Gửi event
+
+        commentEventService.publishCommentUpdated(taskComment);
 
 
         return taskCommentMapper.toResponse(taskComment);
@@ -123,7 +116,9 @@ public class TaskCommentServiceImpl implements TaskCommentService {
 
     @Override
     @Transactional
-    public TaskCommentResponseDTO deleteComment(String idComment, Account actor) {
+    public TaskCommentResponseDTO deleteComment(String idComment) {
+
+        Account actor = RequestContext.getAccount();
 
         TaskComment taskComment = taskCommentUtils.getCommentAndCheck(idComment, actor);
 
@@ -133,8 +128,9 @@ public class TaskCommentServiceImpl implements TaskCommentService {
 
         taskComment = taskCommentRepository.save(taskComment);
 
-        CommentPayload payload = taskCommentMapper.toPayload(taskComment, actorMapper.toActorDto(actor), null);
-        genericEventPublisher.publishCommentEvent(taskComment.getTask().getSection().getProject().getId(), payload, EventType.COMMENT_DELETED);
+        // Gửi event
+
+        commentEventService.publishCommentDeleted(taskComment);
 
 
         return taskCommentMapper.toResponse(taskComment);

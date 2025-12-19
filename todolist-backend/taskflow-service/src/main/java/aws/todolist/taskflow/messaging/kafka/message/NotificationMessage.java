@@ -14,7 +14,7 @@ public class NotificationMessage {
     private String actorId;        // người thực hiện
     private String projectId;      // project liên quan
     private String taskId;         // task liên quan
-    private NotificationType type; // loại thông báo
+    private EventType type; // loại thông báo
     private String title;          // tiêu đề
     private String content;        // nội dung
 }

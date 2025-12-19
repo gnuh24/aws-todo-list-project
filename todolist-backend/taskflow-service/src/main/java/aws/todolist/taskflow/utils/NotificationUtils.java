@@ -1,11 +1,11 @@
 package aws.todolist.taskflow.utils;
 
 import aws.todolist.taskflow.entity.*;
+import aws.todolist.taskflow.messaging.kafka.message.EventType;
 import aws.todolist.taskflow.messaging.kafka.message.NotificationMessage;
-import aws.todolist.taskflow.messaging.kafka.message.NotificationType;
 import aws.todolist.taskflow.messaging.kafka.producer.KafkaNotificationProducer;
 import aws.todolist.taskflow.repository.MemberRepository;
-import aws.todolist.taskflow.service.AccountService;
+import aws.todolist.taskflow.service.ServiceInterface.AccountService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -131,7 +131,7 @@ public class NotificationUtils {
                                  Project project,
                                  Account actor,
                                  Set<Account> accountReceiverSet,
-                                 NotificationType type) {
+                                 EventType type) {
         if (accountReceiverSet.isEmpty()) return;
 
         if (actor == null) {

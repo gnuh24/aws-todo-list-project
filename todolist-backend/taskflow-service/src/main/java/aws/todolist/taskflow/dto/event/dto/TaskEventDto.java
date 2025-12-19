@@ -15,16 +15,25 @@ import java.time.LocalDateTime;
 @Builder
 public class TaskEventDto {
 
+    // ===== Core =====
     private String id;
     private String title;
+    private String description;
 
+    private Boolean isPinned;
     private Status status;
     private Priority priority;
 
-    private Boolean isPinned;
-    private LocalDateTime deadline;
+    // ===== Time =====
     private LocalDateTime startTime;
+    private LocalDateTime deadline;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
-    private String sectionId;
-    private String assigneeId;
+    // ===== Relation =====
+    private String idTaskCha;
+    private String idAccountCreate;
+    private String idAccountAssigned;
+    private String idSection;
+    private String idProject;
 }

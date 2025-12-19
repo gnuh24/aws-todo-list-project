@@ -1,6 +1,6 @@
 package aws.todolist.taskflow.service;
 
-import aws.todolist.taskflow.dto.event.payload.MemberPayload;
+import aws.todolist.taskflow.context.RequestContext;
 import aws.todolist.taskflow.dto.member.MemberCreateRequestDTO;
 import aws.todolist.taskflow.dto.member.MemberResponseDTO;
 import aws.todolist.taskflow.dto.member.MemberUpdateRoleRequestDTO;
@@ -8,7 +8,6 @@ import aws.todolist.taskflow.dto.member.MemberUpdateStatusRequestDTO;
 import aws.todolist.taskflow.entity.Account;
 import aws.todolist.taskflow.entity.Member;
 import aws.todolist.taskflow.entity.Project;
-import aws.todolist.taskflow.enums.EventType;
 import aws.todolist.taskflow.enums.Role;
 import aws.todolist.taskflow.enums.StatusMember;
 import aws.todolist.taskflow.exceptions.ProjectException.BadRequestException;
@@ -18,10 +17,12 @@ import aws.todolist.taskflow.exceptions.errorCode.BusinessErrorCode;
 import aws.todolist.taskflow.exceptions.errorCode.SystemErrorCode;
 import aws.todolist.taskflow.mapper.ActorMapper;
 import aws.todolist.taskflow.mapper.MemberMapper;
-import aws.todolist.taskflow.messaging.kafka.producer.GenericEventPublisher;
 import aws.todolist.taskflow.repository.AccountRepository;
 import aws.todolist.taskflow.repository.MemberRepository;
 import aws.todolist.taskflow.repository.ProjectRepository;
+import aws.todolist.taskflow.service.ServiceEventKafka.MemberEventService;
+import aws.todolist.taskflow.service.ServiceInterface.AccountService;
+import aws.todolist.taskflow.service.ServiceInterface.MemberService;
 import aws.todolist.taskflow.utils.NotificationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -57,10 +58,11 @@ public class MemberServiceImpl implements MemberService {
     private RedisTemplate<String, Object> redisTemplate;
 
     @Autowired
-    private GenericEventPublisher genericEventPublisher;
+    private MemberEventService memberEventService;
 
     @Autowired
     private AccountService accountService;
+
 
     @Override
     public List<MemberResponseDTO> getAllMember(String idProject) {
@@ -71,7 +73,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Transactional
     @Override
-    public MemberResponseDTO addNewMember(String idProject, MemberCreateRequestDTO requestDTO, String accountId) {
+    public MemberResponseDTO addNewMember(String idProject, MemberCreateRequestDTO requestDTO) {
 
         // Kiểm tra xem member của account và project đã được tạo chưa
         Optional<Member> OptMember = memberRepository.findFirstByAccountIdAndProjectIdAndIsDeletedFalse(requestDTO.getIdAccount(), idProject);
@@ -113,12 +115,9 @@ public class MemberServiceImpl implements MemberService {
         Member member_saved = memberRepository.saveAndFlush(member);
 
         // =============================
-        // 🔔 GỬI KAFKA NOTIFICATION
+        // 🔔 GỬI KAFKA
         // =============================
-        Account actor = accountService.getAccountById(accountId);
-
-        MemberPayload payload = memberMapper.toPayload(member_saved, actorMapper.toActorDto(actor), List.of(accountReceiveInvite.getId()));
-        genericEventPublisher.publishMemberEvent(member_saved.getProject().getId(), payload, EventType.PROJECT_MEMBER_ADDED);
+        memberEventService.publishMemberAdded(member_saved);
 
         // =============================
 
@@ -127,7 +126,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public MemberResponseDTO updateRoleMember(String idMember, MemberUpdateRoleRequestDTO requestDTO, String accountId) {
+    public MemberResponseDTO updateRoleMember(String idMember, MemberUpdateRoleRequestDTO requestDTO) {
         Optional<Member> OptMember = memberRepository.findFirstByIdAndIsDeletedFalse(idMember);
 
         Member member = null;
@@ -158,13 +157,10 @@ public class MemberServiceImpl implements MemberService {
 
 
         // =============================
-        // 🔔 Gửi Kafka Notification
+        // 🔔 Gửi Kafka
         // =============================
 
-        Account actor = accountService.getAccountById(accountId);
-        List<String> listReceiver = memberRepository.findAccountIdsByProjectId(member_saved.getProject().getId());
-        MemberPayload payload = memberMapper.toPayload(member_saved, actorMapper.toActorDto(actor), listReceiver);
-        genericEventPublisher.publishMemberEvent(member_saved.getProject().getId(), payload, EventType.PROJECT_MEMBER_ROLE_UPDATED);
+        memberEventService.publishRoleUpdated(member_saved);
 
         return memberMapper.toResponse(member_saved);
     }
@@ -198,16 +194,17 @@ public class MemberServiceImpl implements MemberService {
 
         // Gửi kafka cho event
 
-        MemberPayload payload = memberMapper.toPayload(member_saved, null, null);
-        genericEventPublisher.publishMemberEvent(member_saved.getProject().getId(), payload, EventType.PROJECT_MEMBER_REMOVED);
+        memberEventService.publishMemberRemoved(member_saved);
 
         return memberMapper.toResponse(member_saved);
     }
 
     @Override
-    public MemberResponseDTO responseRequestMember(String idProject, MemberUpdateStatusRequestDTO requestDTO, Account account) {
+    public MemberResponseDTO responseRequestMember(String idProject, MemberUpdateStatusRequestDTO requestDTO) {
 
-        Optional<Member> optMember = memberRepository.findFirstByAccountIdAndProjectIdAndIsDeletedFalse(account.getId(), idProject);
+        Account actor = RequestContext.getAccount();
+
+        Optional<Member> optMember = memberRepository.findFirstByAccountIdAndProjectIdAndIsDeletedFalse(actor.getId(), idProject);
 
         if (optMember.isEmpty()) {
             throw new ForbiddenException(BusinessErrorCode.TASKFLOW_ACCESS_DENIED,
@@ -249,13 +246,11 @@ public class MemberServiceImpl implements MemberService {
         // 🔔 Gửi Kafka Notification
         // =============================
 
-        List<String> listReceiver = memberRepository.findAccountIdsByProjectId(idProject);
-        MemberPayload payload = memberMapper.toPayload(member, actorMapper.toActorDto(account), listReceiver);
         if (member.getStatus() == StatusMember.ACCEPTED) {
-            genericEventPublisher.publishMemberEvent(idProject, payload, EventType.PROJECT_MEMBER_ACCEPTED);
+            memberEventService.publishInviteAccepted(member);
 
         } else {
-            genericEventPublisher.publishMemberEvent(idProject, payload, EventType.PROJECT_MEMBER_DECLINED);
+            memberEventService.publishInviteDeclined(member);
 
         }
 

@@ -1,19 +1,20 @@
 package aws.todolist.taskflow.controller;
 
 import aws.todolist.taskflow.api.ApiResponse;
-import aws.todolist.taskflow.service.AwsService;
+import aws.todolist.taskflow.service.ServiceInterface.AwsService;
 import io.jsonwebtoken.io.IOException;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
-import java.net.URISyntaxException;
 
 @RestController
 @RequestMapping("/s3bucketstorage")
