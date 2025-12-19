@@ -1,10 +1,10 @@
 package aws.todolist.auth.dto.twoFactor;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
 public class TwoFactorVerifyForm {
-    @NotBlank(message = "OTP không được để trống")
-    private String otp;
+    @NotNull(message = "OTP không được để trống")
+    private int otp;
 }

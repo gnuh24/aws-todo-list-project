@@ -14,6 +14,7 @@ import com.warrenstrange.googleauth.GoogleAuthenticatorQRGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -49,26 +50,28 @@ public class TwoFactorServiceImpl implements TwoFactorService {
 		return resp;
 	}
 	
-//	@Override
-//	public void verify2FA(Account account, int otp) {
-//		Object secretObj = redisService.get("2FA_PENDING_SECRET:" + account.getId());
-//		if (secretObj == null) {
-//			throw new TwoFactorException("2FA secret đã hết hạn hoặc chưa setup");
-//		}
-//
-//		String secret = secretObj.toString();
-//		if (!gAuth.authorize(secret, otp)) {
-//			throw new TwoFactorFailedException("OTP không hợp lệ");
-//		}
-//
-//		// Gắn secret vào account, enable 2FA
-//		account.setTwoFactorSecret(secret);
-//		account.setTwoFactorEnabled(true);
-//		accountService.save(account);
-//
-//		// Xóa secret tạm
-//		redisService.delete("2FA_PENDING_SECRET:" + account.getId());
-//	}
+	@Override
+	public void verify2FA(String accountId, int otp) {
+		Account account = accountService.getAccountById(accountId);
+		Object secretObj = redisService.get( RedisConstants.TWO_FA_PENDING_SECRET + ":" + account.getEmail());
+		if (secretObj == null) {
+			throw new TwoFactorFailedException("2FA secret đã hết hạn hoặc chưa setup");
+		}
+
+		String secret = secretObj.toString();
+		if (!gAuth.authorize(secret, otp)) {
+			throw new TwoFactorFailedException("OTP không hợp lệ");
+		}
+
+		// Gắn secret vào account, enable 2FA
+		account.setTwoFactorSecret(secret);
+		account.setTwoFactorEnabled(true);
+		account.setTwoFactorVerifiedAt(LocalDateTime.now());
+		accountService.saveAccount(account);
+
+		// Xóa secret tạm
+		redisService.delete("2FA_PENDING_SECRET:" + account.getEmail());
+	}
 //
 //	@Override
 //	public boolean verifyLoginOTP(Account account, int otp) {
