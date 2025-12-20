@@ -13,9 +13,7 @@ public interface TwoFactorService {
 	 * Verify OTP và bật 2FA cho account
 	 */
 	void verify2FA(String accountId, int otp);
+	
+	void disable2FA(String accountId, int otp);
 
-//	/**
-//	 * Verify OTP khi login
-//	 */
-//	boolean verifyLoginOTP(Account account, int otp);
 }

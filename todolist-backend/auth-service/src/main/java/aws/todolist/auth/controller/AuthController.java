@@ -3,6 +3,7 @@ package aws.todolist.auth.controller;
 import aws.todolist.auth.api.ApiResponse;
 import aws.todolist.auth.dto.account.AccountRedisDTO;
 import aws.todolist.auth.dto.auth.*;
+import aws.todolist.auth.dto.twoFactor.TwoFactorDisableForm;
 import aws.todolist.auth.dto.twoFactor.TwoFactorSetupResponse;
 import aws.todolist.auth.dto.twoFactor.TwoFactorVerifyForm;
 import aws.todolist.auth.entity.Account;
@@ -81,7 +82,17 @@ public class AuthController {
 			new ApiResponse<>(200, "Xác thực 2FA thành công", null)
 		);
 	}
-
+	
+	@PostMapping("/2fa/disable")
+	public ResponseEntity<ApiResponse<Void>> disable2FA(
+		@RequestHeader("X-User-Id") String accountId,
+		@RequestBody TwoFactorDisableForm req
+	) {
+		twoFactorService.disable2FA(accountId, req.getOtp());
+		return ResponseEntity.ok(
+			new ApiResponse<>(200, "Vô hiệu hóa xác thực 2FA thành công", null)
+		);
+	}
 	
 	
 	/**
