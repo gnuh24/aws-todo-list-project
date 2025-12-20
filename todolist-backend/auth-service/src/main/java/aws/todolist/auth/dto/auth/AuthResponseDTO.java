@@ -26,6 +26,10 @@ public class AuthResponseDTO {
 	@Schema(description = "Mã token để xác thực", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
 	private String token;
 	
+	private boolean receiveEmail;
+	
+	private boolean twoFactorEnabled;
+	
 	@Schema(description = "Thời gian hết hạn của token", example = "2025-05-10T12:00:00")
 	private String tokenExpirationTime;
 	

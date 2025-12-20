@@ -1,5 +1,6 @@
 package aws.todolist.user.dto.account;
 
+import jakarta.persistence.Column;
 import lombok.*;
 import java.time.LocalDateTime;
 
@@ -15,6 +16,7 @@ public class AccountDetailResponseDTO {
     private String role;
     private String status;
     private boolean receiveEmail;
+	private boolean twoFactorEnabled;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
