@@ -1,6 +1,6 @@
 package aws.todolist.notification.dto.notification;
 
-import aws.todolist.notification.entity.Notification;
+import aws.todolist.notification.enums.NotificationType;
 import lombok.Builder;
 import lombok.Data;
 
@@ -13,7 +13,7 @@ public class WebSocketResponse {
     private String id;
     private String title;
     private String content;
-    private Notification.NotificationType type;
+    private NotificationType type;
     private boolean read;
     private LocalDateTime createdAt;
     private String receiverId;

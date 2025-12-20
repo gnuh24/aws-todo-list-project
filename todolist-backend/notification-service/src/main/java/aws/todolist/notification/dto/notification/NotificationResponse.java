@@ -1,6 +1,5 @@
 package aws.todolist.notification.dto.notification;
-
-import aws.todolist.notification.entity.Notification.NotificationType;
+import aws.todolist.notification.enums.NotificationType;
 import lombok.Builder;
 import lombok.Data;
 import java.time.LocalDateTime;

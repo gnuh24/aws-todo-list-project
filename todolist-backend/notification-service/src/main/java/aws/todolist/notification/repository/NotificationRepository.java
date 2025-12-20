@@ -1,6 +1,7 @@
 package aws.todolist.notification.repository;
 
 import aws.todolist.notification.entity.Notification;
+import aws.todolist.notification.enums.NotificationType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -48,7 +49,7 @@ public interface NotificationRepository extends JpaRepository<Notification, Stri
 	List<Notification> findDistinctActorAndType(
 			List<String> projectIds,
 			List<String> actorIds,
-			List<Notification.NotificationType> types
+			List<NotificationType> types
 	);
 
 }

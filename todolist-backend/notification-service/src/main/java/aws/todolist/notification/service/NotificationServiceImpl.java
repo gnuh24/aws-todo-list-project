@@ -25,13 +25,10 @@ public class NotificationServiceImpl implements NotificationService {
 	private final NotificationRepository notificationRepository;
 	
 	@Autowired
-	private AccountRepository accountRepository;
+	private AccountService accountService;
 	
 	@Autowired
 	private AppLogger appLogger;
-
-	@Autowired
-	private WebSocketService webSocketService;
 
 	@Autowired
 	private EmailService emailService;
@@ -69,18 +66,13 @@ public class NotificationServiceImpl implements NotificationService {
 	public void create(NotificationMessage msg) {
 		try {
 			// Tìm actor và receiver trong DB
-			Optional<Account> receiverOpt = accountRepository.findById(msg.getReceiverId());
-			Optional<Account> actorOpt = accountRepository.findById(msg.getActorId());
-			
-			if (receiverOpt.isEmpty()) {
-				System.err.println("⚠️ Receiver " + msg.getReceiverId() + " không tồn tại, bỏ qua");
-				return;
-			}
-			
+			Account receiver = accountService.getAccountByEmail(msg.getReceiverEmail());
+			Account actor = accountService.getAccountById(msg.getActorId());
+
 			Notification notification = Notification.builder()
 			    .id(UUID.randomUUID().toString())
-			    .receiver(receiverOpt.get())
-			    .actor(actorOpt.orElse(null))
+			    .receiver(receiver)
+			    .actor(actor)
 			    .projectId(msg.getProjectId())
 			    .taskId(msg.getTaskId())
 			    .type(msg.getType())
@@ -90,26 +82,21 @@ public class NotificationServiceImpl implements NotificationService {
 			    .createdAt(LocalDateTime.now())
 			    .isDeleted(false)
 			    .build();
-			
+
 			notificationRepository.save(notification);
-			
+
 			System.err.println("💾 [NotificationService] Saved notification "
-			    + msg.getType() + " for receiver " + msg.getReceiverId());
+			    + msg.getType() + " for receiver " + msg.getReceiverEmail());
 
-
-			// Gửi thông báo cho user thông qua websocket
-
-			System.err.println("Sent notifications to "+ receiverOpt.get().getEmail());
-
-			webSocketService.sendToUserNew(receiverOpt.get().getEmail(),notification);
 
 			// Kiểm tra xem người dùng có muốn gửi thông báo đến email hay không
-			if(receiverOpt.get().isReceiveEmail()){
+			if(receiver.isReceiveEmail()){
 				emailService.sendNotification(notification);
 			}
 
 
-			
+
+
 		} catch (Exception e) {
 			System.err.println("❌ Lỗi khi tạo Notification: " + e.getMessage());
 			e.printStackTrace();

@@ -1,6 +1,7 @@
 package aws.todolist.notification.dto.activity;
 
 import aws.todolist.notification.entity.Notification;
+import aws.todolist.notification.enums.NotificationType;
 import lombok.Builder;
 import lombok.Data;
 
@@ -12,7 +13,7 @@ public class ActivityResponse {
 
     private String id;
     private String content;
-    private Notification.NotificationType type;
+    private NotificationType type;
     private String projectId;
     private LocalDateTime createdAt;
     private String actorId;
