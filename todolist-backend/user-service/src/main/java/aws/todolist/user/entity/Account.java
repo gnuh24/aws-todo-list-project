@@ -47,6 +47,7 @@ public class Account implements Serializable, UserDetails {
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 20)
 	private Status status = Status.ACTIVE;
+
 	
 	@Column(name = "created_at", nullable = false)
 	private LocalDateTime createdAt = LocalDateTime.now();
@@ -63,6 +64,15 @@ public class Account implements Serializable, UserDetails {
 
 	@Column(name = "receive_email", nullable = false)
 	private boolean receiveEmail = false;
+	
+	@Column(name = "two_factor_enabled", nullable = false)
+	private boolean twoFactorEnabled;
+	
+	@Column(name = "two_factor_secret", length = 64)
+	private String twoFactorSecret;
+	
+	@Column(name = "two_factor_verified_at")
+	private LocalDateTime twoFactorVerifiedAt;
 	
 	// --- ENUMS ---
 	public enum Role {

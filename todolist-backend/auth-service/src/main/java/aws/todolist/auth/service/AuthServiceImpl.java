@@ -82,7 +82,7 @@ public class AuthServiceImpl implements AuthService {
 	public AuthResponseDTO login(LoginRequestForm request) {
 		Account account = accountService.getAccountByUsername(request.getEmail());
 		
-		if (account == null || account.isEnabled() || !passwordEncoder.matches(request.getPassword(), account.getPassword())) {
+		if (account == null || !account.isEnabled() || !passwordEncoder.matches(request.getPassword(), account.getPassword())) {
 			throw new InvalidCredentialsException();
 		}
 		
