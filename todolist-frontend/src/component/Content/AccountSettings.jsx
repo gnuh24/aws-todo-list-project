@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Switch } from "antd";
-import { https_user } from "../../service/api";
+import { https_user, https_authupdate } from "../../service/api";
+import { Switch, Modal, Input, message } from "antd";
 
 export default function AccountSettings({
     onGotoChangePassword,
@@ -17,6 +17,11 @@ export default function AccountSettings({
     const [editing, setEditing] = useState(false);
     const [isNotificationEmail, setIsNotificationEmail] = useState(receiveEmail | false);
     const [isTwoFactorEnabled, setIsTwoFactorEnabled] = useState(twoFactorEnabled | false);
+
+    const [disable2FAModalOpen, setDisable2FAModalOpen] = useState(false);
+    const [otp, setOtp] = useState("");
+    const [loadingDisable2FA, setLoadingDisable2FA] = useState(false);
+
 
     const handleCancel = () => {
         setTempName(name);
@@ -69,12 +74,51 @@ export default function AccountSettings({
 
     const handleUpdateTwoFactorEnabled = async (value) => {
         if (value) {
-            onGotoEnable2FA()
+            // Enable 2FA → chuyển sang flow setup
+            onGotoEnable2FA();
         } else {
+            // Disable 2FA → mở dialog nhập OTP
+            setOtp("");
+            setDisable2FAModalOpen(true);
+        }
+    };
 
+    const handleDisable2FA = async () => {
+        if (!otp || otp.length < 6) {
+            message.error("Vui lòng nhập OTP hợp lệ");
+            return;
         }
 
-    }
+        try {
+            setLoadingDisable2FA(true);
+
+            await https_authupdate.post("/v1/2fa/disable", {
+                otp: Number(otp),
+            });
+
+            message.success("Đã tắt xác thực 2 bước");
+
+            // Update UI
+            setIsTwoFactorEnabled(false);
+
+            // Update localStorage
+            const updated = {
+                ...dataUser,
+                twoFactorEnabled: false,
+            };
+            localStorage.setItem("USER_INFO", JSON.stringify(updated));
+
+            setDisable2FAModalOpen(false);
+        } catch (error) {
+            message.error(
+                error?.response?.data?.message || "OTP không hợp lệ"
+            );
+        } finally {
+            setLoadingDisable2FA(false);
+        }
+    };
+
+
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -209,6 +253,32 @@ export default function AccountSettings({
                     2FA is disabled on your Todoist account.
                 </p>
             </div>
+
+            <Modal
+                open={disable2FAModalOpen}
+                title="Disable Two-Factor Authentication"
+                onCancel={() => {
+                    setDisable2FAModalOpen(false);
+                    setIsTwoFactorEnabled(true); // rollback switch
+                }}
+                onOk={handleDisable2FA}
+                confirmLoading={loadingDisable2FA}
+                okText="Disable"
+                cancelText="Cancel"
+            >
+                <p className="text-sm text-gray-600 mb-2">
+                    Nhập mã OTP từ Google Authenticator để xác nhận tắt 2FA
+                </p>
+
+                <Input
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    placeholder="Enter 6-digit OTP"
+                    maxLength={6}
+                    autoFocus
+                />
+            </Modal>
+
 
             {/* Email Notifications */}
             <div className="mb-8">
