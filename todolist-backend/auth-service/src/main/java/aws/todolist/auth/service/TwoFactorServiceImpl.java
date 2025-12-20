@@ -72,10 +72,30 @@ public class TwoFactorServiceImpl implements TwoFactorService {
 		// Xóa secret tạm
 		redisService.delete("2FA_PENDING_SECRET:" + account.getEmail());
 	}
-//
-//	@Override
-//	public boolean verifyLoginOTP(Account account, int otp) {
-//		if (!account.isTwoFactorEnabled()) return true;
-//		return gAuth.authorize(account.getTwoFactorSecret(), otp);
-//	}
+	
+	@Override
+	public void disable2FA(String accountId, int otp) {
+		Account account = accountService.getAccountById(accountId);
+		
+		// Chưa bật 2FA mà đòi tắt
+		if (!account.isTwoFactorEnabled() || account.getTwoFactorSecret() == null) {
+			throw new TwoFactorFailedException("Tài khoản chưa bật 2FA");
+		}
+		
+		String secret = account.getTwoFactorSecret();
+		
+		// Verify OTP bằng secret đang lưu trong DB
+		if (!gAuth.authorize(secret, otp)) {
+			throw new TwoFactorFailedException("OTP không hợp lệ");
+		}
+		
+		// Disable 2FA
+		account.setTwoFactorEnabled(false);
+		account.setTwoFactorSecret(null);
+		account.setTwoFactorVerifiedAt(null);
+		
+		accountService.saveAccount(account);
+	}
+	
+	
 }
