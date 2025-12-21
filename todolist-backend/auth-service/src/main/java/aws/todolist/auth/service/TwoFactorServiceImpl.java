@@ -74,7 +74,7 @@ public class TwoFactorServiceImpl implements TwoFactorService {
 	}
 	
 	@Override
-	public void disable2FA(String accountId, int otp) {
+	public void disable2FA(String accountId, int totp) {
 		Account account = accountService.getAccountById(accountId);
 		
 		// Chưa bật 2FA mà đòi tắt
@@ -85,7 +85,7 @@ public class TwoFactorServiceImpl implements TwoFactorService {
 		String secret = account.getTwoFactorSecret();
 		
 		// Verify OTP bằng secret đang lưu trong DB
-		if (!gAuth.authorize(secret, otp)) {
+		if (!gAuth.authorize(secret, totp)) {
 			throw new TwoFactorFailedException("OTP không hợp lệ");
 		}
 		
@@ -95,6 +95,14 @@ public class TwoFactorServiceImpl implements TwoFactorService {
 		account.setTwoFactorVerifiedAt(null);
 		
 		accountService.saveAccount(account);
+	}
+	
+	@Override
+	public boolean verifyOtp(String secret, int totp) {
+		if (secret == null || secret.isBlank()) {
+			return false;
+		}
+		return gAuth.authorize(secret, totp);
 	}
 	
 	

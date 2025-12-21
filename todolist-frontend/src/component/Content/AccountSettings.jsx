@@ -5,8 +5,8 @@ import { Switch, Modal, Input, message } from "antd";
 export default function AccountSettings({
     onGotoChangePassword,
     onGotoChangeEmail,
-    onGotoEnable2FA
-
+    onGotoEnable2FA,
+    refreshKey
 }) {
     const dataUser = JSON.parse(localStorage.getItem("USER_INFO")) || {};
     const { id, displayName, email, avatar, twoFactorEnabled, receiveEmail } = dataUser;
@@ -119,20 +119,24 @@ export default function AccountSettings({
     };
 
 
+    const fetchUser = async () => {
+        try {
+            const res = await https_user.get("/v1/accounts/me"); // phải await
+            setIsNotificationEmail(res.data.data.receiveEmail);
+            setIsTwoFactorEnabled(res.data.data.twoFactorEnabled);
+        } catch (e) {
+            console.error(e);
+        }
+    };
 
     useEffect(() => {
-        const fetchUser = async () => {
-            try {
-                const res = await https_user.get("/v1/accounts/me"); // phải await
-                setIsNotificationEmail(res.data.data.receiveEmail);
-                setIsTwoFactorEnabled(res.data.data.twoFactorEnabled);
-            } catch (e) {
-                console.error(e);
-            }
-        };
-
         fetchUser();
     }, []);
+
+    useEffect(() => {
+        fetchUser();
+    }, [refreshKey]);
+
 
     return (
         <div className="text-gray-700">

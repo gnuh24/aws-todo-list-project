@@ -1,138 +1,160 @@
 import {
-  ArrowLeftOutlined,
-  EyeInvisibleOutlined,
-  EyeTwoTone,
+    ArrowLeftOutlined,
+    EyeInvisibleOutlined,
+    EyeTwoTone,
 } from "@ant-design/icons";
-import { Input, Button, message } from "antd";
+import { Input } from "antd";
 import { useState } from "react";
 import { toast } from "sonner";
 import { https_authupdate } from "../../service/api";
 
 export default function ChangePassword({ onBack }) {
-  const [current, setCurrent] = useState("");
-  const [newPw, setNewPw] = useState("");
-  const [confirm, setConfirm] = useState("");
-  const handleChangePassword = async () => {
-    if (!current || !newPw || !confirm) {
-      return toast.error("Please fill in all fields.");
-    }
 
-    if (newPw.length < 6) {
-      return toast.error("New password must be at least 6 characters.");
-    }
+    const [current, setCurrent] = useState("");
+    const [newPw, setNewPw] = useState("");
+    const [confirm, setConfirm] = useState("");
+    const [totp, setTotp] = useState("");
+    const [requireTotp, setRequireTotp] = useState(false);
 
-    if (newPw !== confirm) {
-      return toast.error("New passwords do not match.");
-    }
 
-    try {
-      const res = await https_authupdate.patch("/v1/update-password", {
-        oldPassword: current,
-        newPassword: newPw,
-      });
+    const handleChangePassword = async () => {
+        if (!current || !newPw || !confirm) {
+            return toast.error("Please fill in all fields.");
+        }
 
-      toast.success("Password updated successfully!");
+        if (newPw.length < 6) {
+            return toast.error("New password must be at least 6 characters.");
+        }
 
-      // Nếu backend trả token mới thì cập nhật
-      if (res.data?.data?.token) {
-        const user = JSON.parse(localStorage.getItem("USER_INFO")) || {};
-        user.token = res.data.data.token;
-        localStorage.setItem("USER_INFO", JSON.stringify(user));
-      }
+        if (newPw !== confirm) {
+            return toast.error("New passwords do not match.");
+        }
 
-      // Reset input
-      setCurrent("");
-      setNewPw("");
-      setConfirm("");
-    } catch (err) {
-      console.error(err);
+        // Nếu backend đã yêu cầu OTP thì mới validate
+        if (requireTotp) {
+            if (!totp) {
+                return toast.error("Please enter your 2FA authentication code.");
+            }
 
-      if (err.response?.status === 400) {
-        return toast.error("Incorrect old password.");
-      }
+            if (!/^\d{6}$/.test(totp)) {
+                return toast.error("2FA code must be a 6-digit number.");
+            }
+        }
 
-      toast.error("Failed to update password.");
-    }
-  };
+        try {
+            await https_authupdate.patch("/v1/update-password", {
+                oldPassword: current,
+                newPassword: newPw,
+                ...(requireTotp && { totp: Number(totp) }),
+            });
 
-  return (
-    <div className="text-gray-700">
-      {/* HEADER */}
-      <div className="flex items-center gap-3 mb-8">
-        <button onClick={onBack} className="p-1 rounded hover:bg-gray-200">
-          <ArrowLeftOutlined />
-        </button>
+            toast.success("Password updated successfully!");
 
-        <h2 className="text-xl font-semibold">Change password</h2>
-      </div>
+            setCurrent("");
+            setNewPw("");
+            setConfirm("");
+            setTotp("");
+            setRequireTotp(false);
 
-      {/* CURRENT PASSWORD */}
-      <div className="mb-6">
-        <h3 className="text-sm font-medium mb-1">Current password</h3>
+        } catch (err) {
+            const code = err?.response?.data?.code;
+            const msg = err?.response?.data?.message;
 
-        <Input.Password
-          value={current}
-          onChange={(e) => setCurrent(e.target.value)}
-          className="w-80"
-          iconRender={(visible) =>
-            visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
-          }
-        />
+            // ✅ Backend yêu cầu 2FA
+            if (code === "SYS-AUTH-029") {
+                setRequireTotp(true);
+                return toast.info("Please enter your 2FA authentication code.");
+            }
 
-        <button className="text-sm text-red-500 mt-2 hover:underline">
-          Forgot password?
-        </button>
-      </div>
+            toast.error(msg || "Failed to update password.");
+        }
+    };
 
-      {/* NEW PASSWORD */}
-      <div className="mb-6">
-        <h3 className="text-sm font-medium mb-1">New password</h3>
 
-        <Input.Password
-          value={newPw}
-          onChange={(e) => setNewPw(e.target.value)}
-          className="w-80"
-          iconRender={(visible) =>
-            visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
-          }
-        />
-      </div>
+    return (
+        <div className="text-gray-700">
+            {/* HEADER */}
+            <div className="flex items-center gap-3 mb-8">
+                <button onClick={onBack} className="p-1 rounded hover:bg-gray-200">
+                    <ArrowLeftOutlined />
+                </button>
+                <h2 className="text-xl font-semibold">Change password</h2>
+            </div>
 
-      {/* CONFIRM NEW PASSWORD */}
-      <div className="mb-6">
-        <h3 className="text-sm font-medium mb-1">Confirm new password</h3>
+            {/* CURRENT PASSWORD */}
+            <div className="mb-6">
+                <h3 className="text-sm font-medium mb-1">Current password</h3>
+                <Input.Password
+                    value={current}
+                    onChange={(e) => setCurrent(e.target.value)}
+                    className="w-80"
+                    iconRender={(v) => v ? <EyeTwoTone /> : <EyeInvisibleOutlined />}
+                />
+            </div>
 
-        <Input.Password
-          value={confirm}
-          onChange={(e) => setConfirm(e.target.value)}
-          className="w-80"
-          iconRender={(visible) =>
-            visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
-          }
-        />
-      </div>
+            {/* NEW PASSWORD */}
+            <div className="mb-6">
+                <h3 className="text-sm font-medium mb-1">New password</h3>
+                <Input.Password
+                    value={newPw}
+                    onChange={(e) => setNewPw(e.target.value)}
+                    className="w-80"
+                    iconRender={(v) => v ? <EyeTwoTone /> : <EyeInvisibleOutlined />}
+                />
+            </div>
 
-      {/* FOOTER */}
-      <p className="text-xs text-gray-500 mb-10">
-        Your password must be at least 8 characters long. Avoid common words or
-        patterns.
-      </p>
+            {/* CONFIRM PASSWORD */}
+            <div className="mb-6">
+                <h3 className="text-sm font-medium mb-1">Confirm new password</h3>
+                <Input.Password
+                    value={confirm}
+                    onChange={(e) => setConfirm(e.target.value)}
+                    className="w-80"
+                    iconRender={(v) => v ? <EyeTwoTone /> : <EyeInvisibleOutlined />}
+                />
+            </div>
 
-      <div className="flex justify-end gap-3 pr-3">
-        <button
-          onClick={onBack}
-          className="px-4 py-1.5 rounded border text-sm hover:bg-gray-100"
-        >
-          Cancel
-        </button>
+            {/* ✅ TOTP INPUT – chỉ hiện khi backend yêu cầu */}
+            {requireTotp && (
+                <div className="mb-6">
+                    <h3 className="text-sm font-medium mb-1">
+                        2FA authentication code
+                    </h3>
 
-        <button
-          onClick={handleChangePassword}
-          className="px-4 py-1.5 rounded bg-[#f8b4a0] text-white text-sm hover:bg-[#f7a58d]"
-        >
-          Change password
-        </button>
-      </div>
-    </div>
-  );
+                    <Input
+                        value={totp}
+                        onChange={(e) => setTotp(e.target.value)}
+                        placeholder="Enter 6-digit code"
+                        maxLength={6}
+                        className="w-40"
+                        autoFocus
+                    />
+
+                    <p className="text-xs text-gray-500 mt-1">
+                        Enter the 6-digit code generated by your authenticator app
+                        (Google Authenticator, Microsoft Authenticator, Authy, etc.).
+                    </p>
+                </div>
+            )}
+
+
+
+            {/* FOOTER */}
+            <div className="flex justify-end gap-3 pr-3">
+                <button
+                    onClick={onBack}
+                    className="px-4 py-1.5 rounded border text-sm hover:bg-gray-100"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    onClick={handleChangePassword}
+                    className="px-4 py-1.5 rounded bg-[#f8b4a0] text-white text-sm hover:bg-[#f7a58d]"
+                >
+                    Change password
+                </button>
+            </div>
+        </div>
+    );
 }

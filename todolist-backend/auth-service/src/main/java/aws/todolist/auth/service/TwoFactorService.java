@@ -14,6 +14,6 @@ public interface TwoFactorService {
 	 */
 	void verify2FA(String accountId, int otp);
 	
-	void disable2FA(String accountId, int otp);
-
+	void disable2FA(String accountId, int totp);
+	boolean verifyOtp(String secret, int totp);
 }

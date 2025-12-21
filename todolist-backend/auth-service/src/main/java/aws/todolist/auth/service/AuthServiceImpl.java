@@ -5,12 +5,13 @@ import aws.todolist.auth.dto.account.AccountRedisDTO;
 import aws.todolist.auth.dto.auth.*;
 import aws.todolist.auth.entity.Account;
 import aws.todolist.auth.exceptionHandler.exceptions.DeleteConfirmationRequiredException;
-import aws.todolist.auth.exceptionHandler.exceptions.twoFactorException.TwoFactorFailedException;
 import aws.todolist.auth.exceptionHandler.exceptions.jwtException.*;
 import aws.todolist.auth.exceptionHandler.exceptions.loginException.AccountInactiveException;
 import aws.todolist.auth.exceptionHandler.exceptions.loginException.AccountLockedException;
 import aws.todolist.auth.exceptionHandler.exceptions.loginException.InvalidCredentialsException;
 import aws.todolist.auth.exceptionHandler.exceptions.otpException.OtpNotFoundException;
+import aws.todolist.auth.exceptionHandler.exceptions.twoFactorException.TwoFactorFailedException;
+import aws.todolist.auth.exceptionHandler.exceptions.twoFactorException.TwoFactorRequiredException;
 import aws.todolist.auth.integration.redis.RedisConstants;
 import aws.todolist.auth.integration.redis.RedisService;
 import aws.todolist.auth.mapper.AuthMapper;
@@ -54,6 +55,8 @@ public class AuthServiceImpl implements AuthService {
 	@Autowired
 	private AuthMapper authMapper;
 	
+	@Autowired
+	private TwoFactorService twoFactorService;
 	
 	@Override
 	@Transactional
@@ -235,9 +238,32 @@ public class AuthServiceImpl implements AuthService {
 	public Account updatePassword(String accountId, UpdatePasswordForm form) {
 		
 		Account account = accountService.getAccountById(accountId);
+		
 		if (!passwordEncoder.matches(form.getOldPassword(), account.getPassword())) {
 			throw new TwoFactorFailedException("Mật khẩu hiện không đúng !!");
 		}
+		
+		if (account.isTwoFactorEnabled()) {
+			if (form.getTotp() == null) {
+				throw new TwoFactorRequiredException(
+					"Tài khoản của bạn đang bật xác thực 2 lớp (2FA). Vui lòng nhập mã xác thực từ ứng dụng."
+				);
+			}
+			
+			boolean validTotp = twoFactorService.verifyOtp(
+				account.getTwoFactorSecret(),
+				form.getTotp()
+			);
+			
+			if (!validTotp) {
+				throw new TwoFactorFailedException(
+					"Mã xác thực 2FA không hợp lệ hoặc đã hết hạn. Vui lòng thử lại."
+				);
+			}
+			
+		}
+		
+	
 		
 		return accountService.updatePassword(account, form.getNewPassword());
 		
@@ -268,7 +294,6 @@ public class AuthServiceImpl implements AuthService {
 		// Send OTP via Kafka (email)
 		kafkaProducerService.sendDeleteAccount(email, otp);
 	}
-	
 	
 	@Override
 	public Account updateEmail(String accountId, UpdateEmailForm form) {
@@ -417,7 +442,5 @@ public class AuthServiceImpl implements AuthService {
 		 * ===================================================== */
 		return accountService.deleteAccount(account);
 	}
-	
-	
 	
 }
