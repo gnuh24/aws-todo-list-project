@@ -99,8 +99,7 @@ public class AccountServiceImpl implements AccountService {
 		
 		return accountRepository.save(account);
 	}
-
-
+	
 //    @Override
 //    public Account updateStatusOfAccount(String accountId, Account.Status status) {
 //        Account account = getAccountById(accountId);
@@ -108,6 +107,8 @@ public class AccountServiceImpl implements AccountService {
 //        return accountRepository.save(account);
 //    }
 //
+
+
 //    @Override
 //    public Account updateRoleOfAccount(String accountId, Account.Role role) {
 //        Account account = getAccountById(accountId);

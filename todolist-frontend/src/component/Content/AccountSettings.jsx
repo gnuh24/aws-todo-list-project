@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { https_user, https_authupdate } from "../../service/api";
 import { Switch, Modal, Input, message } from "antd";
+import { Button } from "antd";
 
 export default function AccountSettings({
     onGotoChangePassword,
     onGotoChangeEmail,
     onGotoEnable2FA,
+    onGotoDeleteAccount,
     refreshKey
 }) {
     const dataUser = JSON.parse(localStorage.getItem("USER_INFO")) || {};
@@ -27,6 +29,8 @@ export default function AccountSettings({
         setTempName(name);
         setEditing(false);
     };
+
+
 
     const handleUpdate = async () => {
         try {
@@ -300,6 +304,11 @@ export default function AccountSettings({
                     You will receive updates and alerts via email.
                 </p>
             </div>
+
+            <Button danger onClick={onGotoDeleteAccount}>
+                Xóa tài khoản
+            </Button>
+
 
         </div>
     );

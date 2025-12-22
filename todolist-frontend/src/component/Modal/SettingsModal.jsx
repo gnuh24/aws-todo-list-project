@@ -5,6 +5,7 @@ import ChangePassword from "../Content/ChangePassword";
 import SettingsSidebar from "../Sidebar/SettingsSidebar";
 import ChangeEmail from "../Content/ChangeEmail";
 import Enable2FA from "../Content/Enable2FA"
+import DeleteAccount from "../Content/DeleteAccount";
 
 export default function SettingsModal({ open, onClose }) {
     const [page, setPage] = useState("account");
@@ -29,6 +30,7 @@ export default function SettingsModal({ open, onClose }) {
                             onGotoChangePassword={() => setPage("change_password")}
                             onGotoChangeEmail={() => setPage("change_email")}
                             onGotoEnable2FA={() => setPage("enable_2fa")}
+                            onGotoDeleteAccount={() => setPage("delete_account")}
                             refreshKey={refreshKey}
                         />
                     )}
@@ -44,6 +46,10 @@ export default function SettingsModal({ open, onClose }) {
                             setPage("account");
                         }} />
                     )}
+                    {page === "delete_account" && (
+                        <DeleteAccount onBack={() => setPage("account")} />
+                    )}
+
                 </div>
             </div>
         </Modal>

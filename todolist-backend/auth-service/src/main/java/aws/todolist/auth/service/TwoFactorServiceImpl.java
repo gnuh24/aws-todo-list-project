@@ -35,7 +35,7 @@ public class TwoFactorServiceImpl implements TwoFactorService {
 		GoogleAuthenticatorKey key = gAuth.createCredentials();
 		
 		String qrUrl = GoogleAuthenticatorQRGenerator.getOtpAuthURL(
-			"AWS Todolist",
+			"AWS Todolist Dev",
 			email,
 			key
 		).replace("margin=0", "margin=10");

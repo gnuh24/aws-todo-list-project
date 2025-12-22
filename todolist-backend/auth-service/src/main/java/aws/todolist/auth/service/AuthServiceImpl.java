@@ -426,11 +426,16 @@ public class AuthServiceImpl implements AuthService {
 		Account account = accountService.getAccountById(accountId);
 		
 		/* =====================================================
+		 * 0. Validate email belongs to account
+		 * ===================================================== */
+		if (!account.getEmail().equalsIgnoreCase(form.getEmail())) {
+			throw new TwoFactorFailedException("Email không khớp với tài khoản hiện tại.");
+		}
+		
+		/* =====================================================
 		 * 1. Confirm text
 		 * ===================================================== */
-		String expectedConfirm = "delete";
-		if (form.getConfirmText() == null ||
-			!expectedConfirm.equalsIgnoreCase(form.getConfirmText().trim())) {
+		if (!"delete".equalsIgnoreCase(form.getConfirmText().trim())) {
 			throw new DeleteConfirmationRequiredException();
 		}
 		
@@ -442,33 +447,54 @@ public class AuthServiceImpl implements AuthService {
 		}
 		
 		/* =====================================================
-		 * 3. Verify OTP (default – chưa dùng TOTP)
+		 * 3. Verify 2FA
 		 * ===================================================== */
-		String redisDeleteOtpKey =
-			RedisConstants.OTP_DELETE_ACCOUNT + ":" + account.getEmail();
-		
-		Object otpObj = redisService.get(redisDeleteOtpKey);
-		
-		// OTP không tồn tại (chưa gửi hoặc đã hết hạn)
-		if (otpObj == null) {
-			throw new OtpNotFoundException();
+		if (account.isTwoFactorEnabled()) {
+			
+			// ---- TOTP REQUIRED ----
+			if (form.getTotp() == null) {
+				throw new TwoFactorRequiredException(
+					"Tài khoản của bạn đang bật xác thực 2 lớp (2FA). Vui lòng nhập mã từ ứng dụng xác thực."
+				);
+			}
+			
+			boolean validTotp = twoFactorService.verifyOtp(
+				account.getTwoFactorSecret(),
+				form.getTotp()
+			);
+			
+			if (!validTotp) {
+				throw new TwoFactorFailedException(
+					"Mã xác thực 2FA không hợp lệ hoặc đã hết hạn."
+				);
+			}
+			
+		} else {
+			
+			// ---- EMAIL OTP REQUIRED ----
+			String redisDeleteOtpKey =
+				RedisConstants.OTP_DELETE_ACCOUNT + ":" + account.getEmail();
+			
+			Object otpObj = redisService.get(redisDeleteOtpKey);
+			
+			if (otpObj == null) {
+				throw new OtpNotFoundException();
+			}
+			
+			if (!otpObj.toString().equals(form.getOtp())) {
+				throw new OtpNotFoundException();
+			}
+			
+			// Clear OTP sau khi verify
+			redisService.delete(redisDeleteOtpKey);
 		}
-		
-		String otpRedis = otpObj.toString();
-		
-		// OTP không khớp
-		if (!otpRedis.equals(form.getOtp())) {
-			throw new OtpNotFoundException();
-		}
-		
-		// Clear OTP sau khi verify thành công
-		redisService.delete(redisDeleteOtpKey);
 		
 		/* =====================================================
 		 * 4. Revoke token (force logout)
 		 * ===================================================== */
 		String redisBanlistAccountIdKey =
 			RedisConstants.BANLIST_ACCOUNT_ID + ":" + account.getId();
+		
 		redisService.set(redisBanlistAccountIdKey, true);
 		
 		/* =====================================================
@@ -476,5 +502,7 @@ public class AuthServiceImpl implements AuthService {
 		 * ===================================================== */
 		return accountService.deleteAccount(account);
 	}
+	
+	
 	
 }
