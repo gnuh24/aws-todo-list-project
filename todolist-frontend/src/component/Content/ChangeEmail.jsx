@@ -1,7 +1,7 @@
 import {
-  ArrowLeftOutlined,
-  EyeInvisibleOutlined,
-  EyeTwoTone,
+    ArrowLeftOutlined,
+    EyeInvisibleOutlined,
+    EyeTwoTone,
 } from "@ant-design/icons";
 import { Input, Modal, message } from "antd";
 import { useState } from "react";
@@ -9,161 +9,207 @@ import { toast } from "sonner";
 import { https_authupdate } from "../../service/api";
 
 export default function ChangeEmail({ onBack }) {
-  const dataUser = JSON.parse(localStorage.getItem("USER_INFO")) || {};
-  const currentEmail = dataUser.email;
+    const dataUser = JSON.parse(localStorage.getItem("USER_INFO")) || {};
+    const currentEmail = dataUser.email;
 
-  const [email1, setEmail1] = useState("");
-  const [email2, setEmail2] = useState("");
-  const [password, setPassword] = useState("");
+    const [email1, setEmail1] = useState("");
+    const [email2, setEmail2] = useState("");
+    const [password, setPassword] = useState("");
 
-  // OTP modal
-  const [otpModal, setOtpModal] = useState(false);
-  const [otp, setOtp] = useState("");
+    // OTP modal
+    const [otpModal, setOtpModal] = useState(false);
+    const [otp, setOtp] = useState("");
 
-  const handleSendOtp = async () => {
-    if (!email1 || !email2 || email1 !== email2) {
-      return toast.error("Emails do not match!");
-    }
+    const [requireTotp, setRequireTotp] = useState(false);
+    const [totp, setTotp] = useState("");
 
-    if (!password) {
-      return toast.error("Please enter your password.");
-    }
 
-    try {
-      // 1️⃣ CHECK EMAIL TỒN TẠI
-      const check = await https_authupdate.get(
-        `/v1/check-email?email=${email1}`
-      );
+    const handleSendOtp = async () => {
+        if (!email1 || !email2 || email1 !== email2) {
+            return toast.error("Emails do not match!");
+        }
 
-      if (check.data?.data === true) {
-        return toast.error("Email already exists. Please use another email.");
-      }
+        if (!password) {
+            return toast.error("Please enter your password.");
+        }
 
-      // 2️⃣ GỬI OTP
-      await https_authupdate.post(`/v1/send-update-email-otp/${email1}`);
+        try {
+            // 1️⃣ CHECK EMAIL TỒN TẠI
+            const check = await https_authupdate.get(
+                `/v1/check-email?email=${email1}`
+            );
 
-      setOtpModal(true);
-      message.success("OTP has been sent to your new email.");
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to send OTP.");
-    }
-  };
+            if (check.data?.data === true) {
+                return toast.error("Email already exists. Please use another email.");
+            }
 
-  const handleSubmitOtp = async () => {
-    if (!otp) return toast.error("Please enter the OTP.");
+            // 2️⃣ GỬI OTP
+            await https_authupdate.post(`/v1/send-update-email-otp/${email1}`);
 
-    try {
-      await https_authupdate.patch("/v1/update-email", {
-        otp: otp,
-        currentPassword: password,
-        newEmail: email1,
-      });
+            setOtpModal(true);
+            message.success("OTP has been sent to your new email.");
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to send OTP.");
+        }
+    };
 
-      // Update localStorage
-      const updated = { ...dataUser, email: email1 };
-      localStorage.setItem("USER_INFO", JSON.stringify(updated));
+    const handleSubmitOtp = async () => {
+        if (!otp) return toast.error("Please enter the OTP.");
 
-      message.success("Email updated successfully!");
-      setOtpModal(false);
-      onBack();
-    } catch (err) {
-      console.error(err);
-      toast.error("Invalid OTP or password.");
-    }
-  };
+        try {
+            await https_authupdate.patch("/v1/update-email", {
+                otp: otp,
+                currentPassword: password,
+                newEmail: email1,
+                ...(requireTotp && { totp: Number(totp) }),
+            });
 
-  return (
-    <div className="text-gray-700">
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-8">
-        <button onClick={onBack} className="p-1 rounded hover:bg-gray-200">
-          <ArrowLeftOutlined />
-        </button>
-        <h2 className="text-xl font-semibold">Change email address</h2>
-      </div>
+            // Update localStorage
+            const updated = { ...dataUser, email: email1 };
+            localStorage.setItem("USER_INFO", JSON.stringify(updated));
 
-      {/* Description */}
-      <p className="text-sm mb-8">
-        Update the email you use for your Todoist account. Your email is
-        currently <span className="font-medium">{currentEmail}</span>.
-      </p>
+            message.success("Email updated successfully!");
+            setOtpModal(false);
+            setRequireTotp(false);
+            setTotp("");
+            onBack();
 
-      {/* New email */}
-      <div className="mb-6">
-        <h3 className="text-sm font-medium mb-1">New email</h3>
+        } catch (err) {
+            console.error(err);
 
-        <Input
-          value={email1}
-          onChange={(e) => setEmail1(e.target.value)}
-          className="w-80"
-        />
-      </div>
+            const code = err?.response?.data?.code;
+            const msg = err?.response?.data?.message;
 
-      {/* Confirm new email */}
-      <div className="mb-6">
-        <h3 className="text-sm font-medium mb-1">Confirm new email</h3>
+            // 🔐 2FA REQUIRED
+            if (code === "SYS-AUTH-029") {
+                setRequireTotp(true);
+                return toast.warning(
+                    msg || "Please enter your 2FA authentication code."
+                );
+            }
 
-        <Input
-          value={email2}
-          onChange={(e) => setEmail2(e.target.value)}
-          className="w-80"
-        />
-      </div>
+            toast.error(msg || "Failed to update email.");
+        }
+    };
 
-      {/* Password */}
-      <div className="mb-6">
-        <h3 className="text-sm font-medium mb-1">Todoist password</h3>
 
-        <Input.Password
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-80"
-          iconRender={(visible) =>
-            visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
-          }
-        />
+    return (
+        <div className="text-gray-700">
+            {/* Header */}
+            <div className="flex items-center gap-3 mb-8">
+                <button onClick={onBack} className="p-1 rounded hover:bg-gray-200">
+                    <ArrowLeftOutlined />
+                </button>
+                <h2 className="text-xl font-semibold">Change email address</h2>
+            </div>
 
-        <button className="text-sm text-red-500 mt-2 hover:underline">
-          Forgot password?
-        </button>
-      </div>
+            {/* Description */}
+            <p className="text-sm mb-8">
+                Update the email you use for your Todoist account. Your email is
+                currently <span className="font-medium">{currentEmail}</span>.
+            </p>
 
-      {/* Footer buttons */}
-      <div className="flex justify-end gap-3 pr-3 mt-10">
-        <button
-          onClick={onBack}
-          className="px-4 py-1.5 rounded border text-sm hover:bg-gray-100"
-        >
-          Cancel
-        </button>
+            {/* New email */}
+            <div className="mb-6">
+                <h3 className="text-sm font-medium mb-1">New email</h3>
 
-        <button
-          onClick={handleSendOtp}
-          className="px-4 py-1.5 rounded bg-[#f8b4a0] text-white text-sm hover:bg-[#f7a58d]"
-        >
-          Change email
-        </button>
-      </div>
+                <Input
+                    value={email1}
+                    onChange={(e) => setEmail1(e.target.value)}
+                    className="w-80"
+                />
+            </div>
 
-      {/* OTP Modal */}
-      <Modal
-        title="Enter OTP"
-        open={otpModal}
-        onCancel={() => setOtpModal(false)}
-        onOk={handleSubmitOtp}
-        okText="Confirm"
-        cancelText="Cancel"
-      >
-        <p className="mb-2 text-sm">
-          Enter the OTP sent to your new email address:
-        </p>
-        <Input
-          value={otp}
-          onChange={(e) => setOtp(e.target.value)}
-          placeholder="Enter OTP"
-        />
-      </Modal>
-    </div>
-  );
+            {/* Confirm new email */}
+            <div className="mb-6">
+                <h3 className="text-sm font-medium mb-1">Confirm new email</h3>
+
+                <Input
+                    value={email2}
+                    onChange={(e) => setEmail2(e.target.value)}
+                    className="w-80"
+                />
+            </div>
+
+            {/* Password */}
+            <div className="mb-6">
+                <h3 className="text-sm font-medium mb-1">Todoist password</h3>
+
+                <Input.Password
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-80"
+                    iconRender={(visible) =>
+                        visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
+                    }
+                />
+
+                <button className="text-sm text-red-500 mt-2 hover:underline">
+                    Forgot password?
+                </button>
+            </div>
+
+            {/* Footer buttons */}
+            <div className="flex justify-end gap-3 pr-3 mt-10">
+                <button
+                    onClick={onBack}
+                    className="px-4 py-1.5 rounded border text-sm hover:bg-gray-100"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    onClick={handleSendOtp}
+                    className="px-4 py-1.5 rounded bg-[#f8b4a0] text-white text-sm hover:bg-[#f7a58d]"
+                >
+                    Change email
+                </button>
+            </div>
+
+            {/* OTP Modal */}
+            <Modal
+                title="Confirm email change"
+                open={otpModal}
+                onCancel={() => setOtpModal(false)}
+                onOk={handleSubmitOtp}
+                okText="Confirm"
+                cancelText="Cancel"
+            >
+                <p className="mb-2 text-sm">
+                    Enter the OTP sent to your new email address:
+                </p>
+
+                <Input
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    placeholder="Email OTP"
+                    className="mb-4"
+                />
+
+                {/* ✅ SHOW TOTP ONLY IF REQUIRED */}
+                {requireTotp && (
+                    <>
+                        <p className="mb-1 text-sm font-medium">
+                            2FA authentication code
+                        </p>
+
+                        <Input
+                            value={totp}
+                            onChange={(e) => setTotp(e.target.value)}
+                            placeholder="6-digit code"
+                            maxLength={6}
+                            className="w-40"
+                        />
+
+                        <p className="text-xs text-gray-500 mt-1">
+                            Enter the 6-digit code generated by your authenticator app
+                            (Google Authenticator, Microsoft Authenticator, Authy, etc.).
+                        </p>
+                    </>
+                )}
+            </Modal>
+
+        </div>
+    );
 }

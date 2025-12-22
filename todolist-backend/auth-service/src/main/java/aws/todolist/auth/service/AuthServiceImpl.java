@@ -299,25 +299,59 @@ public class AuthServiceImpl implements AuthService {
 	public Account updateEmail(String accountId, UpdateEmailForm form) {
 		
 		Account account = accountService.getAccountById(accountId);
+		
+		// 1️⃣ Validate password
 		if (!passwordEncoder.matches(form.getCurrentPassword(), account.getPassword())) {
-			throw new TwoFactorFailedException("Mật khẩu hiện tại không đúng.");
+			throw new TwoFactorFailedException(
+				"Mật khẩu hiện tại không đúng."
+			);
 		}
 		
-		String otpRedis = redisService.get(RedisConstants.OTP_CHANGE_EMAIL + ":" + form.getNewEmail()).toString();
-		if (!otpRedis.equals(form.getOtp())) {
+		// 2️⃣ Validate 2FA nếu bật
+		if (account.isTwoFactorEnabled()) {
+			
+			if (form.getTotp() == null) {
+				throw new TwoFactorRequiredException(
+					"Tài khoản của bạn đang bật xác thực 2 lớp (2FA). Vui lòng nhập mã xác thực từ ứng dụng."
+				);
+			}
+			
+			boolean validTotp = twoFactorService.verifyOtp(
+				account.getTwoFactorSecret(),
+				form.getTotp()
+			);
+			
+			if (!validTotp) {
+				throw new TwoFactorFailedException(
+					"Mã xác thực 2FA không hợp lệ hoặc đã hết hạn. Vui lòng thử lại."
+				);
+			}
+		}
+		
+		// 3️⃣ Validate OTP email
+		String redisKey = RedisConstants.OTP_CHANGE_EMAIL + ":" + form.getNewEmail();
+		Object otpRedisObj = redisService.get(redisKey);
+		
+		if (otpRedisObj == null || !otpRedisObj.toString().equals(form.getOtp())) {
 			throw new OtpNotFoundException();
 		}
 		
-		redisService.delete(RedisConstants.OTP_CHANGE_EMAIL + ":" + form.getNewEmail());
+		// 4️⃣ Cleanup OTP
+		redisService.delete(redisKey);
 		
-		
+		// 5️⃣ Update email + cache
 		String currentEmail = account.getUsername();
 		redisService.delete(RedisConstants.EMAIL_EXIST + ":" + currentEmail);
-		redisService.set(RedisConstants.EMAIL_EXIST + ":" + form.getNewEmail(), "true");
+		redisService.set(
+			RedisConstants.EMAIL_EXIST + ":" + form.getNewEmail(),
+			"true"
+		);
 		
 		accountService.updateEmail(account, form.getNewEmail());
+		
 		return account;
 	}
+	
 	
 	@Override
 	public AuthResponseDTO refreshToken(String refreshToken) {

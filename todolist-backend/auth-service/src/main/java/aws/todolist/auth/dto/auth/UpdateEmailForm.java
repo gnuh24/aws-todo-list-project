@@ -11,4 +11,7 @@ public class UpdateEmailForm {
 	
 	private String newEmail;
 	
+	private Integer totp; // 2FA TOTP (nullable)
+	
+	
 }
