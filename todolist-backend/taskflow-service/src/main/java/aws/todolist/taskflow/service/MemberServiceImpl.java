@@ -23,7 +23,6 @@ import aws.todolist.taskflow.repository.ProjectRepository;
 import aws.todolist.taskflow.service.ServiceEventKafka.MemberEventService;
 import aws.todolist.taskflow.service.ServiceInterface.AccountService;
 import aws.todolist.taskflow.service.ServiceInterface.MemberService;
-import aws.todolist.taskflow.utils.NotificationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -50,9 +49,6 @@ public class MemberServiceImpl implements MemberService {
 
     @Autowired
     private AccountRepository accountRepository;
-
-    @Autowired
-    private NotificationUtils notificationUtils;
 
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;

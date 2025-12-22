@@ -1,7 +1,7 @@
 package aws.todolist.notification.messaging.kafka.dispatcher;
 
 
-import aws.todolist.notification.dto.event.EventEnvelope;
+import aws.todolist.notification.dto.eventTaskflow.EventEnvelope;
 import aws.todolist.notification.messaging.kafka.handler.EventHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

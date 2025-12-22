@@ -1,7 +1,7 @@
 package aws.todolist.notification.messaging.kafka.consumer;
 
-import aws.todolist.notification.dto.event.EventEnvelope;
-import aws.todolist.notification.dto.event.payload.*;
+import aws.todolist.notification.dto.eventTaskflow.EventEnvelope;
+import aws.todolist.notification.dto.eventTaskflow.payload.*;
 import aws.todolist.notification.messaging.kafka.dispatcher.EventDispatcher;
 import aws.todolist.notification.service.NotificationService;
 import com.fasterxml.jackson.core.type.TypeReference;

@@ -4,6 +4,7 @@ package aws.todolist.notification.service;
 import aws.todolist.notification.logging.AppLogger;
 import aws.todolist.notification.entity.Account;
 import aws.todolist.notification.entity.Notification;
+import aws.todolist.notification.mapper.NotificationMapper;
 import aws.todolist.notification.messaging.kafka.message.NotificationMessage;
 import aws.todolist.notification.repository.AccountRepository;
 import aws.todolist.notification.repository.NotificationRepository;
@@ -32,6 +33,11 @@ public class NotificationServiceImpl implements NotificationService {
 
 	@Autowired
 	private EmailService emailService;
+
+	@Autowired
+	private PublishEventService publishEventService;
+
+
 	
 	// GIẢ ĐỊNH: Các service cần thiết để truy vấn dữ liệu nghiệp vụ
 	// @Autowired private TaskService taskService;
@@ -89,12 +95,14 @@ public class NotificationServiceImpl implements NotificationService {
 			    + msg.getType() + " for receiver " + msg.getReceiverEmail());
 
 
-			// Kiểm tra xem người dùng có muốn gửi thông báo đến email hay không
+//			// Kiểm tra xem người dùng có muốn gửi thông báo đến email hay không
 			if(receiver.isReceiveEmail()){
 				emailService.sendNotification(notification);
 			}
 
+			// send event to websocket
 
+			publishEventService.publish(notification);
 
 
 		} catch (Exception e) {
@@ -102,6 +110,9 @@ public class NotificationServiceImpl implements NotificationService {
 			e.printStackTrace();
 		}
 	}
+
+
+
 
 	
 	

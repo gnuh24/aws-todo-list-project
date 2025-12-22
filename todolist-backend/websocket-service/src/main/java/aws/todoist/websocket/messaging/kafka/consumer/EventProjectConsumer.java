@@ -1,7 +1,7 @@
 package aws.todoist.websocket.messaging.kafka.consumer;
 
-import aws.todoist.websocket.dto.event.EventEnvelope;
-import aws.todoist.websocket.dto.event.payload.*;
+import aws.todoist.websocket.dto.taskflow.EventEnvelope;
+import aws.todoist.websocket.dto.taskflow.payload.*;
 import aws.todoist.websocket.enums.eventDto.EventType;
 import aws.todoist.websocket.service.WebSocketService;
 import com.fasterxml.jackson.core.type.TypeReference;

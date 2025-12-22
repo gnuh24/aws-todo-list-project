@@ -14,7 +14,6 @@ import aws.todolist.taskflow.repository.TaskRepository;
 import aws.todolist.taskflow.service.ServiceEventKafka.CommentEventService;
 import aws.todolist.taskflow.service.ServiceInterface.CommentAttachService;
 import aws.todolist.taskflow.service.ServiceInterface.TaskCommentService;
-import aws.todolist.taskflow.utils.NotificationUtils;
 import aws.todolist.taskflow.utils.TaskCommentUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,9 +33,6 @@ public class TaskCommentServiceImpl implements TaskCommentService {
 
     @Autowired
     private TaskCommentMapper taskCommentMapper;
-
-    @Autowired
-    private NotificationUtils notificationUtils;
 
     @Autowired
     private TaskCommentUtils taskCommentUtils;

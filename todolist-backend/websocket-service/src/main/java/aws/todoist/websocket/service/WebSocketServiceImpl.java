@@ -1,6 +1,6 @@
 package aws.todoist.websocket.service;
 
-import aws.todoist.websocket.dto.notification.WebSocketResponse;
+import aws.todoist.websocket.dto.notification.NotificationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.user.SimpUser;
@@ -81,29 +81,29 @@ public class WebSocketServiceImpl implements WebSocketService{
      * Notification riêng cho từng user
      */
     @Override
-    public void sendNotificationToUser(String userId, WebSocketResponse notification) {
+    public void sendNotificationToUser(String email, NotificationResponse notification) {
         messagingTemplate.convertAndSendToUser(
-                userId,
+                email,
                 "/queue/notification",
                 notification
         );
     }
 
     @Override
-    public void sendProjectSummaryToUser(String userId, Object event) {
+    public void sendProjectSummaryToUser(String email, Object event) {
 
         // Kiểm tra user có đang kết nối WebSocket không
-        SimpUser simpUser = simpUserRegistry.getUser(userId);
+        SimpUser simpUser = simpUserRegistry.getUser(email);
         if (simpUser == null) {
-            System.err.println("❌ User " + userId + " chưa kết nối WebSocket hoặc chưa được setUser(authentication)");
+            System.err.println("❌ User " + email + " chưa kết nối WebSocket hoặc chưa được setUser(authentication)");
             return;
         }
 
-        System.out.println("✅ User " + userId + " đang online qua WebSocket, sessions: " + simpUser.getSessions().size());
+        System.out.println("✅ User " + email + " đang online qua WebSocket, sessions: " + simpUser.getSessions().size());
 
 
         messagingTemplate.convertAndSendToUser(
-                userId,
+                email,
                 "/queue/project-summary",
                 event
         );

@@ -1,14 +1,13 @@
 package aws.todolist.notification.messaging.kafka.handler;
 
-import aws.todolist.notification.dto.event.EventEnvelope;
-import aws.todolist.notification.dto.event.payload.ProjectPayload;
+import aws.todolist.notification.dto.eventTaskflow.EventEnvelope;
+import aws.todolist.notification.dto.eventTaskflow.payload.ProjectPayload;
 import aws.todolist.notification.enums.EventType;
 import aws.todolist.notification.enums.NotificationType;
 import aws.todolist.notification.messaging.kafka.message.NotificationMessage;
 import aws.todolist.notification.messaging.kafka.resolver.NotificationResolver;
 import aws.todolist.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 

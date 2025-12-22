@@ -2,7 +2,9 @@ package aws.todolist.taskflow.messaging.kafka.producer;
 
 import aws.todolist.taskflow.dto.event.payload.*;
 import aws.todolist.taskflow.enums.EventType;
+import org.springframework.stereotype.Service;
 
+@Service
 public interface GenericEventPublisher {
     void publishProjectEvent(String key, ProjectPayload payload, EventType eventType);
 

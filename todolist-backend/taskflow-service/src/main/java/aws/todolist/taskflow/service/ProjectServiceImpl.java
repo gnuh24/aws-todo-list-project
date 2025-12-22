@@ -24,7 +24,6 @@ import aws.todolist.taskflow.repository.SectionRepository;
 import aws.todolist.taskflow.repository.TaskRepository;
 import aws.todolist.taskflow.service.ServiceEventKafka.ProjectEventService;
 import aws.todolist.taskflow.service.ServiceInterface.ProjectService;
-import aws.todolist.taskflow.utils.NotificationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,9 +56,6 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Autowired
     private TaskServiceImpl taskService;
-
-    @Autowired
-    private NotificationUtils notificationUtils;
 
     @Autowired
     private GenericEventPublisher eventPublisher;

@@ -1,6 +1,6 @@
 package aws.todolist.notification.messaging.kafka.handler;
 
-import aws.todolist.notification.dto.event.EventEnvelope;
+import aws.todolist.notification.dto.eventTaskflow.EventEnvelope;
 import aws.todolist.notification.enums.EventType;
 
 public interface EventHandler<T> {

@@ -1,14 +1,13 @@
 package aws.todolist.notification.messaging.kafka.handler;
 
-import aws.todolist.notification.dto.event.EventEnvelope;
-import aws.todolist.notification.dto.event.payload.MemberPayload;
+import aws.todolist.notification.dto.eventTaskflow.EventEnvelope;
+import aws.todolist.notification.dto.eventTaskflow.payload.MemberPayload;
 import aws.todolist.notification.enums.EventType;
 import aws.todolist.notification.enums.NotificationType;
 import aws.todolist.notification.messaging.kafka.message.NotificationMessage;
 import aws.todolist.notification.messaging.kafka.resolver.NotificationResolver;
 import aws.todolist.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -47,14 +46,14 @@ public class MemberEventHandler implements EventHandler<MemberPayload> {
             message.setProjectId(payload.getProjectId());
             message.setType(type);
 
-            applyContent(message);
+            applyContent(message,payload);
 
 
             notificationService.create(message);
         }
     }
 
-    private void applyContent(NotificationMessage message) {
+    private void applyContent(NotificationMessage message, MemberPayload payload) {
 
         switch (message.getType()) {
 
@@ -65,7 +64,7 @@ public class MemberEventHandler implements EventHandler<MemberPayload> {
 
             case PROJECT_MEMBER_ROLE_UPDATED -> {
                 message.setTitle("Vai trò trong project thay đổi");
-                message.setContent("Vai trò của bạn trong project đã được cập nhật.");
+                message.setContent(String.format("Vai trò của %s trong project đã được cập nhật là %s.", payload.getMemberEventDto().getDisplayName(), payload.getMemberEventDto().getRole().toString()));
             }
 
             case REQUEST_ACCEPTED -> {

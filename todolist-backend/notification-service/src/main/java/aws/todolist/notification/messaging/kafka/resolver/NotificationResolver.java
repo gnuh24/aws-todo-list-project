@@ -1,8 +1,7 @@
 package aws.todolist.notification.messaging.kafka.resolver;
 
-import aws.todolist.notification.dto.event.EventEnvelope;
-import aws.todolist.notification.dto.event.payload.TaskPayload;
-import aws.todolist.notification.enums.EventType;
+import aws.todolist.notification.dto.eventTaskflow.EventEnvelope;
+import aws.todolist.notification.dto.eventTaskflow.payload.TaskPayload;
 import aws.todolist.notification.enums.NotificationType;
 import aws.todolist.notification.enums.Status;
 import org.springframework.stereotype.Component;

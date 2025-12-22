@@ -1,6 +1,6 @@
 package aws.todoist.websocket.service;
 
-import aws.todoist.websocket.dto.notification.WebSocketResponse;
+import aws.todoist.websocket.dto.notification.NotificationResponse;
 
 public interface WebSocketService {
 
@@ -20,7 +20,7 @@ public interface WebSocketService {
     void sendCommentEvent(String projectId, Object event);
 
     // ===== Notification (private) =====
-    void sendNotificationToUser(String userId, WebSocketResponse notification);
+    void sendNotificationToUser(String userId, NotificationResponse notification);
 
     // ✅ NEW: Project summary (sidebar)
     void sendProjectSummaryToUser(String userId, Object event);
