@@ -8,6 +8,8 @@ import aws.todolist.auth.dto.twoFactor.TwoFactorSetupResponse;
 import aws.todolist.auth.dto.twoFactor.TwoFactorVerifyForm;
 import aws.todolist.auth.entity.Account;
 import aws.todolist.auth.exceptionHandler.exceptions.twoFactorException.TwoFactorException;
+import aws.todolist.auth.otp.OtpPurpose;
+import aws.todolist.auth.otp.OtpService;
 import aws.todolist.auth.security.JwtTokenProvider;
 import aws.todolist.auth.service.AccountService;
 import aws.todolist.auth.service.AuthService;
@@ -37,6 +39,9 @@ public class AuthController {
 	
 	@Autowired
 	private TwoFactorService twoFactorService;
+	
+	@Autowired
+	private OtpService otpService;
 	
 	/**
 	 * 📌 Kiểm tra email đã tồn tại chưa
@@ -162,9 +167,11 @@ public class AuthController {
 	 */
 	@Operation(summary = "Đăng nhập nhân viên", description = "Đăng nhập nhân viên vào hệ thống.")
 	@PostMapping("/active-account")
-	public ResponseEntity<ApiResponse<AuthResponseDTO>> activeAccount(@RequestParam String otp) {
+	public ResponseEntity<ApiResponse<AuthResponseDTO>> activeAccount(
+		@RequestParam String email,
+		@RequestParam String otp) {
 		
-		Account account = authService.activeAccount(otp);
+		Account account = authService.activeAccount(email, otp);
 		AuthResponseDTO responseDTO = new AuthResponseDTO();
 		responseDTO.setId(account.getId());
 		responseDTO.setEmail(account.getUsername());
@@ -174,7 +181,7 @@ public class AuthController {
 	
 	@PostMapping("/send-reset-password-otp/{email}")
 	public ResponseEntity<ApiResponse<String>> sendOtpForResetPassword(@PathVariable String email) {
-		authService.sendOtpResetPassword(email);
+		otpService.sendOtp(OtpPurpose.FORGOT_PASSWORD, email);
 		return ResponseEntity.ok(
 		    new ApiResponse<>(200, "Hệ thống đã gửi OTP sang email " + email + ". Bạn có 3 phút để kiểm tra nhé", null)
 		);
@@ -183,7 +190,7 @@ public class AuthController {
 	
 	@PostMapping("/send-update-email-otp/{newEmail}")
 	public ResponseEntity<ApiResponse<String>> sendOtpForUpdateEmail(@PathVariable String newEmail) {
-		authService.sendOtpUpdateEmail(newEmail);
+		otpService.sendOtp(OtpPurpose.CHANGE_EMAIL , newEmail);
 		return ResponseEntity.ok(
 		    new ApiResponse<>(200, "Hệ thống đã gửi OTP sang email " + newEmail + ". Bạn có 3 phút để kiểm tra nhé", null)
 		);
@@ -194,7 +201,7 @@ public class AuthController {
 		@RequestHeader("X-User-Email") String email
 	) {
 		
-		authService.sendOtpDeleteAccount(email);
+		otpService.sendOtp(OtpPurpose.DELETE_ACCOUNT , email);
 		
 		return ResponseEntity.ok(
 			new ApiResponse<>(

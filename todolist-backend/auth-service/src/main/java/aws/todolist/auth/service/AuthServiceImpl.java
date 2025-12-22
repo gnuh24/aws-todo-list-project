@@ -16,6 +16,8 @@ import aws.todolist.auth.integration.redis.RedisConstants;
 import aws.todolist.auth.integration.redis.RedisService;
 import aws.todolist.auth.mapper.AuthMapper;
 import aws.todolist.auth.messaging.kafka.producer.KafkaProducerService;
+import aws.todolist.auth.otp.OtpPurpose;
+import aws.todolist.auth.otp.OtpService;
 import aws.todolist.auth.security.JwtTokenProvider;
 import aws.todolist.auth.utils.IdGenerator;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -50,30 +52,48 @@ public class AuthServiceImpl implements AuthService {
 	private RedisService redisService;
 	
 	@Autowired
-	private KafkaProducerService kafkaProducerService;
+	private AuthMapper authMapper;
 	
 	@Autowired
-	private AuthMapper authMapper;
+	private OtpService otpService;
 	
 	@Autowired
 	private TwoFactorService twoFactorService;
 	
 	@Override
 	@Transactional
-	public Account activeAccount(String otp) {
+	public Account activeAccount(String email, String otp) {
 		
-		AccountRedisDTO account = (AccountRedisDTO) redisService.get(RedisConstants.OTP_VERIFY_ACCOUNT + ":" + otp);
+		// 1. Verify OTP (single source of truth)
+		String redisKey = RedisConstants.OTP_VERIFY_ACCOUNT + ":" + email;
+		Object otpRedisObj = redisService.getObject(redisKey);
 		
-		if (account == null) {
+		if (otpRedisObj == null || !otpRedisObj.toString().equals(otp)) {
 			throw new OtpNotFoundException();
 		}
 		
-		AccountCreateForm accountCreateForm = authMapper.toAccountCreateForm(account);
+		// 2. Load pending account
+		AccountRedisDTO accountRedis =
+			(AccountRedisDTO) redisService.getObject(
+				RedisConstants.REGISTER_PENDING_ACCOUNT + ":" + email
+			);
 		
-		redisService.set(RedisConstants.EMAIL_EXIST + ":" + accountCreateForm.getEmail(), "true");
+		if (accountRedis == null) {
+			throw new IllegalStateException("Pending account not found");
+		}
 		
-		return accountService.saveAccount(accountCreateForm);
+		// 3. Map → entity
+		AccountCreateForm form =
+			authMapper.toAccountCreateForm(accountRedis);
 		
+		// 4. Save account to DB
+		Account savedAccount = accountService.saveAccount(form);
+		
+		// 5. Cleanup Redis
+		redisService.delete(RedisConstants.REGISTER_PENDING_ACCOUNT + ":" + email);
+		redisService.delete(RedisConstants.OTP_VERIFY_ACCOUNT + ":" + email);
+		
+		return savedAccount;
 	}
 	
 	@Override
@@ -174,45 +194,52 @@ public class AuthServiceImpl implements AuthService {
 	
 	@Override
 	@Transactional
-	public AccountRedisDTO register(UserRegistrationForm userRegistrationForm) {
-//		if (accountService.isEmailExists(userRegistrationForm.getEmail())) {
-//			throw new RuntimeException("Email :" + userRegistrationForm.getEmail() + " đã tồn tại trong hệ thống !");
-//		}
+	public AccountRedisDTO register(UserRegistrationForm form) {
 		
+		String email = form.getEmail();
+		
+		// 1. Generate accountId
 		String accountId = UUID.randomUUID().toString();
-		redisService.set(RedisConstants.EMAIL_EXIST + ":" + userRegistrationForm.getEmail(), "true", 5, TimeUnit.MINUTES);
 		
+		// 2. Mark email is registering (anti-spam)
+		redisService.set(
+			RedisConstants.EMAIL_EXIST + ":" + email,
+			"true",
+			5,
+			TimeUnit.MINUTES
+		);
 		
+		// 3. Build pending account (CHƯA SAVE DB)
 		AccountRedisDTO account = new AccountRedisDTO();
 		account.setId(accountId);
-		account.setEmail(userRegistrationForm.getEmail());
+		account.setEmail(email);
 		account.setPassword(
-			passwordEncoder.encode(
-				userRegistrationForm.getPassword()
-			)
+			passwordEncoder.encode(form.getPassword())
 		);
-		String otp = IdGenerator.generateOTP();
-		redisService.setObjectWithTTL(RedisConstants.OTP_VERIFY_ACCOUNT + ":" + otp, account, 5, TimeUnit.MINUTES);
 		
-		kafkaProducerService.sendRegisterEmail(userRegistrationForm.getEmail(), otp);
+		// 4. Save pending account (key = email)
+		redisService.setObjectWithTTL(
+			RedisConstants.REGISTER_PENDING_ACCOUNT + ":" + email,
+			account,
+			5,
+			TimeUnit.MINUTES
+		);
+		
+		// 5. Send OTP via OTP Service
+		otpService.sendOtp(OtpPurpose.VERIFY_ACCOUNT, email);
+		
 		return account;
 	}
 	
-	@Override
-	public void sendOtpResetPassword(String email) {
-		redisService.delete(RedisConstants.OTP_FORGOT_PASSWORD + ":" + email);
-		String otp = IdGenerator.generateOTP();
-		String key = RedisConstants.OTP_FORGOT_PASSWORD + ":" + email;
-		redisService.set(key, otp, 3, TimeUnit.MINUTES);
-		kafkaProducerService.sendResetPasswordEmail(email, otp);
-	}
+	
+	
 	
 	@Override
 	public Account resetPassword(String username, ResetPasswordForm form) {
 		
 		String key = RedisConstants.OTP_FORGOT_PASSWORD + ":" + username;
 		
-		Object otpObj = redisService.get(key);
+		Object otpObj = redisService.getObject(key);
 		
 		// 1. OTP không tồn tại (hết hạn hoặc chưa gửi)
 		if (otpObj == null) {
@@ -269,31 +296,6 @@ public class AuthServiceImpl implements AuthService {
 		
 	}
 	
-	@Override
-	public void sendOtpUpdateEmail(String newEmail) {
-		redisService.delete(RedisConstants.OTP_CHANGE_EMAIL + ":" + newEmail);
-		String otp = IdGenerator.generateOTP();
-		redisService.set(RedisConstants.OTP_CHANGE_EMAIL + ":" + newEmail, otp, 3, TimeUnit.MINUTES);
-		kafkaProducerService.sendUpdateEmail(newEmail, otp);
-	}
-	
-	@Override
-	public void sendOtpDeleteAccount(String email) {
-		
-		String redisKey = RedisConstants.OTP_DELETE_ACCOUNT + ":" + email;
-		
-		// Clear OTP cũ (nếu có)
-		redisService.delete(redisKey);
-		
-		// Generate OTP
-		String otp = IdGenerator.generateOTP();
-		
-		// TTL 3 phút (giống update email)
-		redisService.set(redisKey, otp, 3, TimeUnit.MINUTES);
-		
-		// Send OTP via Kafka (email)
-		kafkaProducerService.sendDeleteAccount(email, otp);
-	}
 	
 	@Override
 	public Account updateEmail(String accountId, UpdateEmailForm form) {
@@ -330,7 +332,7 @@ public class AuthServiceImpl implements AuthService {
 		
 		// 3️⃣ Validate OTP email
 		String redisKey = RedisConstants.OTP_CHANGE_EMAIL + ":" + form.getNewEmail();
-		Object otpRedisObj = redisService.get(redisKey);
+		Object otpRedisObj = redisService.getObject(redisKey);
 		
 		if (otpRedisObj == null || !otpRedisObj.toString().equals(form.getOtp())) {
 			throw new OtpNotFoundException();
@@ -376,7 +378,7 @@ public class AuthServiceImpl implements AuthService {
 			
 			String redisKey = RedisConstants.BANLIST_ACCOUNT_ID + ":" + account.getId();
 			
-			if (redisService.get(redisKey) != null) {
+			if (redisService.getObject(redisKey) != null) {
 				throw new RefreshTokenBlacklistedException();
 			}
 			
@@ -475,7 +477,7 @@ public class AuthServiceImpl implements AuthService {
 			String redisDeleteOtpKey =
 				RedisConstants.OTP_DELETE_ACCOUNT + ":" + account.getEmail();
 			
-			Object otpObj = redisService.get(redisDeleteOtpKey);
+			Object otpObj = redisService.getObject(redisDeleteOtpKey);
 			
 			if (otpObj == null) {
 				throw new OtpNotFoundException();

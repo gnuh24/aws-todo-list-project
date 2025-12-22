@@ -21,7 +21,6 @@ export default function DeleteAccount({ onBack }) {
         const { twoFactorEnabled } = dataUser;
 
         const flag = twoFactorEnabled
-        console.log(flag)
         setIs2FAEnabled(flag === true);
 
     }, []);
@@ -59,7 +58,6 @@ export default function DeleteAccount({ onBack }) {
     const handleDelete = async () => {
         try {
             setLoading(true);
-            console.log("Is 2FA Enable 2: " + is2FAEnabled)
 
             const payload = {
                 email: form.email,
@@ -70,7 +68,6 @@ export default function DeleteAccount({ onBack }) {
                     : { otp: form.otp })
             };
 
-            console.log(payload)
 
             await https_authupdate.delete("/v1/delete-account", {
                 data: payload

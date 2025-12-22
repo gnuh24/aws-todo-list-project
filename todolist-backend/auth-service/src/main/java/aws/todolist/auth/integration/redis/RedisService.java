@@ -27,7 +27,7 @@ public interface RedisService {
 	
 	boolean hashExists(String key, String field);
 	
-	Object get(String key);
+	Object getObject(String key);
 	
 	public Map<String, Object> getField(String key);
 	
