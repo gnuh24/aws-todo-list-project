@@ -10,4 +10,11 @@ public class TwoFactorRequiredException extends TwoFactorException {
             "Cần xác thực bổ sung để tiếp tục"
         );
     }
+	
+	public TwoFactorRequiredException(String message) {
+		super(
+			SystemErrorCode.AUTH_2FA_REQUIRED,
+			message
+		);
+	}
 }

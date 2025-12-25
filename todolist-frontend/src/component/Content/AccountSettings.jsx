@@ -1,12 +1,22 @@
 import { useEffect, useState } from "react";
 import { https_user, https_authupdate } from "../../service/api";
 import { Switch, Modal, Input, message } from "antd";
+<<<<<<< HEAD
+=======
+import { Button } from "antd";
+>>>>>>> thug24
 
 export default function AccountSettings({
     onGotoChangePassword,
     onGotoChangeEmail,
+<<<<<<< HEAD
     onGotoEnable2FA
 
+=======
+    onGotoEnable2FA,
+    onGotoDeleteAccount,
+    refreshKey
+>>>>>>> thug24
 }) {
     const dataUser = JSON.parse(localStorage.getItem("USER_INFO")) || {};
     const { id, displayName, email, avatar, twoFactorEnabled, receiveEmail } = dataUser;
@@ -28,10 +38,19 @@ export default function AccountSettings({
         setEditing(false);
     };
 
+<<<<<<< HEAD
     const handleUpdate = async () => {
         try {
             setEditing(false);
 
+=======
+
+
+    const handleUpdate = async () => {
+        try {
+            setEditing(false);
+
+>>>>>>> thug24
             const payload = {
                 avatar: avatar || null, // hoặc state bạn đang dùng để lưu avatar
                 displayName: tempName,
@@ -119,20 +138,24 @@ export default function AccountSettings({
     };
 
 
+    const fetchUser = async () => {
+        try {
+            const res = await https_user.get("/v1/accounts/me"); // phải await
+            setIsNotificationEmail(res.data.data.receiveEmail);
+            setIsTwoFactorEnabled(res.data.data.twoFactorEnabled);
+        } catch (e) {
+            console.error(e);
+        }
+    };
 
     useEffect(() => {
-        const fetchUser = async () => {
-            try {
-                const res = await https_user.get("/v1/accounts/me"); // phải await
-                setIsNotificationEmail(res.data.data.receiveEmail);
-                setIsTwoFactorEnabled(res.data.data.twoFactorEnabled);
-            } catch (e) {
-                console.error(e);
-            }
-        };
-
         fetchUser();
     }, []);
+
+    useEffect(() => {
+        fetchUser();
+    }, [refreshKey]);
+
 
     return (
         <div className="text-gray-700">
@@ -297,6 +320,14 @@ export default function AccountSettings({
                 </p>
             </div>
 
-        </div>
+<<<<<<< HEAD
+=======
+            <Button danger onClick={onGotoDeleteAccount}>
+                Xóa tài khoản
+            </Button>
+
+
+>>>>>>> thug24
+        </div >
     );
 }

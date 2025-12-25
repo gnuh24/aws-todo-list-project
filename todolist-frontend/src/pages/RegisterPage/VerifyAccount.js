@@ -8,9 +8,9 @@ export default function VerifyAccount() {
   const [searchParams] = useSearchParams();
   const [status, setStatus] = useState("loading"); // 'loading' | 'success' | 'error'
   const otp = searchParams.get("otp");
-  const storedUser = JSON.parse(localStorage.getItem("USER_REGISTER"));
-  const { email } = storedUser;
-  console.log(email);
+  const email = searchParams.get("email");
+//   const storedUser = JSON.parse(localStorage.getItem("USER_REGISTER"));
+//   const { email } = storedUser;
 
   useEffect(() => {
     const verifyAccount = async () => {
@@ -25,7 +25,7 @@ export default function VerifyAccount() {
           BASE_URL+`/auth/v1/active-account`,
           null, // body trống
           {
-            params: { otp },
+            params: { otp, email },
           }
         );
 

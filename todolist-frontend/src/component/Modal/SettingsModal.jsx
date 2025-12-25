@@ -5,10 +5,18 @@ import ChangePassword from "../Content/ChangePassword";
 import SettingsSidebar from "../Sidebar/SettingsSidebar";
 import ChangeEmail from "../Content/ChangeEmail";
 import Enable2FA from "../Content/Enable2FA"
+<<<<<<< HEAD
+=======
+import DeleteAccount from "../Content/DeleteAccount";
+>>>>>>> thug24
 
 export default function SettingsModal({ open, onClose }) {
     const [page, setPage] = useState("account");
     // "account" | "change_password" | ...
+<<<<<<< HEAD
+=======
+    const [refreshKey, setRefreshKey] = useState(0);
+>>>>>>> thug24
 
     return (
         <Modal
@@ -28,6 +36,8 @@ export default function SettingsModal({ open, onClose }) {
                             onGotoChangePassword={() => setPage("change_password")}
                             onGotoChangeEmail={() => setPage("change_email")}
                             onGotoEnable2FA={() => setPage("enable_2fa")}
+                            onGotoDeleteAccount={() => setPage("delete_account")}
+                            refreshKey={refreshKey}
                         />
                     )}
                     {page === "change_password" && (
@@ -37,8 +47,20 @@ export default function SettingsModal({ open, onClose }) {
                         <ChangeEmail onBack={() => setPage("account")} />
                     )}
                     {page === "enable_2fa" && (
+<<<<<<< HEAD
                         <Enable2FA onBack={() => setPage("account")} />
                     )}
+=======
+                        <Enable2FA onBack={() => {
+                        setRefreshKey(prev => prev + 1);
+                        setPage("account");
+                    }} />
+                    )}
+                    {page === "delete_account" && (
+                        <DeleteAccount onBack={() => setPage("account")} />
+                    )}
+
+>>>>>>> thug24
                 </div>
             </div>
         </Modal>

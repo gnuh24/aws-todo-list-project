@@ -37,6 +37,15 @@ export default function Enable2FA({ onBack }) {
         try {
             await https_authupdate.post("/v1/2fa/verify", { otp: otp });
 
+            const dataUser = JSON.parse(localStorage.getItem("USER_INFO")) || {};
+
+            // Update localStorage
+            const updated = {
+                ...dataUser,
+                twoFactorEnabled: true,
+            };
+            localStorage.setItem("USER_INFO", JSON.stringify(updated));
+
             message.success("2FA enabled successfully!");
             onBack();
         } catch (err) {

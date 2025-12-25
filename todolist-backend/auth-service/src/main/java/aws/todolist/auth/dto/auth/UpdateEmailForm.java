@@ -11,4 +11,6 @@ public class UpdateEmailForm {
 	
 	private String newEmail;
 	
+	private Integer totp;
+	
 }

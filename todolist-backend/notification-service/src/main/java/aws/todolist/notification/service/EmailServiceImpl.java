@@ -27,8 +27,7 @@ public class EmailServiceImpl implements EmailService {
 	public void sendRegistrationUserConfirm(String email, String otp) {
 		
 		
-		
-		String confirmationUrl = domainFrontEnd + "/auth/verify-account?otp=" + otp;
+		String confirmationUrl = domainFrontEnd + "/auth/verify-account?otp=" + otp + "&email=" + email;
 		
 		String subject = "Xác Nhận Đăng Ký Tài khoản";
 		String content = getEmailContentForRegistration(confirmationUrl);

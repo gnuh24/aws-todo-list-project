@@ -6,6 +6,9 @@ public class RedisConstants {
 	public static final String EMAIL_EXIST = "email_exist";
 	
 	// 2. OTP xác thực tài khoản
+	public static final String REGISTER_PENDING_ACCOUNT = "register:pending";
+	
+	
 	public static final String OTP_VERIFY_ACCOUNT = "otp:verify_account";
 	
 	public static final String OTP_DELETE_ACCOUNT = "otp:delete_account";

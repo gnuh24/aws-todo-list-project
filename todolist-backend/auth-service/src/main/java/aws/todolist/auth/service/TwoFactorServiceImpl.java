@@ -2,12 +2,9 @@ package aws.todolist.auth.service;
 
 import aws.todolist.auth.dto.twoFactor.TwoFactorSetupResponse;
 import aws.todolist.auth.entity.Account;
-import aws.todolist.auth.exceptionHandler.exceptions.twoFactorException.TwoFactorException;
 import aws.todolist.auth.exceptionHandler.exceptions.twoFactorException.TwoFactorFailedException;
 import aws.todolist.auth.integration.redis.RedisConstants;
 import aws.todolist.auth.integration.redis.RedisService;
-import aws.todolist.auth.service.AccountService;
-import aws.todolist.auth.service.TwoFactorService;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
 import com.warrenstrange.googleauth.GoogleAuthenticatorQRGenerator;
@@ -35,7 +32,7 @@ public class TwoFactorServiceImpl implements TwoFactorService {
 		GoogleAuthenticatorKey key = gAuth.createCredentials();
 		
 		String qrUrl = GoogleAuthenticatorQRGenerator.getOtpAuthURL(
-			"AWS Todolist",
+			"AWS Todolist Dev",
 			email,
 			key
 		).replace("margin=0", "margin=10");
@@ -53,7 +50,7 @@ public class TwoFactorServiceImpl implements TwoFactorService {
 	@Override
 	public void verify2FA(String accountId, int otp) {
 		Account account = accountService.getAccountById(accountId);
-		Object secretObj = redisService.get( RedisConstants.TWO_FA_PENDING_SECRET + ":" + account.getEmail());
+		Object secretObj = redisService.getObject( RedisConstants.TWO_FA_PENDING_SECRET + ":" + account.getEmail());
 		if (secretObj == null) {
 			throw new TwoFactorFailedException("2FA secret đã hết hạn hoặc chưa setup");
 		}
@@ -74,7 +71,7 @@ public class TwoFactorServiceImpl implements TwoFactorService {
 	}
 	
 	@Override
-	public void disable2FA(String accountId, int otp) {
+	public void disable2FA(String accountId, int totp) {
 		Account account = accountService.getAccountById(accountId);
 		
 		// Chưa bật 2FA mà đòi tắt
@@ -85,7 +82,7 @@ public class TwoFactorServiceImpl implements TwoFactorService {
 		String secret = account.getTwoFactorSecret();
 		
 		// Verify OTP bằng secret đang lưu trong DB
-		if (!gAuth.authorize(secret, otp)) {
+		if (!gAuth.authorize(secret, totp)) {
 			throw new TwoFactorFailedException("OTP không hợp lệ");
 		}
 		
@@ -95,6 +92,14 @@ public class TwoFactorServiceImpl implements TwoFactorService {
 		account.setTwoFactorVerifiedAt(null);
 		
 		accountService.saveAccount(account);
+	}
+	
+	@Override
+	public boolean verifyOtp(String secret, int totp) {
+		if (secret == null || secret.isBlank()) {
+			return false;
+		}
+		return gAuth.authorize(secret, totp);
 	}
 	
 	
