@@ -49,10 +49,6 @@ public class KafkaProducerService {
 	 * ===================================================== */
 	
 	private String buildMessage(String email, String otp) {
-<<<<<<< HEAD
-		// JSON đơn giản – consumer email service xử lý
-=======
->>>>>>> thug24
 		return String.format(
 			"{\"email\":\"%s\",\"otp\":\"%s\"}",
 			email,

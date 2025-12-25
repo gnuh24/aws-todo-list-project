@@ -214,13 +214,7 @@ public class AuthServiceImpl implements AuthService {
 		account.setId(accountId);
 		account.setEmail(email);
 		account.setPassword(
-<<<<<<< HEAD
-			passwordEncoder.encode(
-				userRegistrationForm.getPassword()
-			)
-=======
 			passwordEncoder.encode(form.getPassword())
->>>>>>> thug24
 		);
 		
 		// 4. Save pending account (key = email)
@@ -237,30 +231,15 @@ public class AuthServiceImpl implements AuthService {
 		return account;
 	}
 	
-<<<<<<< HEAD
-	@Override
-	public void sendOtpResetPassword(String email) {
-		redisService.delete(RedisConstants.OTP_FORGOT_PASSWORD + ":" + email);
-		String otp = IdGenerator.generateOTP();
-		String key = RedisConstants.OTP_FORGOT_PASSWORD + ":" + email;
-		redisService.set(key, otp, 3, TimeUnit.MINUTES);
-		kafkaProducerService.sendResetPasswordEmail(email, otp);
-	}
-=======
 	
 	
->>>>>>> thug24
 	
 	@Override
 	public Account resetPassword(String username, ResetPasswordForm form) {
 		
 		String key = RedisConstants.OTP_FORGOT_PASSWORD + ":" + username;
 		
-<<<<<<< HEAD
-		Object otpObj = redisService.get(key);
-=======
 		Object otpObj = redisService.getObject(key);
->>>>>>> thug24
 		
 		// 1. OTP không tồn tại (hết hạn hoặc chưa gửi)
 		if (otpObj == null) {
@@ -378,13 +357,8 @@ public class AuthServiceImpl implements AuthService {
 			throw new OtpNotFoundException();
 		}
 		
-<<<<<<< HEAD
-		redisService.delete(RedisConstants.OTP_CHANGE_EMAIL + ":" + form.getNewEmail());
-		
-=======
 		// 4️⃣ Cleanup OTP
 		redisService.delete(redisKey);
->>>>>>> thug24
 		
 		// 5️⃣ Update email + cache
 		String currentEmail = account.getUsername();
@@ -473,13 +447,6 @@ public class AuthServiceImpl implements AuthService {
 		Account account = accountService.getAccountById(accountId);
 		
 		/* =====================================================
-<<<<<<< HEAD
-		 * 1. Confirm text
-		 * ===================================================== */
-		String expectedConfirm = "delete";
-		if (form.getConfirmText() == null ||
-			!expectedConfirm.equalsIgnoreCase(form.getConfirmText().trim())) {
-=======
 		 * 0. Validate email belongs to account
 		 * ===================================================== */
 		if (!account.getEmail().equalsIgnoreCase(form.getEmail())) {
@@ -490,7 +457,6 @@ public class AuthServiceImpl implements AuthService {
 		 * 1. Confirm text
 		 * ===================================================== */
 		if (!"delete".equalsIgnoreCase(form.getConfirmText().trim())) {
->>>>>>> thug24
 			throw new DeleteConfirmationRequiredException();
 		}
 		
@@ -502,30 +468,6 @@ public class AuthServiceImpl implements AuthService {
 		}
 		
 		/* =====================================================
-<<<<<<< HEAD
-		 * 3. Verify OTP (default – chưa dùng TOTP)
-		 * ===================================================== */
-		String redisDeleteOtpKey =
-			RedisConstants.OTP_DELETE_ACCOUNT + ":" + account.getEmail();
-		
-		Object otpObj = redisService.get(redisDeleteOtpKey);
-		
-		// OTP không tồn tại (chưa gửi hoặc đã hết hạn)
-		if (otpObj == null) {
-			throw new OtpNotFoundException();
-		}
-		
-		String otpRedis = otpObj.toString();
-		
-		// OTP không khớp
-		if (!otpRedis.equals(form.getOtp())) {
-			throw new OtpNotFoundException();
-		}
-		
-		// Clear OTP sau khi verify thành công
-		redisService.delete(redisDeleteOtpKey);
-		
-=======
 		 * 3. Verify 2FA
 		 * ===================================================== */
 		if (account.isTwoFactorEnabled()) {
@@ -568,16 +510,12 @@ public class AuthServiceImpl implements AuthService {
 			redisService.delete(redisDeleteOtpKey);
 		}
 		
->>>>>>> thug24
 		/* =====================================================
 		 * 4. Revoke token (force logout)
 		 * ===================================================== */
 		String redisBanlistAccountIdKey =
 			RedisConstants.BANLIST_ACCOUNT_ID + ":" + account.getId();
-<<<<<<< HEAD
-=======
 		
->>>>>>> thug24
 		redisService.set(redisBanlistAccountIdKey, true);
 		
 		/* =====================================================

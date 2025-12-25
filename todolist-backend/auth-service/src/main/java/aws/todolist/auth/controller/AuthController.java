@@ -201,11 +201,7 @@ public class AuthController {
 		@RequestHeader("X-User-Email") String email
 	) {
 		
-<<<<<<< HEAD
-		authService.sendOtpDeleteAccount(email);
-=======
 		otpService.sendOtp(OtpPurpose.DELETE_ACCOUNT , email);
->>>>>>> thug24
 		
 		return ResponseEntity.ok(
 			new ApiResponse<>(
