@@ -1,5 +1,8 @@
 package aws.todolist.taskflow.mapper;
 
+import aws.todolist.taskflow.dto.event.ActorDto;
+import aws.todolist.taskflow.dto.event.dto.TaskEventDto;
+import aws.todolist.taskflow.dto.event.payload.TaskPayload;
 import aws.todolist.taskflow.dto.task.TaskDetailResponseDTO;
 import aws.todolist.taskflow.dto.task.TaskResponseDTO;
 import aws.todolist.taskflow.entity.Task;
@@ -59,4 +62,31 @@ public interface TaskMapper {
             dto.setLabels(taskLabelMapper.toResponseList(task.getTaskLabels()));
         }
     }
+
+    @Mapping(target = "idTaskCha", source = "taskFather.id")
+    @Mapping(target = "idAccountCreate", source = "createdByAccount.id")
+    @Mapping(target = "idAccountAssigned", source = "accountAssign.id")
+    @Mapping(target = "idSection", source = "section.id")
+    @Mapping(target = "idProject", source = "section.project.id")
+    TaskEventDto toEventDto(Task task);
+
+    default TaskPayload toPayload(
+            Task task,
+            ActorDto actor,
+            List<String> receivers
+    ) {
+        TaskPayload payload = new TaskPayload();
+
+        payload.setProjectId(
+                task.getSection().getProject().getId()
+        );
+
+        payload.setActor(actor);
+        payload.setReceivers(receivers);
+        payload.setTask(toEventDto(task));
+
+        return payload;
+    }
+
+
 }

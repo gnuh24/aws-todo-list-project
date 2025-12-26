@@ -12,14 +12,17 @@ import java.util.Optional;
 
 public interface ProjectRepository extends JpaRepository<Project, String>, JpaSpecificationExecutor<Project> {
     @Query("""
-                SELECT DISTINCT p 
-                FROM Project p 
-                JOIN FETCH p.members m 
+                SELECT DISTINCT p
+                FROM Project p
+                JOIN FETCH p.members m
                 WHERE m.account.id = :accountId
-                  AND (p.isDeleted = false OR p.isDeleted IS NULL) AND m.status = ACCEPTED
+                  AND m.status = ACCEPTED
+                  AND (m.isDeleted = false OR m.isDeleted IS NULL)
+                  AND (p.isDeleted = false OR p.isDeleted IS NULL)
                 ORDER BY p.updatedAt DESC
             """)
     List<Project> findAllByAccountId(@Param("accountId") String accountId);
+
 
     Optional<Project> findByIdAndIsDeletedFalse(String id);
 

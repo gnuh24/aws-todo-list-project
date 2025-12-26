@@ -5,8 +5,8 @@ import aws.todolist.taskflow.annotation.RequireProjectRole;
 import aws.todolist.taskflow.api.ApiResponse;
 import aws.todolist.taskflow.dto.section.*;
 import aws.todolist.taskflow.enums.Role;
-import aws.todolist.taskflow.service.AccountService;
-import aws.todolist.taskflow.service.SectionService;
+import aws.todolist.taskflow.service.ServiceInterface.AccountService;
+import aws.todolist.taskflow.service.ServiceInterface.SectionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -24,7 +24,7 @@ public class SectionController {
 
     @Autowired
     private SectionService sectionService;
-    
+
     @Autowired
     private AccountService accountService;
 
@@ -71,7 +71,7 @@ public class SectionController {
 
         return ResponseEntity.ok(response);
     }
-    
+
 
     @Operation(summary = "Xóa section", description = "Xóa section và các task trong section")
     @DeleteMapping("/{idProject}/sections/{idSection}")

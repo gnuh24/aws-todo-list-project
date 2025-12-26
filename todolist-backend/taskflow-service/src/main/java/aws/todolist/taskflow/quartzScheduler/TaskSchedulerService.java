@@ -1,7 +1,7 @@
 package aws.todolist.taskflow.quartzScheduler;
 
 
-import aws.todolist.taskflow.messaging.kafka.message.NotificationType;
+import aws.todolist.taskflow.enums.EventType;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,7 +31,7 @@ public class TaskSchedulerService {
 
         // Nếu job chưa tồn tại, tạo JobDetail
         if (!scheduler.checkExists(jobKey)) {
-            JobDetail jobDetail = JobBuilder.newJob(TaskNotificationReminder.class)
+            JobDetail jobDetail = JobBuilder.newJob(TaskEventReminder.class)
                     .withIdentity(jobKey)
                     .usingJobData("taskId", taskId)
                     .usingJobData("deadline", deadline.toString())
@@ -82,7 +82,7 @@ public class TaskSchedulerService {
                     .forJob(jobKey)
                     .withIdentity(triggerKey)
                     .startAt(triggerTime)
-                    .usingJobData("type", String.valueOf(NotificationType.TASK_DUE_SOON))
+                    .usingJobData("type", String.valueOf(EventType.TASK_DUE_SOON))
                     .withSchedule(SimpleScheduleBuilder.simpleSchedule()
                             .withMisfireHandlingInstructionFireNow()) // nếu bỏ lỡ, chạy ngay
                     .build();
@@ -108,7 +108,7 @@ public class TaskSchedulerService {
                 .forJob(jobKey)
                 .withIdentity(triggerKey)
                 .startAt(triggerTime)
-                .usingJobData("type", String.valueOf(NotificationType.TASK_OVERDUE))
+                .usingJobData("type", String.valueOf(EventType.TASK_OVERDUE))
                 .withSchedule(SimpleScheduleBuilder.simpleSchedule()
                         .withMisfireHandlingInstructionFireNow()) // nếu bỏ lỡ, chạy ngay
                 .build();

@@ -17,6 +17,7 @@ public interface NotificationService {
 	Integer markNotificationsByIsRead(List<String> ids, boolean isRead);
 
 	void create(NotificationMessage msg);
+
 	int updateReadStatus(String notificationId, boolean isRead); // Đã bỏ receiverId
 	Long getCountNotificationByIsRead(boolean isRead, String idReceiver);
 

@@ -6,11 +6,10 @@ import aws.todolist.taskflow.dto.member.MemberCreateRequestDTO;
 import aws.todolist.taskflow.dto.member.MemberResponseDTO;
 import aws.todolist.taskflow.dto.member.MemberUpdateRoleRequestDTO;
 import aws.todolist.taskflow.dto.member.MemberUpdateStatusRequestDTO;
-import aws.todolist.taskflow.entity.Account;
 import aws.todolist.taskflow.enums.Role;
 import aws.todolist.taskflow.enums.StatusMember;
-import aws.todolist.taskflow.service.AccountService;
-import aws.todolist.taskflow.service.MemberService;
+import aws.todolist.taskflow.service.ServiceInterface.AccountService;
+import aws.todolist.taskflow.service.ServiceInterface.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -27,7 +26,7 @@ public class MemberController {
 
     @Autowired
     private MemberService memberService;
-    
+
     @Autowired
     private AccountService accountService;
 
@@ -46,10 +45,10 @@ public class MemberController {
     @PostMapping("/{idProject}/members")
     @RequireProjectRole({Role.ADMIN, Role.OWNER})
     public ResponseEntity<ApiResponse<MemberResponseDTO>> addNewMember(
-            @PathVariable("idProject") String id,
+            @PathVariable("idProject") String projectId,
             @RequestBody @Valid MemberCreateRequestDTO request) {
 
-        MemberResponseDTO memberResponseDTO = memberService.addNewMember(id, request);
+        MemberResponseDTO memberResponseDTO = memberService.addNewMember(projectId, request);
 
         ApiResponse<MemberResponseDTO> response = new ApiResponse<>(
                 200,
@@ -83,12 +82,11 @@ public class MemberController {
     @PatchMapping("/{idProject}/members/response")
     public ResponseEntity<ApiResponse<MemberResponseDTO>> updateStatusMember(
             @PathVariable("idProject") String id,
-            @RequestBody @Valid MemberUpdateStatusRequestDTO request,
-	    @RequestHeader("X-User-Id") String accountId
+            @RequestBody @Valid MemberUpdateStatusRequestDTO request
     ) {
-	    
-	    Account account = accountService.getAccountById(accountId);
-	    MemberResponseDTO memberResponseDTO = memberService.responseRequestMember(id, request, account);
+
+
+        MemberResponseDTO memberResponseDTO = memberService.responseRequestMember(id, request);
 
         String message;
         if (memberResponseDTO.getStatus() == StatusMember.ACCEPTED) {

@@ -1,0 +1,174 @@
+package aws.todoist.websocket.security;
+
+import io.jsonwebtoken.*;
+import jakarta.annotation.PostConstruct;
+import lombok.Data;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
+
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+@Component
+@Data
+public class JwtTokenProvider {
+	
+	@Value("${jwt.secret}")
+	private String secretString;
+	
+	private SecretKey secretKey;  // Use a single secret key for both access and refresh tokens
+	
+//	private static final long EXPIRATION_TIME_FOR_TOKEN = 0;
+//	private static final long EXPIRATION_TIME_FOR_REFRESH_TOKEN = 0;
+	
+	private static final long EXPIRATION_TIME_FOR_TOKEN = 30L * 24 * 60 * 60 * 1000;
+	private static final long EXPIRATION_TIME_FOR_REFRESH_TOKEN = 30L * 24 * 60 * 60 * 1000;
+	private static final long INTERNAL_EXPIRATION_TIME = 30L * 24 * 60 * 60 * 1000;
+	
+	@PostConstruct
+	public void init() {
+		if (secretString == null || secretString.isBlank()) {
+			throw new IllegalStateException("JWT secret key is not set in application.properties");
+		}
+		byte[] keyBytes = Base64.getDecoder().decode(secretString.getBytes(StandardCharsets.UTF_8));
+		this.secretKey = new SecretKeySpec(keyBytes, "HmacSHA256");
+	}
+	
+	// ✅ Generate Access Token
+	public String generateToken(UserDetails userDetails) {
+		Map<String, Object> claims = new HashMap<>();
+		claims.put("typ", "access");  // Mark this as access token
+		
+		if (userDetails.getAuthorities() != null && !userDetails.getAuthorities().isEmpty()) {
+			claims.put("role", userDetails.getAuthorities().iterator().next().getAuthority());
+		}
+		
+		return Jwts.builder()
+		    .setClaims(claims)
+		    .setSubject(userDetails.getUsername())
+		    .setIssuedAt(new Date(System.currentTimeMillis()))
+		    .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME_FOR_TOKEN))
+		    .signWith(secretKey)
+		    .compact();
+	}
+	
+	// ✅ Generate Internal Token
+	public String generateInternalToken(String serviceName) {
+		Map<String, Object> claims = new HashMap<>();
+		claims.put("typ", "internal");   // Mark this as internal token
+		claims.put("service", serviceName); // Ai đã generate (ví dụ: "auth-service")
+		
+		return Jwts.builder()
+		    .setClaims(claims)
+		    .setSubject("internal-token") // Subject cố định, không gắn với user
+		    .setIssuedAt(new Date(System.currentTimeMillis()))
+		    .setExpiration(new Date(System.currentTimeMillis() + INTERNAL_EXPIRATION_TIME)) // thời gian sống có thể ngắn hơn
+		    .signWith(secretKey)
+		    .compact();
+	}
+	
+	
+	// ✅ Generate Refresh Token
+	public String generateRefreshToken(UserDetails userDetails) {
+		Map<String, Object> claims = new HashMap<>();
+		claims.put("typ", "refresh");  // Mark this as refresh token
+		
+		if (userDetails.getAuthorities() != null && !userDetails.getAuthorities().isEmpty()) {
+			claims.put("role", userDetails.getAuthorities().iterator().next().getAuthority());
+		}
+		
+		return Jwts.builder()
+		    .setClaims(claims)
+		    .setSubject(userDetails.getUsername())
+		    .setIssuedAt(new Date(System.currentTimeMillis()))
+		    .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME_FOR_REFRESH_TOKEN))
+		    .signWith(secretKey)
+		    .compact();
+	}
+	
+	
+	public void logJwtTokenInfo(String token) {
+		String[] parts = token.split("\\.");
+		String encodedPayload = parts[1];
+		String payload = new String(Base64.getUrlDecoder().decode(encodedPayload), StandardCharsets.UTF_8);
+		
+		System.err.println("===== JWT Token Info =====");
+		System.err.println(payload);
+		System.err.println("==========================");
+	}
+	
+	
+	public String getUsername(String token) {
+		return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getSubject();
+	}
+	
+	public String getTokenType(String token) {
+		String[] parts = token.split("\\.");
+		String encodedPayload = parts[1];
+		String payload = new String(Base64.getUrlDecoder().decode(encodedPayload), StandardCharsets.UTF_8);
+		
+		// Tìm chuỗi "typ":"xxx"
+		int typIndex = payload.indexOf("\"typ\"");
+		if (typIndex == -1) return null;
+		
+		int colonIndex = payload.indexOf(":", typIndex);
+		int firstQuote = payload.indexOf("\"", colonIndex + 1);
+		int secondQuote = payload.indexOf("\"", firstQuote + 1);
+		
+		return payload.substring(firstQuote + 1, secondQuote);
+	}
+
+	
+	
+	// Extract username from JWT Token without using library methods (manual extraction)
+	public String getUsernameWithoutExpired(String token) {
+		String[] parts = token.split("\\.");
+		String encodedPayload = parts[1];
+		String payload = new String(Base64.getUrlDecoder().decode(encodedPayload), StandardCharsets.UTF_8);
+		return payload.split("\"")[3];
+	}
+
+	/**
+	 * Xác thực token: hợp lệ, chưa hết hạn, chữ ký đúng.
+	 */
+	public boolean validateToken(String token) {
+		if (token == null || token.trim().isEmpty()) {
+			System.err.println("❌ Token is null or empty");
+			return false;
+		}
+
+		try {
+			// Parse và xác minh chữ ký + thời hạn
+			Jws<Claims> claims = Jwts.parser()
+					.verifyWith(secretKey)
+					.build()
+					.parseSignedClaims(token.trim());
+
+			// Không cần làm gì thêm — nếu đến đây là hợp lệ
+			System.out.println("✅ Token valid for user: " + claims.getPayload().getSubject());
+			return true;
+
+		} catch (ExpiredJwtException e) {
+			System.err.println("❌ Token expired: " + e.getMessage());
+		} catch (io.jsonwebtoken.security.SignatureException e) {
+			System.err.println("❌ Invalid signature: " + e.getMessage());
+		} catch (MalformedJwtException e) {
+			System.err.println("❌ Malformed token: " + e.getMessage());
+		} catch (IllegalArgumentException e) {
+			System.err.println("❌ Token is null/empty/invalid: " + e.getMessage());
+		} catch (JwtException e) {
+			System.err.println("❌ JWT error: " + e.getMessage());
+		} catch (Exception e) {
+			System.err.println("❌ Unexpected error: " + e.getMessage());
+			e.printStackTrace();
+		}
+
+		return false;
+	}
+}

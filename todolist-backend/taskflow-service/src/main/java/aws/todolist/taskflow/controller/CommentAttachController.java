@@ -5,7 +5,7 @@ import aws.todolist.taskflow.annotation.RequireProjectRole;
 import aws.todolist.taskflow.api.ApiResponse;
 import aws.todolist.taskflow.dto.commentAttach.CommentAttachResponse;
 import aws.todolist.taskflow.enums.Role;
-import aws.todolist.taskflow.service.CommentAttachService;
+import aws.todolist.taskflow.service.ServiceInterface.CommentAttachService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;

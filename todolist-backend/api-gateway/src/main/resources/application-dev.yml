@@ -8,7 +8,7 @@ spring:
             globalcors:
                 add-to-simple-url-handler-mapping: true
                 corsConfigurations:
-                    '[/api/taskflow/**]':
+                    '[/api/**]':
                         allowedOrigins:
                             - "http://localhost:4200"
                             - "http://127.0.0.1:4200"
@@ -27,85 +27,6 @@ spring:
                             - OPTIONS
                         allowedHeaders: "*"
                         allowCredentials: true
-
-                    '[/api/notification/v1/**]':
-                        allowedOrigins:
-                            - "http://localhost:4200"
-                            - "http://127.0.0.1:4200"
-                            - "http://localhost:5500"
-                            - "http://127.0.0.1:5500"
-                            - "http://localhost:3000"
-                            - "http://127.0.0.1:3000"
-                            - "https://sgutodolist.com"
-
-                        allowedMethods:
-                            - GET
-                            - POST
-                            - PUT
-                            - PATCH
-                            - DELETE
-                            - OPTIONS
-                        allowedHeaders: "*"
-                        allowCredentials: true
-
-                    '[/api/user/**]':
-                        allowedOrigins:
-                            - "http://localhost:4200"
-                            - "http://127.0.0.1:4200"
-                            - "http://localhost:5500"
-                            - "http://127.0.0.1:5500"
-                            - "http://localhost:3000"
-                            - "http://127.0.0.1:3000"
-                            - "https://sgutodolist.com"
-                        allowedMethods:
-                            - GET
-                            - POST
-                            - PUT
-                            - PATCH
-                            - DELETE
-                            - OPTIONS
-                        allowedHeaders: "*"
-                        allowCredentials: true
-
-                    '[/api/auth/**]':
-                        allowedOrigins:
-                            - "http://localhost:4200"
-                            - "http://127.0.0.1:4200"
-                            - "http://localhost:5500"
-                            - "http://127.0.0.1:5500"
-                            - "http://localhost:3000"
-                            - "http://127.0.0.1:3000"
-                            - "https://sgutodolist.com"
-                            
-                        allowedMethods:
-                            - GET
-                            - POST
-                            - PUT
-                            - PATCH
-                            - DELETE
-                            - OPTIONS
-                        allowedHeaders: "*"
-                        allowCredentials: true
-
-                    '[/api/model/**]':
-                        allowedOrigins:
-                            - "http://localhost:4200"
-                            - "http://127.0.0.1:4200"
-                            - "http://localhost:5500"
-                            - "http://127.0.0.1:5500"
-                            - "http://localhost:3000"
-                            - "http://127.0.0.1:3000"
-                            - "https://sgutodolist.com"
-                        allowedMethods:
-                            - GET
-                            - POST
-                            - PUT
-                            - PATCH
-                            - DELETE
-                            - OPTIONS
-                        allowedHeaders: "*"
-                        allowCredentials: true
-
             # 🔹 Routes Configuration
             routes:
                 -   id: ai-model-service
@@ -118,9 +39,9 @@ spring:
                     predicates:
                         - Path=/api/user/**
 
-
                 -   id: taskflow-service
                     uri: ${TASKFLOW_SERVICE_URL:http://localhost:8082}
+#                    uri: "http://localhost:8082"
                     predicates:
                         - Path=/api/taskflow/**
 
@@ -130,18 +51,9 @@ spring:
                     predicates:
                         - Path=/api/auth/**
 
-
-                # 🔹 WebSocket route (HTTP/SockJS)
-                -   id: notification-ws
-                    uri: ${NOTIFICATION_SERVICE_URL:http://localhost:9998}
-                    predicates:
-                        - Path=/api/notification/ws/**
-
-
-                # 🔹 REST route
                 -   id: notification-rest
                     uri: ${NOTIFICATION_SERVICE_URL:http://localhost:9998}
-                    #                                        uri: http://localhost:9998
+#                    uri: http://localhost:9998
                     predicates:
                         - Path=/api/notification/**
 

@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>TaskFlow – WebSocket Test Console</title>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: Inter, Arial, sans-serif;
+        background: #f4f6f8;
+        margin: 0;
+        padding: 24px;
+        color: #1f2937;
+      }
+      h1 {
+        font-size: 22px;
+        margin-bottom: 16px;
+      }
+      h2 {
+        font-size: 16px;
+        margin: 16px 0 8px;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 320px 1fr;
+        gap: 16px;
+        height: calc(100vh - 48px);
+      }
+
+      .card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        display: flex;
+        flex-direction: column;
+      }
+
+      label {
+        font-size: 13px;
+        font-weight: 600;
+        margin-top: 10px;
+      }
+      input {
+        padding: 8px 10px;
+        border-radius: 8px;
+        border: 1px solid #d1d5db;
+        margin-top: 4px;
+      }
+
+      button {
+        padding: 10px;
+        border-radius: 10px;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+      }
+
+      .btn-primary {
+        background: #2563eb;
+        color: #fff;
+      }
+      .btn-danger {
+        background: #dc2626;
+        color: #fff;
+      }
+      .btn-secondary {
+        background: #e5e7eb;
+      }
+
+      .row {
+        display: flex;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .status {
+        margin-top: 12px;
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .log {
+        flex: 1;
+        background: #0f172a;
+        color: #e5e7eb;
+        border-radius: 10px;
+        padding: 12px;
+        overflow-y: auto;
+        font-size: 13px;
+      }
+
+      .log-item {
+        margin-bottom: 6px;
+      }
+      .log-item.private {
+        color: #93c5fd;
+      }
+      .log-item.project {
+        color: #86efac;
+      }
+      .log-item.system {
+        color: #facc15;
+      }
+
+      .project-item {
+        padding: 10px;
+        border-radius: 8px;
+        cursor: pointer;
+        border: 1px solid #e5e7eb;
+        margin-bottom: 6px;
+        font-size: 14px;
+      }
+
+      .project-item:hover {
+        background: #f1f5f9;
+      }
+
+      .project-item.active {
+        background: #2563eb;
+        color: white;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🚀 TaskFlow – WebSocket Test Console</h1>
+
+    <div class="layout">
+      <!-- LEFT: AUTH + SUBSCRIBE -->
+      <div class="card">
+        <h2>Authentication</h2>
+
+        <label>Email</label>
+        <input id="email" placeholder="user@email.com" />
+
+        <label>Password</label>
+        <input id="password" type="password" />
+
+        <div class="row">
+          <button class="btn-primary" onclick="connect()">Connect</button>
+          <button class="btn-danger" onclick="disconnect()">Disconnect</button>
+        </div>
+
+        <div id="status" class="status">Not connected</div>
+
+        <label>My Projects</label>
+        <div id="projectList"></div>
+      </div>
+
+      <!-- RIGHT: LOG -->
+      <div class="card">
+        <h2>Realtime Events</h2>
+        <div id="log" class="log"></div>
+      </div>
+    </div>
+
+    <script>
+      let stompClient = null;
+      let token = null;
+      const MAX_RECONNECT = 5;
+      let reconnectAttempts = 0;
+
+      let currentProjectId = null;
+      let subscriptions = [];
+
+      const logEl = document.getElementById("log");
+      const statusEl = document.getElementById("status");
+      const projectSelect = document.getElementById("projectSelect");
+
+      function log(msg, type = "system") {
+        const div = document.createElement("div");
+        div.className = "log-item " + type;
+        div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+        logEl.appendChild(div);
+        logEl.scrollTop = logEl.scrollHeight;
+      }
+
+      /* ================= LOGIN + WS ================= */
+
+      async function connect() {
+        const emailInput = document.getElementById("email");
+        const passwordInput = document.getElementById("password");
+
+        const email = emailInput.value.trim();
+        const password = passwordInput.value.trim();
+
+        if (!email || !password) {
+          alert("Please enter email and password");
+          return;
+        }
+
+        const res = await fetch("http://localhost:8080/api/auth/v1/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const json = await res.json();
+        token = json.data?.token;
+
+        if (!token) {
+          alert("Login failed");
+          return;
+        }
+
+        const socket = new SockJS("http://localhost:8085/websocket/ws");
+
+        stompClient = new StompJs.Client({
+          webSocketFactory: () => socket,
+          connectHeaders: {
+            Authorization: "Bearer " + token,
+          },
+
+          debug: (str) => console.log("[STOMP]", str),
+
+          reconnectDelay: 3000, // 3s / lần
+
+          onConnect: async () => {
+            reconnectAttempts = 0; // ✅ reset khi connect thành công
+            statusEl.textContent = "Connected";
+            log("WebSocket connected");
+
+            // subscribe personal notification
+            stompClient.subscribe("/user/queue/notification", (msg) =>
+              log(msg.body, "private")
+            );
+            log("Subscribed personal notifications");
+
+            // subscribe personal notification
+            stompClient.subscribe("/user/queue/project-summary", (msg) => {
+              log(msg.body, "project summary");
+              const event = JSON.parse(msg.body);
+              handleProjectSummaryEvent(event);
+            });
+
+            log("Subscribed personal project summary");
+
+            await loadMyProjects();
+          },
+
+          onWebSocketClose: () => {
+            reconnectAttempts++;
+            log(
+              `WebSocket closed (${reconnectAttempts}/${MAX_RECONNECT})`,
+              "system"
+            );
+
+            if (reconnectAttempts >= MAX_RECONNECT) {
+              log(
+                "❌ Max reconnect attempts reached. Stop reconnecting.",
+                "system"
+              );
+              stompClient.reconnectDelay = 0; // ❌ tắt auto reconnect
+              stompClient.deactivate();
+            }
+          },
+
+          onStompError: (frame) => {
+            log("STOMP error: " + frame.headers["message"], "system");
+          },
+        });
+
+        stompClient.activate();
+      }
+
+      function disconnect() {
+        leaveProject();
+        stompClient?.deactivate();
+        log("Disconnected");
+      }
+
+      /* ================= PROJECT ================= */
+
+      async function loadMyProjects() {
+        const res = await fetch(
+          "http://localhost:8080/api/taskflow/v1/projects",
+          {
+            headers: { Authorization: "Bearer " + token },
+          }
+        );
+
+        const json = await res.json();
+        const container = document.getElementById("projectList");
+        container.innerHTML = "";
+
+        renderProjectList(json.data);
+
+        log("Loaded project list");
+      }
+
+      function renderProjectList(projects) {
+        const container = document.getElementById("projectList");
+        container.innerHTML = "";
+
+        projects.forEach((project) => {
+          const div = document.createElement("div");
+          div.className = "project-item";
+          div.dataset.projectId = project.id; // ⭐ key chính
+          div.textContent = project.name;
+          div.onclick = () => selectProject(project.id, div);
+
+          container.appendChild(div);
+        });
+      }
+
+      function handleProjectSummaryEvent(event) {
+        const type = event.eventType;
+        const project = event.payload?.project;
+        if (!project) return;
+
+        switch (type) {
+          case "PROJECT_CREATED":
+            addProjectToList(project);
+            break;
+
+          case "PROJECT_UPDATED":
+            updateProjectInList(project);
+            break;
+
+          case "PROJECT_ARCHIVED":
+          case "PROJECT_DELETED":
+            removeProjectFromList(project.id);
+            break;
+        }
+
+        log(`Project summary updated: ${type}`, "private");
+      }
+
+      function addProjectToList(project) {
+        const container = document.getElementById("projectList");
+
+        // tránh add trùng
+        if (container.querySelector(`[data-project-id="${project.id}"]`))
+          return;
+
+        const div = document.createElement("div");
+        div.className = "project-item";
+        div.dataset.projectId = project.id;
+        div.textContent = project.name;
+        div.onclick = () => selectProject(project.id, div);
+
+        container.appendChild(div);
+      }
+
+      function updateProjectInList(project) {
+        const el = document.querySelector(
+          `.project-item[data-project-id="${project.id}"]`
+        );
+
+        if (!el) return;
+
+        el.textContent = project.name;
+      }
+
+      function removeProjectFromList(projectId) {
+        const el = document.querySelector(
+          `.project-item[data-project-id="${projectId}"]`
+        );
+
+        if (el) el.remove();
+      }
+
+      function selectProject(projectId, element) {
+        // UI active state
+        document
+          .querySelectorAll(".project-item")
+          .forEach((e) => e.classList.remove("active"));
+        element.classList.add("active");
+
+        // unsubscribe project cũ
+        leaveProject();
+
+        currentProjectId = projectId;
+
+        subscriptions.push(
+          stompClient.subscribe(`/topic/project/${projectId}`, (m) =>
+            log(m.body, "project")
+          ),
+          stompClient.subscribe(`/topic/project/${projectId}/task`, (m) =>
+            log(m.body, "project")
+          ),
+          stompClient.subscribe(`/topic/project/${projectId}/section`, (m) =>
+            log(m.body, "project")
+          ),
+          stompClient.subscribe(`/topic/project/${projectId}/member`, (m) =>
+            log(m.body, "project")
+          ),
+          stompClient.subscribe(`/topic/project/${projectId}/comment`, (m) =>
+            log(m.body, "project")
+          )
+        );
+
+        log(`Entered project ${projectId}`);
+      }
+
+      function leaveProject() {
+        subscriptions.forEach((s) => s.unsubscribe());
+        subscriptions = [];
+        if (currentProjectId) log(`Left project ${currentProjectId}`);
+        currentProjectId = null;
+      }
+
+      /* expose */
+      window.connect = connect;
+      window.disconnect = disconnect;
+    </script>
+  </body>
+</html>

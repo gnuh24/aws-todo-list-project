@@ -1,5 +1,6 @@
 package aws.todolist.taskflow.service;
 
+import aws.todolist.taskflow.context.RequestContext;
 import aws.todolist.taskflow.dto.member.MemberCreateRequestDTO;
 import aws.todolist.taskflow.dto.member.MemberResponseDTO;
 import aws.todolist.taskflow.dto.member.MemberUpdateRoleRequestDTO;
@@ -14,12 +15,14 @@ import aws.todolist.taskflow.exceptions.ProjectException.ForbiddenException;
 import aws.todolist.taskflow.exceptions.ProjectException.ResourceNotFoundException;
 import aws.todolist.taskflow.exceptions.errorCode.BusinessErrorCode;
 import aws.todolist.taskflow.exceptions.errorCode.SystemErrorCode;
+import aws.todolist.taskflow.mapper.ActorMapper;
 import aws.todolist.taskflow.mapper.MemberMapper;
-import aws.todolist.taskflow.messaging.kafka.message.NotificationType;
 import aws.todolist.taskflow.repository.AccountRepository;
 import aws.todolist.taskflow.repository.MemberRepository;
 import aws.todolist.taskflow.repository.ProjectRepository;
-import aws.todolist.taskflow.utils.NotificationUtils;
+import aws.todolist.taskflow.service.ServiceEventKafka.MemberEventService;
+import aws.todolist.taskflow.service.ServiceInterface.AccountService;
+import aws.todolist.taskflow.service.ServiceInterface.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -39,16 +42,23 @@ public class MemberServiceImpl implements MemberService {
     private MemberMapper memberMapper;
 
     @Autowired
+    private ActorMapper actorMapper;
+
+    @Autowired
     private ProjectRepository projectRepository;
 
     @Autowired
     private AccountRepository accountRepository;
 
     @Autowired
-    private NotificationUtils notificationUtils;
+    private RedisTemplate<String, Object> redisTemplate;
 
     @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    private MemberEventService memberEventService;
+
+    @Autowired
+    private AccountService accountService;
+
 
     @Override
     public List<MemberResponseDTO> getAllMember(String idProject) {
@@ -76,7 +86,7 @@ public class MemberServiceImpl implements MemberService {
 
         Project project;
 
-        Account account;
+        Account accountReceiveInvite;
 
         if (OptProject.isPresent()) {
             project = OptProject.get();
@@ -85,7 +95,7 @@ public class MemberServiceImpl implements MemberService {
         }
 
         if (OptAccount.isPresent()) {
-            account = OptAccount.get();
+            accountReceiveInvite = OptAccount.get();
         } else {
             throw new ResourceNotFoundException(BusinessErrorCode.TASKFLOW_NOT_FOUND, "Tài khoản không tồn tại.");
         }
@@ -96,15 +106,14 @@ public class MemberServiceImpl implements MemberService {
             throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Không thể phân quyền OWNER cho các thành viên khác.");
         }
 
-        Member member = Member.builder().account(account).project(project).role(requestDTO.getRole()).status(StatusMember.PENDING).build();
+        Member member = Member.builder().account(accountReceiveInvite).project(project).role(requestDTO.getRole()).status(StatusMember.PENDING).build();
 
         Member member_saved = memberRepository.saveAndFlush(member);
 
         // =============================
-        // 🔔 GỬI KAFKA NOTIFICATION
+        // 🔔 GỬI KAFKA
         // =============================
-
-        notificationUtils.sendNotification(null, project, null, notificationUtils.getReceiversForMemberAdd(member_saved), NotificationType.PROJECT_MEMBER_ADDED);
+        memberEventService.publishMemberAdded(member_saved);
 
         // =============================
 
@@ -144,12 +153,10 @@ public class MemberServiceImpl implements MemberService {
 
 
         // =============================
-        // 🔔 Gửi Kafka Notification
+        // 🔔 Gửi Kafka
         // =============================
 
-
-        notificationUtils.sendNotification(null, member_saved.getProject(), null, notificationUtils.getReceiversForMemberUpdate(member_saved), NotificationType.PROJECT_MEMBER_ROLE_UPDATED);
-
+        memberEventService.publishRoleUpdated(member_saved);
 
         return memberMapper.toResponse(member_saved);
     }
@@ -181,13 +188,19 @@ public class MemberServiceImpl implements MemberService {
 
         redisTemplate.delete(key);
 
+        // Gửi kafka cho event
+
+        memberEventService.publishMemberRemoved(member_saved);
+
         return memberMapper.toResponse(member_saved);
     }
 
     @Override
-    public MemberResponseDTO responseRequestMember(String idProject, MemberUpdateStatusRequestDTO requestDTO, Account account) {
+    public MemberResponseDTO responseRequestMember(String idProject, MemberUpdateStatusRequestDTO requestDTO) {
 
-        Optional<Member> optMember = memberRepository.findFirstByAccountIdAndProjectIdAndIsDeletedFalse(account.getId(), idProject);
+        Account actor = RequestContext.getAccount();
+
+        Optional<Member> optMember = memberRepository.findFirstByAccountIdAndProjectIdAndIsDeletedFalse(actor.getId(), idProject);
 
         if (optMember.isEmpty()) {
             throw new ForbiddenException(BusinessErrorCode.TASKFLOW_ACCESS_DENIED,
@@ -230,10 +243,10 @@ public class MemberServiceImpl implements MemberService {
         // =============================
 
         if (member.getStatus() == StatusMember.ACCEPTED) {
-            notificationUtils.sendNotification(null, member.getProject(), null, notificationUtils.getReceiversForMemberUpdate(member), NotificationType.REQUEST_ACCEPTED);
+            memberEventService.publishInviteAccepted(member);
 
         } else {
-            notificationUtils.sendNotification(null, member.getProject(), null, notificationUtils.getReceiversForMemberUpdate(member), NotificationType.REQUEST_DECLINED);
+            memberEventService.publishInviteDeclined(member);
 
         }
 
