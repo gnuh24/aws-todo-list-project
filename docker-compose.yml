@@ -234,6 +234,41 @@ services:
         networks:
             - default
 
+    # =====================
+    # 🌐 Websocket Service (Spring Boot)
+    # =====================
+    websocket-service:
+        build:
+            context: ./todolist-backend/websocket-service
+            dockerfile: Dockerfile
+        container_name: websocket-service
+        restart: unless-stopped
+        depends_on:
+            - mysql
+            - redis
+            - kafka
+        ports:
+            - "8085:8085"
+        environment:
+            # ==== MySQL ====
+            SPRING_DATASOURCE_URL: jdbc:mysql://mysql_db:3306/aws_todolist_database?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+            SPRING_DATASOURCE_USERNAME: root
+            SPRING_DATASOURCE_PASSWORD:
+            
+            # ==== Redis ====
+            SPRING_DATA_REDIS_HOST: redis_cache
+            SPRING_DATA_REDIS_PORT: 6379
+
+            # ==== Kafka ====
+            SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka_broker:29092
+
+
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+
+        networks:
+            - default
+
 
     # =====================
     # 🌐 AI Model Service (Flask)
