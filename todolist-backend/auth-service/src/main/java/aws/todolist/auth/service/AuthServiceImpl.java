@@ -298,25 +298,6 @@ public class AuthServiceImpl implements AuthService {
 	
 	
 	@Override
-	public void sendOtpDeleteAccount(String email) {
-		
-		String redisKey = RedisConstants.OTP_DELETE_ACCOUNT + ":" + email;
-		
-		// Clear OTP cũ (nếu có)
-		redisService.delete(redisKey);
-		
-		// Generate OTP
-		String otp = IdGenerator.generateOTP();
-		
-		// TTL 3 phút (giống update email)
-		redisService.set(redisKey, otp, 3, TimeUnit.MINUTES);
-		
-		// Send OTP via Kafka (email)
-		kafkaProducerService.sendDeleteAccount(email, otp);
-	}
-	
-	
-	@Override
 	public Account updateEmail(String accountId, UpdateEmailForm form) {
 		
 		Account account = accountService.getAccountById(accountId);
