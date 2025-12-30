@@ -94,11 +94,18 @@
 									]
 								},
 								"method": "GET",
-								"header": [],
+								"header": [
+									{
+										"key": "X-User-Id",
+										"value": "adasd",
+										"type": "text",
+										"disabled": true
+									}
+								],
 								"url": {
-									"raw": "{{prod-root}}/user/v1/accounts/me",
+									"raw": "{{API_ROOT}}/user/v1/accounts/me",
 									"host": [
-										"{{prod-root}}"
+										"{{API_ROOT}}"
 									],
 									"path": [
 										"user",
@@ -113,22 +120,12 @@
 						{
 							"name": "US003: Lấy thông tin cá nhân bằng email",
 							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{access-token-user1}}",
-											"type": "string"
-										}
-									]
-								},
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{prod-root}}/user/v1/accounts?email=user1@gmail.com",
+									"raw": "{{API_ROOT}}/user/v1/accounts?email=user1@gmail.com",
 									"host": [
-										"{{prod-root}}"
+										"{{API_ROOT}}"
 									],
 									"path": [
 										"user",
@@ -162,7 +159,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"avatar\": \"BANNEDD.jpg\",\n    \"displayName\": \"TST\"\n}",
+									"raw": "{\n    \"avatar\": \"BANNEDD.jpg\",\n    \"displayName\": \"TST\",\n    \"receiveEmail\": false\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -381,6 +378,70 @@
 			"name": "Auth Service",
 			"item": [
 				{
+					"name": "AU001: Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// ================= EXISTING LOGIC (GIỮ NGUYÊN) =================\r",
+									"\r",
+									"// Parse response\r",
+									"const response = pm.response.json();\r",
+									"\r",
+									"// Lưu token nếu có\r",
+									"if (response?.data?.token) {\r",
+									"    pm.collectionVariables.set(\"access-token-auto\", response.data.token);\r",
+									"    console.log(\"Token saved:\", response.data.token);\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"hungnt.020404@gmail.com\",\n  \"password\": 123\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_ROOT}}/auth/v1/login",
+							"host": [
+								"{{API_ROOT}}"
+							],
+							"path": [
+								"auth",
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "AU003: Check email exists",
 					"request": {
 						"auth": {
@@ -389,24 +450,89 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{prod-root}}/auth/v1/check-email?email=user1@gmail.com",
+							"raw": "{{API_ROOT}}/auth/v1/check-email",
 							"host": [
-								"{{prod-root}}"
+								"{{API_ROOT}}"
 							],
 							"path": [
 								"auth",
 								"v1",
 								"check-email"
-							],
-							"query": [
-								{
-									"key": "email",
-									"value": "user1@gmail.com",
-									"description": "Email đầu vào"
-								}
 							]
 						},
 						"description": "Kiểm tra xem email đã tồn tại hay chưa ?  \n1\\. Đã tồn tại -> TRUE\n\n2\\. Chưa tồn tại -> FALSE"
+					},
+					"response": []
+				},
+				{
+					"name": "AU004: Register",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"hungnt.020404@gmail.com\",\n    \"password\": \"123456\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_ROOT}}/auth/v1/register",
+							"host": [
+								"{{API_ROOT}}"
+							],
+							"path": [
+								"auth",
+								"v1",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AU005: Active account",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"giaule0122@gmail.com\",\n    \"password\": \"123456\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_ROOT}}/auth/v1/active-account?otp=171717&email=hungnt.020404@gmail.com",
+							"host": [
+								"{{API_ROOT}}"
+							],
+							"path": [
+								"auth",
+								"v1",
+								"active-account"
+							],
+							"query": [
+								{
+									"key": "otp",
+									"value": "171717"
+								},
+								{
+									"key": "email",
+									"value": "hungnt.020404@gmail.com"
+								}
+							]
+						}
 					},
 					"response": []
 				},
@@ -416,13 +542,53 @@
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "{{auth-service-domain}}/v1/send-reset-password-otp/hungnt.020404@gmail.com",
+							"raw": "{{API_ROOT}}/auth/v1/send-reset-password-otp/hungnt.020404@gmail.com",
 							"host": [
-								"{{auth-service-domain}}"
+								"{{API_ROOT}}"
 							],
 							"path": [
+								"auth",
 								"v1",
 								"send-reset-password-otp",
+								"hungnt.020404@gmail.com"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AU007: Reset password",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJhY2NvdW50SWQiOiIwNTIxMDM1My1mZDIyLTQ0NmUtYWU0Zi01ZmRhYzI2Zjc2OWUiLCJyb2xlIjoiVVNFUiIsInR5cCI6ImFjY2VzcyIsInN1YiI6Imh1bmdudC4wMjA0MDRAZ21haWwuY29tIiwiaWF0IjoxNzY2NDQ2MTc1LCJleHAiOjE3NjkwMzgxNzV9.6o3eAc0H5u03OUIA5OhU_ZxHtelalluDrLfL-cfrnG8",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"otp\": \"825406\",\n    \"newPassword\": \"123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_ROOT}}/auth/v1/reset-password/hungnt.020404@gmail.com",
+							"host": [
+								"{{API_ROOT}}"
+							],
+							"path": [
+								"auth",
+								"v1",
+								"reset-password",
 								"hungnt.020404@gmail.com"
 							]
 						}
@@ -437,7 +603,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{access-token-user1}}",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJhY2NvdW50SWQiOiIwNTIxMDM1My1mZDIyLTQ0NmUtYWU0Zi01ZmRhYzI2Zjc2OWUiLCJyb2xlIjoiVVNFUiIsInR5cCI6ImFjY2VzcyIsInN1YiI6Imh1bmdudC4wMjA0MDRAZ21haWwuY29tIiwiaWF0IjoxNzY2NDQ2MTc1LCJleHAiOjE3NjkwMzgxNzV9.6o3eAc0H5u03OUIA5OhU_ZxHtelalluDrLfL-cfrnG8",
 									"type": "string"
 								}
 							]
@@ -445,41 +611,14 @@
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "{{auth-service-domain}}/v1/send-update-email-otp/hungnt.020404@gmail.com",
+							"raw": "{{API_ROOT}}/auth/v1/send-update-email-otp/hungnt.020404@gmail.com",
 							"host": [
-								"{{auth-service-domain}}"
+								"{{API_ROOT}}"
 							],
 							"path": [
+								"auth",
 								"v1",
 								"send-update-email-otp",
-								"hungnt.020404@gmail.com"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "AU007: Reset password",
-					"request": {
-						"method": "PATCH",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"otp\": \"687304\",\n    \"newPassword\": \"123\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{auth-service-domain}}/v1/reset-password/hungnt.020404@gmail.com",
-							"host": [
-								"{{auth-service-domain}}"
-							],
-							"path": [
-								"v1",
-								"reset-password",
 								"hungnt.020404@gmail.com"
 							]
 						}
@@ -503,7 +642,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"otp\": \"845798\",\n    \"currentPassword\": \"123456\",\n    \"newEmail\": \"hungnt.020404@gmail.com\"\n}",
+							"raw": "{\n    \"otp\": \"932762\",\n    \"currentPassword\": \"123456\",\n    \"newEmail\": \"hungnt.020404@gmail.com\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -511,11 +650,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{auth-service-domain}}/v1/update-email",
+							"raw": "{{API_ROOT}}/auth/v1/update-email",
 							"host": [
-								"{{auth-service-domain}}"
+								"{{API_ROOT}}"
 							],
 							"path": [
+								"auth",
 								"v1",
 								"update-email"
 							]
@@ -540,7 +680,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"oldPassword\": \"123456\",\n    \"newPassword\": \"1234567\"\n}",
+							"raw": "{\n    \"oldPassword\": \"12345678\",\n    \"newPassword\": \"123456\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -548,90 +688,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{auth-service-domain}}/v1/update-password",
-							"host": [
-								"{{auth-service-domain}}"
-							],
-							"path": [
-								"v1",
-								"update-password"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "AU001: Login",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"// Parse response\r",
-									"const response = pm.response.json();\r",
-									"\r",
-									"// Hoặc lưu vào collection variable\r",
-									"pm.collectionVariables.set(\"access-token-auto\", response.data.token);\r",
-									"\r",
-									"// Log để check\r",
-									"console.log(\"Token saved:\", response.data.token);"
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"email\": \"user3@gmail.com\",\n    \"password\": \"123456\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{prod-root}}/auth/v1/login",
-							"host": [
-								"{{prod-root}}"
-							],
-							"path": [
-								"auth",
-								"v1",
-								"login"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "AU011: Refresh Token API",
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{API_ROOT}}/auth/v1/refresh-token",
+							"raw": "{{API_ROOT}}/auth/v1/update-password",
 							"host": [
 								"{{API_ROOT}}"
 							],
 							"path": [
 								"auth",
 								"v1",
-								"refresh-token"
+								"update-password"
 							]
 						}
 					},
@@ -714,94 +778,52 @@
 					"response": []
 				},
 				{
-					"name": "AU004: Register",
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"email\": \"hungnt.020404@gmail.com\",\n    \"password\": \"123456\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{API_ROOT}}/auth/v1/register",
-							"host": [
-								"{{API_ROOT}}"
-							],
-							"path": [
-								"auth",
-								"v1",
-								"register"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "AU005: Active account",
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"username\": \"giaule0122@gmail.com\",\n    \"password\": \"123456\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{API_ROOT}}/auth/v1/active-account?otp=927093",
-							"host": [
-								"{{API_ROOT}}"
-							],
-							"path": [
-								"auth",
-								"v1",
-								"active-account"
-							],
-							"query": [
-								{
-									"key": "otp",
-									"value": "927093"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "AU005: Active account Copy",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
+					"name": "AU015: Send delete account otp",
 					"request": {
 						"auth": {
 							"type": "bearer",
 							"bearer": [
 								{
 									"key": "token",
-									"value": "",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJhY2NvdW50SWQiOiIwNTIxMDM1My1mZDIyLTQ0NmUtYWU0Zi01ZmRhYzI2Zjc2OWUiLCJyb2xlIjoiVVNFUiIsInR5cCI6ImFjY2VzcyIsInN1YiI6Imh1bmdudC4wMjA0MDRAZ21haWwuY29tIiwiaWF0IjoxNzY2NDQ2MTc1LCJleHAiOjE3NjkwMzgxNzV9.6o3eAc0H5u03OUIA5OhU_ZxHtelalluDrLfL-cfrnG8",
 									"type": "string"
 								}
 							]
 						},
-						"method": "GET",
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{API_ROOT}}/auth/v1/send-delete-account-otp",
+							"host": [
+								"{{API_ROOT}}"
+							],
+							"path": [
+								"auth",
+								"v1",
+								"send-delete-account-otp"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AU016: Delete account",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access-token-user1}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"username\": \"giaule0122@gmail.com\",\n    \"password\": \"123456\"\n}",
+							"raw": "{\n    \"confirmText\": \"delete\",\n    \"email\": \"user1@gmail.com\",\n    \"password\": \"123456\",\n    \"otp\": \"073153\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -809,19 +831,122 @@
 							}
 						},
 						"url": {
-							"raw": "{{auth-service-domain}}/v1/test?token",
+							"raw": "{{API_ROOT}}/auth/v1/delete-account",
 							"host": [
-								"{{auth-service-domain}}"
+								"{{API_ROOT}}"
 							],
 							"path": [
+								"auth",
 								"v1",
-								"test"
-							],
-							"query": [
+								"delete-account"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AU018: Setup 2FA",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
 								{
 									"key": "token",
-									"value": null
+									"value": "{{access-token-user1}}",
+									"type": "string"
 								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{API_ROOT}}/auth/v1/2fa/setup",
+							"host": [
+								"{{API_ROOT}}"
+							],
+							"path": [
+								"auth",
+								"v1",
+								"2fa",
+								"setup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AU019: Verify 2FA",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access-token-user1}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"otp\": \"037364\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_ROOT}}/auth/v1/2fa/verify",
+							"host": [
+								"{{API_ROOT}}"
+							],
+							"path": [
+								"auth",
+								"v1",
+								"2fa",
+								"verify"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AU019: Disable 2FA",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access-token-user1}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"otp\": \"167894\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_ROOT}}/auth/v1/2fa/disable",
+							"host": [
+								"{{API_ROOT}}"
+							],
+							"path": [
+								"auth",
+								"v1",
+								"2fa",
+								"disable"
 							]
 						}
 					},
@@ -854,9 +979,9 @@
 									}
 								},
 								"url": {
-									"raw": "{{prod-root}}/{{taskflow-service-v1}}/projects",
+									"raw": "{{API_ROOT}}/{{taskflow-service-v1}}/projects",
 									"host": [
-										"{{prod-root}}"
+										"{{API_ROOT}}"
 									],
 									"path": [
 										"{{taskflow-service-v1}}",
@@ -872,9 +997,9 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{prod-root}}/{{taskflow-service-v1}}/projects/:projectId",
+									"raw": "{{API_ROOT}}/{{taskflow-service-v1}}/projects/:projectId",
 									"host": [
-										"{{prod-root}}"
+										"{{API_ROOT}}"
 									],
 									"path": [
 										"{{taskflow-service-v1}}",
@@ -884,7 +1009,7 @@
 									"variable": [
 										{
 											"key": "projectId",
-											"value": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+											"value": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"
 										}
 									]
 								}
@@ -898,7 +1023,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"name\": \"Test project test\",\r\n    \"isArchived\": true\r\n}",
+									"raw": "{\r\n    \"name\": \"Test project test member\",\r\n    \"isArchived\": true\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -925,7 +1050,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"isArchived\": false\r\n}",
+									"raw": "{\r\n    \"name\": \"Project Alpha 2\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1347,6 +1472,47 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "TAS037: Cập nhật tên section",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"đi học\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{API_ROOT}}/{{taskflow-service-v1}}/projects/:projectId/sections/:sectionId/update-name",
+									"host": [
+										"{{API_ROOT}}"
+									],
+									"path": [
+										"{{taskflow-service-v1}}",
+										"projects",
+										":projectId",
+										"sections",
+										":sectionId",
+										"update-name"
+									],
+									"variable": [
+										{
+											"key": "projectId",
+											"value": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+										},
+										{
+											"key": "sectionId",
+											"value": "ebdc6e77-4fbe-4573-82fa-f7f20af9e7e2"
+										}
+									]
+								}
+							},
+							"response": []
 						}
 					]
 				},
@@ -1377,7 +1543,7 @@
 										},
 										{
 											"key": "taskId",
-											"value": "66666666-cccc-cccc-cccc-cccccccccccc"
+											"value": "66666666-cccc-cccc-cccc-ccccccccccce"
 										}
 									]
 								}
@@ -1763,7 +1929,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n  \"description\": \"Ngày mai nhớ đi ăn sáng\"\r\n}\r\n",
+									"raw": "{\r\n   \"deadline\": \"2026-10-15T03:10:53.183Z\"\r\n}\r\n",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1971,7 +2137,7 @@
 										},
 										{
 											"key": "taskId",
-											"value": "1a2b3c4d-0000-1111-2222-aaaaaaaaaaa3"
+											"value": "44444444-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
 										}
 									]
 								}
