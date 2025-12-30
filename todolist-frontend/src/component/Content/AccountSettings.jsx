@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import { https_user, https_authupdate } from "../../service/api";
-import { Switch, Modal, Input, message } from "antd";
-import { Button } from "antd";
+import { useEffect, useState, useRef } from "react";
+import { https_user, https_authupdate, https_media } from "../../service/api";
+import { Switch, Modal, Input, message, Button } from "antd";
+import { BASE_URL } from "../../service/api"
 
 export default function AccountSettings({
     onGotoChangePassword,
@@ -13,74 +13,114 @@ export default function AccountSettings({
     const dataUser = JSON.parse(localStorage.getItem("USER_INFO")) || {};
     const { id, displayName, email, avatar, twoFactorEnabled, receiveEmail } = dataUser;
 
-
+    /* ================= STATE ================= */
     const [name, setName] = useState(displayName || "");
     const [tempName, setTempName] = useState(displayName || "");
     const [editing, setEditing] = useState(false);
-    const [isNotificationEmail, setIsNotificationEmail] = useState(receiveEmail | false);
-    const [isTwoFactorEnabled, setIsTwoFactorEnabled] = useState(twoFactorEnabled | false);
+
+    const [isNotificationEmail, setIsNotificationEmail] = useState(receiveEmail || false);
+    const [isTwoFactorEnabled, setIsTwoFactorEnabled] = useState(twoFactorEnabled || false);
 
     const [disable2FAModalOpen, setDisable2FAModalOpen] = useState(false);
     const [otp, setOtp] = useState("");
     const [loadingDisable2FA, setLoadingDisable2FA] = useState(false);
 
+    /* ===== Avatar TEMP ===== */
+    const fileInputRef = useRef(null);
+    const [tempAvatarFile, setTempAvatarFile] = useState(null);
+    const [tempAvatarPreview, setTempAvatarPreview] = useState(null);
+
+    /* ================= HANDLERS ================= */
 
     const handleCancel = () => {
         setTempName(name);
+        setTempAvatarFile(null);
+        setTempAvatarPreview(avatar || null);
         setEditing(false);
     };
 
+    const handleChooseAvatar = () => {
+        fileInputRef.current.click();
+    };
+
+    const handleAvatarChange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+
+        setTempAvatarFile(file);
+        setTempAvatarPreview(URL.createObjectURL(file));
+        setEditing(true);
+    };
+
+    const uploadAvatarIfNeeded = async () => {
+        if (!tempAvatarFile) return avatar || null;
+
+        const formData = new FormData();
+        formData.append("file", tempAvatarFile);
+
+        const res = await https_media.post(
+            "/v1/local/uploads",
+            formData,
+            {
+                headers: { "Content-Type": "multipart/form-data" }
+            }
+        );
+
+        console.log(res);
+        console.log(res.data);
+
+        console.log(res.data.data);
+
+
+        return res.data.data; // mediaId
+    };
 
     const handleUpdate = async () => {
         try {
             setEditing(false);
 
+            const uploadedAvatar = await uploadAvatarIfNeeded();
+
             const payload = {
-                avatar: avatar || null, // hoặc state bạn đang dùng để lưu avatar
+                avatar: uploadedAvatar,
                 displayName: tempName,
             };
 
-            // Gọi API cập nhật
-            const res = await https_user.patch(`/v1/accounts/me`, payload);
+            await https_user.patch("/v1/accounts/me", payload);
 
-            // Cập nhật lại UI
             setName(tempName);
 
-            // Lưu lại localStorage
-            const updated = { ...dataUser, displayName: tempName };
+            const updated = {
+                ...dataUser,
+                displayName: tempName,
+                avatar: uploadedAvatar,
+            };
+
             localStorage.setItem("USER_INFO", JSON.stringify(updated));
 
-            console.log("Update success:", res.data);
+            message.success("Account updated successfully");
         } catch (error) {
-            console.error("Update failed:", error);
+            console.error(error);
+            message.error("Update failed");
         }
     };
 
     const handleUpdateNotificationEmail = async (value) => {
-        console.log(value)
         try {
-
-            // Gọi API cập nhật
-            await https_user.patch(`/v1/accounts/me`, {
+            await https_user.patch("/v1/accounts/me", {
                 receiveEmail: value,
             });
-
-            // Cập nhật lại UI
-            setIsNotificationEmail(value)
-
-            console.log(value)
-
+            setIsNotificationEmail(value);
         } catch (error) {
-            console.error("Update failed:", error);
+            message.error("Update failed");
         }
-    }
+    };
 
     const handleUpdateTwoFactorEnabled = async (value) => {
         if (value) {
-            // Enable 2FA → chuyển sang flow setup
             onGotoEnable2FA();
         } else {
-            // Disable 2FA → mở dialog nhập OTP
             setOtp("");
             setDisable2FAModalOpen(true);
         }
@@ -101,10 +141,8 @@ export default function AccountSettings({
 
             message.success("Đã tắt xác thực 2 bước");
 
-            // Update UI
             setIsTwoFactorEnabled(false);
 
-            // Update localStorage
             const updated = {
                 ...dataUser,
                 twoFactorEnabled: false,
@@ -113,24 +151,23 @@ export default function AccountSettings({
 
             setDisable2FAModalOpen(false);
         } catch (error) {
-            message.error(
-                error?.response?.data?.message || "OTP không hợp lệ"
-            );
+            message.error(error?.response?.data?.message || "OTP không hợp lệ");
         } finally {
             setLoadingDisable2FA(false);
         }
     };
 
-
     const fetchUser = async () => {
         try {
-            const res = await https_user.get("/v1/accounts/me"); // phải await
+            const res = await https_user.get("/v1/accounts/me");
             setIsNotificationEmail(res.data.data.receiveEmail);
             setIsTwoFactorEnabled(res.data.data.twoFactorEnabled);
         } catch (e) {
             console.error(e);
         }
     };
+
+    /* ================= EFFECT ================= */
 
     useEffect(() => {
         fetchUser();
@@ -140,22 +177,15 @@ export default function AccountSettings({
         fetchUser();
     }, [refreshKey]);
 
+    /* ================= RENDER ================= */
 
     return (
         <div className="text-gray-700">
+
             {/* HEADER */}
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-semibold">Account</h2>
-                {/* <button className="px-4 py-1.5 rounded border text-sm hover:bg-gray-100">
-          Manage plan
-        </button> */}
             </div>
-
-            {/* PLAN
-        <div className="mb-8">
-            <h3 className="text-sm text-gray-500">Plan</h3>
-            <p className="text-lg font-medium">Beginner</p>
-        </div> */}
 
             {/* PHOTO */}
             <div className="mb-8">
@@ -163,24 +193,51 @@ export default function AccountSettings({
 
                 <div className="flex items-center gap-5">
                     <img
-                        src={avatar || "https://i.pravatar.cc/80"}
+                        src={
+                            tempAvatarPreview
+                                ? tempAvatarPreview
+                                : avatar
+                                    ? `${BASE_URL}/media/v1/local/${avatar}`
+                                    : "https://i.pravatar.cc/80"
+                        }
                         referrerPolicy="no-referrer"
                         className="w-20 h-20 rounded-full object-cover"
                     />
 
+
                     <div className="flex gap-3">
-                        <button className="px-3 py-1 rounded border text-sm hover:bg-gray-100">
+                        <button
+                            onClick={handleChooseAvatar}
+                            className="px-3 py-1 rounded border text-sm hover:bg-gray-100"
+                        >
                             Change photo
                         </button>
 
-                        <button className="px-3 py-1 rounded border border-red-400 text-red-500 text-sm hover:bg-red-50">
-                            Remove photo
-                        </button>
+                        {/* {tempAvatarPreview && (
+                            <button
+                                onClick={() => {
+                                    setTempAvatarFile(null);
+                                    setTempAvatarPreview(null);
+                                    setEditing(true);
+                                }}
+                                className="px-3 py-1 rounded border border-red-400 text-red-500 text-sm hover:bg-red-50"
+                            >
+                                Remove photo
+                            </button>
+                        )} */}
                     </div>
                 </div>
 
+                <input
+                    type="file"
+                    accept="image/*"
+                    ref={fileInputRef}
+                    className="hidden"
+                    onChange={handleAvatarChange}
+                />
+
                 <p className="text-xs text-gray-500 mt-2">
-                    Pick a photo up to 4MB. Your avatar photo will be public.
+                    Pick a photo up to 45MB. Your avatar photo will be public.
                 </p>
             </div>
 
@@ -198,7 +255,6 @@ export default function AccountSettings({
 
                 <p className="text-xs text-gray-500 mt-1">{tempName.length}/255</p>
 
-                {/* Buttons appear only when editing */}
                 {editing && (
                     <div className="flex gap-2 mt-3">
                         <button
@@ -210,7 +266,11 @@ export default function AccountSettings({
 
                         <button
                             onClick={handleUpdate}
-                            disabled={tempName.trim() === "" || tempName === name}
+                            disabled={
+                                tempName.trim() === "" ||
+                                (tempName === name && !tempAvatarFile)
+                            }
+
                             className="px-3 py-1 rounded bg-red-500 text-white text-sm
                          disabled:opacity-50"
                         >
@@ -245,7 +305,7 @@ export default function AccountSettings({
                 </button>
             </div>
 
-            {/* { 2FA } */}
+            {/* 2FA */}
             <div className="mb-8">
                 <h3 className="text-sm text-gray-500 mb-1">
                     Two-factor authentication
@@ -253,12 +313,8 @@ export default function AccountSettings({
 
                 <Switch
                     checked={isTwoFactorEnabled}
-                    onChange={(value) => handleUpdateTwoFactorEnabled(value)}
+                    onChange={handleUpdateTwoFactorEnabled}
                 />
-
-                <p className="text-xs text-gray-500 mt-1">
-                    2FA is disabled on your Todoist account.
-                </p>
             </div>
 
             <Modal
@@ -266,26 +322,20 @@ export default function AccountSettings({
                 title="Disable Two-Factor Authentication"
                 onCancel={() => {
                     setDisable2FAModalOpen(false);
-                    setIsTwoFactorEnabled(true); // rollback switch
+                    setIsTwoFactorEnabled(true);
                 }}
                 onOk={handleDisable2FA}
                 confirmLoading={loadingDisable2FA}
                 okText="Disable"
                 cancelText="Cancel"
             >
-                <p className="text-sm text-gray-600 mb-2">
-                    Nhập mã OTP từ Google Authenticator để xác nhận tắt 2FA
-                </p>
-
                 <Input
                     value={otp}
                     onChange={(e) => setOtp(e.target.value)}
                     placeholder="Enter 6-digit OTP"
                     maxLength={6}
-                    autoFocus
                 />
             </Modal>
-
 
             {/* Email Notifications */}
             <div className="mb-8">
@@ -295,20 +345,14 @@ export default function AccountSettings({
 
                 <Switch
                     checked={isNotificationEmail}
-                    onChange={(value) => handleUpdateNotificationEmail(value)}
+                    onChange={handleUpdateNotificationEmail}
                 />
-
-
-                <p className="text-xs text-gray-500 mt-1">
-                    You will receive updates and alerts via email.
-                </p>
             </div>
 
             <Button danger onClick={onGotoDeleteAccount}>
                 Xóa tài khoản
             </Button>
 
-
-        </div >
+        </div>
     );
 }

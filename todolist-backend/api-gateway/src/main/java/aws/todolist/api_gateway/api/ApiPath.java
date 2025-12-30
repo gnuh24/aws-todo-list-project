@@ -8,6 +8,8 @@ public class ApiPath {
 	
 	public static final String BASE = "/api";
 	public static final String MODEL = BASE + "/model/predict";
+	public static final String MEDIA = BASE + "/media/**";
+	
 	// ---------- AUTH ----------
 	public static final String AUTH = BASE + "/auth";
 	public static final String LOGIN = AUTH + "/v1/login";
@@ -71,6 +73,7 @@ public class ApiPath {
 	// ---------- PUBLIC PATHS ----------
 	private static final List<String> PUBLIC_PATH_PATTERNS = List.of(
 	    MODEL,
+		MEDIA,
 	    LOGIN,
 	    STAFF_LOGIN,
 	    REGISTER,

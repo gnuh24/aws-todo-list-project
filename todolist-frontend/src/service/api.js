@@ -36,6 +36,15 @@ export let https_user = axios.create({
   },
 });
 
+export let https_media = axios.create({
+    baseURL: BASE_URL+"/media",
+    headers: {
+      Authorization:
+          "Bearer " + JSON.parse(localStorage.getItem("USER_INFO"))?.token
+    },
+  });
+  
+
 export let https_model = axios.create({
   baseURL: BASE_URL+"/model",
   headers: {

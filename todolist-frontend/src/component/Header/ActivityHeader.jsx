@@ -9,133 +9,134 @@ import {
     CheckOutlined, TeamOutlined,
 } from "@ant-design/icons";
 import { Dropdown, Input, Typography, Divider } from "antd";
-import {useEffect, useMemo, useState} from "react";
-import {https_taskflow} from "../../service/api";
-import {notificationFilterMap} from "../../data/ActivityFilter";
+import { useEffect, useMemo, useState } from "react";
+import { https_taskflow } from "../../service/api";
+import { notificationFilterMap } from "../../data/ActivityFilter";
+import { BASE_URL } from "../../service/api"
 
 const { Text } = Typography;
 export default function ActivityHeader({
-                                        selectedCollaboratorID,
-                                        selectedTypes,
-                                        selectedProjectID,
-                                        setSelectedProjectID,
-                                        setSelectedCollaboratorID,
-                                        setSelectedTypes,
-                                        setProjectData
+    selectedCollaboratorID,
+    selectedTypes,
+    selectedProjectID,
+    setSelectedProjectID,
+    setSelectedCollaboratorID,
+    setSelectedTypes,
+    setProjectData
 }) {
 
-  const [searchProject, setSearchProject] = useState("");
-  const [searchMember, setSearchMember] = useState("");
-  const [searchType, setSearchType] = useState("");
+    const [searchProject, setSearchProject] = useState("");
+    const [searchMember, setSearchMember] = useState("");
+    const [searchType, setSearchType] = useState("");
 
-  const [selectedProject, setSelectedProject] = useState("All Projects");
-  const [selectedFilter, setSelectedFilter] = useState("All Actions");
-  const [selectedCollaborator, setSelectedCollaborator] = useState("Everyone");
+    const [selectedProject, setSelectedProject] = useState("All Projects");
+    const [selectedFilter, setSelectedFilter] = useState("All Actions");
+    const [selectedCollaborator, setSelectedCollaborator] = useState("Everyone");
 
 
-  const [openProject, setOpenProject] = useState(false);
-  const [openCollaborator, setOpenCollaborator] = useState(false);
-  const [openFilter, setOpenFilter] = useState(false);
+    const [openProject, setOpenProject] = useState(false);
+    const [openCollaborator, setOpenCollaborator] = useState(false);
+    const [openFilter, setOpenFilter] = useState(false);
 
-  const [myProjects, setMyProjects] = useState([]);
-  const [members, setMembers] = useState([]);
+    const [myProjects, setMyProjects] = useState([]);
+    const [members, setMembers] = useState([]);
 
-  // hàm để truy vấn
-  useEffect(()=>{
+    // hàm để truy vấn
+    useEffect(() => {
 
-  },[selectedCollaboratorID, selectedTypes])
+    }, [selectedCollaboratorID, selectedTypes])
 
-  useEffect(() => {
-    const getMyProject = async () => {
-      try {
-        const response = await https_taskflow.get("/v1/projects");
-        if (response.status === 200) {
-          const listProject = response.data.data;
-          setMyProjects(listProject);
-          setSelectedProjectID(listProject.map(p => p.id));
-          setSelectedTypes(Object.keys(notificationFilterMap));
+    useEffect(() => {
+        const getMyProject = async () => {
+            try {
+                const response = await https_taskflow.get("/v1/projects");
+                if (response.status === 200) {
+                    const listProject = response.data.data;
+                    setMyProjects(listProject);
+                    setSelectedProjectID(listProject.map(p => p.id));
+                    setSelectedTypes(Object.keys(notificationFilterMap));
 
-            // Chuyển listProject thành object { [id]: name }
-            const projectObj = listProject.reduce((acc, project) => {
-                acc[project.id] = project.name;
-                return acc;
-            }, {});
+                    // Chuyển listProject thành object { [id]: name }
+                    const projectObj = listProject.reduce((acc, project) => {
+                        acc[project.id] = project.name;
+                        return acc;
+                    }, {});
 
-            setProjectData(projectObj);
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    };
+                    setProjectData(projectObj);
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        };
 
-    getMyProject();
-  }, []);
+        getMyProject();
+    }, []);
 
-  // Filter project theo searchText
-  const filteredProjects = useMemo(() => {
-    return myProjects.filter((project) =>
-        project.name.toLowerCase().includes(searchProject.toLowerCase())
+    // Filter project theo searchText
+    const filteredProjects = useMemo(() => {
+        return myProjects.filter((project) =>
+            project.name.toLowerCase().includes(searchProject.toLowerCase())
+        );
+    }, [myProjects, searchProject]);
+
+    const projectMenu = (
+        <div className="w-64 p-3 bg-white shadow-lg rounded-md">
+            {/* Thanh tìm kiếm */}
+            <Input
+                size="small"
+                placeholder="Search project..."
+                className="mb-3 text-sm rounded"
+                value={searchProject}
+                onChange={(e) => setSearchProject(e.target.value)}
+            />
+
+            {/* Mục All Projects */}
+            <div
+                className="flex items-center gap-2 px-2 py-1 rounded cursor-pointer hover:bg-gray-100"
+                onClick={() => {
+                    setSelectedProject("All Projects")
+                    setSelectedProjectID(myProjects.map(p => p.id))
+                    setOpenProject(false)
+                    setSearchProject("")
+                }}
+            >
+                <NumberOutlined /> All Projects
+            </div>
+
+            <Divider className="my-2" />
+
+            {/* Tiêu đề My Projects */}
+            <Text type="secondary" className="pl-2 text-xs uppercase">
+                My Projects
+            </Text>
+
+            {/* Danh sách project filter */}
+            <div className="mt-2 max-h-64 overflow-y-auto space-y-1">
+                {filteredProjects.length > 0 ? (
+                    filteredProjects.map((project) => (
+                        <div
+                            key={project.id}
+                            className="flex items-center gap-2 px-2 py-1 rounded cursor-pointer hover:bg-gray-100"
+                            onClick={() => {
+                                setSelectedProject(project.name)
+                                setSelectedProjectID([project.id])
+                                setOpenProject(false)
+                                setSearchProject("")
+                            }}
+                        >
+                            <ProjectOutlined /> {project.name}
+                        </div>
+                    ))
+                ) : (
+                    <Text type="secondary" className="px-2 text-xs">
+                        No projects found
+                    </Text>
+                )}
+            </div>
+        </div>
     );
-  }, [myProjects, searchProject]);
 
-  const projectMenu = (
-      <div className="w-64 p-3 bg-white shadow-lg rounded-md">
-        {/* Thanh tìm kiếm */}
-        <Input
-            size="small"
-            placeholder="Search project..."
-            className="mb-3 text-sm rounded"
-            value={searchProject}
-            onChange={(e) => setSearchProject(e.target.value)}
-        />
-
-        {/* Mục All Projects */}
-        <div
-            className="flex items-center gap-2 px-2 py-1 rounded cursor-pointer hover:bg-gray-100"
-            onClick={() => {
-              setSelectedProject("All Projects")
-              setSelectedProjectID(myProjects.map(p => p.id))
-              setOpenProject(false)
-              setSearchProject("")
-            }}
-        >
-          <NumberOutlined /> All Projects
-        </div>
-
-        <Divider className="my-2" />
-
-        {/* Tiêu đề My Projects */}
-        <Text type="secondary" className="pl-2 text-xs uppercase">
-          My Projects
-        </Text>
-
-        {/* Danh sách project filter */}
-        <div className="mt-2 max-h-64 overflow-y-auto space-y-1">
-          {filteredProjects.length > 0 ? (
-              filteredProjects.map((project) => (
-                  <div
-                      key={project.id}
-                      className="flex items-center gap-2 px-2 py-1 rounded cursor-pointer hover:bg-gray-100"
-                      onClick={() => {
-                        setSelectedProject(project.name)
-                        setSelectedProjectID([project.id])
-                        setOpenProject(false)
-                        setSearchProject("")
-                      }}
-                  >
-                    <ProjectOutlined /> {project.name}
-                  </div>
-              ))
-          ) : (
-              <Text type="secondary" className="px-2 text-xs">
-                No projects found
-              </Text>
-          )}
-        </div>
-      </div>
-  );
-
-  // --- Collaborator Dropdown ---
+    // --- Collaborator Dropdown ---
 
     useEffect(() => {
         const getMembers = async () => {
@@ -202,9 +203,8 @@ export default function ActivityHeader({
                         setSearchMember("")
                         setOpenCollaborator(false)
                     }}
-                    className={`flex items-center justify-between px-3 py-1.5 text-[13px] rounded cursor-pointer hover:bg-gray-100 ${
-                        selectedCollaborator === "Everyone" ? "bg-gray-50" : ""
-                    }`}
+                    className={`flex items-center justify-between px-3 py-1.5 text-[13px] rounded cursor-pointer hover:bg-gray-100 ${selectedCollaborator === "Everyone" ? "bg-gray-50" : ""
+                        }`}
                 >
                     <div className="flex items-center gap-2">
                         <span>Everyone</span>
@@ -224,14 +224,13 @@ export default function ActivityHeader({
                             setSearchMember("")
                             setOpenCollaborator(false)
                         }}
-                        className={`flex items-center justify-between px-3 py-1.5 text-[13px] rounded cursor-pointer hover:bg-gray-100 ${
-                            selectedCollaborator === member.displayName ? "bg-gray-50" : ""
-                        }`}
+                        className={`flex items-center justify-between px-3 py-1.5 text-[13px] rounded cursor-pointer hover:bg-gray-100 ${selectedCollaborator === member.displayName ? "bg-gray-50" : ""
+                            }`}
                     >
                         <div className="flex items-center gap-2">
                             {member.avatar ? (
                                 <img
-                                    src={member.avatar}
+                                    src={member.avatar != null ? `${BASE_URL}/media/v1/local/${member.avatar}` : "https://i.pravatar.cc/80"}
                                     alt={member.displayName}
                                     className="w-6 h-6 rounded-full object-cover"
                                 />
@@ -265,7 +264,7 @@ export default function ActivityHeader({
             item.label.toLowerCase().includes(searchType.toLowerCase())
         );
 
-// JSX menu
+    // JSX menu
     const filterMenu = (
         <div className="bg-white border rounded-md shadow-lg w-56 p-2">
             <Input
@@ -287,9 +286,8 @@ export default function ActivityHeader({
                         setOpenFilter(false);
                         setSearchType("");
                     }}
-                    className={`flex items-center gap-2 px-3 py-1.5 rounded cursor-pointer text-[13px] hover:bg-gray-100 ${
-                        selectedFilter === "All Actions" ? "bg-gray-50 font-medium" : ""
-                    }`}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded cursor-pointer text-[13px] hover:bg-gray-100 ${selectedFilter === "All Actions" ? "bg-gray-50 font-medium" : ""
+                        }`}
                 >
                     <UnorderedListOutlined className="text-gray-500" />
                     <span>All Actions</span>
@@ -308,9 +306,8 @@ export default function ActivityHeader({
                             setOpenFilter(false);
                             setSearchType("");
                         }}
-                        className={`flex items-center gap-2 px-3 py-1.5 rounded cursor-pointer text-[13px] hover:bg-gray-100 ${
-                            selectedFilter === item.label ? "bg-gray-50 font-medium" : ""
-                        }`}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded cursor-pointer text-[13px] hover:bg-gray-100 ${selectedFilter === item.label ? "bg-gray-50 font-medium" : ""
+                            }`}
                     >
                         {item.icon}
                         <span>{item.label}</span>
@@ -325,55 +322,55 @@ export default function ActivityHeader({
 
 
     return (
-      <div className="flex items-center justify-between mb-8">
-        {/* Left: Title */}
-        <div className="flex items-center gap-2">
-          <h3 className="text-xl font-semibold flex items-center gap-2">
-            Activity:{" "}
-            <Dropdown
-                overlay={projectMenu}
-                trigger={["click"]}
-                open={openProject}
-                onOpenChange={setOpenProject}
-            >
-            <span
-                className="font-normal cursor-pointer hover:underline select-none flex items-center gap-1"
-                onClick={(e) => e.stopPropagation()} // ngăn event bubble nếu cần
-            >
-              {selectedProject} <DownOutlined className="text-xs" />
-            </span>
-            </Dropdown>
-          </h3>
-        </div>
+        <div className="flex items-center justify-between mb-8">
+            {/* Left: Title */}
+            <div className="flex items-center gap-2">
+                <h3 className="text-xl font-semibold flex items-center gap-2">
+                    Activity:{" "}
+                    <Dropdown
+                        overlay={projectMenu}
+                        trigger={["click"]}
+                        open={openProject}
+                        onOpenChange={setOpenProject}
+                    >
+                        <span
+                            className="font-normal cursor-pointer hover:underline select-none flex items-center gap-1"
+                            onClick={(e) => e.stopPropagation()} // ngăn event bubble nếu cần
+                        >
+                            {selectedProject} <DownOutlined className="text-xs" />
+                        </span>
+                    </Dropdown>
+                </h3>
+            </div>
 
-        {/* Right: Filters */}
-        <div className="flex items-center gap-5 text-gray-600">
-          <Dropdown
-              overlay={collaboratorMenu}
-              trigger={["click"]}
-              open={openCollaborator}
-              onOpenChange={setOpenCollaborator}
-          >
-          <span className="flex items-center gap-1 cursor-pointer
+            {/* Right: Filters */}
+            <div className="flex items-center gap-5 text-gray-600">
+                <Dropdown
+                    overlay={collaboratorMenu}
+                    trigger={["click"]}
+                    open={openCollaborator}
+                    onOpenChange={setOpenCollaborator}
+                >
+                    <span className="flex items-center gap-1 cursor-pointer
                  hover:bg-gray-200  hover:text-black
                  transition-colors duration-200 px-1 py-1 rounded">
-              <TeamOutlined /> {selectedCollaborator}
-          </span>
-          </Dropdown>
+                        <TeamOutlined /> {selectedCollaborator}
+                    </span>
+                </Dropdown>
 
-          <Dropdown
-              overlay={filterMenu}
-              trigger={["click"]}
-              open={openFilter}
-              onOpenChange={setOpenFilter}
-          >
-          <span className="flex items-center gap-1 cursor-pointer
+                <Dropdown
+                    overlay={filterMenu}
+                    trigger={["click"]}
+                    open={openFilter}
+                    onOpenChange={setOpenFilter}
+                >
+                    <span className="flex items-center gap-1 cursor-pointer
                  hover:bg-gray-200  hover:text-black
                  transition-colors duration-200 px-1 py-1 rounded">
-            <SmileOutlined /> {selectedFilter}
-          </span>
-          </Dropdown>
+                        <SmileOutlined /> {selectedFilter}
+                    </span>
+                </Dropdown>
+            </div>
         </div>
-      </div>
-  );
+    );
 }

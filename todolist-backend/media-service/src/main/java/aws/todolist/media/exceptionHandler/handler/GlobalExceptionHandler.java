@@ -5,7 +5,6 @@ import aws.todolist.media.exceptionHandler.ErrorResponse;
 import aws.todolist.media.exceptionHandler.errorCode.SystemErrorCode;
 import aws.todolist.media.logging.AppLogger;
 import aws.todolist.media.utils.EnvironmentUtils;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -195,25 +194,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 null);
     }
 	
-
-    /* =====================================================
-     *                     NOT FOUND
-     * ===================================================== */
-
-    @ExceptionHandler({
-            EntityNotFoundException.class,
-    })
-    public ResponseEntity<Object> handleNotFound(
-            HttpServletRequest request,
-            Exception ex) {
-
-        return build(request,
-                HttpStatus.NOT_FOUND,
-                SystemErrorCode.SYS_RESOURCE_NOT_FOUND,
-                ex.getMessage(),
-                ex,
-                null);
-    }
+	
 
     /* =====================================================
      *                     FALLBACK

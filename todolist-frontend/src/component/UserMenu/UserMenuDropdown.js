@@ -9,6 +9,8 @@ import {
   PrinterOutlined,
 } from "@ant-design/icons";
 
+import { BASE_URL } from "../../service/api"
+
 import { Menu } from "antd";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -38,7 +40,7 @@ localStorage.removeItem("refreshToken");
       <div className="flex items-center gap-3 px-3 py-2 border-b pb-3">
        
          <img
-            src={avatar || "https://i.pravatar.cc/80"}
+            src={avatar != null ? `${BASE_URL}/media/v1/local/${avatar}` : "https://i.pravatar.cc/80"}
             referrerPolicy="no-referrer"
               className="rounded-full w-10 h-10"
           />
