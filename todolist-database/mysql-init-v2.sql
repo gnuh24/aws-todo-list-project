@@ -57,18 +57,7 @@ CREATE TABLE `project` (
     `is_deleted` BOOLEAN NOT NULL DEFAULT FALSE
 );
 
-CREATE TABLE `project_label` (
-    `id` CHAR(36) PRIMARY KEY,
-    `project_id` CHAR(36) NOT NULL,
-    `name` VARCHAR(255) NOT NULL,
-    `description` TEXT,
-    `created_by` CHAR(36),
 
-    `created_at` TIMESTAMP NOT NULL,
-    `updated_at` TIMESTAMP NOT NULL,
-    `deleted_at` TIMESTAMP,
-    `is_deleted` BOOLEAN NOT NULL DEFAULT FALSE
-);
 
 CREATE TABLE `member` (
     `id` CHAR(36) PRIMARY KEY,
@@ -167,6 +156,19 @@ CREATE TABLE `task` (
     `completed_at` TIMESTAMP,
 	`task_father_id`    CHAR(36), 
      `account_id`        CHAR(36),  
+    `created_by` CHAR(36),
+
+    `created_at` TIMESTAMP NOT NULL,
+    `updated_at` TIMESTAMP NOT NULL,
+    `deleted_at` TIMESTAMP,
+    `is_deleted` BOOLEAN NOT NULL DEFAULT FALSE
+);
+
+CREATE TABLE `project_label` (
+    `id` CHAR(36) PRIMARY KEY,
+    `project_id` CHAR(36) NOT NULL,
+    `name` VARCHAR(255) NOT NULL,
+    `description` TEXT,
     `created_by` CHAR(36),
 
     `created_at` TIMESTAMP NOT NULL,
