@@ -50,9 +50,6 @@ public class ApiPath {
 	public static final String ADDRESS_BY_ID = BASE + "/addresses/{addressId}";
 	public static final String ADDRESS_SET_DEFAULT = BASE + "/addresses/{addressId}/set-default";
 	
-	// ---------- MEDIA ----------
-	public static final String MEDIA_GET = BASE + "/media";
-	public static final String MEDIA_UPLOAD = BASE + "/media/upload";
 	
 	// ---------- SWAGGER & DOCS ----------
 	public static final String USER = BASE + "/user";

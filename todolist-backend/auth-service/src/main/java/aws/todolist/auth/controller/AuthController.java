@@ -6,6 +6,7 @@ import aws.todolist.auth.dto.auth.*;
 import aws.todolist.auth.dto.twoFactor.TwoFactorDisableForm;
 import aws.todolist.auth.dto.twoFactor.TwoFactorSetupResponse;
 import aws.todolist.auth.dto.twoFactor.TwoFactorVerifyForm;
+import aws.todolist.auth.dto.twoFactor.TwoFactorVeriyResponse;
 import aws.todolist.auth.entity.Account;
 import aws.todolist.auth.exceptionHandler.exceptions.twoFactorException.TwoFactorException;
 import aws.todolist.auth.otp.OtpPurpose;
@@ -64,10 +65,6 @@ public class AuthController {
 	public ResponseEntity<ApiResponse<TwoFactorSetupResponse>> setup2FA(
 		@RequestHeader("X-User-Email") String email
 	) {
-	
-//		if (account.isTwoFactorEnabled()) {
-//			throw new TwoFactorException("Tài khoản đã bật 2FA");
-//		}
 		
 		TwoFactorSetupResponse response = twoFactorService.setup2FA(email);
 		
@@ -77,14 +74,14 @@ public class AuthController {
 	}
 	
 	@PostMapping("/2fa/verify")
-	public ResponseEntity<ApiResponse<Void>> verify2FA(
+	public ResponseEntity<ApiResponse<TwoFactorVeriyResponse>> verify2FA(
 		@RequestHeader("X-User-Id") String accountId,
 		@Valid @RequestBody TwoFactorVerifyForm form
 	) {
-		twoFactorService.verify2FA(accountId, form.getOtp());
+		TwoFactorVeriyResponse response = twoFactorService.verify2FA(accountId, form.getOtp());
 		
 		return ResponseEntity.ok(
-			new ApiResponse<>(200, "Xác thực 2FA thành công", null)
+			new ApiResponse<>(200, "Xác thực 2FA thành công", response)
 		);
 	}
 	
@@ -93,7 +90,7 @@ public class AuthController {
 		@RequestHeader("X-User-Id") String accountId,
 		@RequestBody TwoFactorDisableForm req
 	) {
-		twoFactorService.disable2FA(accountId, req.getOtp());
+		twoFactorService.disable2FA(accountId, req);
 		return ResponseEntity.ok(
 			new ApiResponse<>(200, "Vô hiệu hóa xác thực 2FA thành công", null)
 		);

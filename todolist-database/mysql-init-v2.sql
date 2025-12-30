@@ -37,6 +37,27 @@ VALUES
 -- ('c5f6d12b-5e84-4d1a-8ca4-421e83a4e555', 'user5@gmail.com', '$2a$10$W2neF9.6Agi6kAKVq8q3fec5dHW8KUA.b0VSIGdIZyUravfLpyIFi', NULL, 'User Five', 'USER', 'DELETED', NOW(), NOW(), NOW(), 1, 1);
 
 
+CREATE TABLE `account_recovery_key` (
+    `id` CHAR(36) PRIMARY KEY,
+    
+    `account_id` CHAR(36) NOT NULL,
+    
+    -- Hash của recovery key (bcrypt / sha256)
+    `key_hash` VARCHAR(255) NOT NULL,
+    
+    -- Trạng thái đã dùng hay chưa
+    `is_used` BOOLEAN NOT NULL DEFAULT FALSE,
+    
+    `used_at` TIMESTAMP NULL,
+    
+    `created_at` TIMESTAMP NOT NULL,
+    
+    CONSTRAINT `fk_recovery_key_account`
+        FOREIGN KEY (`account_id`) REFERENCES `account`(`id`)
+        ON DELETE CASCADE,
+
+    UNIQUE (`key_hash`)
+);
 
 
 -- __________________________________________________________________ PROJECT DATABASE _____________________________________________________________________________
