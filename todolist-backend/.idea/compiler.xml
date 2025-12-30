@@ -7,6 +7,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="api-gateway" />
+        <module name="media-service" />
       </profile>
       <profile name="Annotation profile for taskflow-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -18,7 +19,7 @@
         </processorPath>
         <module name="taskflow-service" />
       </profile>
-      <profile name="Annotation profile for media-service" enabled="true">
+      <profile name="Annotation profile for websocket-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -28,9 +29,8 @@
         </processorPath>
         <module name="auth-service" />
         <module name="user-service" />
-        <module name="notification-service" />
         <module name="websocket-service" />
-        <module name="media-service" />
+        <module name="notification-service" />
       </profile>
     </annotationProcessing>
   </component>

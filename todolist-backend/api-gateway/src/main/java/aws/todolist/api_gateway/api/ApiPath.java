@@ -8,6 +8,8 @@ public class ApiPath {
 	
 	public static final String BASE = "/api";
 	public static final String MODEL = BASE + "/model/predict";
+	public static final String MEDIA = BASE + "/media/**";
+	
 	// ---------- AUTH ----------
 	public static final String AUTH = BASE + "/auth";
 	public static final String LOGIN = AUTH + "/v1/login";
@@ -48,9 +50,6 @@ public class ApiPath {
 	public static final String ADDRESS_BY_ID = BASE + "/addresses/{addressId}";
 	public static final String ADDRESS_SET_DEFAULT = BASE + "/addresses/{addressId}/set-default";
 	
-	// ---------- MEDIA ----------
-	public static final String MEDIA_GET = BASE + "/media";
-	public static final String MEDIA_UPLOAD = BASE + "/media/upload";
 	
 	// ---------- SWAGGER & DOCS ----------
 	public static final String USER = BASE + "/user";
@@ -71,6 +70,7 @@ public class ApiPath {
 	// ---------- PUBLIC PATHS ----------
 	private static final List<String> PUBLIC_PATH_PATTERNS = List.of(
 	    MODEL,
+		MEDIA,
 	    LOGIN,
 	    STAFF_LOGIN,
 	    REGISTER,
