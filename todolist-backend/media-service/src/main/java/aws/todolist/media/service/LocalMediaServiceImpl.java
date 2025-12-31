@@ -16,100 +16,147 @@ import java.nio.file.Paths;
 import java.util.Set;
 import java.util.UUID;
 
-
 @Service
 public class LocalMediaServiceImpl implements MediaService {
-
-    private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-    private static final Set<String> ALLOWED_TYPES = Set.of(
-        "image/jpeg",
-        "image/png",
-        "image/webp"
-    );
-
-    @Value("${app.image.storage.path}")
-    private String imageStoragePath;
-
-    @Override
-    public String saveImage(MultipartFile image) {
-
-        // 1. Validate
-        if (image == null || image.isEmpty()) {
-            throw new FileEmptyException(); // SYS-FILE-005
-        }
-
-        if (image.getSize() > MAX_FILE_SIZE) {
-            throw new FileTooLargeException(); // SYS-FILE-001
-        }
-
-        if (!ALLOWED_TYPES.contains(image.getContentType())) {
-            throw new FileUnsupportedTypeException(); // SYS-FILE-002
-        }
-
-        try {
-            // 2. Ensure folder exists (absolute path, portable)
-            Path uploadDir = Paths.get(
-                new File(imageStoragePath).getAbsolutePath()
-            );
-
-            if (Files.notExists(uploadDir)) {
-                Files.createDirectories(uploadDir);
-            }
-
-            // 3. Generate mediaId = filename
-            String extension = getFileExtension(image.getOriginalFilename());
-            String mediaId = UUID.randomUUID() + extension;
-
-            Path uploadPath = uploadDir.resolve(mediaId);
-
-            // 4. Save file
-            Files.write(uploadPath, image.getBytes());
-
-            return mediaId;
-
-        } catch (IOException e) {
-            throw new FileUploadFailedException(); // SYS-FILE-003
-        }
-    }
-
-    @Override
-    public Resource getResourceByMediaId(String mediaId)
-            throws MalformedURLException {
-
-        Path imagePath = Paths.get(
-            new File(imageStoragePath).getAbsolutePath(),
-            mediaId
-        );
-
-        if (Files.notExists(imagePath)) {
-            throw new FileNotFoundException(); // SYS-FILE-004
-        }
-
-        return new UrlResource(imagePath.toUri());
-    }
-
-    @Override
-    public void deleteByMediaId(String mediaId) {
-
-        Path imagePath = Paths.get(
-            new File(imageStoragePath).getAbsolutePath(),
-            mediaId
-        );
-
-        try {
-            if (Files.exists(imagePath)) {
-                Files.delete(imagePath);
-            } else {
-                throw new FileNotFoundException();
-            }
-        } catch (IOException e) {
-            throw new FileUploadFailedException();
-        }
-    }
-
-    private String getFileExtension(String fileName) {
-        if (fileName == null) return "";
-        int dotIndex = fileName.lastIndexOf('.');
-        return dotIndex == -1 ? "" : fileName.substring(dotIndex);
-    }
+	
+	/* =======================
+	 * FILE SIZE CONFIG
+	 * ======================= */
+	private static final long IMAGE_MAX_SIZE = 4 * 1024 * 1024;   // 4MB
+	private static final long FILE_MAX_SIZE  = 20 * 1024 * 1024;  // 20MB
+	
+	/* =======================
+	 * IMAGE WHITELIST
+	 * ======================= */
+	private static final Set<String> IMAGE_CONTENT_TYPES = Set.of(
+		"image/jpeg",
+		"image/png",
+		"image/webp"
+	);
+	
+	private static final Set<String> IMAGE_EXTENSIONS = Set.of(
+		"jpg", "jpeg", "png", "webp"
+	);
+	
+	/* =======================
+	 * BLACKLIST (SECURITY)
+	 * ======================= */
+	private static final Set<String> BLACKLIST_EXTENSIONS = Set.of(
+		"exe", "bat", "cmd", "sh",
+		"js", "php", "jsp", "py",
+		"jar", "dll",
+		"docm", "xlsm"
+	);
+	
+	@Value("${app.image.storage.path}")
+	private String imageStoragePath;
+	
+	/* =======================
+	 * SAVE FILE
+	 * ======================= */
+	@Override
+	public String saveImage(MultipartFile file) {
+		
+		// 1. Empty check
+		if (file == null || file.isEmpty()) {
+			throw new FileEmptyException(); // SYS-FILE-005
+		}
+		
+		String extension = getFileExtension(file.getOriginalFilename());
+		
+		// 2. Blacklist extension (HIGH PRIORITY)
+		if (BLACKLIST_EXTENSIONS.contains(extension)) {
+			throw new FileUnsupportedTypeException(); // SYS-FILE-002
+		}
+		
+		boolean isImage = isImage(file, extension);
+		
+		// 3. Size validation
+		if (isImage && file.getSize() > IMAGE_MAX_SIZE) {
+			throw new FileTooLargeException(); // SYS-FILE-001
+		}
+		
+		if (!isImage && file.getSize() > FILE_MAX_SIZE) {
+			throw new FileTooLargeException(); // SYS-FILE-001
+		}
+		
+		try {
+			// 4. Ensure folder exists
+			Path uploadDir = Paths.get(
+				new File(imageStoragePath).getAbsolutePath()
+			);
+			
+			if (Files.notExists(uploadDir)) {
+				Files.createDirectories(uploadDir);
+			}
+			
+			// 5. Generate mediaId
+			String mediaId = UUID.randomUUID() + "." + extension;
+			Path uploadPath = uploadDir.resolve(mediaId);
+			
+			// 6. Save file
+			Files.write(uploadPath, file.getBytes());
+			
+			return mediaId;
+			
+		} catch (IOException e) {
+			throw new FileUploadFailedException(); // SYS-FILE-003
+		}
+	}
+	
+	/* =======================
+	 * GET FILE
+	 * ======================= */
+	@Override
+	public Resource getResourceByMediaId(String mediaId)
+		throws MalformedURLException {
+		
+		Path filePath = Paths.get(
+			new File(imageStoragePath).getAbsolutePath(),
+			mediaId
+		);
+		
+		if (Files.notExists(filePath)) {
+			throw new FileNotFoundException(); // SYS-FILE-004
+		}
+		
+		return new UrlResource(filePath.toUri());
+	}
+	
+	/* =======================
+	 * DELETE FILE
+	 * ======================= */
+	@Override
+	public void deleteByMediaId(String mediaId) {
+		
+		Path filePath = Paths.get(
+			new File(imageStoragePath).getAbsolutePath(),
+			mediaId
+		);
+		
+		try {
+			if (Files.exists(filePath)) {
+				Files.delete(filePath);
+			} else {
+				throw new FileNotFoundException(); // SYS-FILE-004
+			}
+		} catch (IOException e) {
+			throw new FileUploadFailedException(); // SYS-FILE-003
+		}
+	}
+	
+	/* =======================
+	 * HELPER METHODS
+	 * ======================= */
+	private boolean isImage(MultipartFile file, String extension) {
+		return IMAGE_CONTENT_TYPES.contains(file.getContentType())
+			&& IMAGE_EXTENSIONS.contains(extension);
+	}
+	
+	private String getFileExtension(String fileName) {
+		if (fileName == null) return "";
+		int dotIndex = fileName.lastIndexOf('.');
+		if (dotIndex == -1) return "";
+		return fileName.substring(dotIndex + 1).toLowerCase();
+	}
 }

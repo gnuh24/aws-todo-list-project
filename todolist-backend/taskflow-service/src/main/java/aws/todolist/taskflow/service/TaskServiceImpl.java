@@ -147,7 +147,7 @@ public class TaskServiceImpl implements TaskService {
         Task task = Task.builder()
                 .title(requestDTO.getTitle())
                 .description(requestDTO.getDescription())
-                .priority(requestDTO.getPriority() != null ? requestDTO.getPriority() : null)
+                .priority(requestDTO.getPriority() != null ? requestDTO.getPriority() : Priority.LOW)
                 .deadline(requestDTO.getDeadline())
                 .startTime(requestDTO.getStartTime())
                 .isPinned(requestDTO.getIsPinned() != null ? requestDTO.getIsPinned() : false)

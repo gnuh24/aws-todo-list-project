@@ -44,8 +44,6 @@ public interface TaskMapper {
 
     // Map Task → TaskDetailResponseDTO
     @Mapping(target = "taskChild", source = "taskChild", qualifiedByName = "taskChildList")
-    @Mapping(target = "idAccountAssigned", source = "accountAssign.id")
-    @Mapping(target = "idAccountCreate", source = "createdByAccount.id")
     @Mapping(target = "idSection", source = "section.id")
     @Mapping(target = "idProject", source = "section.project.id")
     TaskDetailResponseDTO toDetailResponse(Task task);

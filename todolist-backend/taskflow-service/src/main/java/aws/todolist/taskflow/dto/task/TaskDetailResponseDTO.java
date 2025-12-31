@@ -1,6 +1,8 @@
 package aws.todolist.taskflow.dto.task;
 
 
+import aws.todolist.taskflow.dto.member.MemberDTO;
+import aws.todolist.taskflow.dto.member.MemberResponseDTO;
 import aws.todolist.taskflow.dto.taskComment.TaskCommentResponseDTO;
 import aws.todolist.taskflow.dto.taskLabel.TaskLabelResponseDTO;
 import aws.todolist.taskflow.enums.Priority;
@@ -58,10 +60,10 @@ public class TaskDetailResponseDTO {
 	private LocalDateTime updatedAt;
 	
 	@Schema(description = "id người tạo", example = "")
-	private String idAccountCreate;
+	private MemberDTO createdByAccount;
 	
 	@Schema(description = "id người được phân công", example = "")
-	private String idAccountAssigned;
+	private MemberDTO accountAssign;
 	
 	@Schema(description = "Danh sách các Task con")
 	private List<TaskResponseDTO> taskChild;
