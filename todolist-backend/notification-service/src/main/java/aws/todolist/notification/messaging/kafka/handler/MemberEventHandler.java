@@ -59,12 +59,12 @@ public class MemberEventHandler implements EventHandler<MemberPayload> {
 
             case PROJECT_MEMBER_ADDED -> {
                 message.setTitle("Bạn được thêm vào project");
-                message.setContent("Bạn vừa được thêm vào một project.");
+                message.setContent(String.format("Bạn vừa được thêm vào project %s với vai trò %s.",payload.getMemberEventDto().getProjectName(), payload.getMemberEventDto().getRole().toString()));
             }
 
             case PROJECT_MEMBER_ROLE_UPDATED -> {
                 message.setTitle("Vai trò trong project thay đổi");
-                message.setContent(String.format("Vai trò của %s trong project đã được cập nhật là %s.", payload.getMemberEventDto().getDisplayName(), payload.getMemberEventDto().getRole().toString()));
+                message.setContent(String.format("Vai trò của %s trong project %s đã được cập nhật là %s.", payload.getMemberEventDto().getDisplayName(), payload.getMemberEventDto().getProjectName(), payload.getMemberEventDto().getRole().toString()));
             }
 
             case REQUEST_ACCEPTED -> {

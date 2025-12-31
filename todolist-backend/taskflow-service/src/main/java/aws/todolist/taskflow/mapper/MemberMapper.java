@@ -25,6 +25,7 @@ public interface MemberMapper {
     @Mapping(source = "account.displayName", target = "displayName")
     @Mapping(source = "account.avatar", target = "avatar")
     @Mapping(source = "account.email", target = "email")
+    @Mapping(source = "project.name", target = "projectName")
     MemberEventDto toEventDto(Member member);
 
     default MemberPayload toPayload(

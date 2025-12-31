@@ -18,6 +18,8 @@ public class MemberEventDto {
 
     private String displayName;
 
+    private String projectName;
+
     private String avatar;
 
     private Role role;

@@ -8,7 +8,6 @@ import aws.todolist.taskflow.exceptions.ProjectException.ResourceNotFoundExcepti
 import aws.todolist.taskflow.exceptions.errorCode.BusinessErrorCode;
 import aws.todolist.taskflow.mapper.CommentAttachMapper;
 import aws.todolist.taskflow.repository.CommentAttachRepository;
-import aws.todolist.taskflow.service.ServiceInterface.AwsService;
 import aws.todolist.taskflow.service.ServiceInterface.CommentAttachService;
 import aws.todolist.taskflow.utils.TaskCommentUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +31,6 @@ public class CommentAttachImpl implements CommentAttachService {
     @Autowired
     private CommentAttachMapper commentAttachMapper;
 
-    @Autowired
-    private AwsService awsService;
-
 
     @Override
     @Transactional
@@ -42,9 +38,7 @@ public class CommentAttachImpl implements CommentAttachService {
 
         TaskComment taskComment = taskCommentUtils.getCommentAndCheck(idComment, account);
 
-        String newUrl = awsService.moveFileToAttach(url);
-
-        CommentAttach commentAttach = CommentAttach.builder().attachmentUrl(newUrl).taskComment(taskComment).build();
+        CommentAttach commentAttach = CommentAttach.builder().attachmentUrl(url).taskComment(taskComment).build();
 
         return commentAttachRepository.save(commentAttach);
     }
@@ -53,15 +47,11 @@ public class CommentAttachImpl implements CommentAttachService {
     @Transactional
     public CommentAttachResponse deleteCommentAttach(String url) {
 
-        System.err.println(url);
-
         CommentAttach commentAttach = commentAttachRepository.findByAttachmentUrl(url);
 
         if (commentAttach == null) {
             throw new ResourceNotFoundException(BusinessErrorCode.TASKFLOW_NOT_FOUND, "Không tìm thấy comment attach này");
         }
-
-        awsService.deleteFile(url);
 
         commentAttachRepository.delete(commentAttach);
 
@@ -76,11 +66,6 @@ public class CommentAttachImpl implements CommentAttachService {
         List<CommentAttach> attachList = commentAttachRepository.findAllByTaskCommentId(idComment);
 
         if (attachList.isEmpty()) return;
-
-        // 3. Xóa file trên S3
-        attachList.forEach(attach -> {
-            awsService.deleteFile(attach.getAttachmentUrl());
-        });
 
         // 4. Xóa bản ghi DB
         commentAttachRepository.deleteAll(attachList);
