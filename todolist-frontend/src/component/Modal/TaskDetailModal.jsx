@@ -3,7 +3,7 @@ import {
 } from "@ant-design/icons";
 import { Modal } from "antd";
 import { useState, useEffect } from "react";
-import { https_taskflow } from "../../service/api";
+import {BASE_URL, https_taskflow} from "../../service/api";
 import CommentSection from "../TaskComment/CommentSection";
 import { LabelsSection } from "../Section/LabelsSection";
 import PriorityDropdown from "../Dropdown/PriorityDropdown";
@@ -62,126 +62,6 @@ export default function TaskDetailModal({
         setTaskStack(stack => stack.slice(0, -1));
         setCurrentTaskId(prev.id); // 🔥 trigger API again
     };
-
-
-
-
-    // ╔══════════════════════════════════════╗
-    // ║        📝 Comment Update Helpers     ║
-    // ╚══════════════════════════════════════╝
-
-
-    const handleComment = async (newComment, attachments) => {
-        try {
-            const response = await https_taskflow.post(`/v1/projects/${task.idProject}/tasks/${task.id}/comments`, {
-                comment: newComment,
-                urls: attachments
-            })
-
-            if (response.status === 200) {
-                const taskDetailNew = { ...taskDetail, comments: [...taskDetail.comments, response.data.data] };
-                setTaskDetail(taskDetailNew);
-            }
-
-
-        } catch (err) {
-            // Kiểm tra xem server có trả lỗi dạng JSON không
-            if (err.response && err.response.data) {
-                const msg = err.response.data.message || err.response.data.detailMessage || "Đã xảy ra lỗi không xác định";
-                toast.error(msg);
-            } else {
-                toast.info("Không thể kết nối đến server. Vui lòng thử lại.");
-            }
-        }
-    };
-
-    const onUpdateComment = async (newComment, idComment) => {
-        if (!newComment.trim()) return;
-        try {
-            const res = await https_taskflow.patch(
-                `/v1/projects/${task.idProject}/tasks/comments/${idComment}`,
-                { comment: newComment }
-            );
-
-            if (res.status === 200) {
-                const commentUpdated = res.data.data;
-                const updatedComments = taskDetail.comments.map(comment =>
-                    comment.id === commentUpdated.id ? commentUpdated : comment
-                );
-                setTaskDetail(prev => ({ ...prev, comments: updatedComments }));
-            }
-        } catch (err) {
-            // Kiểm tra xem server có trả lỗi dạng JSON không
-            if (err.response && err.response.data) {
-                const msg = err.response.data.message || err.response.data.detailMessage || "Đã xảy ra lỗi không xác định";
-                toast.error(msg);
-            } else {
-                toast.info("Không thể kết nối đến server. Vui lòng thử lại.");
-            }
-        }
-    };
-
-
-    const onDeleteComment = async (idComment) => {
-        try {
-            const res = await https_taskflow.delete(
-                `/v1/projects/${task.idProject}/tasks/comments/${idComment}`
-            );
-
-            if (res.status === 200) {
-                const commentDeleted = res.data.data;
-                const updatedComments = (taskDetail.comments || []).filter(
-                    comment => comment.id !== commentDeleted.id
-                );
-                setTaskDetail(prev => ({ ...prev, comments: updatedComments }));
-            }
-        } catch (err) {
-            // Kiểm tra xem server có trả lỗi dạng JSON không
-            if (err.response && err.response.data) {
-                const msg = err.response.data.message || err.response.data.detailMessage || "Đã xảy ra lỗi không xác định";
-                toast.error(msg);
-            } else {
-                toast.info("Không thể kết nối đến server. Vui lòng thử lại.");
-            }
-        }
-    }
-
-    const onDeleteCommentAttach = async (url) => {
-        try {
-            const res = await https_taskflow.delete(
-                `/v1/projects/${task.idProject}/deleteCommentAttach`, {
-                params: {
-                    fileUrl: url
-                }
-            }
-            );
-
-            if (res.status === 200) {
-                const commentAttachDeleted = res.data.data;
-                const updatedComments = (taskDetail.comments || []).map(comment => {
-                    // nếu đây là comment chứa attachment vừa xóa
-                    if (comment.id === commentAttachDeleted.taskCommentId) {
-                        return {
-                            ...comment,
-                            commentAttach: (comment.commentAttach || []).filter(
-                                att => att.id !== commentAttachDeleted.id
-                            )
-                        };
-                    }
-                    return comment;
-                });
-                setTaskDetail(prev => ({ ...prev, comments: updatedComments }));
-            }
-        } catch (err) {
-            // Kiểm tra xem server có trả lỗi dạng JSON không
-            if (err.response && err.response.data) {
-                const msg = err.response.data.message || err.response.data.detailMessage || "Đã xảy ra lỗi không xác định";
-                toast.error(msg);
-            } else {
-                toast.info("Không thể kết nối đến server. Vui lòng thử lại.");
-            }
-        }
-    }
 
 
 
@@ -494,10 +374,9 @@ export default function TaskDetailModal({
                         <CommentSection
                             isOpenComment={isOpenComment}
                             comments={taskDetail?.comments ?? []}
-                            handleComment={handleComment}
-                            onUpdateComment={onUpdateComment}
-                            onDeleteComment={onDeleteComment}
-                            onDeleteCommentAttach={onDeleteCommentAttach}
+                            setTaskDetail={setTaskDetail}
+                            taskDetail={taskDetail}
+
                         />
                     </div>
 
@@ -536,7 +415,7 @@ export default function TaskDetailModal({
                             <div className="flex items-center gap-2">
                                 <img
                                     src={
-                                        taskDetail.createdByAccount?.avatar ||
+                                        `${BASE_URL}/media/v1/local/${taskDetail.createdByAccount?.avatar}` ||
                                         "https://i.pravatar.cc/80"
                                     }
                                     alt="creator"

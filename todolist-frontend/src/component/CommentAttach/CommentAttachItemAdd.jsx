@@ -1,55 +1,43 @@
 import {DeleteOutlined} from "@ant-design/icons";
-import {FileIcon} from "./FileIcon";
+import { Image } from "antd";
+import {BASE_URL} from "../../service/api";
 
 
-export function CommentAttachItemAdd({attachments, setAttachments}) {
-
-    const isImage = (url) => {
-        return /\.(png|jpg|jpeg|gif|webp|svg)$/i.test(url);
-    };
-
+export function CommentAttachItemAdd({ attachments, setAttachments }) {
     return (
         <div className="flex flex-wrap gap-2 mt-2 w-full">
-            {attachments.map((url, idx) => {
-                let filename = url.split('/').pop();
-
-                filename = filename.replace(/^[0-9a-fA-F-]{36}-/, '');
-
-                return (
+            <Image.PreviewGroup>
+                {attachments.map((idFile, idx) => (
                     <div
                         key={idx}
-                        className="w-28 h-28 relative border rounded overflow-hidden bg-gray-50 flex items-center justify-center"
+                        className="w-40 h-40 relative border rounded overflow-hidden bg-gray-50"
                     >
-                        {isImage(url) ? (
-                            <img
-                                src={url}
-                                alt=""
-                                className="w-full h-full object-cover"
-                                onError={(e) => {
-                                    if (e.currentTarget.src !== '/file-broken.png') {
-                                        e.currentTarget.src = '/file-broken.png';
-                                    }
-                                }}
-                            />
-                        ) : (
-                            <div className="flex flex-col items-center justify-center p-1 text-center">
-                                <FileIcon type={filename.split('.').pop()} /> {/* component hiển thị icon theo type */}
-                                <span className="text-xs truncate w-16">{filename}</span>
-                            </div>
-                        )}
+                        <Image
+                            src={
+                                idFile
+                                    ? `${BASE_URL}/media/v1/local/${idFile}`
+                                    : "/file-broken.png"
+                            }
+                            alt="attachment"
+                            className="w-full h-full object-cover cursor-pointer"
+                            preview
+                        />
 
                         {/* Nút xóa */}
                         <button
-                            onClick={() =>
-                                setAttachments(prev => prev.filter((_, i) => i !== idx))
-                            }
-                            className="absolute top-0 right-0 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center hover:bg-red-600"
+                            onClick={(e) => {
+                                e.stopPropagation(); // ❗ không trigger preview
+                                setAttachments(prev =>
+                                    prev.filter((_, i) => i !== idx)
+                                );
+                            }}
+                            className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center hover:bg-red-600 z-10"
                         >
-                            <DeleteOutlined style={{ fontSize: '14px' }} />
+                            <DeleteOutlined style={{ fontSize: 12 }} />
                         </button>
                     </div>
-                );
-            })}
+                ))}
+            </Image.PreviewGroup>
         </div>
-    )
+    );
 }
