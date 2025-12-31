@@ -15,12 +15,16 @@ public class KafkaProducerService {
 	
 	private final Map<OtpPurpose, String> topicMap = new EnumMap<>(OtpPurpose.class);
 	
+	@Value("${app.kafka.topic.auth.initialize-default-project}")
+	private String initializeDefaultProjectTopic;
+	
 	public KafkaProducerService(
 		KafkaTemplate<String, String> kafkaTemplate,
 		@Value("${app.kafka.topic.auth.register-email}") String registerEmailTopic,
 		@Value("${app.kafka.topic.auth.reset-password-email}") String resetPasswordEmailTopic,
 		@Value("${app.kafka.topic.auth.update-email}") String updateEmailTopic,
 		@Value("${app.kafka.topic.auth.delete-account}") String deleteAccountTopic
+		
 	) {
 		this.kafkaTemplate = kafkaTemplate;
 		
@@ -43,6 +47,24 @@ public class KafkaProducerService {
 		
 		kafkaTemplate.send(topic, buildMessage(email, otp));
 	}
+	
+	public void sendInitDefaultProjectTopic(String accountId, String email) {
+		String message = buildInitDefaultProjectMessage(accountId, email);
+		kafkaTemplate.send(initializeDefaultProjectTopic, message);
+	}
+	
+	/* =====================================================
+	 *                   BUILDER
+	 * ===================================================== */
+	
+	private String buildInitDefaultProjectMessage(String accountId, String email) {
+		return String.format(
+			"{\"accountId\":\"%s\",\"email\":\"%s\"}",
+			accountId,
+			email
+		);
+	}
+	
 	
 	/* =====================================================
 	 *                   BUILDER

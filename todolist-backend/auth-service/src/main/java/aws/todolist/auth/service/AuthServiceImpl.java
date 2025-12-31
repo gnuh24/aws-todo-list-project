@@ -59,6 +59,8 @@ public class AuthServiceImpl implements AuthService {
 	
 	@Autowired
 	private TwoFactorService twoFactorService;
+	@Autowired
+	private KafkaProducerService kafkaProducerService;
 	
 	@Override
 	@Transactional
@@ -92,7 +94,7 @@ public class AuthServiceImpl implements AuthService {
 		// 5. Cleanup Redis
 		redisService.delete(RedisConstants.REGISTER_PENDING_ACCOUNT + ":" + email);
 		redisService.delete(RedisConstants.OTP_VERIFY_ACCOUNT + ":" + email);
-		
+		kafkaProducerService.sendInitDefaultProjectTopic(savedAccount.getId(), savedAccount.getEmail());
 		return savedAccount;
 	}
 	
