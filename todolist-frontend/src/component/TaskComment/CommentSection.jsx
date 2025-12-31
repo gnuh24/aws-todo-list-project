@@ -1,16 +1,16 @@
 import { useState, useEffect, useRef } from "react";
-import {Input, Button, message} from "antd";
+import { Input, Button, message } from "antd";
 import {
     PaperClipOutlined,
     UpOutlined,
     DeleteOutlined, EditOutlined, CopyOutlined
 } from "@ant-design/icons";
 import dayjs from "dayjs";
-import {https_taskflow} from "../../service/api";
-import {CommentAttachItem} from "../CommentAttach/CommentAttachItem";
-import {CommentAttachItemAdd} from "../CommentAttach/CommentAttachItemAdd";
+import { https_taskflow } from "../../service/api";
+import { CommentAttachItem } from "../CommentAttach/CommentAttachItem";
+import { CommentAttachItemAdd } from "../CommentAttach/CommentAttachItemAdd";
 import SpinnerForSettings from "../Spinner/SpinnerForSettings";
-import {toast} from "sonner";
+import { toast } from "sonner";
 
 const MAX_SIZE = 3 * 1024 * 1024;
 
@@ -132,7 +132,7 @@ export default function CommentSection({ isOpenComment, comments, handleComment,
 
 
     return (
-        <div className="w-full border-t pt-10"  ref={menuRef}>
+        <div className="w-full border-t pt-10" ref={menuRef}>
 
             {loading && (
                 <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-70 z-50">
@@ -160,12 +160,11 @@ export default function CommentSection({ isOpenComment, comments, handleComment,
                 {/* Comment List */}
                 <div
                     ref={containerRef}
-                    className={`space-y-4 mb-4 pr-2 transition-all duration-300 overflow-y-auto ${
-                        showComments ? "max-h-80" : "max-h-0 overflow-hidden"
-                    }`}
+                    className={`space-y-4 mb-4 pr-2 transition-all duration-300 overflow-y-auto ${showComments ? "max-h-80" : "max-h-0 overflow-hidden"
+                        }`}
 
                 >
-                {comments.map((c) => {
+                    {comments.map((c) => {
                         const isMe = c.accountId === auth.id;
 
                         return (
@@ -287,7 +286,7 @@ export default function CommentSection({ isOpenComment, comments, handleComment,
                 {!isExpanded && (
                     <div className="w-full flex items-center gap-2">
                         <div className="w-9 h-9 rounded-full bg-[#56D08A] text-white flex items-center justify-center font-semibold overflow-hidden">
-                            {auth.avatar? (
+                            {auth.avatar ? (
                                 <img
                                     src={auth.avatar}
                                     alt="avatar"
@@ -316,47 +315,47 @@ export default function CommentSection({ isOpenComment, comments, handleComment,
 
                 {isExpanded && (
                     <div className="border rounded-md p-3">
-                      <Input.TextArea
-                        rows={3}
-                        placeholder="Comment"
-                        value={newComment}
-                        onChange={(e) => setNewComment(e.target.value)}
-                        className="border-none focus:ring-0 resize-none"
-                        autoFocus
-                        onKeyDown={(e) => {
-                            if (e.key === "Enter" && !e.shiftKey) {
-                                e.preventDefault(); // tránh xuống dòng
-                                handleSubmit();
-                            }
-                        }}
-                      />
+                        <Input.TextArea
+                            rows={3}
+                            placeholder="Comment"
+                            value={newComment}
+                            onChange={(e) => setNewComment(e.target.value)}
+                            className="border-none focus:ring-0 resize-none"
+                            autoFocus
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter" && !e.shiftKey) {
+                                    e.preventDefault(); // tránh xuống dòng
+                                    handleSubmit();
+                                }
+                            }}
+                        />
 
                         {attachments.length > 0 && (
                             <CommentAttachItemAdd attachments={attachments} setAttachments={setAttachments} />
                         )}
 
                         <div className="flex justify-between items-center mt-2">
-                        {/*<div className="flex gap-3 text-gray-400 text-lg">*/}
-                        {/*    <PaperClipOutlined*/}
-                        {/*        className="cursor-pointer text-gray-500 hover:text-gray-700"*/}
-                        {/*        onClick={() => fileInputRef.current?.click()}*/}
-                        {/*    />*/}
-                        {/*</div>*/}
-                        <div className="flex gap-2">
-                          <Button onClick={()=> {
-                              setIsExpanded(false)
-                              setNewComment("")
-                              setAttachments([])
-                          }
-                          }>Cancel</Button>
-                          <Button type="primary" danger onClick={handleSubmit}>
-                            Comment
-                          </Button>
+                            {/*<div className="flex gap-3 text-gray-400 text-lg">*/}
+                            {/*    <PaperClipOutlined*/}
+                            {/*        className="cursor-pointer text-gray-500 hover:text-gray-700"*/}
+                            {/*        onClick={() => fileInputRef.current?.click()}*/}
+                            {/*    />*/}
+                            {/*</div>*/}
+                            <div className="flex gap-2">
+                                <Button onClick={() => {
+                                    setIsExpanded(false)
+                                    setNewComment("")
+                                    setAttachments([])
+                                }
+                                }>Cancel</Button>
+                                <Button type="primary" danger onClick={handleSubmit}>
+                                    Comment
+                                </Button>
+                            </div>
                         </div>
-                      </div>
                     </div>
                 )}
-                </>}
+            </>}
         </div>
     );
 }

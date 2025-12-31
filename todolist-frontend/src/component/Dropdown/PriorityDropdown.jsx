@@ -6,9 +6,9 @@ export default function PriorityDropdown({ priority, onSelect }) {
 
     const priorities = [
         { id: "CRITICAL", color: "text-red-700", label: "Critical" },   // Cực kỳ khẩn cấp
-        { id: "HIGH",     color: "text-red-500", label: "High" },       // Quan trọng
-        { id: "MEDIUM",   color: "text-orange-400", label: "Medium" },  // Bình thường
-        { id: "LOW",      color: "text-blue-500", label: "Low" }        // Thấp
+        { id: "HIGH", color: "text-red-500", label: "High" },       // Quan trọng
+        { id: "MEDIUM", color: "text-orange-400", label: "Medium" },  // Bình thường
+        { id: "LOW", color: "text-blue-500", label: "Low" }        // Thấp
     ];
 
     const menu = (
@@ -23,11 +23,11 @@ export default function PriorityDropdown({ priority, onSelect }) {
                             onSelect?.(p.id);
                         }}
                     >
-            <span className="flex items-center gap-2">
-              <FlagOutlined className={p.color} />
-                {p.label}
-            </span>
-                        { priority === p.id && <CheckOutlined className="text-red-500" />}
+                        <span className="flex items-center gap-2">
+                            <FlagOutlined className={p.color} />
+                            {p.label}
+                        </span>
+                        {priority === p.id && <CheckOutlined className="text-red-500" />}
                     </div>
                 ),
             }))}

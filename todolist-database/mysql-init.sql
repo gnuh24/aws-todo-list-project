@@ -240,6 +240,178 @@ VALUES
 -- Additional new tasks
 ('10101010-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Setup CI/CD', 'Configure continuous integration and deployment', FALSE, FALSE, 'PENDING', 'HIGH', '2025-10-20 23:59:59', NULL, NULL, NULL, NOW(), NOW(), NULL, FALSE, NULL, '11111111-1111-1111-1111-111111111111'),
 ('20202020-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '22222222-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Create API Documentation', 'Document all API endpoints', FALSE, FALSE, 'READY', 'MEDIUM', '2025-10-22 23:59:59', NULL, NULL, NULL, NOW(), NOW(), NULL, FALSE, NULL, '11111111-1111-1111-1111-111111111111');
+
+-- =====================================================
+-- Additional hierarchical tasks (parent / child)
+-- =====================================================
+
+INSERT INTO `task`
+(`id`, `section_id`, `title`, `description`, `is_archived`, `is_pinned`, `status`,
+ `priority`, `deadline`, `start_time`, `completed_at`, `task_father_id`,
+ `created_at`, `updated_at`, `deleted_at`, `is_deleted`, `account_id`, `created_by`)
+VALUES
+
+-- 1. Parent task: API Security
+('11111111-cccc-cccc-cccc-cccccccccccc',
+ '22222222-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+ 'API Security',
+ 'Implement security mechanisms for APIs',
+ FALSE, FALSE, 'PENDING', 'HIGH',
+ '2025-10-18 23:59:59', NULL, NULL, NULL,
+ NOW(), NOW(), NULL, FALSE, NULL,
+ '11111111-1111-1111-1111-111111111111'),
+
+-- 2. Child of API Security
+('22222222-cccc-cccc-cccc-cccccccccccc',
+ '22222222-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+ 'JWT Authentication',
+ 'Implement JWT authentication for APIs',
+ FALSE, FALSE, 'READY', 'HIGH',
+ '2025-10-14 23:59:59', NULL, NULL,
+ '11111111-cccc-cccc-cccc-cccccccccccc',
+ NOW(), NOW(), NULL, FALSE, NULL,
+ '11111111-1111-1111-1111-111111111111'),
+
+-- 3. Child of API Security
+('33333333-cccc-cccc-cccc-cccccccccccc',
+ '22222222-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+ 'Role-Based Authorization',
+ 'Add role-based access control',
+ FALSE, FALSE, 'PENDING', 'MEDIUM',
+ '2025-10-16 23:59:59', NULL, NULL,
+ '11111111-cccc-cccc-cccc-cccccccccccc',
+ NOW(), NOW(), NULL, FALSE, NULL,
+ '11111111-1111-1111-1111-111111111111'),
+
+-- 4. Child of existing task: Implement API
+('44444444-cccc-cccc-cccc-cccccccccccc',
+ '22222222-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+ 'API Error Handling',
+ 'Standardize API error responses',
+ FALSE, FALSE, 'IN_PROGRESS', 'MEDIUM',
+ '2025-10-11 23:59:59', NOW(), NULL,
+ '66666666-cccc-cccc-cccc-cccccccccccc',
+ NOW(), NOW(), NULL, FALSE, NULL,
+ '11111111-1111-1111-1111-111111111111'),
+
+-- 5. Child of existing task: Setup Backend
+('55555555-cccc-cccc-cccc-cccccccccccc',
+ '11111111-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+ 'Configure Environment Variables',
+ 'Setup env variables for backend',
+ FALSE, FALSE, 'READY', 'LOW',
+ '2025-09-28 23:59:59', NULL, NULL,
+ '77777777-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+ NOW(), NOW(), NULL, FALSE, NULL,
+ '11111111-1111-1111-1111-111111111111'),
+
+-- 6. Parent task: Frontend Optimization
+('66666666-dddd-dddd-dddd-dddddddddddd',
+ '11111111-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+ 'Frontend Optimization',
+ 'Optimize frontend performance',
+ FALSE, FALSE, 'PENDING', 'MEDIUM',
+ '2025-10-22 23:59:59', NULL, NULL, NULL,
+ NOW(), NOW(), NULL, FALSE, NULL,
+ '11111111-1111-1111-1111-111111111111'),
+
+-- 7. Child of Frontend Optimization
+('77777777-dddd-dddd-dddd-dddddddddddd',
+ '11111111-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+ 'Reduce Bundle Size',
+ 'Optimize bundle size using code splitting',
+ FALSE, FALSE, 'PENDING', 'MEDIUM',
+ '2025-10-19 23:59:59', NULL, NULL,
+ '66666666-dddd-dddd-dddd-dddddddddddd',
+ NOW(), NOW(), NULL, FALSE, NULL,
+ '11111111-1111-1111-1111-111111111111'),
+
+-- 8. Child of Frontend Optimization
+('88888888-dddd-dddd-dddd-dddddddddddd',
+ '11111111-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+ 'Optimize Images',
+ 'Compress and optimize images',
+ FALSE, FALSE, 'READY', 'LOW',
+ '2025-10-18 23:59:59', NULL, NULL,
+ '66666666-dddd-dddd-dddd-dddddddddddd',
+ NOW(), NOW(), NULL, FALSE, NULL,
+ '11111111-1111-1111-1111-111111111111'),
+
+-- 9. Child of Develop Module X
+('99999999-dddd-dddd-dddd-dddddddddddd',
+ '66666666-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+ 'Module X Validation',
+ 'Add input validation for Module X',
+ FALSE, FALSE, 'IN_PROGRESS', 'HIGH',
+ '2025-10-13 23:59:59', NOW(), NULL,
+ 'eeeeeeee-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+ NOW(), NOW(), NULL, FALSE, NULL,
+ '11111111-1111-1111-1111-111111111111'),
+
+-- 10. Child of Develop Module X
+('aaaaaaaa-dddd-dddd-dddd-dddddddddddd',
+ '66666666-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+ 'Module X Logging',
+ 'Implement logging for Module X',
+ FALSE, FALSE, 'PENDING', 'MEDIUM',
+ '2025-10-14 23:59:59', NULL, NULL,
+ 'eeeeeeee-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+ NOW(), NOW(), NULL, FALSE, NULL,
+ '11111111-1111-1111-1111-111111111111');
+
+
+INSERT INTO `task`
+(`id`, `section_id`, `title`, `description`, `is_archived`, `is_pinned`, `status`,
+ `priority`, `deadline`, `start_time`, `completed_at`, `task_father_id`,
+ `created_at`, `updated_at`, `deleted_at`, `is_deleted`, `account_id`, `created_by`)
+VALUES
+
+-- 11. Child of JWT Authentication
+('aaaa1111-cccc-cccc-cccc-cccccccccccc',
+ '22222222-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+ 'Access Token Generation',
+ 'Implement access token generation logic',
+ FALSE, FALSE, 'READY', 'HIGH',
+ '2025-10-12 23:59:59', NULL, NULL,
+ '22222222-cccc-cccc-cccc-cccccccccccc',
+ NOW(), NOW(), NULL, FALSE, NULL,
+ '11111111-1111-1111-1111-111111111111'),
+
+-- 12. Child of JWT Authentication
+('bbbb2222-cccc-cccc-cccc-cccccccccccc',
+ '22222222-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+ 'Refresh Token Flow',
+ 'Implement refresh token and rotation mechanism',
+ FALSE, FALSE, 'PENDING', 'HIGH',
+ '2025-10-13 23:59:59', NULL, NULL,
+ '22222222-cccc-cccc-cccc-cccccccccccc',
+ NOW(), NOW(), NULL, FALSE, NULL,
+ '11111111-1111-1111-1111-111111111111'),
+
+-- 13. Child of Role-Based Authorization
+('cccc3333-cccc-cccc-cccc-cccccccccccc',
+ '22222222-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+ 'Define Roles and Permissions',
+ 'Define system roles and permission matrix',
+ FALSE, FALSE, 'READY', 'MEDIUM',
+ '2025-10-14 23:59:59', NULL, NULL,
+ '33333333-cccc-cccc-cccc-cccccccccccc',
+ NOW(), NOW(), NULL, FALSE, NULL,
+ '11111111-1111-1111-1111-111111111111'),
+
+-- 14. Child of Role-Based Authorization
+('dddd4444-cccc-cccc-cccc-cccccccccccc',
+ '22222222-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+ 'Authorization Middleware',
+ 'Implement permission-check middleware',
+ FALSE, FALSE, 'PENDING', 'MEDIUM',
+ '2025-10-15 23:59:59', NULL, NULL,
+ '33333333-cccc-cccc-cccc-cccccccccccc',
+ NOW(), NOW(), NULL, FALSE, NULL,
+ '11111111-1111-1111-1111-111111111111');
+
+
+
 -- 7. Dữ liệu mẫu cho bảng `task_comment`
 INSERT INTO `task_comment` (`id`, `task_id`, `account_id`, `comment`, `created_at`, `updated_at`, `deleted_at`, `is_deleted`)
 VALUES
@@ -251,6 +423,74 @@ INSERT INTO `comment_attachment` (`id`, `task_comment_id`, `attachment_url`, `cr
 VALUES
 ('99999999-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '77777777-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'https://example.com/db_schema.png', NOW()),
 ('aaaaaaaa-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '88888888-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'https://example.com/api_test.json', NOW());
+
+-- =====================================================
+-- Seed data for table `task_comment` (50 comments)
+-- =====================================================
+
+INSERT INTO `task_comment`
+(`id`, `task_id`, `account_id`, `comment`, `created_at`, `updated_at`, `deleted_at`, `is_deleted`)
+VALUES
+
+-- Setup Database (10 comments)
+('cmt-001', '44444444-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', 'Initial database schema created.', NOW(), NOW(), NULL, FALSE),
+('cmt-002', '44444444-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '22222222-2222-2222-2222-222222222222', 'Indexes need optimization.', NOW(), NOW(), NULL, FALSE),
+('cmt-003', '44444444-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', 'Foreign keys look correct.', NOW(), NOW(), NULL, FALSE),
+('cmt-004', '44444444-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '22222222-2222-2222-2222-222222222222', 'Consider soft delete strategy.', NOW(), NOW(), NULL, FALSE),
+('cmt-005', '44444444-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', 'Added audit fields.', NOW(), NOW(), NULL, FALSE),
+('cmt-006', '44444444-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '22222222-2222-2222-2222-222222222222', 'Migration script tested.', NOW(), NOW(), NULL, FALSE),
+('cmt-007', '44444444-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', 'Seed data inserted.', NOW(), NOW(), NULL, FALSE),
+('cmt-008', '44444444-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '22222222-2222-2222-2222-222222222222', 'Performance is acceptable.', NOW(), NOW(), NULL, FALSE),
+('cmt-009', '44444444-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', 'Waiting for backend integration.', NOW(), NOW(), NULL, FALSE),
+('cmt-010', '44444444-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '22222222-2222-2222-2222-222222222222', 'Ready for review.', NOW(), NOW(), NULL, FALSE),
+
+-- Implement API (15 comments)
+('cmt-011', '66666666-cccc-cccc-cccc-cccccccccccc', '11111111-1111-1111-1111-111111111111', 'Base controller implemented.', NOW(), NOW(), NULL, FALSE),
+('cmt-012', '66666666-cccc-cccc-cccc-cccccccccccc', '22222222-2222-2222-2222-222222222222', 'Endpoints follow REST standard.', NOW(), NOW(), NULL, FALSE),
+('cmt-013', '66666666-cccc-cccc-cccc-cccccccccccc', '11111111-1111-1111-1111-111111111111', 'Validation layer added.', NOW(), NOW(), NULL, FALSE),
+('cmt-014', '66666666-cccc-cccc-cccc-cccccccccccc', '22222222-2222-2222-2222-222222222222', 'Error handling still missing.', NOW(), NOW(), NULL, FALSE),
+('cmt-015', '66666666-cccc-cccc-cccc-cccccccccccc', '11111111-1111-1111-1111-111111111111', 'Swagger config ready.', NOW(), NOW(), NULL, FALSE),
+('cmt-016', '66666666-cccc-cccc-cccc-cccccccccccc', '22222222-2222-2222-2222-222222222222', 'Security not implemented yet.', NOW(), NOW(), NULL, FALSE),
+('cmt-017', '66666666-cccc-cccc-cccc-cccccccccccc', '11111111-1111-1111-1111-111111111111', 'API versioning discussed.', NOW(), NOW(), NULL, FALSE),
+('cmt-018', '66666666-cccc-cccc-cccc-cccccccccccc', '22222222-2222-2222-2222-222222222222', 'Need rate limiting.', NOW(), NOW(), NULL, FALSE),
+('cmt-019', '66666666-cccc-cccc-cccc-cccccccccccc', '11111111-1111-1111-1111-111111111111', 'Refactor service layer.', NOW(), NOW(), NULL, FALSE),
+('cmt-020', '66666666-cccc-cccc-cccc-cccccccccccc', '22222222-2222-2222-2222-222222222222', 'Logging added.', NOW(), NOW(), NULL, FALSE),
+('cmt-021', '66666666-cccc-cccc-cccc-cccccccccccc', '11111111-1111-1111-1111-111111111111', 'Unit tests in progress.', NOW(), NOW(), NULL, FALSE),
+('cmt-022', '66666666-cccc-cccc-cccc-cccccccccccc', '22222222-2222-2222-2222-222222222222', 'Some tests failing.', NOW(), NOW(), NULL, FALSE),
+('cmt-023', '66666666-cccc-cccc-cccc-cccccccccccc', '11111111-1111-1111-1111-111111111111', 'Mock data prepared.', NOW(), NOW(), NULL, FALSE),
+('cmt-024', '66666666-cccc-cccc-cccc-cccccccccccc', '22222222-2222-2222-2222-222222222222', 'API response format confirmed.', NOW(), NOW(), NULL, FALSE),
+('cmt-025', '66666666-cccc-cccc-cccc-cccccccccccc', '11111111-1111-1111-1111-111111111111', 'Ready for frontend integration.', NOW(), NOW(), NULL, FALSE),
+
+-- API Security (10 comments)
+('cmt-026', '11111111-cccc-cccc-cccc-cccccccccccc', '11111111-1111-1111-1111-111111111111', 'Security requirements defined.', NOW(), NOW(), NULL, FALSE),
+('cmt-027', '11111111-cccc-cccc-cccc-cccccccccccc', '22222222-2222-2222-2222-222222222222', 'JWT chosen as auth method.', NOW(), NOW(), NULL, FALSE),
+('cmt-028', '11111111-cccc-cccc-cccc-cccccccccccc', '11111111-1111-1111-1111-111111111111', 'Role-based model approved.', NOW(), NOW(), NULL, FALSE),
+('cmt-029', '11111111-cccc-cccc-cccc-cccccccccccc', '22222222-2222-2222-2222-222222222222', 'Token expiration discussed.', NOW(), NOW(), NULL, FALSE),
+('cmt-030', '11111111-cccc-cccc-cccc-cccccccccccc', '11111111-1111-1111-1111-111111111111', 'Refresh token flow planned.', NOW(), NOW(), NULL, FALSE),
+('cmt-031', '11111111-cccc-cccc-cccc-cccccccccccc', '22222222-2222-2222-2222-222222222222', 'Permission matrix drafted.', NOW(), NOW(), NULL, FALSE),
+('cmt-032', '11111111-cccc-cccc-cccc-cccccccccccc', '11111111-1111-1111-1111-111111111111', 'Middleware design ready.', NOW(), NOW(), NULL, FALSE),
+('cmt-033', '11111111-cccc-cccc-cccc-cccccccccccc', '22222222-2222-2222-2222-222222222222', 'Edge cases listed.', NOW(), NOW(), NULL, FALSE),
+('cmt-034', '11111111-cccc-cccc-cccc-cccccccccccc', '11111111-1111-1111-1111-111111111111', 'Security review pending.', NOW(), NOW(), NULL, FALSE),
+('cmt-035', '11111111-cccc-cccc-cccc-cccccccccccc', '22222222-2222-2222-2222-222222222222', 'Implementation starting.', NOW(), NOW(), NULL, FALSE),
+
+-- Frontend Optimization (10 comments)
+('cmt-036', '66666666-dddd-dddd-dddd-dddddddddddd', '11111111-1111-1111-1111-111111111111', 'Performance audit completed.', NOW(), NOW(), NULL, FALSE),
+('cmt-037', '66666666-dddd-dddd-dddd-dddddddddddd', '22222222-2222-2222-2222-222222222222', 'Bundle size too large.', NOW(), NOW(), NULL, FALSE),
+('cmt-038', '66666666-dddd-dddd-dddd-dddddddddddd', '11111111-1111-1111-1111-111111111111', 'Lazy loading suggested.', NOW(), NOW(), NULL, FALSE),
+('cmt-039', '66666666-dddd-dddd-dddd-dddddddddddd', '22222222-2222-2222-2222-222222222222', 'Images not optimized.', NOW(), NOW(), NULL, FALSE),
+('cmt-040', '66666666-dddd-dddd-dddd-dddddddddddd', '11111111-1111-1111-1111-111111111111', 'Cache strategy discussed.', NOW(), NOW(), NULL, FALSE),
+('cmt-041', '66666666-dddd-dddd-dddd-dddddddddddd', '22222222-2222-2222-2222-222222222222', 'Lighthouse score improved.', NOW(), NOW(), NULL, FALSE),
+('cmt-042', '66666666-dddd-dddd-dddd-dddddddddddd', '11111111-1111-1111-1111-111111111111', 'Code splitting implemented.', NOW(), NOW(), NULL, FALSE),
+('cmt-043', '66666666-dddd-dddd-dddd-dddddddddddd', '22222222-2222-2222-2222-222222222222', 'Recheck mobile performance.', NOW(), NOW(), NULL, FALSE),
+('cmt-044', '66666666-dddd-dddd-dddd-dddddddddddd', '11111111-1111-1111-1111-111111111111', 'Final review scheduled.', NOW(), NOW(), NULL, FALSE),
+('cmt-045', '66666666-dddd-dddd-dddd-dddddddddddd', '22222222-2222-2222-2222-222222222222', 'Optimization complete.', NOW(), NOW(), NULL, FALSE),
+
+-- JWT Authentication (5 comments)
+('cmt-046', '22222222-cccc-cccc-cccc-cccccccccccc', '11111111-1111-1111-1111-111111111111', 'JWT library selected.', NOW(), NOW(), NULL, FALSE),
+('cmt-047', '22222222-cccc-cccc-cccc-cccccccccccc', '22222222-2222-2222-2222-222222222222', 'Claims structure defined.', NOW(), NOW(), NULL, FALSE),
+('cmt-048', '22222222-cccc-cccc-cccc-cccccccccccc', '11111111-1111-1111-1111-111111111111', 'Token expiry configurable.', NOW(), NOW(), NULL, FALSE),
+('cmt-049', '22222222-cccc-cccc-cccc-cccccccccccc', '22222222-2222-2222-2222-222222222222', 'Refresh token pending.', NOW(), NOW(), NULL, FALSE),
+('cmt-050', '22222222-cccc-cccc-cccc-cccccccccccc', '11111111-1111-1111-1111-111111111111', 'Ready for testing.', NOW(), NOW(), NULL, FALSE);
 
 
 CREATE TABLE `notification` (

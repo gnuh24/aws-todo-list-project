@@ -347,7 +347,7 @@ services:
       TASKFLOW_SERVICE_URL: http://taskflow-service:8082
       NOTIFICATION_SERVICE_URL: http://notification-service:9998
       AI_MODEL_SERVICE: http://ai-model-service:9997
-
+      MEDIA_SERVICE:  http://media-service:9996
     extra_hosts:
       - "host.docker.internal:host-gateway"
 

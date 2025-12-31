@@ -32,7 +32,7 @@ public class MemberController {
 
     @Operation(summary = "Lấy danh sách member của project", description = "Dùng id client cung cấp để lấy danh sách member")
     @GetMapping("/{idProject}/members")
-    @RequireProjectRole({Role.ADMIN, Role.OWNER})
+    @RequireProjectRole({Role.ADMIN, Role.OWNER, Role.VIEWER, Role.MEMBER})
     public ResponseEntity<ApiResponse<List<MemberResponseDTO>>> getMemberByIdProject(@PathVariable("idProject") String id) {
         List<MemberResponseDTO> members = memberService.getAllMember(id);
 
