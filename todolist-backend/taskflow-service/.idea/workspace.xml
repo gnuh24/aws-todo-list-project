@@ -5,119 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="aafb8b93-6ddf-44d9-bc7c-02d1e2b5b281" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../notification-service/src/main/java/aws/todolist/notification/dto/eventTaskflow/dto/MemberEventDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/../notification-service/src/main/java/aws/todolist/notification/dto/eventTaskflow/dto/MemberEventDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../notification-service/src/main/java/aws/todolist/notification/messaging/kafka/handler/MemberEventHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/../notification-service/src/main/java/aws/todolist/notification/messaging/kafka/handler/MemberEventHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/.idea/encodings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/.idea/uiDesigner.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/ProjectServiceApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/annotation/RequireProjectRole.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/api/ApiResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/aspect/ProjectRoleAspect.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/config/ModelMapperConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/config/RedisConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/config/RestTemplate.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/config/SwaggerConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/context/RequestContext.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/controller/MemberController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/controller/ProjectController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/controller/SectionController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/dto/commentAttach/CommentAttachResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/dto/event/ActorDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/dto/event/EventEnvelope.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/dto/event/PayloadBase.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/dto/event/dto/MemberEventDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/dto/event/dto/ProjectEventDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/dto/event/dto/SectionEventDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/dto/event/payload/MemberPayload.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/dto/event/payload/ProjectPayload.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/dto/event/payload/SectionPayload.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/dto/member/MemberCreateRequestDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/dto/member/MemberResponseDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/dto/member/MemberUpdateRoleRequestDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/dto/member/MemberUpdateStatusRequestDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/dto/project/ProjectCreateRequestDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/dto/project/ProjectDetailResponseDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/dto/project/ProjectResponseDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/dto/project/ProjectUpdateRequestDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/dto/section/SectionCreateRequestDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/dto/section/SectionDeleteAndMigrateDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/dto/section/SectionResponseDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/dto/section/SectionUpdateNameDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/dto/section/SectionUpdateRequestDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/dto/task/TaskResponseDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/dto/taskComment/TaskCommentResponseDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/entity/Account.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/entity/Member.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/entity/Project.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/entity/ProjectLabel.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/entity/Section.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/entity/Task.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/enums/EventType.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/enums/Priority.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/enums/Role.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/enums/Status.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/enums/StatusMember.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/exceptions/AuthException/AuthExceptionHandler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/exceptions/AuthException/StepUpAuthenticationException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/exceptions/DetailError.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/exceptions/ErrorResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/exceptions/ProjectException/BadRequestException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/exceptions/ProjectException/ForbiddenException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/exceptions/ProjectException/ResourceNotFoundException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/exceptions/errorCode/BusinessErrorCode.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/exceptions/errorCode/SystemErrorCode.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/exceptions/handler/GlobalExceptionHandler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/exceptions/handler/ProjectExceptionHandler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/filter/AccountContextFilter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/integration/kafka/KafkaConsumerService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/integration/redis/RedisConstants.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/integration/redis/RedisService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/integration/redis/RedisServiceImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/logging/AppLogger.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/logging/RequestLoggingFilter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/mapper/ActorMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/mapper/MemberMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/mapper/ProjectMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/mapper/SectionMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/messaging/kafka/message/EventType.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/messaging/kafka/producer/GenericEventPublisher.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/messaging/kafka/producer/GenericEventPublisherImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/repository/AccountRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/repository/MemberRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/repository/ProjectRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/repository/SectionRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/security/WebSecurityConfiguration.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/service/AccountServiceImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/service/MemberServiceImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/service/ProjectServiceImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/service/SectionServiceImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/service/ServiceEventKafka/MemberEventService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/service/ServiceEventKafka/ProjectEventService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/service/ServiceEventKafka/SectionEventService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/service/ServiceInterface/AccountService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/service/ServiceInterface/MemberService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/service/ServiceInterface/ProjectService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/service/ServiceInterface/SectionService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/utils/EnvironmentUtils.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/java/aws/todolist/project/utils/IdGenerator.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/resources/application-dev.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/resources/application-prod.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../project-service/src/main/resources/application.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../api-gateway/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../api-gateway/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../api-gateway/src/main/resources/application-dev.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../api-gateway/src/main/resources/application-dev.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/config/AWSConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/controller/AwsController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/dto/event/dto/MemberEventDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/dto/event/dto/MemberEventDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/mapper/MemberMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/mapper/MemberMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/AwsServiceImplementation.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/CommentAttachImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/CommentAttachImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/ServiceInterface/AwsService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../todolist-database/mysql-init-v2.sql" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-database/mysql-init-v2.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/controller/ProjectController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/controller/ProjectController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/dto/project/ProjectCreateRequestDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/dto/project/ProjectCreateRequestDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/repository/ProjectRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/repository/ProjectRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/ProjectServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/ProjectServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/ServiceInterface/ProjectService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/ServiceInterface/ProjectService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application-dev.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application-dev.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application-prod.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application-prod.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
