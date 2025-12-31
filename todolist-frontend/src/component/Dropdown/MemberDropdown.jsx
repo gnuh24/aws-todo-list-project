@@ -42,31 +42,49 @@ export default function MemberDropdown({
 
             {!loading &&
                 members.map(member => {
-                    const isAssigned = taskDetail.accountAssign?.id === member.id;
+                    const isAssigned =
+                        taskDetail.accountAssign?.id === member.accountId;
 
                     return (
                         <div
-                            key={member.id}
-                            className={`px-3 py-2 flex items-center gap-2 cursor-pointer
-              ${isAssigned ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100"}`}
+                            key={member.accountId}
+                            className={`px-3 py-2 flex items-center gap-3 cursor-pointer
+                            ${isAssigned
+                                    ? "bg-blue-100 text-blue-700"
+                                    : "hover:bg-gray-100"
+                                }`}
                             onClick={() => {
                                 if (isAssigned) return;
-                                onAssign(member.id);
+                                onAssign(member.accountId);
                                 onClose();
                             }}
                         >
-                            <img
-                                src={member.avatar || "https://i.pravatar.cc/80"}
-                                className="w-6 h-6 rounded-full"
-                            />
-                            <span className="flex-1 text-sm">
+                            {/* ✅ Avatar with fallback */}
+                            <div className="w-7 h-7 rounded-full bg-[#56D08A] text-white flex items-center justify-center font-semibold flex-shrink-0">
+                                {member.avatar ? (
+                                    <img
+                                        src={member.avatar}
+                                        alt="avatar"
+                                        className="w-full h-full object-cover rounded-full"
+                                        onError={(e) =>
+                                            (e.currentTarget.src = "/default-avatar.png")
+                                        }
+                                    />
+                                ) : (
+                                    member?.displayName?.[0]?.toUpperCase() || "U"
+                                )}
+                            </div>
+
+                            <span className="flex-1 text-sm truncate">
                                 {member.displayName}
                             </span>
+
                             {isAssigned && <CheckOutlined />}
                         </div>
                     );
                 })}
 
+            {/* Remove assignee */}
             <div
                 className="px-3 py-2 text-sm text-red-500 cursor-pointer hover:bg-red-50"
                 onClick={() => {

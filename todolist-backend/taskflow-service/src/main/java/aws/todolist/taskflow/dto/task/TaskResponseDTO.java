@@ -1,5 +1,6 @@
 package aws.todolist.taskflow.dto.task;
 
+import aws.todolist.taskflow.dto.member.MemberDTO;
 import aws.todolist.taskflow.enums.Priority;
 import aws.todolist.taskflow.enums.Status;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -55,12 +56,18 @@ public class TaskResponseDTO {
 
     @Schema(description = "id người được phân công", example = "")
     private String idAccountAssigned;
+	
+	private MemberDTO accountAssign;
 
     @Schema(description = "idSection của task")
     private String idSection;
 
     @Schema(description = "idProject chứa task")
     private String idProject;
+	
+	private String sectionName;
+	
+	private String projectName;
 
 
 }

@@ -25,14 +25,18 @@ public class TaskUpdateRequestDTO {
     private LocalDateTime deadline;
 
     private String priority; // Enum Priority → gửi dạng String ("LOW", "MEDIUM", "HIGH", ...)
-
-    private Boolean isPinned;
-
-    private boolean isStartTimeSent;
+	
+	private String idSection;
+	
+	
+	
+	private Boolean isPinned;
+	
+	
+	private boolean isStartTimeSent;
 
     private boolean isDeadlineSent;
 
-    private String idSection;
 
     @JsonSetter("startTime")
     public void setStartTime(LocalDateTime startTime) {

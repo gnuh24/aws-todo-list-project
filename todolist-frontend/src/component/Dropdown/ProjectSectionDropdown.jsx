@@ -63,7 +63,7 @@ export default function ProjectSectionDropdown({
                     ${isCurrentSection ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100"}`}
                                         onClick={() => {
                                             if (isCurrentSection) return;
-                                            onUpdateSection(project.id, section.id);
+                                            onUpdateSection(project.id, project.name, section.id, section.name);
                                             onClose();
                                         }}
                                     >

@@ -1,7 +1,7 @@
 import {
     LockOutlined
 } from "@ant-design/icons";
-import { Modal, Tooltip } from "antd";
+import { Modal } from "antd";
 import { useState, useEffect } from "react";
 import { https_taskflow } from "../../service/api";
 import CommentSection from "../TaskComment/CommentSection";
@@ -9,8 +9,13 @@ import { LabelsSection } from "../Section/LabelsSection";
 import PriorityDropdown from "../Dropdown/PriorityDropdown";
 import { toast } from "sonner";
 import dayjs from "dayjs";
-import { CheckOutlined } from "@ant-design/icons";
 import { DatePicker } from "antd";
+import ProjectSectionDropdown from "../Dropdown/ProjectSectionDropdown";
+import MemberDropdown from "../Dropdown/MemberDropdown";
+import { EditOutlined } from "@ant-design/icons";
+import DateHelper from "../../helpers/DateHelper";
+import TaskHelper from "../../helpers/TaskHelper";
+import ImageHelper from "../../helpers/ImageHelper";
 
 export default function TaskDetailModal({
     isOpenComment,
@@ -19,25 +24,13 @@ export default function TaskDetailModal({
     task,
     onUpdateStatus,
 }) {
+
+
+    // ╔══════════════════════════════════════╗
+    // ║             💾 Component State       ║
+    // ╚══════════════════════════════════════╝
     const [taskDetail, setTaskDetail] = useState({});
-
-    const formatDate = (date) => {
-        if (!date) return "+";
-        return dayjs(date).format("HH:mm:ss DD/MM/YYYY");
-    };
-
-    // Status color mapping
-    const statusColors = {
-        PENDING: "gray",
-        READY: "blue",
-        IN_PROGRESS: "orange",
-        COMPLETED: "green",
-        CANCELLED: "red",
-    };
-
-    const [projectDropdownOpen, setProjectDropdownOpen] = useState(false);
-    const [projects, setProjects] = useState([]);
-    const [loadingProjects, setLoadingProjects] = useState(false);
+    const [taskStack, setTaskStack] = useState([]);
     const [currentTaskId, setCurrentTaskId] = useState(task?.id);
 
     const [editingTitle, setEditingTitle] = useState(false);
@@ -50,25 +43,17 @@ export default function TaskDetailModal({
     const [openDeadlinePicker, setOpenDeadlinePicker] = useState(false);
 
     const [memberDropdownOpen, setMemberDropdownOpen] = useState(false);
-    const [members, setMembers] = useState([]);
-    const [loadingMembers, setLoadingMembers] = useState(false);
+    const [projectDropdownOpen, setProjectDropdownOpen] = useState(false);
 
-    const [taskStack, setTaskStack] = useState([]);
+
+    // ╔══════════════════════════════════════╗
+    // ║           🔄 Task Navigation         ║
+    // ╚══════════════════════════════════════╝
 
     const openChildTask = (childTask) => {
         setTaskStack(prev => [...prev, taskDetail]);
         setCurrentTaskId(childTask.id); // 🔥 trigger API
     };
-
-
-
-    const normalizeTask = (task) => ({
-        ...task,
-        taskChild: task.taskChild || [],
-        comments: task.comments || [],
-        labels: task.labels || []
-    });
-
 
     const backToParentTask = () => {
         const prev = taskStack[taskStack.length - 1];
@@ -79,27 +64,11 @@ export default function TaskDetailModal({
     };
 
 
-    const loadProjectMembers = async () => {
-        try {
-            setLoadingMembers(true);
-            const res = await https_taskflow.get(
-                `/v1/projects/${taskDetail.idProject}/members`
-            );
-
-            if (res.status === 200) {
-                setMembers(res.data.data || []);
-                setMemberDropdownOpen(true);
-            }
-        } catch (err) {
-            toast.error("Failed to load project members");
-        } finally {
-            setLoadingMembers(false);
-        }
-    };
 
 
-
-
+    // ╔══════════════════════════════════════╗
+    // ║        📝 Comment Update Helpers     ║
+    // ╚══════════════════════════════════════╝
 
 
     const handleComment = async (newComment, attachments) => {
@@ -151,6 +120,7 @@ export default function TaskDetailModal({
             }
         }
     };
+
 
     const onDeleteComment = async (idComment) => {
         try {
@@ -213,6 +183,25 @@ export default function TaskDetailModal({
         }
     }
 
+
+
+    // ╔══════════════════════════════════════╗
+    // ║          🚀 Task Update Helpers      ║
+    // ╚══════════════════════════════════════╝
+
+    const patchTask = async (payload) => {
+        try {
+            const res = await https_taskflow.patch(
+                `/v1/projects/${taskDetail.idProject}/tasks/${taskDetail.id}`,
+                payload
+            );
+            return res.status === 200;
+        } catch (err) {
+            toast.error("Failed to update task");
+            return false;
+        }
+    };
+
     const onUpdatePriority = async (newPriority) => {
         try {
             const res = await https_taskflow.patch(
@@ -233,149 +222,7 @@ export default function TaskDetailModal({
                 toast.info("Không thể kết nối đến server. Vui lòng thử lại.");
             }
         }
-    }
-
-    const updateTaskSection = async (projectId, sectionId) => {
-        try {
-            const res = await https_taskflow.patch(
-                `/v1/projects/${projectId}/tasks/${task.id}/update-section`,
-                {
-                    idSection: sectionId
-                }
-            );
-
-            if (res.status === 200) {
-                const { projectName, sectionName } =
-                    resolveProjectSectionName(projects, projectId, sectionId);
-
-                setTaskDetail(prev => ({
-                    ...prev,
-                    idProject: projectId,
-                    idSection: sectionId,
-                    projectName,
-                    sectionName
-                }));
-
-                toast.success("Task moved successfully");
-                setProjectDropdownOpen(false);
-            }
-
-        } catch (err) {
-            toast.error("Failed to update task section");
-        }
     };
-
-
-    const onClickProject = async (idProject, idSection) => {
-        if (projectDropdownOpen) {
-            setProjectDropdownOpen(false);
-            return;
-        }
-
-        try {
-            setLoadingProjects(true);
-
-            const res = await https_taskflow.get(`/v1/projects`);
-
-            if (res.status === 200) {
-                const projectsData = res.data.data || [];
-                setProjects(projectsData);
-
-                const { projectName, sectionName } =
-                    resolveProjectSectionName(
-                        projectsData,
-                        taskDetail.idProject,
-                        taskDetail.idSection
-                    );
-
-                setTaskDetail(prev => ({
-                    ...prev,
-                    projectName,
-                    sectionName
-                }));
-
-                setProjectDropdownOpen(true);
-            }
-
-        } catch (err) {
-            toast.error("Failed to load projects");
-        } finally {
-            setLoadingProjects(false);
-        }
-    };
-
-    useEffect(() => {
-        if (!currentTaskId) return;
-
-        const getDetails = async () => {
-            try {
-                const response = await https_taskflow.get(
-                    `/v1/projects/${task.idProject}/tasks/${currentTaskId}`
-                );
-
-                setTaskDetail(normalizeTask(response.data.data));
-            } catch (error) {
-                console.log(error);
-                toast.error("Failed to load task detail");
-            }
-        };
-
-        getDetails();
-    }, [currentTaskId]);
-
-
-
-    const resolveProjectSectionName = (projects, idProject, idSection) => {
-        const project = projects.find(p => p.id === idProject);
-        const section = project?.section?.find(s => s.id === idSection);
-
-        return {
-            projectName: project?.name || "Unknown Project",
-            sectionName: section?.name || "Unknown Section"
-        };
-    };
-
-    const patchTask = async (payload) => {
-        try {
-            const res = await https_taskflow.patch(
-                `/v1/projects/${taskDetail.idProject}/tasks/${taskDetail.id}`,
-                payload
-            );
-            return res.status === 200;
-        } catch (err) {
-            toast.error("Failed to update task");
-            return false;
-        }
-    };
-
-    useEffect(() => {
-        if (taskDetail.title !== undefined) {
-            setTitleDraft(taskDetail.title);
-        }
-        if (taskDetail.description !== undefined) {
-            setDescDraft(taskDetail.description || "");
-        }
-    }, [taskDetail.title, taskDetail.description]);
-
-
-    useEffect(() => {
-        const getDetails = async () => {
-            try {
-                const response = await https_taskflow.get(
-                    `/v1/projects/${task.idProject}/tasks/${task.id}`
-                );
-                setCurrentTaskId(task.id);
-
-                setTaskDetail(normalizeTask(response.data.data)); // ✅ FIX
-            } catch (error) {
-                console.log(error);
-            }
-        };
-
-        getDetails();
-    }, [task]);
-
-
 
     const onUpdateStartTime = async (date) => {
         const ok = await patchTask({
@@ -397,20 +244,123 @@ export default function TaskDetailModal({
         }
     };
 
-    const onUpdateAssignee = async (accountId) => {
-        const ok = await patchTask({
-            accountAssignId: accountId || null
-        });
+    const onUpdateTaskSection = async (projectId, projectName, sectionId, sectionName) => {
+        try {
 
-        if (ok) {
-            const selected = members.find(m => m.id === accountId) || null;
-            setTaskDetail(prev => ({
-                ...prev,
-                accountAssign: selected
-            }));
-            setMemberDropdownOpen(false);
+            const res = await https_taskflow.patch(
+                `/v1/projects/${projectId}/tasks/${task.id}/update-section`,
+                { idSection: sectionId }
+            );
+
+            if (res.status === 200) {
+                setTaskDetail(prev => ({
+                    ...prev,
+                    idProject: projectId,
+                    projectName: projectName,
+                    idSection: sectionId,
+                    sectionName: sectionName
+                }));
+
+                toast.success("Task moved successfully");
+                setProjectDropdownOpen(false);
+            }
+        } catch {
+            toast.error("Failed to update task section");
         }
     };
+
+    const onUpdateAssignee = async (accountId) => {
+        try {
+            let res;
+
+            if (accountId === null) {
+                // 🔴 REMOVE assignee
+                res = await https_taskflow.delete(
+                    `/v1/projects/${taskDetail.idProject}/tasks/${taskDetail.id}/assignee`
+                );
+            } else {
+                // 🟢 ASSIGN assignee
+                res = await https_taskflow.patch(
+                    `/v1/projects/${taskDetail.idProject}/tasks/${taskDetail.id}/assign`,
+                    { idAccount: accountId }
+                );
+            }
+
+            if (res.status === 200) {
+                setTaskDetail(prev => ({
+                    ...prev,
+                    accountAssign: accountId === null
+                        ? null
+                        : res.data.data.accountAssign
+                }));
+
+                toast.success(
+                    accountId === null
+                        ? "Unassigned task successfully"
+                        : "Assign task successfully"
+                );
+
+                setMemberDropdownOpen(false);
+            }
+        } catch (err) {
+            toast.error(
+                accountId === null
+                    ? "Failed to unassign task"
+                    : "Failed to assign task"
+            );
+        }
+    };
+
+
+
+    // ╔══════════════════════════════════════╗
+    // ║            🔗 React Hooks            ║
+    // ╚══════════════════════════════════════╝
+
+    useEffect(() => {
+        if (!currentTaskId) return;
+
+        const getDetails = async () => {
+            try {
+                const response = await https_taskflow.get(
+                    `/v1/projects/${task.idProject}/tasks/${currentTaskId}`
+                );
+
+                console.log(response.data.data);
+
+                setTaskDetail(TaskHelper.normalizeTask(response.data.data));
+            } catch (error) {
+                console.log(error);
+                toast.error("Failed to load task detail");
+            }
+        };
+
+        getDetails();
+    }, [currentTaskId]);
+
+
+
+    useEffect(() => {
+        if (taskDetail.title !== undefined) {
+            setTitleDraft(taskDetail.title);
+        }
+        if (taskDetail.description !== undefined) {
+            setDescDraft(taskDetail.description || "");
+        }
+    }, [taskDetail.title, taskDetail.description]);
+
+
+
+    useEffect(() => {
+        if (task?.id) {
+            setCurrentTaskId(task.id);
+            setTaskStack([]); // reset navigation stack when opening new task
+        }
+    }, [task?.id]);
+
+
+
+
 
 
 
@@ -528,7 +478,7 @@ export default function TaskDetailModal({
 
                                             <span
                                                 className="text-xs font-medium"
-                                                style={{ color: statusColors[child.status] }}
+                                                style={{ color: TaskHelper.statusColors[child.status] }}
                                             >
                                                 {child.status}
                                             </span>
@@ -555,78 +505,39 @@ export default function TaskDetailModal({
                     <div className="w-72 bg-[#fcfaf8] p-4 space-y-2 border-l">
                         <SidebarItem
                             label="Project"
-                            // icon={<LockOutlined />}
-                            value={
-                                taskDetail.projectName && taskDetail.sectionName
-                                    ? `${taskDetail.projectName} / ${taskDetail.sectionName}`
-                                    : "Select project"
-                            }
+                            onClick={() => setProjectDropdownOpen(v => !v)}
+                        >
+                            <EditableValue>
+                                <span className="text-sm">
+                                    {taskDetail.projectName || "Unknown Project"} /{" "}
+                                    {taskDetail.sectionName || "Unknown Section"}
+                                </span>
+                            </EditableValue>
+                        </SidebarItem>
 
-                            onClick={() => onClickProject(taskDetail.idProject, taskDetail.idSection)}
 
+
+                        <ProjectSectionDropdown
+                            open={projectDropdownOpen}
+                            onClose={() => setProjectDropdownOpen(false)}
+                            taskDetail={taskDetail}
+                            onUpdateSection={onUpdateTaskSection}
                         />
 
-
-
-                        {projectDropdownOpen && (
-                            <div className="absolute right-0 mt-2 w-64 bg-white border rounded-lg shadow-lg z-50 max-h-96 overflow-auto">
-
-                                {loadingProjects && (
-                                    <div className="p-3 text-sm text-gray-500">
-                                        Loading...
-                                    </div>
-                                )}
-
-                                {!loadingProjects && projects.map(project => {
-                                    const isCurrentProject = project.id === taskDetail.idProject;
-
-                                    return (
-                                        <div key={project.id} className="border-b last:border-b-0">
-
-                                            {/* Project name */}
-                                            <div
-                                                className={`px-3 py-2 font-semibold flex items-center justify-between
-                                                ${isCurrentProject ? "bg-blue-50 text-blue-700" : "bg-gray-50 text-gray-800"}`}
-                                            >
-                                                <span>{project.name}</span>
-                                                {isCurrentProject && <CheckOutlined />}
-                                            </div>
-
-                                            {/* Sections */}
-                                            {project.section?.map(section => {
-                                                const isCurrentSection =
-                                                    project.id === taskDetail.idProject &&
-                                                    section.id === taskDetail.idSection;
-
-                                                return (
-                                                    <div
-                                                        key={section.id}
-                                                        className={`px-4 py-2 text-sm flex items-center justify-between cursor-pointer
-                                                        ${isCurrentSection ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100"}`}
-                                                        onClick={() => {
-                                                            if (isCurrentSection) return;
-
-                                                            updateTaskSection(project.id, section.id);
-                                                        }}
-                                                    >
-                                                        <span>▸ {section.name}</span>
-                                                        {isCurrentSection && <CheckOutlined />}
-                                                    </div>
-                                                );
-                                            })}
-
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        )}
-
-                        <SidebarItem label="Created by" disabled>
+                        <SidebarItem
+                            label={
+                                <div className="flex items-center gap-1">
+                                    <LockOutlined />
+                                    <span>Created by</span>
+                                </div>
+                            }
+                            disabled
+                        >
                             <div className="flex items-center gap-2">
                                 <img
                                     src={
-                                        taskDetail.createdByAccount?.avatar
-                                        || "https://i.pravatar.cc/80"
+                                        taskDetail.createdByAccount?.avatar ||
+                                        "https://i.pravatar.cc/80"
                                     }
                                     alt="creator"
                                     className="w-6 h-6 rounded-full"
@@ -637,87 +548,41 @@ export default function TaskDetailModal({
                             </div>
                         </SidebarItem>
 
+
                         <SidebarItem
                             label="Assignee"
-                            onClick={() => {
-                                if (memberDropdownOpen) {
-                                    setMemberDropdownOpen(false);
-                                } else {
-                                    loadProjectMembers();
-                                }
-                            }}
+                            onClick={() => setMemberDropdownOpen(v => !v)}
                         >
-                            <div className="flex items-center gap-2">
-                                {taskDetail.accountAssign ? (
-                                    <>
-                                        <img
-                                            src={
-                                                taskDetail.accountAssign.avatar ||
-                                                "https://i.pravatar.cc/80"
-                                            }
-                                            className="w-6 h-6 rounded-full"
-                                        />
-                                        <span className="text-sm text-gray-700">
+                            <EditableValue>
+                                <div className="flex items-center gap-2">
+                                    <ImageHelper.AvatarCircle
+                                        avatar={taskDetail.accountAssign?.avatar}
+                                        name={taskDetail.accountAssign?.displayName}
+                                        size={24}
+                                    />
+
+                                    {taskDetail.accountAssign ? (
+                                        <span className="text-sm">
                                             {taskDetail.accountAssign.displayName}
                                         </span>
-                                    </>
-                                ) : (
-                                    <>
-                                        {/* Placeholder avatar */}
-                                        <div className="w-6 h-6 rounded-full border border-dashed border-red-400 flex items-center justify-center">
-                                            <span className="text-xs text-red-400">?</span>
-                                        </div>
-
-                                        <span className="text-sm text-red-500 font-medium italic">
+                                    ) : (
+                                        <span className="text-sm text-red-500 italic">
                                             Unassigned
                                         </span>
-                                    </>
-                                )}
-                            </div>
+                                    )}
+                                </div>
+                            </EditableValue>
                         </SidebarItem>
 
 
-                        {memberDropdownOpen && (
-                            <div className="absolute right-0 mt-2 w-64 bg-white border rounded-lg shadow-lg z-50 max-h-80 overflow-auto">
-                                {loadingMembers && (
-                                    <div className="p-3 text-sm text-gray-500">Loading...</div>
-                                )}
+                        <MemberDropdown
+                            open={memberDropdownOpen}
+                            taskDetail={taskDetail}
+                            onAssign={onUpdateAssignee}
+                            onClose={() => setMemberDropdownOpen(false)}
+                        />
 
-                                {!loadingMembers && members.map(member => {
-                                    const isAssigned =
-                                        taskDetail.accountAssign?.id === member.id;
 
-                                    return (
-                                        <div
-                                            key={member.id}
-                                            className={`px-3 py-2 flex items-center gap-2 cursor-pointer
-                    ${isAssigned ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100"}`}
-                                            onClick={() => {
-                                                if (isAssigned) return;
-                                                onUpdateAssignee(member.id);
-                                            }}
-                                        >
-                                            <img
-                                                src={member.avatar || "https://i.pravatar.cc/80"}
-                                                className="w-6 h-6 rounded-full"
-                                            />
-                                            <span className="flex-1 text-sm">
-                                                {member.displayName}
-                                            </span>
-                                            {isAssigned && <CheckOutlined />}
-                                        </div>
-                                    );
-                                })}
-
-                                {/* Unassign */}
-                                <div
-                                    className="px-3 py-2 text-sm text-red-500 cursor-pointer hover:bg-red-50"
-                                    onClick={() => onUpdateAssignee(null)}
-                                >
-                                    Remove assignee
-                                </div>
-                            </div>
-                        )}
 
 
 
@@ -735,21 +600,21 @@ export default function TaskDetailModal({
                                         value={taskDetail.startTime ? dayjs(taskDetail.startTime) : null}
                                         onChange={async (value) => {
                                             if (!value) return;
-                                            const iso = value.toISOString();
-                                            await onUpdateStartTime(iso);
-                                            setOpenStartPicker(false); // ✅ đóng khi OK
+                                            await onUpdateStartTime(value.toISOString());
+                                            setOpenStartPicker(false);
                                         }}
-                                        onOpenChange={(open) => {
-                                            if (!open) setOpenStartPicker(false); // ✅ click outside
-                                        }}
+                                        onOpenChange={(open) => !open && setOpenStartPicker(false)}
                                     />
                                 </div>
                             ) : (
-                                <span>
-                                    {taskDetail.startTime ? formatDate(taskDetail.startTime) : "+"}
-                                </span>
+                                <EditableValue>
+                                    <span className="text-sm">
+                                        {taskDetail.startTime ? DateHelper.formatDate(taskDetail.startTime) : "+"}
+                                    </span>
+                                </EditableValue>
                             )}
                         </SidebarItem>
+
 
 
 
@@ -770,31 +635,27 @@ export default function TaskDetailModal({
                                         value={taskDetail.deadline ? dayjs(taskDetail.deadline) : null}
                                         onChange={async (value) => {
                                             if (!value) return;
-                                            const iso = value.toISOString();
-                                            await onUpdateDeadline(iso);
-                                            setOpenDeadlinePicker(false); // ✅ OK
+                                            await onUpdateDeadline(value.toISOString());
+                                            setOpenDeadlinePicker(false);
                                         }}
-                                        onOpenChange={(open) => {
-                                            if (!open) setOpenDeadlinePicker(false); // ✅ click ngoài
-                                        }}
+                                        onOpenChange={(open) => !open && setOpenDeadlinePicker(false)}
                                     />
                                 </div>
                             ) : (
-                                <span>
-                                    {taskDetail.deadline ? formatDate(taskDetail.deadline) : "+"}
-                                </span>
+                                <EditableValue>
+                                    <span className="text-sm">
+                                        {taskDetail.deadline ? DateHelper.formatDate(taskDetail.deadline) : "+"}
+                                    </span>
+                                </EditableValue>
                             )}
                         </SidebarItem>
-
-
-
 
 
 
                         <SidebarItem
                             label="Status"
                             value={
-                                <span style={{ color: statusColors[taskDetail.status] || "black" }}>
+                                <span style={{ color: TaskHelper.statusColors[taskDetail.status] || "black" }}>
                                     {taskDetail.status || "No status"}
                                 </span>
                             }
@@ -802,15 +663,26 @@ export default function TaskDetailModal({
                         />
 
                         <SidebarItem
-                            label="Created"
-                            value={formatDate(taskDetail.createdAt)}
+                            label={
+                                <div className="flex items-center gap-1">
+                                    <LockOutlined />
+                                    <span>Created</span>
+                                </div>
+                            }
+                            value={DateHelper.formatDate(taskDetail.createdAt)}
+                            disabled
                         />
 
                         <SidebarItem
-                            label="Last updated"
-                            value={formatDate(taskDetail.updatedAt)}
+                            label={
+                                <div className="flex items-center gap-1">
+                                    <LockOutlined />
+                                    <span>Last updated</span>
+                                </div>
+                            }
+                            value={DateHelper.formatDate(taskDetail.updatedAt)}
+                            disabled
                         />
-
 
 
                         {/* Priority */}
@@ -842,10 +714,33 @@ export default function TaskDetailModal({
                         {/*/>*/}
                     </div>
                 </div>
-            )}
-        </Modal>
+            )
+            }
+        </Modal >
     );
 }
+
+const EditableValue = ({ children }) => (
+    <div className="
+        flex items-center gap-1
+        cursor-pointer
+        hover:bg-gray-100
+        rounded
+        px-1
+        transition
+        group
+    ">
+        {children}
+        <EditOutlined
+            className="
+                text-gray-400
+                opacity-0
+                group-hover:opacity-100
+                text-xs
+            "
+        />
+    </div>
+);
 
 
 export function SidebarItem({ label, value, icon, onClick, children, disabled }) {

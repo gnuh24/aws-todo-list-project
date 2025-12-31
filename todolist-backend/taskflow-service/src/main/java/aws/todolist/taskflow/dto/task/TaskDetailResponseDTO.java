@@ -79,5 +79,10 @@ public class TaskDetailResponseDTO {
 	
 	@Schema(description = "Project chứa task")
 	private String idProject;
+	
+	private String sectionName;
+	
+	private String projectName;
+	
 }
 

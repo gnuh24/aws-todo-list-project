@@ -134,7 +134,7 @@ public class TaskServiceImpl implements TaskService {
             member = memberRepository.findFirstByAccountIdAndProjectIdAndIsDeletedFalse(requestDTO.getIdAccountAssign(), idProject).orElseThrow(() -> new ResourceNotFoundException(BusinessErrorCode.TASKFLOW_NOT_FOUND, "Tài khoản này không phải là thành viên của dự án"));
 
             if (member.getStatus() != StatusMember.ACCEPTED) {
-                throw new ForbiddenException(BusinessErrorCode.TASKFLOW_ACCESS_DENIED, "Tài khoản này chưa chấp nhật là thành viên của dự án");
+                throw new ForbiddenException(BusinessErrorCode.TASKFLOW_ACCESS_DENIED, "Tài khoản này chưa chấp nhận là thành viên của dự án");
             }
 
             // Kiểm tra quyền của accountLogging
@@ -326,7 +326,9 @@ public class TaskServiceImpl implements TaskService {
 
         // ====== Lấy task ======
         Task task = this.getTaskAndCheck(idTask);
-
+		
+		
+		
         // ====== Kiểm tra membership ======
         Member member = memberRepository
                 .findFirstByAccountIdAndProjectIdAndIsDeletedFalse(requestDTO.getIdAccount(), idProject)
