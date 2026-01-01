@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { https_user, https_authupdate, https_media } from "../../service/api";
 import { Switch, Modal, Input, message, Button } from "antd";
-import { BASE_URL } from "../../service/api";
+import AvatarCircle from "./AvatarCircle";
 
 export default function AccountSettings({
     onGotoChangePassword,
@@ -190,16 +190,20 @@ export default function AccountSettings({
                 <h3 className="text-sm text-gray-500 mb-2">Photo</h3>
 
                 <div className="flex items-center gap-5">
-                    <img
-                        src={
-                            tempAvatarPreview
-                                ? tempAvatarPreview
-                                : avatar
-                                    ? `${BASE_URL}/media/v1/local/${avatar}`
-                                    : "https://i.pravatar.cc/80"
-                        }
-                        className="w-20 h-20 rounded-full object-cover"
-                    />
+                    {/* Avatar / Preview */}
+                    {tempAvatarPreview ? (
+                        <img
+                            src={tempAvatarPreview}
+                            alt="avatar preview"
+                            className="w-20 h-20 rounded-full object-cover"
+                        />
+                    ) : (
+                        <AvatarCircle
+                            avatar={avatar}
+                            name={displayName}
+                            size={80}
+                        />
+                    )}
 
                     <button
                         onClick={handleChooseAvatar}
@@ -217,6 +221,7 @@ export default function AccountSettings({
                     onChange={handleAvatarChange}
                 />
             </div>
+
 
             {/* NAME */}
             <div className="mb-8">

@@ -15,7 +15,7 @@ import MemberDropdown from "../Dropdown/MemberDropdown";
 import { EditOutlined } from "@ant-design/icons";
 import DateHelper from "../../helpers/DateHelper";
 import TaskHelper from "../../helpers/TaskHelper";
-import ImageHelper from "../../helpers/ImageHelper";
+import AvatarCircle from "../Content/AvatarCircle";
 
 export default function TaskDetailModal({
     isOpenComment,
@@ -491,14 +491,14 @@ export default function TaskDetailModal({
 
 
                         {/* Comment Box */}
-                        <CommentSection
+                        {/* <CommentSection
                             isOpenComment={isOpenComment}
                             comments={taskDetail?.comments ?? []}
                             handleComment={handleComment}
                             onUpdateComment={onUpdateComment}
                             onDeleteComment={onDeleteComment}
                             onDeleteCommentAttach={onDeleteCommentAttach}
-                        />
+                        /> */}
                     </div>
 
                     {/* RIGHT SIDEBAR */}
@@ -534,18 +534,16 @@ export default function TaskDetailModal({
                             disabled
                         >
                             <div className="flex items-center gap-2">
-                                <img
-                                    src={
-                                        taskDetail.createdByAccount?.avatar ||
-                                        "https://i.pravatar.cc/80"
-                                    }
-                                    alt="creator"
-                                    className="w-6 h-6 rounded-full"
+                                <AvatarCircle
+                                    avatar={taskDetail.createdByAccount?.avatar}
+                                    name={taskDetail.createdByAccount?.displayName}
+                                    size={24}
                                 />
                                 <span className="text-sm text-gray-700">
                                     {taskDetail.createdByAccount?.displayName || "Unknown"}
                                 </span>
                             </div>
+
                         </SidebarItem>
 
 
@@ -555,24 +553,33 @@ export default function TaskDetailModal({
                         >
                             <EditableValue>
                                 <div className="flex items-center gap-2">
-                                    <ImageHelper.AvatarCircle
-                                        avatar={taskDetail.accountAssign?.avatar}
-                                        name={taskDetail.accountAssign?.displayName}
-                                        size={24}
-                                    />
-
                                     {taskDetail.accountAssign ? (
-                                        <span className="text-sm">
-                                            {taskDetail.accountAssign.displayName}
-                                        </span>
+                                        <>
+                                            <AvatarCircle
+                                                avatar={taskDetail.accountAssign.avatar}
+                                                name={taskDetail.accountAssign.displayName}
+                                                size={24}
+                                            />
+                                            <span className="text-sm">
+                                                {taskDetail.accountAssign.displayName}
+                                            </span>
+                                        </>
                                     ) : (
-                                        <span className="text-sm text-red-500 italic">
-                                            Unassigned
-                                        </span>
+                                        <>
+                                            {/* Red "?" placeholder */}
+                                            <div className="w-6 h-6 rounded-full bg-red-100 text-red-500 
+                                    flex items-center justify-center text-sm font-semibold">
+                                                ?
+                                            </div>
+                                            <span className="text-sm text-red-500 italic">
+                                                Unassigned
+                                            </span>
+                                        </>
                                     )}
                                 </div>
                             </EditableValue>
                         </SidebarItem>
+
 
 
                         <MemberDropdown
@@ -603,13 +610,22 @@ export default function TaskDetailModal({
                                             await onUpdateStartTime(value.toISOString());
                                             setOpenStartPicker(false);
                                         }}
-                                        onOpenChange={(open) => !open && setOpenStartPicker(false)}
+                                        onOpenChange={(open) => {
+                                            if (!open) setOpenStartPicker(false);
+                                        }}
                                     />
                                 </div>
                             ) : (
                                 <EditableValue>
-                                    <span className="text-sm">
-                                        {taskDetail.startTime ? DateHelper.formatDate(taskDetail.startTime) : "+"}
+                                    <span
+                                        className={`text-sm ${taskDetail.startTime
+                                            ? "text-gray-800"
+                                            : "text-gray-400 italic"
+                                            }`}
+                                    >
+                                        {taskDetail.startTime
+                                            ? DateHelper.formatDate(taskDetail.startTime)
+                                            : "Set start date"}
                                     </span>
                                 </EditableValue>
                             )}
