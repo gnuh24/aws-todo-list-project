@@ -205,9 +205,6 @@ export default function TaskDetailModal({
                 const response = await https_taskflow.get(
                     `/v1/projects/${task.idProject}/tasks/${currentTaskId}`
                 );
-
-                console.log(response.data.data);
-
                 setTaskDetail(TaskHelper.normalizeTask(response.data.data));
             } catch (error) {
                 console.log(error);

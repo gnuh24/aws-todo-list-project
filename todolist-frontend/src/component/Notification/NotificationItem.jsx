@@ -1,4 +1,4 @@
-import {https_taskflow} from "../../service/api";
+import {BASE_URL, https_taskflow} from "../../service/api";
 import {toast} from "sonner";
 
 export default function NotificationItem({ notification, handleClickOnNotification, handleUpdateStatus }) {
@@ -65,16 +65,12 @@ export default function NotificationItem({ notification, handleClickOnNotificati
                 >
                     {/* Avatar */}
                     <div className="w-9 h-9 rounded-full bg-[#56D08A] text-white flex items-center justify-center font-semibold">
-                        {notification.avatar ? (
-                            <img
-                                src={notification.avatar}
-                                alt="avatar"
-                                className="w-full h-full object-cover rounded-full"
-                                onError={(e) => (e.currentTarget.src = "/default-avatar.png")}
-                            />
-                        ) : (
-                            notification?.displayName?.[0]?.toUpperCase() || "U"
-                        )}
+                        <img
+                            src={notification.avatar != null ? `${BASE_URL}/media/v1/local/${notification.avatar}`: "https://i.pravatar.cc/80"}
+                            alt="avatar"
+                            className="w-full h-full object-cover rounded-full"
+                            onError={(e) => (e.currentTarget.src = "/default-avatar.png")}
+                        />
                     </div>
 
                     {/* Content */}

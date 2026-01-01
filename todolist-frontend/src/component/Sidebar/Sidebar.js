@@ -21,7 +21,7 @@ import {
     DeleteOutlined,
 } from "@ant-design/icons";
 import { Button, Dropdown, Menu } from "antd";
-import { useState, useEffect } from "react";
+import {useState, useEffect, useContext} from "react";
 
 import { useLocation, useNavigate } from "react-router-dom";
 import { https_taskflow } from "../../service/api";
@@ -34,6 +34,8 @@ import UserMenuDropdown from "../UserMenu/UserMenuDropdown";
 import SidebarItem from "./SidebarItem";
 import { message } from "antd";
 import { toast } from "sonner";
+import AppContext from "antd/es/app/context";
+import {useAppContext} from "../../layout/MainLayout";
 export default function Sidebar() {
     const location = useLocation();
     const [selectedSection, setSelectedSection] = useState(null);
@@ -45,8 +47,7 @@ export default function Sidebar() {
     const navigate = useNavigate();
     const [openAddProject, setOpenAddProject] = useState(false);
     const [error, setError] = useState(null);
-    // ✅ Danh sách project từ API
-    const [projects, setProjects] = useState([]);
+
     const [loading, setLoading] = useState(false);
     const [showProjectMenu, setShowProjectMenu] = useState(false);
     const [activeProjectId, setActiveProjectId] = useState(null);
@@ -55,6 +56,14 @@ export default function Sidebar() {
     const [editProject, setEditProject] = useState(null);
     const [currentSection, setCurrentSection] = useState(null);
     const [selectedProject, setSelectedProject] = useState(null);
+
+
+    // ✅ Danh sách project từ API
+    const { projects, setProjects } = useAppContext();
+
+
+
+
     const handleAddTask = async (newTask) => {
         if (!selectedProject || !selectedSection) {
             message.warning("Vui lòng chọn Project & Section!");
@@ -107,7 +116,6 @@ export default function Sidebar() {
                 const res = await https_taskflow.get("/v1/projects");
                 if (res.data?.status === 200 && Array.isArray(res.data.data)) {
                     setProjects(res.data.data);
-                    // console.log("res.data.data: ", res.data.data);
                 } else {
                 }
             } catch (err) {

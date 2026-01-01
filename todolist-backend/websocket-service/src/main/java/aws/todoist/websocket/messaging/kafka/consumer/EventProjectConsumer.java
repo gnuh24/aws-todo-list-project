@@ -103,7 +103,7 @@ public class EventProjectConsumer {
         webSocketService.sendMemberEvent(projectId, event);
 
         // 2. kiểm tra xem event có phải là accept ko thì update giao diện sidebar
-        if(event.getEventType() == EventType.PROJECT_MEMBER_ACCEPTED){
+        if(event.getEventType() == EventType.PROJECT_MEMBER_ACCEPTED || event.getEventType() == EventType.PROJECT_MEMBER_REMOVED){
             webSocketService.sendProjectSummaryToUser(event.getPayload().getMemberEventDto().getEmail(), event);
         }
     }

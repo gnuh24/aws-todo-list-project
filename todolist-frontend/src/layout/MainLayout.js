@@ -2,9 +2,9 @@ import Sidebar from "../component/Sidebar/Sidebar";
 import {createContext, useContext, useEffect, useState} from "react";
 import {https_notification} from "../service/api";
 import {Outlet} from "react-router-dom";
-import NotificationSocket from "../component/Notification/NotificationSocket";
 import ModalNotification from "../component/Notification/ModalNotification";
 import SettingsModal from "../component/Modal/SettingsModal";
+import {WebSocketClient} from "../websocket/WebSocketClient";
 
 
 const AppContext = createContext();
@@ -31,6 +31,9 @@ export default function MainLayout() {
 
     const [newNotificationFormWebsocket, setNewNotificationFormWebsocket] = useState(null);
 
+    const [projects, setProjects] = useState([]);
+
+
 
     const closeSettings = () => {
         setIsSettingsModalOpen(false);
@@ -51,13 +54,13 @@ export default function MainLayout() {
     },[]);
 
     return (
-        <AppContext.Provider value={{ countNotificationsUnRead, setCountNotificationsUnRead, notifications, setNotifications, pageSizeNotification, totalPagesNotification, setTotalPagesNotification, pageNotification, setPageNotification, setNewNotificationFormWebsocket, pageNumberNotification, setPageNumberNotification, setIsSettingsModalOpen }}>
+        <AppContext.Provider value={{projects, setProjects, countNotificationsUnRead, setCountNotificationsUnRead, notifications, setNotifications, pageSizeNotification, totalPagesNotification, setTotalPagesNotification, pageNotification, setPageNotification, setNewNotificationFormWebsocket, pageNumberNotification, setPageNumberNotification, setIsSettingsModalOpen }}>
             <div className="ml-72 flex-1 flex flex-col">
                 <Sidebar />
                 <div className="flex-1 bg-white">
+                    <WebSocketClient/>
                     <Outlet/>
                 </div>
-                <NotificationSocket/>
                 {newNotificationFormWebsocket !== null && <ModalNotification message={newNotificationFormWebsocket} setNewNotificationFormWebsocket={setNewNotificationFormWebsocket} />}
             </div>
 

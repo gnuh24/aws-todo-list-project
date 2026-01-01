@@ -228,17 +228,11 @@ export default function ActivityHeader({
                             }`}
                     >
                         <div className="flex items-center gap-2">
-                            {member.avatar ? (
-                                <img
-                                    src={member.avatar != null ? `${BASE_URL}/media/v1/local/${member.avatar}` : "https://i.pravatar.cc/80"}
-                                    alt={member.displayName}
-                                    className="w-6 h-6 rounded-full object-cover"
-                                />
-                            ) : (
-                                <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center text-xs font-semibold">
-                                    {member.displayName?.charAt(0).toUpperCase()}
-                                </div>
-                            )}
+                            <img
+                                src={member.avatar != null ? `${BASE_URL}/media/v1/local/${member.avatar}` : "https://i.pravatar.cc/80"}
+                                alt={member.displayName}
+                                className="w-6 h-6 rounded-full object-cover"
+                            />
                             <span>{member.displayName}</span>
                         </div>
                         {selectedCollaborator === member.displayName && (
