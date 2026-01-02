@@ -60,6 +60,19 @@ spring:
                     predicates:
                         - Path=/api/notification/**
 
+                # --- ROUTE CHAT SERVICE ---
+                -   id: chat-service
+                    # Dùng ws:// để hỗ trợ WebSocket
+                    # Gateway sẽ tự chuyển sang http:// cho các request REST thường (/messages/...)
+                    uri: ws://localhost:8089
+                    predicates:
+                        # Client sẽ gọi: ws://localhost:8080/api/chat/ws
+                        # Hoặc REST: http://localhost:8080/api/chat/messages/...
+                        - Path=/api/chat/**
+                    filters:
+                        # Cắt bỏ /api/chat để Chat Service chỉ nhận phần /ws hoặc /messages...
+                        - StripPrefix=2
+
 
     # =========================
     # 🧱 Redis Configuration
@@ -117,3 +130,4 @@ spring:
                     url: /api/auth/v3/api-docs
                 -   name: notification-service
                     url: /api/notification/v3/api-docs
+
