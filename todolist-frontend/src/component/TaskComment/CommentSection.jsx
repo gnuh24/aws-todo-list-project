@@ -1,5 +1,5 @@
 import { useCallback,useMemo, useState, useEffect, useRef } from "react";
-import { Input, Button, message } from "antd";
+import {Input, Button, message, Avatar} from "antd";
 import {
     PaperClipOutlined,
     UpOutlined,
@@ -11,6 +11,7 @@ import { CommentAttachItem } from "../CommentAttach/CommentAttachItem";
 import { CommentAttachItemAdd } from "../CommentAttach/CommentAttachItemAdd";
 import SpinnerForSettings from "../Spinner/SpinnerForSettings";
 import { toast } from "sonner";
+import AvatarCircle from "../Content/AvatarCircle";
 
 const MAX_SIZE = 3 * 1024 * 1024;
 
@@ -269,14 +270,7 @@ export default function CommentSection({ isOpenComment, comments, setTaskDetail,
                             >
 
                                 {/* Avatar */}
-                                <div className="w-9 h-9 rounded-full bg-[#56D08A] text-white flex items-center justify-center font-semibold flex-shrink-0">
-                                    <img
-                                        src={c.authorAvatar != null ? `${BASE_URL}/media/v1/local/${c.authorAvatar}` : "https://i.pravatar.cc/80"}
-                                        alt="avatar"
-                                        className="w-full h-full object-cover rounded-full"
-                                        onError={(e) => (e.currentTarget.src = '/default-avatar.png')}
-                                    />
-                                </div>
+                                <AvatarCircle avatar={c.authorAvatar} name={c.authorName}  size={36}/>
 
                                 {/* Comment box */}
                                 <div className="flex-1">
@@ -369,18 +363,9 @@ export default function CommentSection({ isOpenComment, comments, setTaskDetail,
                 {/* Comment Input */}
                 {!isExpanded && (
                     <div className="w-full flex items-center gap-2">
-                        <div className="w-9 h-9 rounded-full bg-[#56D08A] text-white flex items-center justify-center font-semibold overflow-hidden">
-                            {auth.avatar ? (
-                                <img
-                                    src={auth.avatar != null ? `${BASE_URL}/media/v1/local/${auth.avatar}` : "https://i.pravatar.cc/80"}
-                                    alt="avatar"
-                                    className="w-full h-full object-cover"
-                                    onError={(e) => (e.currentTarget.src = '/default-avatar.png')}
-                                />
-                            ) : (
-                                auth?.displayName?.[0]?.toUpperCase() || 'U'
-                            )}
-                        </div>
+
+                        <AvatarCircle avatar={auth.avatar} name={auth.name} size={36} />
+
                         <div className="flex-1 flex items-center gap-2 border rounded-full px-3 py-2 hover:bg-gray-100" onClick={() => {
                             setIsExpanded(true)
                             setShowEditForm(null)

@@ -1,5 +1,6 @@
 import {BASE_URL, https_taskflow} from "../../service/api";
 import {toast} from "sonner";
+import AvatarCircle from "../Content/AvatarCircle";
 
 export default function NotificationItem({ notification, handleClickOnNotification, handleUpdateStatus }) {
 
@@ -64,14 +65,7 @@ export default function NotificationItem({ notification, handleClickOnNotificati
                     onClick={() => handleClickOnNotification(notification.projectId, notification.id, notification.read)}
                 >
                     {/* Avatar */}
-                    <div className="w-9 h-9 rounded-full bg-[#56D08A] text-white flex items-center justify-center font-semibold">
-                        <img
-                            src={notification.avatar != null ? `${BASE_URL}/media/v1/local/${notification.avatar}`: "https://i.pravatar.cc/80"}
-                            alt="avatar"
-                            className="w-full h-full object-cover rounded-full"
-                            onError={(e) => (e.currentTarget.src = "/default-avatar.png")}
-                        />
-                    </div>
+                    <AvatarCircle avatar={notification.avatar} name={notification.displayName} size={36}/>
 
                     {/* Content */}
                     <div className="flex-1">

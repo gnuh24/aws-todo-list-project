@@ -491,14 +491,12 @@ export default function TaskDetailModal({
 
 
                         {/* Comment Box */}
-                        {/* <CommentSection
+                        <CommentSection
                             isOpenComment={isOpenComment}
                             comments={taskDetail?.comments ?? []}
-                            handleComment={handleComment}
-                            onUpdateComment={onUpdateComment}
-                            onDeleteComment={onDeleteComment}
-                            onDeleteCommentAttach={onDeleteCommentAttach}
-                        /> */}
+                            setTaskDetail={setTaskDetail}
+                            taskDetail={taskDetail}
+                        />
                     </div>
 
                     {/* RIGHT SIDEBAR */}
