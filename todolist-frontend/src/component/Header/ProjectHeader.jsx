@@ -5,15 +5,17 @@ import ShareSettingsModal from "../Modal/ShareSettingsModal";
 import { Share2, LayoutList, MessageSquare } from "lucide-react";
 import { useParams } from "react-router-dom";
 import { https_taskflow } from "../../service/api";
+import {useProjectContext} from "../../context/ProjectContext";
 
 export default function ProjectHeader() {
+
+  const { members, setMembers } = useProjectContext();
+
   const { projectId } = useParams();
 
   const [openShare, setOpenShare] = useState(false);
   const [openInvite, setOpenInvite] = useState(false);
   const [openSettings, setOpenSettings] = useState(false);
-
-  const [members, setMembers] = useState([]);
 
   const [selectedEmail, setSelectedEmail] = useState("");
   const [selectedId, setSelectedId] = useState("");

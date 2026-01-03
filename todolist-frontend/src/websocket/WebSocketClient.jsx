@@ -7,10 +7,18 @@ import { EVENT } from "../event/EventType";
 import { useNotificationContext } from "../context/NotificationContext";
 import { useProjectContext } from "../context/ProjectContext";
 import {handleProjectEvent} from "./handlers/project.handler";
+import {handleMemberEvent} from "./handlers/member.handler";
+import {useNavigate} from "react-router-dom";
 
 export function WebSocketClient() {
 
-    const { setProjects, activeProject, setActiveProject } = useProjectContext();
+    const { setProjects, activeProject, setActiveProject, setMembers } = useProjectContext();
+
+
+    const navigate = useNavigate();
+
+    const currentUserId = JSON.parse(localStorage.getItem("USER_INFO"))?.id;
+
     const {
         setNotifications,
         setCountNotificationsUnRead,
@@ -34,7 +42,7 @@ export function WebSocketClient() {
             connectHeaders: {
                 Authorization: `Bearer ${token}`,
             },
-            debug: (str) => console.log("[STOMP]", str),
+            // debug: (str) => console.log("[STOMP]", str),
 
             onConnect: () => {
                 console.log("✅ WebSocket connected");
@@ -78,29 +86,37 @@ export function WebSocketClient() {
 
         // 🚀 enter project mới
         projectSubscriptionsRef.current.push(
-            client.subscribe(`/topic/project/${activeProject.id}`, (m) =>
+            client.subscribe(`/topic/project/${activeProject.id}`, (m) => {
                 // console.log("📌 project", m.body)
-                client.subscribe(`/topic/project/${activeProject.id}`, (m) => {
-                    const result = handleProjectEvent(
-                        JSON.parse(m.body),
-                        { activeProject, setActiveProject }
-                    );
-
-                    if (result?.type === "LEAVE_PROJECT") {
-                        leaveProject();
-                    }
-                })
-
-            ),
+                const result = handleProjectEvent(
+                    JSON.parse(m.body),
+                    {activeProject, setActiveProject}
+                );
+                if (result?.type === "LEAVE_PROJECT") {
+                    leaveProject();
+                }
+            }),
             client.subscribe(`/topic/project/${activeProject.id}/task`, (m) =>
                 console.log("📌 task", m.body)
             ),
             client.subscribe(`/topic/project/${activeProject.id}/section`, (m) =>
                 console.log("📌 section", m.body)
             ),
-            client.subscribe(`/topic/project/${activeProject.id}/member`, (m) =>
+            client.subscribe(`/topic/project/${activeProject.id}/member`, (m) => {
                 console.log("📌 member", m.body)
-            ),
+
+                handleMemberEvent(
+                    JSON.parse(m.body),
+                    {
+                        activeProject,
+                        setMembers,
+                        currentUserId,
+                        navigate,
+                    }
+                )
+
+
+            }),
             client.subscribe(`/topic/project/${activeProject.id}/comment`, (m) =>
                 console.log("📌 comment", m.body)
             )

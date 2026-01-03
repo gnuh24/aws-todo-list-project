@@ -1,6 +1,7 @@
 package aws.todoist.websocket.dto.taskflow.dto;
 
 import aws.todoist.websocket.enums.eventDto.Role;
+import aws.todoist.websocket.enums.eventDto.StatusMember;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,4 +24,6 @@ public class MemberEventDto {
     private Role role;
 
     private String email;
+
+    private StatusMember status;
 }
