@@ -11,9 +11,14 @@ export function ProjectProvider({ children }) {
     // 👥 members của project
     const [members, setMembers] = useState([]);
 
+
+    // Section của project
+    const [sections, setSections] = useState([]);
+
+
     return (
         <ProjectContext.Provider
-            value={{ projects, setProjects, activeProject, setActiveProject, members, setMembers }}
+            value={{ projects, setProjects, activeProject, setActiveProject, members, setMembers, sections, setSections }}
         >
             {children}
         </ProjectContext.Provider>

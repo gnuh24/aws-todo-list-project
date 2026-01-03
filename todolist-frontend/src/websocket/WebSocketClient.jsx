@@ -9,10 +9,11 @@ import { useProjectContext } from "../context/ProjectContext";
 import {handleProjectEvent} from "./handlers/project.handler";
 import {handleMemberEvent} from "./handlers/member.handler";
 import {useNavigate} from "react-router-dom";
+import {handleSectionEvent} from "./handlers/section.handler";
 
 export function WebSocketClient() {
 
-    const { setProjects, activeProject, setActiveProject, setMembers } = useProjectContext();
+    const { setProjects, activeProject, setActiveProject, setMembers, setSections } = useProjectContext();
 
 
     const navigate = useNavigate();
@@ -99,11 +100,13 @@ export function WebSocketClient() {
             client.subscribe(`/topic/project/${activeProject.id}/task`, (m) =>
                 console.log("📌 task", m.body)
             ),
-            client.subscribe(`/topic/project/${activeProject.id}/section`, (m) =>
-                console.log("📌 section", m.body)
-            ),
+            client.subscribe(`/topic/project/${activeProject.id}/section`, (m) => {
+                // console.log("📌 section", m.body)
+
+                handleSectionEvent( JSON.parse(m.body), {activeProject, setSections} );
+            }),
             client.subscribe(`/topic/project/${activeProject.id}/member`, (m) => {
-                console.log("📌 member", m.body)
+                // console.log("📌 member", m.body)
 
                 handleMemberEvent(
                     JSON.parse(m.body),

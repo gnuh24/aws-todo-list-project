@@ -31,13 +31,14 @@ export default function SectionItem({
           <div className="flex items-center gap-4">
             <button
               className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
-              onClick={() =>
+              onClick={() => {
                 handleSaveEdit(
                   section.id,
                   editName,
                   (projectId = { projectId })
                 )
-              }
+                setIsEditing(false);
+              }}
             >
               Save
             </button>

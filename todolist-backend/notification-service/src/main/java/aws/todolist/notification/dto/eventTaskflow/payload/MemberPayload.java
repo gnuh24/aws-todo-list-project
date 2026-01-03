@@ -9,5 +9,5 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class MemberPayload extends PayloadBase{
 
-    private MemberEventDto memberEventDto;
+    private MemberEventDto member;
 }
