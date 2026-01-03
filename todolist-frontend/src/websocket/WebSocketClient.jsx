@@ -1,49 +1,51 @@
-import {useContext, useEffect} from "react";
+import { useEffect, useRef } from "react";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
-import {https_taskflow, WEBSOCKET_URL} from "../service/api";
-import {useAppContext} from "../layout/MainLayout";
-import AppContext from "antd/es/app/context";
-import {EVENT} from "../event/EventType";
+import { https_taskflow, WEBSOCKET_URL } from "../service/api";
+
+import { EVENT } from "../event/EventType";
+import { useNotificationContext } from "../context/NotificationContext";
+import { useProjectContext } from "../context/ProjectContext";
+import {handleProjectEvent} from "./handlers/project.handler";
 
 export function WebSocketClient() {
 
-
+    const { setProjects, activeProject, setActiveProject } = useProjectContext();
     const {
-        setCountNotificationsUnRead,
         setNotifications,
+        setCountNotificationsUnRead,
         pageSizeNotification,
-        setNewNotificationFormWebsocket,
-        setProjects,
-    } = useAppContext();
+        setNewNotificationFromWebsocket
+    } = useNotificationContext();
 
     const token = JSON.parse(localStorage.getItem("USER_INFO"))?.token;
 
+    const stompClientRef = useRef(null);
+    const projectSubscriptionsRef = useRef([]);
+
+    /* ================= CONNECT SOCKET ================= */
     useEffect(() => {
         if (!token) return;
 
-        // 1️⃣ tạo socket
         const socket = new SockJS(WEBSOCKET_URL);
 
-        // 2️⃣ tạo stomp client
         const client = new Client({
             webSocketFactory: () => socket,
             connectHeaders: {
                 Authorization: `Bearer ${token}`,
             },
             debug: (str) => console.log("[STOMP]", str),
-            // reconnectDelay: 3000,
 
             onConnect: () => {
                 console.log("✅ WebSocket connected");
 
-                // 3️⃣ subscribe user notification
+                // notification cá nhân
                 client.subscribe("/user/queue/notification", (msg) => {
                     const event = JSON.parse(msg.body);
                     handleNotification(event);
                 });
 
-                // 4️⃣ subscribe project summary
+                // project summary (list project)
                 client.subscribe("/user/queue/project-summary", (msg) => {
                     const event = JSON.parse(msg.body);
                     handleProjectSummaryEvent(event);
@@ -55,8 +57,8 @@ export function WebSocketClient() {
             },
         });
 
-        // 5️⃣ connect
         client.activate();
+        stompClientRef.current = client;
 
         return () => {
             console.log("🧹 WebSocket disconnected");
@@ -64,33 +66,72 @@ export function WebSocketClient() {
         };
     }, [token]);
 
+    /* ================= SWITCH PROJECT (LIKE selectProject) ================= */
+    useEffect(() => {
+        const client = stompClientRef.current;
+        if (!client || !client.connected) return;
+
+        // 🚪 leave project cũ
+        leaveProject();
+
+        if (!activeProject) return;
+
+        // 🚀 enter project mới
+        projectSubscriptionsRef.current.push(
+            client.subscribe(`/topic/project/${activeProject.id}`, (m) =>
+                // console.log("📌 project", m.body)
+                client.subscribe(`/topic/project/${activeProject.id}`, (m) => {
+                    const result = handleProjectEvent(
+                        JSON.parse(m.body),
+                        { activeProject, setActiveProject }
+                    );
+
+                    if (result?.type === "LEAVE_PROJECT") {
+                        leaveProject();
+                    }
+                })
+
+            ),
+            client.subscribe(`/topic/project/${activeProject.id}/task`, (m) =>
+                console.log("📌 task", m.body)
+            ),
+            client.subscribe(`/topic/project/${activeProject.id}/section`, (m) =>
+                console.log("📌 section", m.body)
+            ),
+            client.subscribe(`/topic/project/${activeProject.id}/member`, (m) =>
+                console.log("📌 member", m.body)
+            ),
+            client.subscribe(`/topic/project/${activeProject.id}/comment`, (m) =>
+                console.log("📌 comment", m.body)
+            )
+        );
+
+        console.log("➡️ Entered project", activeProject.id);
+
+        return () => {
+            leaveProject();
+        };
+    }, [activeProject]);
+
+    /* ================= LEAVE PROJECT ================= */
+    function leaveProject() {
+        projectSubscriptionsRef.current.forEach((s) => s.unsubscribe());
+        projectSubscriptionsRef.current = [];
+    }
 
     /* ================= PROJECT HANDLER ================= */
-
     async function handleProjectSummaryEvent(event) {
         const type = event.eventType;
         const payload = event.payload;
 
         switch (type) {
-
-            case EVENT.PROJECT_CREATED: {
-                const project = payload?.project;
-                if (!project) return;
-
-                setProjects(prev => {
-                    if (prev.some(p => p.id === project.id)) return prev;
-                    return [project, ...prev];
-                });
-                break;
-            }
-
             case EVENT.PROJECT_UPDATED: {
                 const project = payload?.project;
                 if (!project) return;
 
                 setProjects(prev =>
                     prev.map(p =>
-                        p.id === project.id ? {...p, ...project} : p
+                        p.id === project.id ? { ...p, ...project } : p
                     )
                 );
                 break;
@@ -112,11 +153,8 @@ export function WebSocketClient() {
                 const projectId = payload?.projectId;
                 if (!projectId) return;
 
-                // 🔥 async fetch ở NGOÀI
                 const project = await fetchProjectSummary(projectId);
                 if (!project) return;
-
-                console.log(project)
 
                 setProjects(prev => {
                     if (prev.some(p => p.id === project.id)) return prev;
@@ -128,24 +166,19 @@ export function WebSocketClient() {
             default:
                 break;
         }
-
-        console.log(`📦 Project summary updated: ${type}`);
     }
-
 
     async function fetchProjectSummary(projectId) {
         try {
             const res = await https_taskflow(`/v1/projects/${projectId}`);
-            return await res.data.data;
+            return res.data.data;
         } catch (e) {
             console.error("Fetch project summary failed", e);
             return null;
         }
     }
 
-
     /* ================= NOTIFICATION ================= */
-
     function handleNotification(notification) {
         setCountNotificationsUnRead(prev => prev + 1);
 
@@ -154,10 +187,8 @@ export function WebSocketClient() {
             return list.slice(0, pageSizeNotification);
         });
 
-        setNewNotificationFormWebsocket(notification);
+        setNewNotificationFromWebsocket(notification);
     }
-
-
 
     return null;
 }

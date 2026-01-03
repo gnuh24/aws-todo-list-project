@@ -5,10 +5,11 @@ import MainLayout from "../../layout/MainLayout";
 import ProjectHeader from "../../component/Header/ProjectHeader";
 import InlineAddSection from "../../component/Modal/InlineAddSection";
 import SectionItem from "../../component/Section/SectionItem";
-import { useParams } from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import { https_taskflow } from "../../service/api";
 import { message } from "antd";
 import { toast } from "sonner";
+import {useProjectContext} from "../../context/ProjectContext";
 
 export default function ProjectPage() {
   const [showModal, setShowModal] = useState(false);
@@ -18,11 +19,25 @@ export default function ProjectPage() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [newSectionName, setNewSectionName] = useState("");
-  const { projectName, projectId } = useParams();
+  const { projectId } = useParams();
   const [selectedProject, setSelectedProject] = useState(null);
   const [selectedSection, setSelectedSection] = useState(null);
 
+  const navigate = useNavigate();
+
   // ✅ Thêm Task vào section cụ thể
+
+  const { activeProject } = useProjectContext();
+
+
+
+  useEffect(() => {
+    if (activeProject === null) {
+      navigate("/app/archive");
+    }
+  }, [activeProject]);
+
+
 
   useEffect(() => {
     const fetchSections = async () => {
@@ -36,7 +51,7 @@ export default function ProjectPage() {
         if (res.data?.status === 200 && Array.isArray(res.data.data)) {
           setSections(res.data.data);
 
-          console.log("sections: ", sections);
+          // console.log("sections: ", sections);
         } else {
           console.warn("API không trả về mảng hợp lệ:", res.data);
           setSections([]); // fallback để tránh lỗi .map
@@ -190,9 +205,9 @@ export default function ProjectPage() {
   };
 
   const handleSaveEdit = async (sectionId, newName, projectId) => {
-    console.log("newName: ", newName);
-    console.log("projectId: ", projectId.projectId);
-    console.log("sectionId: ", sectionId);
+    // console.log("newName: ", newName);
+    // console.log("projectId: ", projectId.projectId);
+    // console.log("sectionId: ", sectionId);
 
     try {
       const res = await https_taskflow.patch(
@@ -238,7 +253,7 @@ export default function ProjectPage() {
 
         {/* MAIN CONTENT */}
         <main className="px-10 py-6">
-          <h1 className="text-2xl font-bold mb-4">{projectName}</h1>
+          <h1 className="text-2xl font-bold mb-4">{activeProject?.name}</h1>
 
           {/* Section list */}
 
@@ -277,8 +292,8 @@ export default function ProjectPage() {
           }}
           onAdd={handleAddTask}
           onSelectProjectSection={(data) => {
-            console.log("📌 PROJECT:", data.projectId);
-            console.log("📌 SECTION:", data.sectionId);
+            // console.log("📌 PROJECT:", data.projectId);
+            // console.log("📌 SECTION:", data.sectionId);
 
             setSelectedProject(data.projectId);
             setSelectedSection(data.sectionId);

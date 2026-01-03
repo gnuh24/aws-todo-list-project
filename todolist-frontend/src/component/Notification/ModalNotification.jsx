@@ -2,25 +2,25 @@
 import React, { useState, useEffect } from 'react';
 import {useNavigate} from "react-router-dom";
 
-const ModalNotification = ({ message, duration = 5000, setNewNotificationFormWebsocket }) => {
+const ModalNotification = ({ message, duration = 5000, setNewNotificationFromWebsocket }) => {
   const [isVisible, setIsVisible] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsVisible(false);
-      setNewNotificationFormWebsocket(null);
+      setNewNotificationFromWebsocket(null);
     }, duration);
 
     return () => clearTimeout(timer);
-  }, [duration, setNewNotificationFormWebsocket]);
+  }, [duration, setNewNotificationFromWebsocket]);
 
   if (!isVisible) return null;
 
   // Xử lý click vào medal (mở trang thông báo)
   const handleMedalClick = () => {
     setIsVisible(false);
-    setNewNotificationFormWebsocket(null);
+    setNewNotificationFromWebsocket(null);
     // Điều hướng đến trang thông báo
     navigate('/app/notifications');
   };
@@ -29,7 +29,7 @@ const ModalNotification = ({ message, duration = 5000, setNewNotificationFormWeb
   const handleDismissClick = (e) => {
     e.stopPropagation();
     setIsVisible(false);
-    setNewNotificationFormWebsocket(null);
+    setNewNotificationFromWebsocket(null);
   };
 
   return (

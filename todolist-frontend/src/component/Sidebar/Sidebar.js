@@ -36,6 +36,7 @@ import { message } from "antd";
 import { toast } from "sonner";
 import AppContext from "antd/es/app/context";
 import {useAppContext} from "../../layout/MainLayout";
+import {useProjectContext} from "../../context/ProjectContext";
 export default function Sidebar() {
     const location = useLocation();
     const [selectedSection, setSelectedSection] = useState(null);
@@ -50,7 +51,6 @@ export default function Sidebar() {
 
     const [loading, setLoading] = useState(false);
     const [showProjectMenu, setShowProjectMenu] = useState(false);
-    const [activeProjectId, setActiveProjectId] = useState(null);
 
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [editProject, setEditProject] = useState(null);
@@ -58,9 +58,8 @@ export default function Sidebar() {
     const [selectedProject, setSelectedProject] = useState(null);
 
 
-    // ✅ Danh sách project từ API
-    const { projects, setProjects } = useAppContext();
-
+    // Context để sử dụng tập trung
+    const { projects, setProjects, setActiveProject, activeProject } = useProjectContext();
 
 
 
@@ -341,13 +340,13 @@ export default function Sidebar() {
                     <div className="mt-6 px-2">
                         <div
                             className={`
-    flex items-center justify-between mb-1 px-3 py-2 rounded-md cursor-pointer
-    transition-colors duration-150 select-none
-    ${isActive("/app/archive")
-                                    ? "bg-red-50 text-red-600 font-medium"
-                                    : "text-gray-500 hover:bg-gray-50"
-                                }
-  `}
+                            flex items-center justify-between mb-1 px-3 py-2 rounded-md cursor-pointer
+                            transition-colors duration-150 select-none
+                            ${isActive("/app/archive")
+                                                            ? "bg-red-50 text-red-600 font-medium"
+                                                            : "text-gray-500 hover:bg-gray-50"
+                                                        }
+                          `}
                             onClick={() => navigate("/app/archive")}
                         >
                             <div className="text-xs font-semibold uppercase tracking-wide">
@@ -378,10 +377,10 @@ export default function Sidebar() {
                                     key={project.id}
                                     icon={<FolderOutlined />}
                                     label={project.name}
-                                    active={activeProjectId === project.id}
+                                    active={isActive(`/app/projects/${project.id}`)}
                                     onClick={() => {
-                                        setActiveProjectId(project.id); // 👈 click để active
-                                        navigate(`/app/projects/${project.name}/${project.id}`);
+                                        setActiveProject(project); // 👈 click để active
+                                        navigate(`/app/projects/${project.id}`);
                                     }}
                                     isProject={true}
                                     project={project}

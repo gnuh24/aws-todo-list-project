@@ -9,7 +9,7 @@ import ImageHelper from "../../helpers/ImageHelper";
  */
 export default function AvatarCircle({ avatar, name, size = 24 }) {
     const avatarUrl = ImageHelper.getAvatarUrl(avatar);
-    console.log(avatarUrl);
+    // console.log(avatarUrl);
     return (
         <div
             className="rounded-full bg-[#56D08A] text-white flex items-center justify-center font-semibold flex-shrink-0"

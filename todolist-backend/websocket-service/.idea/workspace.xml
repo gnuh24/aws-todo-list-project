@@ -5,17 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5bf172b3-cf86-483d-8669-161bc88dbf13" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../notification-service/src/main/java/aws/todolist/notification/enums/EventType.java" beforeDir="false" afterPath="$PROJECT_DIR$/../notification-service/src/main/java/aws/todolist/notification/enums/EventType.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../taskflow-service/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/enums/EventType.java" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/enums/EventType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/service/ServiceEventKafka/ProjectEventService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/service/ServiceEventKafka/ProjectEventService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/messaging/kafka/consumer/EventProjectConsumer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/messaging/kafka/consumer/EventProjectConsumer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/component/Header/ActivityHeader.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/component/Header/ActivityHeader.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/component/Modal/EditProjectModal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/component/Modal/EditProjectModal.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/component/Content/AvatarCircle.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/component/Content/AvatarCircle.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/component/Header/HeaderSidebar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/component/Header/HeaderSidebar.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/component/Modal/TaskDetailModal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/component/Modal/TaskDetailModal.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/component/Notification/NotificationSocket.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/component/Notification/ModalNotification.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/component/Notification/ModalNotification.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/component/Sidebar/Sidebar.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/component/Sidebar/Sidebar.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/event/EventBusContext.jsx" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/layout/MainLayout.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/layout/MainLayout.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/pages/AppPage/CompletedPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/pages/AppPage/CompletedPage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/service/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/service/api.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/pages/AppPage/NotificationPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/pages/AppPage/NotificationPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/pages/AppPage/ProjectPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/pages/AppPage/ProjectPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/websocket/WebSocketClient.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/websocket/WebSocketClient.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,15 +40,15 @@
     <option name="showLibraryContents" value="true" />
     <option name="showModules" value="false" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.WebSocketServiceApplication.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "kiên",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/Worker/FCJ/To-doList/aws-todo-list-project/todolist-backend/websocket-service"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.WebSocketServiceApplication.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;kiên&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Worker/FCJ/To-doList/aws-todo-list-project/todolist-backend/websocket-service&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="websocket" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="aws.todoist.websocket.WebSocketServiceApplication" />

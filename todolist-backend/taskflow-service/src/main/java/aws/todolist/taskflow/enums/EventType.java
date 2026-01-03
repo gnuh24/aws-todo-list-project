@@ -8,6 +8,7 @@ public enum EventType {
     PROJECT_CREATED,
     PROJECT_UPDATED,
     PROJECT_DELETED,
+    PROJECT_ARCHIVED,
 
     // =========================
     // 👥 PROJECT MEMBER EVENTS

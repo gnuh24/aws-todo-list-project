@@ -146,6 +146,9 @@ public class ProjectServiceImpl implements ProjectService {
             throw new ResourceNotFoundException(BusinessErrorCode.TASKFLOW_NOT_FOUND, "Dự án không tồn tại hoặc đã bị xóa.");
         }
 
+        // 🔹 lưu trạng thái archive cũ
+        Boolean oldArchived = project.getIsArchived();
+
         if (projectUpdateRequestDTO.getName() != null) {
             project.setName(projectUpdateRequestDTO.getName());
         }
@@ -154,12 +157,22 @@ public class ProjectServiceImpl implements ProjectService {
             project.setIsArchived(projectUpdateRequestDTO.getIsArchived());
         }
 
-        Project saved_project = projectRepository.saveAndFlush(project);
+        Project savedProject = projectRepository.saveAndFlush(project);
 
         // Gửi event kafka cho websocket
-        projectEventService.publishProjectUpdated(saved_project);
 
-        return projectMapper.toResponse(saved_project);
+        // 🔔 publish event theo NGỮ NGHĨA
+        if (oldArchived != savedProject.getIsArchived()) {
+
+            // 👉 archive
+            projectEventService.publishProjectArchived(savedProject);
+
+        } else {
+            // 👉 update thường
+            projectEventService.publishProjectUpdated(savedProject);
+        }
+
+        return projectMapper.toResponse(savedProject);
     }
 
     @Transactional

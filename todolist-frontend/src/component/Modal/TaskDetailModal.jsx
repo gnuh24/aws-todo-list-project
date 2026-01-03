@@ -326,7 +326,7 @@ export default function TaskDetailModal({
                     `/v1/projects/${task.idProject}/tasks/${currentTaskId}`
                 );
 
-                console.log(response.data.data);
+                // console.log(response.data.data);
 
                 setTaskDetail(TaskHelper.normalizeTask(response.data.data));
             } catch (error) {
