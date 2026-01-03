@@ -138,7 +138,6 @@ export function WebSocketClient() {
             }
 
             case EVENT.PROJECT_MEMBER_REMOVED:
-            case EVENT.PROJECT_ARCHIVED:
             case EVENT.PROJECT_DELETED: {
                 const projectId = payload?.projectId || payload?.project?.id;
                 if (!projectId) return;
@@ -146,6 +145,23 @@ export function WebSocketClient() {
                 setProjects(prev =>
                     prev.filter(p => p.id !== projectId)
                 );
+                break;
+            }
+
+            case EVENT.PROJECT_ARCHIVED: {
+                const project = payload?.project;
+                if (!project) return;
+
+                setProjects(prev => {
+                    // 📦 archive → remove khỏi list đang active
+                    if (project.isArchived === true) {
+                        return prev.filter(p => p.id !== project.id);
+                    }
+
+                    // 🔄 unarchive → add lại
+                    return [project, ...prev];
+                });
+
                 break;
             }
 

@@ -1,5 +1,6 @@
 // websocket/handlers/project.handler.js
 import { EVENT } from "../../event/EventType";
+import {useNavigate} from "react-router-dom";
 
 export function handleProjectEvent(event, { activeProject, setActiveProject }) {
     const { eventType, payload } = event;
