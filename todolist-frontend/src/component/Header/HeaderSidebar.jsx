@@ -5,7 +5,7 @@ import {
     DownOutlined,
 } from "@ant-design/icons";
 import { Dropdown } from "antd";
-import { BASE_URL } from "../../service/api"
+import AvatarCircle from "../Content/AvatarCircle";
 
 import UserMenuDropdown from "../UserMenu/UserMenuDropdown";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -28,17 +28,17 @@ export default function HeaderSidebar() {
                 overlayClassName="rounded-xl shadow-lg"
             >
                 <div className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 px-2 py-1 rounded-md">
-
-                    <img
-                        src={avatar != null ? `${BASE_URL}/media/v1/local/${avatar}` : "https://i.pravatar.cc/80"}
-                        referrerPolicy="no-referrer"
-                        className="rounded-full w-6 h-6"
+                    <AvatarCircle
+                        avatar={avatar}
+                        name={displayName}
+                        size={24}
                     />
                     <span className="font-medium text-sm text-gray-700 truncate">
                         {displayName}
                     </span>
                     <DownOutlined className="text-xs text-gray-500" />
                 </div>
+
             </Dropdown>
 
             <div className="flex items-center gap-3 text-gray-500">

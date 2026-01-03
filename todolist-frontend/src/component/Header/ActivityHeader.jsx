@@ -12,7 +12,7 @@ import { Dropdown, Input, Typography, Divider } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { https_taskflow } from "../../service/api";
 import { notificationFilterMap } from "../../data/ActivityFilter";
-import { BASE_URL } from "../../service/api"
+import AvatarCircle from "../Content/AvatarCircle";
 
 const { Text } = Typography;
 export default function ActivityHeader({
@@ -228,13 +228,14 @@ export default function ActivityHeader({
                             }`}
                     >
                         <div className="flex items-center gap-2">
-                            <img
-                                src={member.avatar != null ? `${BASE_URL}/media/v1/local/${member.avatar}` : "https://i.pravatar.cc/80"}
-                                alt={member.displayName}
-                                className="w-6 h-6 rounded-full object-cover"
+                            <AvatarCircle
+                                avatar={member.avatar}
+                                name={member.displayName}
+                                size={24}
                             />
                             <span>{member.displayName}</span>
                         </div>
+
                         {selectedCollaborator === member.displayName && (
                             <CheckOutlined className="text-red-500 text-xs" />
                         )}

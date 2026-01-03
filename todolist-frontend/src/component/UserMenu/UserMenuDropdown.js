@@ -8,6 +8,7 @@ import {
     StarOutlined,
     PrinterOutlined,
 } from "@ant-design/icons";
+import AvatarCircle from "../Content/AvatarCircle";
 
 import { BASE_URL } from "../../service/api"
 
@@ -38,17 +39,17 @@ export default function UserMenuDropdown() {
         <Menu className="rounded-xl p-2 w-64">
             {/* Header */}
             <div className="flex items-center gap-3 px-3 py-2 border-b pb-3">
-
-                <img
-                    src={avatar != null ? `${BASE_URL}/media/v1/local/${avatar}` : "https://i.pravatar.cc/80"}
-                    referrerPolicy="no-referrer"
-                    className="rounded-full w-10 h-10"
+                <AvatarCircle
+                    avatar={avatar}
+                    name={displayName}
+                    size={40}
                 />
                 <div>
                     <div className="font-semibold text-sm">{displayName}</div>
                     <div className="text-xs text-gray-500">1/5 tasks</div>
                 </div>
             </div>
+
 
             {/* Menu Items */}
             <Menu.Item

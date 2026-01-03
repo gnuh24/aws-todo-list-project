@@ -2,6 +2,7 @@ import { CheckOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { https_taskflow } from "../../service/api";
 import { toast } from "sonner";
+import AvatarCircle from "../../component/Content/AvatarCircle";
 
 export default function MemberDropdown({
     open,
@@ -60,20 +61,12 @@ export default function MemberDropdown({
                             }}
                         >
                             {/* ✅ Avatar with fallback */}
-                            <div className="w-7 h-7 rounded-full bg-[#56D08A] text-white flex items-center justify-center font-semibold flex-shrink-0">
-                                {member.avatar ? (
-                                    <img
-                                        src={member.avatar}
-                                        alt="avatar"
-                                        className="w-full h-full object-cover rounded-full"
-                                        onError={(e) =>
-                                            (e.currentTarget.src = "/default-avatar.png")
-                                        }
-                                    />
-                                ) : (
-                                    member?.displayName?.[0]?.toUpperCase() || "U"
-                                )}
-                            </div>
+                            <AvatarCircle
+                                avatar={member.avatar}
+                                name={member.displayName}
+                                size={24}
+                            />
+
 
                             <span className="flex-1 text-sm truncate">
                                 {member.displayName}

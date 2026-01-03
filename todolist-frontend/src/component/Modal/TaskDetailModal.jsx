@@ -3,7 +3,7 @@ import {
 } from "@ant-design/icons";
 import { Modal } from "antd";
 import { useState, useEffect } from "react";
-import {BASE_URL, https_taskflow} from "../../service/api";
+import { https_taskflow } from "../../service/api";
 import CommentSection from "../TaskComment/CommentSection";
 import { LabelsSection } from "../Section/LabelsSection";
 import PriorityDropdown from "../Dropdown/PriorityDropdown";
@@ -15,7 +15,7 @@ import MemberDropdown from "../Dropdown/MemberDropdown";
 import { EditOutlined } from "@ant-design/icons";
 import DateHelper from "../../helpers/DateHelper";
 import TaskHelper from "../../helpers/TaskHelper";
-import ImageHelper from "../../helpers/ImageHelper";
+import AvatarCircle from "../Content/AvatarCircle";
 
 export default function TaskDetailModal({
     isOpenComment,
@@ -62,6 +62,126 @@ export default function TaskDetailModal({
         setTaskStack(stack => stack.slice(0, -1));
         setCurrentTaskId(prev.id); // 🔥 trigger API again
     };
+
+
+
+
+    // ╔══════════════════════════════════════╗
+    // ║        📝 Comment Update Helpers     ║
+    // ╚══════════════════════════════════════╝
+
+
+    const handleComment = async (newComment, attachments) => {
+        try {
+            const response = await https_taskflow.post(`/v1/projects/${task.idProject}/tasks/${task.id}/comments`, {
+                comment: newComment,
+                urls: attachments
+            })
+
+            if (response.status === 200) {
+                const taskDetailNew = { ...taskDetail, comments: [...taskDetail.comments, response.data.data] };
+                setTaskDetail(taskDetailNew);
+            }
+
+
+        } catch (err) {
+            // Kiểm tra xem server có trả lỗi dạng JSON không
+            if (err.response && err.response.data) {
+                const msg = err.response.data.message || err.response.data.detailMessage || "Đã xảy ra lỗi không xác định";
+                toast.error(msg);
+            } else {
+                toast.info("Không thể kết nối đến server. Vui lòng thử lại.");
+            }
+        }
+    };
+
+    const onUpdateComment = async (newComment, idComment) => {
+        if (!newComment.trim()) return;
+        try {
+            const res = await https_taskflow.patch(
+                `/v1/projects/${task.idProject}/tasks/comments/${idComment}`,
+                { comment: newComment }
+            );
+
+            if (res.status === 200) {
+                const commentUpdated = res.data.data;
+                const updatedComments = taskDetail.comments.map(comment =>
+                    comment.id === commentUpdated.id ? commentUpdated : comment
+                );
+                setTaskDetail(prev => ({ ...prev, comments: updatedComments }));
+            }
+        } catch (err) {
+            // Kiểm tra xem server có trả lỗi dạng JSON không
+            if (err.response && err.response.data) {
+                const msg = err.response.data.message || err.response.data.detailMessage || "Đã xảy ra lỗi không xác định";
+                toast.error(msg);
+            } else {
+                toast.info("Không thể kết nối đến server. Vui lòng thử lại.");
+            }
+        }
+    };
+
+
+    const onDeleteComment = async (idComment) => {
+        try {
+            const res = await https_taskflow.delete(
+                `/v1/projects/${task.idProject}/tasks/comments/${idComment}`
+            );
+
+            if (res.status === 200) {
+                const commentDeleted = res.data.data;
+                const updatedComments = (taskDetail.comments || []).filter(
+                    comment => comment.id !== commentDeleted.id
+                );
+                setTaskDetail(prev => ({ ...prev, comments: updatedComments }));
+            }
+        } catch (err) {
+            // Kiểm tra xem server có trả lỗi dạng JSON không
+            if (err.response && err.response.data) {
+                const msg = err.response.data.message || err.response.data.detailMessage || "Đã xảy ra lỗi không xác định";
+                toast.error(msg);
+            } else {
+                toast.info("Không thể kết nối đến server. Vui lòng thử lại.");
+            }
+        }
+    }
+
+    const onDeleteCommentAttach = async (url) => {
+        try {
+            const res = await https_taskflow.delete(
+                `/v1/projects/${task.idProject}/deleteCommentAttach`, {
+                params: {
+                    fileUrl: url
+                }
+            }
+            );
+
+            if (res.status === 200) {
+                const commentAttachDeleted = res.data.data;
+                const updatedComments = (taskDetail.comments || []).map(comment => {
+                    // nếu đây là comment chứa attachment vừa xóa
+                    if (comment.id === commentAttachDeleted.taskCommentId) {
+                        return {
+                            ...comment,
+                            commentAttach: (comment.commentAttach || []).filter(
+                                att => att.id !== commentAttachDeleted.id
+                            )
+                        };
+                    }
+                    return comment;
+                });
+                setTaskDetail(prev => ({ ...prev, comments: updatedComments }));
+            }
+        } catch (err) {
+            // Kiểm tra xem server có trả lỗi dạng JSON không
+            if (err.response && err.response.data) {
+                const msg = err.response.data.message || err.response.data.detailMessage || "Đã xảy ra lỗi không xác định";
+                toast.error(msg);
+            } else {
+                toast.info("Không thể kết nối đến server. Vui lòng thử lại.");
+            }
+        }
+    }
 
 
 
@@ -205,6 +325,9 @@ export default function TaskDetailModal({
                 const response = await https_taskflow.get(
                     `/v1/projects/${task.idProject}/tasks/${currentTaskId}`
                 );
+
+                console.log(response.data.data);
+
                 setTaskDetail(TaskHelper.normalizeTask(response.data.data));
             } catch (error) {
                 console.log(error);
@@ -368,13 +491,14 @@ export default function TaskDetailModal({
 
 
                         {/* Comment Box */}
-                        <CommentSection
+                        {/* <CommentSection
                             isOpenComment={isOpenComment}
                             comments={taskDetail?.comments ?? []}
-                            setTaskDetail={setTaskDetail}
-                            taskDetail={taskDetail}
-
-                        />
+                            handleComment={handleComment}
+                            onUpdateComment={onUpdateComment}
+                            onDeleteComment={onDeleteComment}
+                            onDeleteCommentAttach={onDeleteCommentAttach}
+                        /> */}
                     </div>
 
                     {/* RIGHT SIDEBAR */}
@@ -410,18 +534,16 @@ export default function TaskDetailModal({
                             disabled
                         >
                             <div className="flex items-center gap-2">
-                                <img
-                                    src={
-                                        `${BASE_URL}/media/v1/local/${taskDetail.createdByAccount?.avatar}` ||
-                                        "https://i.pravatar.cc/80"
-                                    }
-                                    alt="creator"
-                                    className="w-6 h-6 rounded-full"
+                                <AvatarCircle
+                                    avatar={taskDetail.createdByAccount?.avatar}
+                                    name={taskDetail.createdByAccount?.displayName}
+                                    size={24}
                                 />
                                 <span className="text-sm text-gray-700">
                                     {taskDetail.createdByAccount?.displayName || "Unknown"}
                                 </span>
                             </div>
+
                         </SidebarItem>
 
 
@@ -431,24 +553,33 @@ export default function TaskDetailModal({
                         >
                             <EditableValue>
                                 <div className="flex items-center gap-2">
-                                    <ImageHelper.AvatarCircle
-                                        avatar={taskDetail.accountAssign?.avatar}
-                                        name={taskDetail.accountAssign?.displayName}
-                                        size={24}
-                                    />
-
                                     {taskDetail.accountAssign ? (
-                                        <span className="text-sm">
-                                            {taskDetail.accountAssign.displayName}
-                                        </span>
+                                        <>
+                                            <AvatarCircle
+                                                avatar={taskDetail.accountAssign.avatar}
+                                                name={taskDetail.accountAssign.displayName}
+                                                size={24}
+                                            />
+                                            <span className="text-sm">
+                                                {taskDetail.accountAssign.displayName}
+                                            </span>
+                                        </>
                                     ) : (
-                                        <span className="text-sm text-red-500 italic">
-                                            Unassigned
-                                        </span>
+                                        <>
+                                            {/* Red "?" placeholder */}
+                                            <div className="w-6 h-6 rounded-full bg-red-100 text-red-500 
+                                    flex items-center justify-center text-sm font-semibold">
+                                                ?
+                                            </div>
+                                            <span className="text-sm text-red-500 italic">
+                                                Unassigned
+                                            </span>
+                                        </>
                                     )}
                                 </div>
                             </EditableValue>
                         </SidebarItem>
+
 
 
                         <MemberDropdown
@@ -479,13 +610,22 @@ export default function TaskDetailModal({
                                             await onUpdateStartTime(value.toISOString());
                                             setOpenStartPicker(false);
                                         }}
-                                        onOpenChange={(open) => !open && setOpenStartPicker(false)}
+                                        onOpenChange={(open) => {
+                                            if (!open) setOpenStartPicker(false);
+                                        }}
                                     />
                                 </div>
                             ) : (
                                 <EditableValue>
-                                    <span className="text-sm">
-                                        {taskDetail.startTime ? DateHelper.formatDate(taskDetail.startTime) : "+"}
+                                    <span
+                                        className={`text-sm ${taskDetail.startTime
+                                            ? "text-gray-800"
+                                            : "text-gray-400 italic"
+                                            }`}
+                                    >
+                                        {taskDetail.startTime
+                                            ? DateHelper.formatDate(taskDetail.startTime)
+                                            : "Set start date"}
                                     </span>
                                 </EditableValue>
                             )}
