@@ -28,64 +28,68 @@ public class JwtGatewayFilter implements GlobalFilter {
 	private ReactiveRedisTemplate<String, String> redisTemplate;
 	@Autowired
 	private RedisService redisService;
-	
+
 	@Override
 	public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-		
+
 		String path = exchange.getRequest().getURI().getPath();
-		
-		if (ApiPath.isPublicPath(path)) {
+
+		// --- DEBUG LOG ---
+		System.out.println("=================================================");
+		System.out.println("🔍 GATEWAY CHECK PATH: " + path);
+		System.out.println("=================================================");
+
+		// --- 🟢 FIX FINAL: Chấp nhận path gốc HOẶC path sau khi StripPrefix ---
+		// Thêm điều kiện: path.startsWith("/ws/")
+		if (ApiPath.isPublicPath(path) ||
+				path.contains("/chat/") ||
+				path.startsWith("/ws/")) {
+
+			System.out.println("✅ ALLOWED (Public/Chat/WS): " + path);
 			return chain.filter(exchange);
 		}
-		System.err.println("Activate JWT Security with: " + path);
-		
+		// ---------------------------------------------------------------------
+
+		System.err.println("🔒 Checking JWT for: " + path);
+
 		String authHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
-		
+
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+			System.err.println("❌ Missing Token for: " + path);
 			return Mono.error(new MissingTokenException());
 		}
-		
+
 		String jwt = authHeader.substring(7);
-		
+
 		try {
-			
+			// ... (Giữ nguyên phần logic check token cũ của bạn ở dưới) ...
 			String type = jwtTokenProvider.getTokenType(jwt);
 			if (!"access".equals(type)){
 				return Mono.error(new InvalidTokenTypeException());
 			}
-			
+
 			String email  = jwtTokenProvider.getUsername(jwt);
 			String userId = jwtTokenProvider.getAccountId(jwt);
 			String role   = jwtTokenProvider.getRole(jwt);
 
-			// Check trong blacklist
 			String redisKey = RedisConstants.BANLIST_ACCOUNT_ID + ":" + userId;
-			
-			return redisService.get(redisKey)
-				.flatMap(optionalValue -> {
-					
-					// Nếu Redis có key → token bị blacklist
-					if (optionalValue.isPresent()) {
-						return Mono.error(new AccessTokenBlacklistedException());
-					}
-					
-					// Không bị blacklist → Inject header và tiếp tục
-					ServerHttpRequest modified = exchange.getRequest().mutate()
-						.header("X-User-Email", email)
-						.header("X-User-Id", userId)
-						.header("X-User-Role", role)
-						.header("X-Token-Type", type)
-						.build();
-					
-					return chain.filter(exchange.mutate().request(modified).build());
-				})
-				.onErrorResume(ex -> {
-					// Nếu bạn muốn: Redis bị tắt/offline → vẫn cho qua hoặc block toàn bộ
-					// Tùy bạn cấu hình tiếp
-					return Mono.error(ex);
-				});
 
-			
+			return redisService.get(redisKey)
+					.flatMap(optionalValue -> {
+						if (optionalValue.isPresent()) {
+							return Mono.error(new AccessTokenBlacklistedException());
+						}
+						ServerHttpRequest modified = exchange.getRequest().mutate()
+								.header("X-User-Email", email)
+								.header("X-User-Id", userId)
+								.header("X-User-Role", role)
+								.header("X-Token-Type", type)
+								.build();
+
+						return chain.filter(exchange.mutate().request(modified).build());
+					})
+					.onErrorResume(ex -> Mono.error(ex));
+
 		} catch (ExpiredJwtException e) {
 			return Mono.error(new TokenExpiredException());
 		} catch (SignatureException e) {

@@ -20,13 +20,14 @@
     <label>JWT Token (Login via Postman first):</label><br>
     <input type="text" id="token" placeholder="Paste your Bearer Token here..."><br>
     <button onclick="connect()">Connect to WebSocket</button>
+    <p><b>My ID (Share this with friend):</b> <span id="my-id-display" style="color: blue; font-weight: bold">...</span></p>
     <span id="status" style="color: red; margin-left: 10px">Disconnected</span>
 </div>
 
 <div class="box">
     <h3>2. Chat Room</h3>
-    <label>Friend ID (Recipient):</label><br>
-    <input type="text" id="recipient" placeholder="e.g., user2_id"><br>
+    <label>Friend ID (Recipient UUID):</label><br>
+    <input type="text" id="recipient" placeholder="Paste friend's UUID here..."><br>
 
     <label>Message:</label><br>
     <input type="text" id="message" placeholder="Type hello..."><br>
@@ -38,7 +39,7 @@
 
 <script type="text/javascript">
     var stompClient = null;
-    var myUserId = null; // Sẽ lấy từ payload của Token để biết mình là ai
+    var myUserId = null;
 
     function connect() {
         var jwtToken = document.getElementById('token').value.trim();
@@ -47,31 +48,38 @@
             return;
         }
 
-        // --- QUAN TRỌNG: KẾT NỐI QUA GATEWAY (8080) ---
-        // Route: /api/chat (Gateway) + /ws (Chat Service)
+        // --- 1. Hiển thị ID để biết mình là ai ---
+        try {
+            var payload = parseJwt(jwtToken);
+            // 👇 SỬA Ở ĐÂY: Lấy accountId thay vì sub
+            myUserId = payload.accountId;
+            document.getElementById('my-id-display').innerText = myUserId;
+            console.log("My User ID form Token: " + myUserId);
+        } catch (e) {
+            console.error("Lỗi parse token:", e);
+        }
+
+        // --- 2. Kết nối WebSocket ---
         var socket = new SockJS('http://localhost:8080/api/chat/ws');
         stompClient = Stomp.over(socket);
 
-        // Gửi Token trong Header khi bắt tay
         stompClient.connect({ 'Authorization': 'Bearer ' + jwtToken }, function (frame) {
             document.getElementById('status').innerText = "Connected ✅";
             document.getElementById('status').style.color = "green";
             console.log('Connected: ' + frame);
 
-            // Decode token sơ bộ để lấy ID của chính mình (chỉ để hiển thị/subscribe)
-            myUserId = parseJwt(jwtToken).sub;
-            console.log("My User ID: " + myUserId);
-            alert("Connected as: " + myUserId);
-
-            // Subscribe kênh riêng của mình
-            stompClient.subscribe('/user/' + myUserId + '/queue/messages', function (msg) {
+            // --- 3. Đăng ký nhận tin (Subscribe) ---
+            // Đường dẫn này chuẩn rồi, Spring sẽ tự map vào session của mình
+            stompClient.subscribe('/user/queue/messages', function (msg) {
+                console.log("📩 Tin nhắn tới:", msg.body);
                 var body = JSON.parse(msg.body);
                 showMessage(body.senderId + ": " + body.content);
             });
 
         }, function(error) {
             console.error(error);
-            alert("Kết nối thất bại! Kiểm tra Console Log (F12).");
+            document.getElementById('status').innerText = "Error ❌";
+            alert("Kết nối thất bại! Hãy check Console F12 và xem lại Token/Server.");
         });
     }
 
@@ -80,17 +88,18 @@
         var content = document.getElementById('message').value;
 
         if(!stompClient) { alert("Chưa kết nối!"); return; }
+        if(!recipientId) { alert("Chưa nhập ID người nhận!"); return; }
 
         var chatMessage = {
-            // SenderId không cần gửi, Server tự lấy từ Token
             recipientId: recipientId,
             content: content
         };
 
         stompClient.send("/app/chat", {}, JSON.stringify(chatMessage));
 
-        // Hiện tin nhắn của chính mình lên giao diện
+        // Hiện tin nhắn của mình (Client-side echo)
         showMessage("Me: " + content);
+        document.getElementById('message').value = ''; // Xóa ô nhập cho tiện
     }
 
     function showMessage(text) {
@@ -98,9 +107,9 @@
         var li = document.createElement('li');
         li.appendChild(document.createTextNode(text));
         ul.appendChild(li);
+        console.log("Displaying: " + text);
     }
 
-    // Hàm phụ trợ để giải mã JWT lấy user ID (không cần verify signature ở đây)
     function parseJwt (token) {
         var base64Url = token.split('.')[1];
         var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');

@@ -66,7 +66,7 @@ public class ApiPath {
 
 	// ---------- WEBSOCKET -------------
 	public static final String WEBSOCKET = BASE + "/notification/ws/**";
-	
+	public static final String CHAT_WEBSOCKET = BASE + "/chat/**";
 	// ---------- PUBLIC PATHS ----------
 	private static final List<String> PUBLIC_PATH_PATTERNS = List.of(
 	    MODEL,
@@ -82,6 +82,7 @@ public class ApiPath {
 	    SWAGGER_UI,
 	    API_DOCS,
 		WEBSOCKET,
+		CHAT_WEBSOCKET,
 		LOGIN_GOOGLE,
 		LOGIN_GOOGLE_RETURNED,
 		SWAGGER_AUTH,

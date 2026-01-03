@@ -1,67 +1,73 @@
 package aws.todolist.chat.configuration;
 
-import lombok.RequiredArgsConstructor;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import org.springframework.stereotype.Component;
-
-import javax.crypto.spec.SecretKeySpec;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import java.util.Base64;
-import java.util.List;
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 
-@Component
-@RequiredArgsConstructor
 @Slf4j
+@Configuration
 public class WebSocketAuthInterceptor implements ChannelInterceptor {
 
-    // Lấy secret từ application.yaml
+    // Đảm bảo key này GIỐNG HỆT auth-service và gateway
     @Value("${jwt.secret}")
-    private String secretKey;
+    private String jwtSecret;
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
+        // Chỉ kiểm tra khi Client gửi lệnh CONNECT
         if (StompCommand.CONNECT.equals(accessor.getCommand())) {
-            List<String> authorization = accessor.getNativeHeader("Authorization");
 
-            if (authorization != null && !authorization.isEmpty()) {
-                String token = authorization.get(0).substring(7); // Bỏ "Bearer "
+            // 1. Lấy Token từ Header 'Authorization' của gói tin STOMP
+            String authHeader = accessor.getFirstNativeHeader("Authorization");
 
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                String token = authHeader.substring(7);
                 try {
-                    // 1. Decode Secret Key theo chuẩn Base64 (Giống hệt logic Gateway)
-                    byte[] keyBytes = Base64.getDecoder().decode(secretKey);
-                    SecretKeySpec secretKeySpec = new SecretKeySpec(keyBytes, "HmacSHA256");
+                    // 2. Parse Token
+                    byte[] keyBytes = Base64.getDecoder().decode(jwtSecret.getBytes(StandardCharsets.UTF_8));
+                    SecretKey key = Keys.hmacShaKeyFor(keyBytes);
 
-                    // 2. Cấu hình Decoder
-                    JwtDecoder jwtDecoder = NimbusJwtDecoder.withSecretKey(secretKeySpec)
-                            .macAlgorithm(org.springframework.security.oauth2.jose.jws.MacAlgorithm.HS256) // Gateway dùng HmacSHA256 tương ứng HS256
-                            .build();
+                    Claims claims = Jwts.parser()
+                            .verifyWith(key)
+                            .build()
+                            .parseSignedClaims(token)
+                            .getPayload();
 
-                    // 3. Verify & Parse
-                    Jwt jwt = jwtDecoder.decode(token);
-                    String userId = jwt.getSubject(); // Lấy subject (username/id)
+                    // Lấy accountId (UUID) từ payload
+                    String userId = claims.get("accountId", String.class);
+                    if (userId == null) {
+                        System.err.println("❌ Error: userId is null");
+                    }
 
-                    // 4. Set User
-                    accessor.setUser(() -> userId);
+                    // 3. Set Authentication vào Context để Spring biết user này là ai
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(userId, null, Collections.emptyList());
 
-                    log.info("User {} connected via Gateway", userId);
+                    accessor.setUser(authentication);
+                    log.info("✅ User connected: {}", userId);
 
                 } catch (Exception e) {
-                    log.error("WebSocket Auth Failed: {}", e.getMessage());
-                    throw new IllegalArgumentException("Unauthorized: Invalid Token");
+                    log.error("❌ Invalid Token: {}", e.getMessage());
+                    // Có thể throw exception để từ chối kết nối
                 }
             } else {
-                 throw new IllegalArgumentException("Unauthorized: No Token");
+                log.warn("⚠️ No Token provided in WebSocket connection!");
             }
         }
         return message;
