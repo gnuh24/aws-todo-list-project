@@ -93,9 +93,9 @@ export default function NotificationsPage() {
             if (!isRead) {
                 await handleUpdateStatus(true, idNotification);
             }
-
+    
             // Điều hướng
-            navigate(`/app/projects/${encodeURIComponent(project.name)}/${idProject}`);
+            navigate(`/app/projects/${idProject}`);
         } catch (error) {
             console.error("Fetch project failed:", error);
 
