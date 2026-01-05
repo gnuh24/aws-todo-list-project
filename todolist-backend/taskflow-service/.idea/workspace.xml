@@ -5,16 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="aafb8b93-6ddf-44d9-bc7c-02d1e2b5b281" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../notification-service/src/main/java/aws/todolist/notification/messaging/kafka/handler/MemberEventHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/../notification-service/src/main/java/aws/todolist/notification/messaging/kafka/handler/MemberEventHandler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/controller/CommentAttachController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/controller/CommentAttachController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/controller/MemberController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/controller/MemberController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/controller/ProjectController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/controller/ProjectController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/controller/SectionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/controller/SectionController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/controller/TaskCommentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/controller/TaskCommentController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/controller/TaskController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/controller/TaskController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/enums/Role.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/enums/Role.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/TaskServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/TaskServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/component/TaskComment/CommentSection.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/component/TaskComment/CommentSection.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/messaging/kafka/consumer/EventProjectConsumer.java" beforeDir="false" afterPath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/messaging/kafka/consumer/EventProjectConsumer.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -55,7 +48,7 @@
     &quot;Application.TaskService.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;code.cleanup.on.save&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;developer&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;kiên&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;D:/Worker/FCJ/To-doList/aws-todo-list-project/todolist-backend/websocket-service&quot;,
     &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
