@@ -1,6 +1,7 @@
 package aws.todolist.taskflow.dto.event.dto;
 
 import aws.todolist.taskflow.enums.Role;
+import aws.todolist.taskflow.enums.StatusMember;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,9 +19,13 @@ public class MemberEventDto {
 
     private String displayName;
 
+    private String projectName;
+
     private String avatar;
 
     private Role role;
 
     private String email;
+
+    private StatusMember status;
 }

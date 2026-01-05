@@ -1,133 +1,230 @@
-import { useState, useEffect, useRef } from "react";
-import { Input, Button, message } from "antd";
+import { useCallback,useMemo, useState, useEffect, useRef } from "react";
+import {Input, Button, message, Avatar} from "antd";
 import {
     PaperClipOutlined,
     UpOutlined,
     DeleteOutlined, EditOutlined, CopyOutlined
 } from "@ant-design/icons";
 import dayjs from "dayjs";
-import { https_taskflow } from "../../service/api";
+import {BASE_URL, https_media, https_taskflow} from "../../service/api";
 import { CommentAttachItem } from "../CommentAttach/CommentAttachItem";
 import { CommentAttachItemAdd } from "../CommentAttach/CommentAttachItemAdd";
 import SpinnerForSettings from "../Spinner/SpinnerForSettings";
 import { toast } from "sonner";
+import AvatarCircle from "../Content/AvatarCircle";
 
 const MAX_SIZE = 3 * 1024 * 1024;
 
-export default function CommentSection({ isOpenComment, comments, handleComment, onUpdateComment, onDeleteComment, onDeleteCommentAttach }) {
+export default function CommentSection({ isOpenComment, comments, setTaskDetail, taskDetail }) {
+    /* ===================== STATE ===================== */
     const [newComment, setNewComment] = useState("");
-    const [attachments, setAttachments] = useState([]); // list URL trả về từ backend
+    const [attachments, setAttachments] = useState([]);
     const [showComments, setShowComments] = useState(isOpenComment ?? false);
     const [showEditForm, setShowEditForm] = useState(null);
     const [isExpanded, setIsExpanded] = useState(false);
     const [openMenu, setOpenMenu] = useState(null);
     const [loading, setLoading] = useState(false);
 
-    const [auth] = useState(() => {
-        const raw = localStorage.getItem("USER_INFO");
-        if (!raw) return null;
-        try { return JSON.parse(raw); } catch { return null; }
-    });
-    const formatToDisplay = "HH:mm DD/MM"
+    const auth = useMemo(() => {
+        try {
+            return JSON.parse(localStorage.getItem("USER_INFO"));
+        } catch {
+            return null;
+        }
+    }, []);
+
+    const formatToDisplay = "HH:mm DD/MM";
+
     const containerRef = useRef(null);
     const menuRef = useRef(null);
     const fileInputRef = useRef(null);
 
-
+    /* ===================== EFFECT ===================== */
     useEffect(() => {
         if (showComments && containerRef.current) {
             containerRef.current.scrollTop = containerRef.current.scrollHeight;
         }
-    }, [showComments, comments.length]); // scroll khi mở hoặc có comment mới
+    }, [showComments, comments?.length, loading]);
 
     useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (menuRef.current && !menuRef.current.contains(event.target)) {
-                setOpenMenu(null); // đóng menu
+        const handleClickOutside = (e) => {
+            if (menuRef.current && !menuRef.current.contains(e.target)) {
+                setOpenMenu(null);
             }
         };
-
         document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
+        return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
     useEffect(() => {
         setShowComments(isOpenComment);
     }, [isOpenComment]);
 
+    /* ===================== HELPER ===================== */
+    const handleApiError = (err, fallback = "Đã xảy ra lỗi") => {
+        const msg =
+            err?.response?.data?.message ||
+            err?.response?.data?.detailMessage ||
+            fallback;
+        toast.error(msg);
+    };
 
+    /* ===================== COMMENT ACTIONS ===================== */
+    const handleComment = useCallback(async (comment, urls) => {
+        const res = await https_taskflow.post(
+            `/v1/projects/${taskDetail.idProject}/tasks/${taskDetail.id}/comments`,
+            { comment, urls }
+        );
+
+        setTaskDetail(prev => ({
+            ...prev,
+            comments: [...prev.comments, res.data.data],
+        }));
+    }, [taskDetail.id, taskDetail.idProject, setTaskDetail]);
+
+    const onUpdateComment = useCallback(async (comment, id) => {
+
+        const res = await https_taskflow.patch(
+            `/v1/projects/${taskDetail.idProject}/tasks/comments/${id}`,
+            { comment }
+        );
+
+        setTaskDetail(prev => ({
+            ...prev,
+            comments: prev.comments.map(c =>
+                c.id === res.data.data.id ? res.data.data : c
+            ),
+        }));
+    }, [taskDetail.idProject, setTaskDetail]);
+
+    const onDeleteComment = useCallback(async (id) => {
+        await https_taskflow.delete(
+            `/v1/projects/${taskDetail.idProject}/tasks/comments/${id}`
+        );
+
+        setTaskDetail(prev => ({
+            ...prev,
+            comments: prev.comments.filter(c => c.id !== id),
+        }));
+    }, [taskDetail.idProject, setTaskDetail]);
+
+    /* ===================== SUBMIT ===================== */
     const handleSubmit = async () => {
-        setLoading(true);
         if (!newComment.trim()) {
-            alert("Không bỏ trống nội dung comment")
-            return
+            toast.warning("Không bỏ trống nội dung comment");
+            return;
         }
-        await handleComment(newComment, attachments.length > 0 ? attachments : null);
-        setAttachments([]);
-        setNewComment("");
-        setLoading(false);
+
+        setLoading(true);
+        try {
+            await handleComment(newComment, attachments.length ? attachments : null);
+            setNewComment("");
+            setAttachments([]);
+            setIsExpanded(false);
+        } catch (err) {
+            handleApiError(err, "Không thể tạo comment");
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const handleUpdate = async (idComment) => {
-        setLoading(true);
+    const handleUpdate = async (id) => {
         if (!newComment.trim()) {
+            showEditForm(null);
+            return;
+        }
+
+        setLoading(true);
+        try {
+            await onUpdateComment(newComment, id);
+            setNewComment("");
             setShowEditForm(null);
-            return
+        } catch (err) {
+            handleApiError(err, "Không thể cập nhật comment");
+        } finally {
+            setLoading(false);
         }
-        await onUpdateComment(newComment, idComment);
-        setNewComment("");
-        setShowEditForm(null);
-        setLoading(false);
     };
 
-    const handleDelete = async (idComment) => {
-        if (!window.confirm("Bạn có muốn xóa comment này không?")) return
+    const handleDelete = async (id) => {
+        if (!window.confirm("Bạn có muốn xóa comment này không?")) return;
+
         setLoading(true);
-        await onDeleteComment(idComment);
-        setLoading(false);
-    }
-
-    const handleFileSelect = async (e) => {
-        if (!e.target.files) return;
-
-        const files = Array.from(e.target.files);
-
-        for (const file of files) {
-
-            if (file.size > MAX_SIZE) {
-                message.error(`❌ File "${file.name}" vượt quá dung lượng tối đa 3MB`);
-                continue; // bỏ qua file đó, upload file khác
-            }
-
-            const formData = new FormData();
-            formData.append("file", file);
-
-            try {
-                // call API upload
-                const res = await https_taskflow.post("/s3bucketstorage/uploadTemp", formData, {
-                    headers: { "Content-Type": "multipart/form-data" },
-                });
-
-                console.log("res", res);
-
-                // giả sử backend trả về { url: 'https://...' }
-                setAttachments(prev => [...prev, res.data.data]);
-            } catch (error) {
-                console.error("Upload failed", error);
-            }
+        try {
+            await onDeleteComment(id);
+        } catch (err) {
+            handleApiError(err, "Không thể xóa comment");
+        } finally {
+            setLoading(false);
         }
-
-        // reset input để chọn file lần nữa nếu muốn
-        e.target.value = "";
     };
 
-    const handleDeleteFileOnUpdate = async (url) => {
-        if (!window.confirm("Bạn có muốn xóa ảnh này ?")) return;
+    /* ===================== FILE UPLOAD ===================== */
+    const handleFileSelect = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
 
-        onDeleteCommentAttach(url)
-    }
+        if (file.size > MAX_SIZE) {
+            message.error(`❌ File "${file.name}" vượt quá 3MB`);
+            e.target.value = "";
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+            const res = await https_media.post("/v1/local/uploads", formData, {
+                headers: { "Content-Type": "multipart/form-data" }
+            });
+
+            // mỗi lần add đúng 1 file
+            setAttachments(prev => [...prev, res.data.data]);
+        } catch (err) {
+            toast.error("Upload file thất bại");
+        } finally {
+            // reset để chọn lại cùng file nếu cần
+            e.target.value = "";
+        }
+    };
+
+
+    const deleteCommentAttach = async (url) => {
+        if (!window.confirm("Bạn có muốn xóa ảnh này?")) return;
+
+        try {
+            const res = await https_taskflow.delete(
+                `/v1/projects/${taskDetail.idProject}/deleteCommentAttach`,
+                { params: { fileUrl: url } }
+            );
+
+            const deleted = res.data?.data;
+            if (!deleted) return;
+
+            setTaskDetail(prev => ({
+                ...prev,
+                comments: (prev.comments || []).map(comment =>
+                    comment.id === deleted.taskCommentId
+                        ? {
+                            ...comment,
+                            commentAttach: (comment.commentAttach || []).filter(
+                                att => att.id !== deleted.id
+                            )
+                        }
+                        : comment
+                )
+            }));
+
+        } catch (err) {
+            const msg =
+                err?.response?.data?.message ||
+                err?.response?.data?.detailMessage ||
+                "Không thể xóa file đính kèm";
+
+            toast.error(msg);
+        }
+    };
+
 
 
 
@@ -143,7 +240,6 @@ export default function CommentSection({ isOpenComment, comments, handleComment,
             {!loading && <>
                 <input
                     type="file"
-                    multiple={true}
                     ref={fileInputRef}
                     className="hidden"
                     onChange={handleFileSelect}
@@ -174,29 +270,21 @@ export default function CommentSection({ isOpenComment, comments, handleComment,
                             >
 
                                 {/* Avatar */}
-                                <div className="w-9 h-9 rounded-full bg-[#56D08A] text-white flex items-center justify-center font-semibold flex-shrink-0">
-                                    {c.authorAvatar ? (
-                                        <img
-                                            src={c.authorAvatar}
-                                            alt="avatar"
-                                            className="w-full h-full object-cover rounded-full"
-                                            onError={(e) => (e.currentTarget.src = '/default-avatar.png')}
-                                        />
-                                    ) : (
-                                        c?.authorName?.[0]?.toUpperCase() || 'U'
-                                    )}
-                                </div>
+                                <AvatarCircle avatar={c.authorAvatar} name={c.authorName}  size={36}/>
 
                                 {/* Comment box */}
                                 <div className="flex-1">
                                     {showEditForm !== c.id ? (
                                         <div
-                                            className="relative rounded-lg px-5 pb-4 shadow-sm bg-white group"
+                                            className={`relative rounded-lg px-5 pb-4 shadow-sm group
+                                                ${isMe ? "bg-blue-50" : "bg-white"}
+                                            `}
                                         >
-                                            <div className="text-sm font-semibold text-gray-600 mb-1">{c.authorName}</div>
+
+                                        <div className="text-sm font-semibold text-gray-600 mb-1">{c.authorName}</div>
                                             <div className="text-xs text-gray-600 mb-1">{dayjs(c.updatedAt).format(formatToDisplay)}</div>
                                             <div className="text-sm text-gray-700 whitespace-pre-line pt-3">{c.comment}</div>
-                                            {/*{!!c.commentAttach?.length && <CommentAttachItem commentAttach={c.commentAttach} />}*/}
+                                            {!!c.commentAttach?.length && <CommentAttachItem commentAttach={c.commentAttach} onDeleteCommentAttach={deleteCommentAttach} />}
 
                                             {/* Menu button */}
                                             <div className="absolute top-2 right-2">
@@ -257,13 +345,6 @@ export default function CommentSection({ isOpenComment, comments, handleComment,
                                                 className="border-none focus:ring-0 resize-none w-full"
                                                 autoFocus
                                             />
-                                            {/*{!!c.commentAttach?.length && (*/}
-                                            {/*    <CommentAttachItem*/}
-                                            {/*        commentAttach={c.commentAttach}*/}
-                                            {/*        onDeleteCommentAttach={onDeleteCommentAttach}*/}
-                                            {/*        isEditing*/}
-                                            {/*    />*/}
-                                            {/*)}*/}
                                             <div className="flex justify-end gap-2 mt-2">
                                                 <Button onClick={() => setShowEditForm(null)}>Cancel</Button>
                                                 <Button type="primary" danger onClick={() => handleUpdate(c.id)}>
@@ -285,18 +366,9 @@ export default function CommentSection({ isOpenComment, comments, handleComment,
                 {/* Comment Input */}
                 {!isExpanded && (
                     <div className="w-full flex items-center gap-2">
-                        <div className="w-9 h-9 rounded-full bg-[#56D08A] text-white flex items-center justify-center font-semibold overflow-hidden">
-                            {auth.avatar ? (
-                                <img
-                                    src={auth.avatar}
-                                    alt="avatar"
-                                    className="w-full h-full object-cover"
-                                    onError={(e) => (e.currentTarget.src = '/default-avatar.png')}
-                                />
-                            ) : (
-                                auth?.displayName?.[0]?.toUpperCase() || 'U'
-                            )}
-                        </div>
+
+                        <AvatarCircle avatar={auth.avatar} name={auth.displayName} size={36} />
+
                         <div className="flex-1 flex items-center gap-2 border rounded-full px-3 py-2 hover:bg-gray-100" onClick={() => {
                             setIsExpanded(true)
                             setShowEditForm(null)
@@ -335,12 +407,12 @@ export default function CommentSection({ isOpenComment, comments, handleComment,
                         )}
 
                         <div className="flex justify-between items-center mt-2">
-                            {/*<div className="flex gap-3 text-gray-400 text-lg">*/}
-                            {/*    <PaperClipOutlined*/}
-                            {/*        className="cursor-pointer text-gray-500 hover:text-gray-700"*/}
-                            {/*        onClick={() => fileInputRef.current?.click()}*/}
-                            {/*    />*/}
-                            {/*</div>*/}
+                            <div className="flex gap-3 text-gray-400 text-lg">
+                                <PaperClipOutlined
+                                    className="cursor-pointer text-gray-500 hover:text-gray-700"
+                                    onClick={() => fileInputRef.current?.click()}
+                                />
+                            </div>
                             <div className="flex gap-2">
                                 <Button onClick={() => {
                                     setIsExpanded(false)

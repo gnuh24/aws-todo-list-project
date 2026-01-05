@@ -4,16 +4,19 @@ import { https_taskflow, https_user } from "../../service/api";
 import { useParams } from "react-router-dom";
 import { toast } from "sonner";
 import AvatarCircle from "../Content/AvatarCircle";
+import { useProjectContext } from "../../context/ProjectContext";
 
 export default function ShareSettings({ onClose }) {
     const { projectId } = useParams();
+
+    const { members, setMembers } = useProjectContext();
+
 
     const [email, setEmail] = useState("");
     const [loading, setLoading] = useState(false);
     const [userFound, setUserFound] = useState(null);
 
     const [openDropdown, setOpenDropdown] = useState(null);
-    const [collaborators, setCollaborators] = useState([]);
 
     const dropdownRef = useRef();
 
@@ -25,18 +28,7 @@ export default function ShareSettings({ onClose }) {
             try {
                 const res = await https_taskflow.get(`/v1/projects/${projectId}/members`);
                 const members = res.data?.data || [];
-
-                const formatted = members.map((m) => ({
-                    id: m.id,
-                    accountId: m.accountId,
-                    name: m.displayName,
-                    email: m.email || "unknown@mail.com",
-                    avatar: m.avatar,
-                    role: m.role === "OWNER" ? "Owner" : "Member",
-                    status: m.status === "PENDING" ? "pending" : "active",
-                }));
-
-                setCollaborators(formatted);
+                setMembers(members);
             } catch (err) {
                 console.error("FAILED MEMBER LIST:", err);
             }
@@ -73,7 +65,6 @@ export default function ShareSettings({ onClose }) {
                     setUserFound(null);
                 }
             } catch (err) {
-                console.error("Error searching user:", err);
                 setUserFound(null);
             } finally {
                 setLoading(false);
@@ -93,8 +84,7 @@ export default function ShareSettings({ onClose }) {
         try {
             const body = {
                 idAccount: userFound.id,
-                role: "MEMBER"
-
+                role: "MEMBER",
             };
 
             await https_taskflow.post(
@@ -107,24 +97,16 @@ export default function ShareSettings({ onClose }) {
             setEmail("");
             setUserFound(null);
 
-            // Refresh members list
-            setCollaborators((prev) => [
-                ...prev,
-                {
-                    id: crypto.randomUUID(),
-                    accountId: userFound.id,
-                    name: userFound.displayName,
-                    email: userFound.email,
-                    avatar: userFound.avatar,
-                    role: "Member",
-                    status: "pending",
-                },
-            ]);
+            // ❌ KHÔNG setMembers ở đây
+            // ✔ Members sẽ được add qua websocket:
+            // EVENT.PROJECT_MEMBER_ADDED / ACCEPTED
+
         } catch (err) {
             console.error("ERROR INVITING USER:", err);
             toast.error("Thành viên đã có trong dự án");
         }
     };
+
 
 
     // -----------------------------------
@@ -134,14 +116,13 @@ export default function ShareSettings({ onClose }) {
         try {
             await https_taskflow.delete(`/v1/projects/${projectId}/members/${memberId}`);
 
-            setCollaborators(collaborators.filter((c) => c.id !== memberId));
+            setMembers(members.filter((c) => c.id !== memberId));
             toast.success("Member removed");
             setOpenDropdown(null);
         } catch (err) {
             console.error(err);
         }
     };
-
 
     return (
         <div className="fixed top-16 right-6 w-[480px] bg-white rounded-xl shadow-2xl overflow-y-auto z-50 animate-slideIn">
@@ -171,7 +152,7 @@ export default function ShareSettings({ onClose }) {
                 {userFound && !loading && (
                     <div
                         className="mt-3 p-3 bg-gray-50 rounded-xl border cursor-pointer hover:bg-gray-100"
-                        onClick={handleInviteUser}
+                        onClick={() => handleInviteUser()}
                     >
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
@@ -195,28 +176,28 @@ export default function ShareSettings({ onClose }) {
                 <div className="mt-6">
                     <div className="text-xs font-semibold text-gray-700 mb-2">In this project</div>
 
-                    {collaborators.map((c, i) => (
+                    {members.map((c, i) => (
                         <div key={i} className="flex items-center justify-between py-3 border-b last:border-none">
 
                             <div className="flex items-center gap-3">
                                 <AvatarCircle
                                     avatar={c.avatar}
-                                    name={c.name}
+                                    name={c.displayName}
                                     size={36}
                                 />
 
 
                                 <div>
-                                    <div className="text-sm font-medium">{c.name}</div>
+                                    <div className="text-sm font-medium">{c.displayName}</div>
                                     <div className="text-xs text-gray-500">{c.email}</div>
-                                    {c.status === "pending" && (
+                                    {c.status === "PENDING" && (
                                         <div className="text-xs text-gray-400">Pending</div>
                                     )}
                                 </div>
                             </div>
 
-                            {c.role === "Owner" ? (
-                                <span className="text-xs text-gray-500">Owner</span>
+                            {c.role === "OWNER" ? (
+                                <span className="text-xs text-gray-500">{c.role}</span>
                             ) : (
                                 <div ref={dropdownRef} className="relative">
                                     <button

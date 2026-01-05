@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from "react";
-import MainLayout from "../../layout/MainLayout";
 import ProjectHeader from "../../component/Header/ProjectHeader";
-import SectionItem from "../../component/Section/SectionItem";
 import { useParams } from "react-router-dom";
 import { https_taskflow } from "../../service/api";
-import { message } from "antd";
 import { toast } from "sonner";
+import {useProjectContext} from "../../context/ProjectContext";
 
 export default function UnArchivePage() {
-  const [sections, setSections] = useState([]);
+
+  const { activeProject, sections, setSections } = useProjectContext();
+
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const { projectName, projectId } = useParams();
+  const { projectId } = useParams();
 
   // 🎯 Lấy sections + tasks trong sections
   useEffect(() => {
@@ -62,7 +63,7 @@ export default function UnArchivePage() {
         <ProjectHeader />
 
         <main className="px-10 py-6">
-          <h1 className="text-2xl font-bold mb-4">{projectName}</h1>
+          <h1 className="text-2xl font-bold mb-4">{activeProject?.name}</h1>
 
           {/* ARCHIVE BANNER */}
           {isArchived && (

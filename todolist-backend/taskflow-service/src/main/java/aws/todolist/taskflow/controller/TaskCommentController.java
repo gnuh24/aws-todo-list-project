@@ -29,7 +29,7 @@ public class TaskCommentController {
 
     @Operation(summary = "Tạo comment mới", description = "Tạo thêm một comment mới")
     @PostMapping("/{idProject}/tasks/{idTask}/comments")
-    @RequireProjectRole({Role.OWNER, Role.MEMBER, Role.ADMIN, Role.VIEWER})
+    @RequireProjectRole({Role.OWNER, Role.MEMBER})
     public ResponseEntity<ApiResponse<TaskCommentResponseDTO>> addNewComment(@PathVariable("idProject") String idProject, @PathVariable("idTask") String idTask, @RequestBody @Valid TaskCommentRequestDTO requestDTO) {
 
         TaskCommentResponseDTO taskComment = taskCommentService.addNewComment(requestDTO, idTask);
@@ -41,7 +41,7 @@ public class TaskCommentController {
 
     @Operation(summary = "Chỉnh sửa comment", description = "Thay đổi nội dung comment đã tạo")
     @PatchMapping("/{idProject}/tasks/comments/{idComment}")
-    @RequireProjectRole({Role.OWNER, Role.MEMBER, Role.ADMIN, Role.VIEWER})
+    @RequireProjectRole({Role.OWNER, Role.MEMBER})
     public ResponseEntity<ApiResponse<TaskCommentResponseDTO>> updateComment(@PathVariable("idProject") String idProject, @PathVariable("idComment") String idComment, @RequestBody @Valid TaskCommentRequestDTO requestDTO) {
 
         TaskCommentResponseDTO taskComment = taskCommentService.updateComment(requestDTO, idComment);
@@ -53,7 +53,7 @@ public class TaskCommentController {
 
     @Operation(summary = "Xóa comment", description = "Cập nhật trạng thái comment là đã xóa")
     @DeleteMapping("/{idProject}/tasks/comments/{idComment}")
-    @RequireProjectRole({Role.OWNER, Role.MEMBER, Role.ADMIN, Role.VIEWER})
+    @RequireProjectRole({Role.OWNER, Role.MEMBER})
     public ResponseEntity<ApiResponse<TaskCommentResponseDTO>> deleteComment(@PathVariable("idProject") String idProject, @PathVariable("idComment") String idComment) {
         TaskCommentResponseDTO taskComment = taskCommentService.deleteComment(idComment);
 

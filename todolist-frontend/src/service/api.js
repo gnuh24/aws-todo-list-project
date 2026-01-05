@@ -3,6 +3,9 @@ import { store } from "..";
 
 export const BASE_URL = "http://localhost:8080/api";
 
+
+export const WEBSOCKET_URL = "http://localhost:8085/websocket/ws";
+
 // axios instance
 export let https_auth = axios.create({
   baseURL: BASE_URL+"/auth",

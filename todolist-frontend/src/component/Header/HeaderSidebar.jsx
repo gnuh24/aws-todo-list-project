@@ -10,6 +10,7 @@ import AvatarCircle from "../Content/AvatarCircle";
 import UserMenuDropdown from "../UserMenu/UserMenuDropdown";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAppContext } from "../../layout/MainLayout";
+import {useNotificationContext} from "../../context/NotificationContext";
 
 export default function HeaderSidebar() {
     const dataUser = JSON.parse(localStorage.getItem("USER_INFO"));
@@ -18,7 +19,8 @@ export default function HeaderSidebar() {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const { countNotificationsUnRead } = useAppContext();
+    const { countNotificationsUnRead } = useNotificationContext();
+
     return (
         <div className="flex items-center justify-between px-4 py-3 border-b">
             <Dropdown

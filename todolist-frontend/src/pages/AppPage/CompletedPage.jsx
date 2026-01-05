@@ -4,11 +4,12 @@ import { LockOutlined } from "@ant-design/icons";
 import ActivityHeader from "../../component/Header/ActivityHeader";
 import TaskDetailModal from "../../component/Modal/TaskDetailModal";
 import SpinnerForSettings from "../../component/Spinner/SpinnerForSettings";
-import {https_notification, https_taskflow} from "../../service/api";
+import {BASE_URL, https_notification, https_taskflow} from "../../service/api";
 import {useNavigate} from "react-router-dom";
 import {notificationFilterMap} from "../../data/ActivityFilter";
 import { toast } from "sonner";
 import MainLayout from "../../layout/MainLayout";
+import AvatarCircle from "../../component/Content/AvatarCircle";
 
 function formatDateHeader(dateStr) {
   const date = new Date(dateStr);
@@ -132,17 +133,9 @@ export default function CompletedPage() {
 
                                 {/* Avatar */}
                                 <div className="relative">
-                                  {item.avatar ? (
-                                      <img
-                                          src={item.avatar}
-                                          alt={item.displayName}
-                                          className="w-14 h-14 rounded-full object-cover"
-                                      />
-                                  ) : (
-                                      <div className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center text-xs font-semibold">
-                                        {item.displayName?.charAt(0).toUpperCase()}
-                                      </div>
-                                  )}
+
+                                  <AvatarCircle avatar={item.avatar} name={item.displayName} size={56}/>
+
                                   <div className="absolute -bottom-1 -right-1 w-6 h-6 flex items-center justify-center text-green-500 bg-white rounded-full shadow-md">
                                     {notificationFilterMap[item.type]?.icon}
                                   </div>

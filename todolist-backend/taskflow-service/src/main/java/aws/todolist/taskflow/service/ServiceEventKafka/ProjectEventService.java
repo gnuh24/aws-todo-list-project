@@ -41,6 +41,10 @@ public class ProjectEventService {
         publish(project, EventType.PROJECT_DELETED);
     }
 
+    public void publishProjectArchived(Project project) {
+        publish(project, EventType.PROJECT_ARCHIVED);
+    }
+
     // ===== CORE =====
 
     private void publish(Project project, EventType type) {

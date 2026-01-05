@@ -39,25 +39,25 @@ VALUES
 
 CREATE TABLE `account_recovery_key` (
     `id` CHAR(36) PRIMARY KEY,
-    
+
     `account_id` CHAR(36) NOT NULL,
-    
-    -- Hash của recovery key (bcrypt / sha256)
+
     `key_hash` VARCHAR(255) NOT NULL,
-    
-    -- Trạng thái đã dùng hay chưa
-    `is_used` BOOLEAN NOT NULL DEFAULT FALSE,
-    
+
+    `is_used` TINYINT(1) NOT NULL DEFAULT 0,
+
     `used_at` TIMESTAMP NULL,
-    
-    `created_at` TIMESTAMP NOT NULL,
-    
+
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
     CONSTRAINT `fk_recovery_key_account`
-        FOREIGN KEY (`account_id`) REFERENCES `account`(`id`)
+        FOREIGN KEY (`account_id`)
+        REFERENCES `account`(`id`)
         ON DELETE CASCADE,
 
     UNIQUE (`key_hash`)
 );
+
 
 
 -- __________________________________________________________________ PROJECT DATABASE _____________________________________________________________________________
@@ -322,36 +322,15 @@ CREATE TABLE `notification` (
 
 INSERT INTO `notification`
 (`id`, `receiver_id`, `actor_id`, `project_id`, `task_id`, `type`, `title`, `content`, `is_read`, `created_at`, `is_deleted`)
-VALUES
--- Project role updated
+VALUES 
 ('22222222-bbbb-4bbb-bbbb-222222222222', '11111111-1111-1111-1111-111111111111', '33333333-3333-3333-3333-333333333333', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', NULL, 'PROJECT_MEMBER_ROLE_UPDATED', 'Role updated in Project Alpha', 'User Three role has been changed to ADMIN in Project Alpha.', FALSE, NOW(), FALSE),
-
--- Task assigned
 ('33333333-cccc-4ccc-cccc-333333333333', '11111111-1111-1111-1111-111111111111', '22222222-2222-2222-2222-222222222222', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '44444444-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'TASK_ASSIGNED', 'New task assigned', 'You have been assigned the task "Setup Database" in Project Alpha.', FALSE, NOW(), FALSE),
-
--- Task commented
 ('44444444-dddd-4ddd-dddd-444444444444', '11111111-1111-1111-1111-111111111111', '22222222-2222-2222-2222-222222222222', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '55555555-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'TASK_COMMENTED', 'New comment on your task', 'User One commented on task "Design Schema".', FALSE, NOW(), FALSE),
-
--- Task updated
 ('55555555-eeee-4eee-eeee-555555555555', '11111111-1111-1111-1111-111111111111', '33333333-3333-3333-3333-333333333333', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'dddddddd-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'TASK_UPDATED', 'Task updated', 'Task "Research New Feature" has been updated by User Three.', FALSE, NOW(), FALSE),
-
--- Task completed
 ('66666666-ffff-4fff-ffff-666666666666', '11111111-1111-1111-1111-111111111111', '22222222-2222-2222-2222-222222222222', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'ffffffff-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'TASK_COMPLETED', 'Task completed', 'Task "Finalize Documentation" has been completed by User Two.', FALSE, NOW(), FALSE),
-
--- Task reopened
 ('77777777-aaaa-4aaa-aaaa-777777777777', '11111111-1111-1111-1111-111111111111', '33333333-3333-3333-3333-333333333333', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '77777777-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'TASK_REOPENED', 'Task reopened', 'Task "Setup Backend" has been reopened by User Three.', FALSE, NOW(), FALSE),
-
--- Task due soon
 ('88888888-bbbb-4bbb-bbbb-888888888888', '11111111-1111-1111-1111-111111111111', '22222222-2222-2222-2222-222222222222', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '88888888-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'TASK_DUE_SOON', 'Task due soon', 'Task "Frontend Skeleton" is due in 3 days.', FALSE, NOW(), FALSE),
-
--- Task overdue
 ('99999999-cccc-4ccc-cccc-999999999999', '11111111-1111-1111-1111-111111111111', '33333333-3333-3333-3333-333333333333', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'eeeeeeee-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'TASK_OVERDUE', 'Task overdue', 'Task "Develop Module X" is overdue.', FALSE, NOW(), FALSE),
-
--- Request accepted
 ('aaaaaaaa-dddd-4ddd-dddd-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', '22222222-2222-2222-2222-222222222222', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', NULL, 'REQUEST_ACCEPTED', 'Request accepted', 'Your request to join Project Beta has been accepted.', FALSE, NOW(), FALSE),
-
--- Request declined
 ('bbbbbbbb-eeee-4eee-eeee-bbbbbbbbbbbb', '11111111-1111-1111-1111-111111111111', '33333333-3333-3333-3333-333333333333', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', NULL, 'REQUEST_DECLINED', 'Request declined', 'Your request to join Project Alpha has been declined.', FALSE, NOW(), FALSE),
-
--- Project deleted
 ('cccccccc-ffff-4fff-ffff-cccccccccccc', '11111111-1111-1111-1111-111111111111', '22222222-2222-2222-2222-222222222222', 'cccccccc-cccc-cccc-cccc-cccccccccccc', NULL, 'PROJECT_DELETED', 'Project deleted', 'Project Gamma has been deleted by User Two.', FALSE, NOW(), FALSE);

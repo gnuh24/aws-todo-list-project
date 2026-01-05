@@ -19,4 +19,8 @@ public interface ProjectService {
     ProjectResponseDTO updateProject(String id, ProjectUpdateRequestDTO projectUpdateRequestDTO);
 
     ProjectResponseDTO removeProject(String id);
+
+    void addProjectDefault(String idAccount);
+
+    ProjectDetailResponseDTO getProjectDefault();
 }

@@ -32,7 +32,7 @@ public class MemberController {
 
     @Operation(summary = "Lấy danh sách member của project", description = "Dùng id client cung cấp để lấy danh sách member")
     @GetMapping("/{idProject}/members")
-    @RequireProjectRole({Role.ADMIN, Role.OWNER, Role.VIEWER, Role.MEMBER})
+    @RequireProjectRole({Role.OWNER, Role.MEMBER})
     public ResponseEntity<ApiResponse<List<MemberResponseDTO>>> getMemberByIdProject(@PathVariable("idProject") String id) {
         List<MemberResponseDTO> members = memberService.getAllMember(id);
 
@@ -43,7 +43,7 @@ public class MemberController {
 
     @Operation(summary = "Thêm thành viên mới vào dự án", description = "Thêm một member mới vào dự án")
     @PostMapping("/{idProject}/members")
-    @RequireProjectRole({Role.ADMIN, Role.OWNER})
+    @RequireProjectRole({Role.OWNER})
     public ResponseEntity<ApiResponse<MemberResponseDTO>> addNewMember(
             @PathVariable("idProject") String projectId,
             @RequestBody @Valid MemberCreateRequestDTO request) {
@@ -61,7 +61,7 @@ public class MemberController {
 
     @Operation(summary = "Thay đổi vai trò", description = "Thay đổi vai trò của member")
     @PatchMapping("/{idProject}/members/{idMember}")
-    @RequireProjectRole({Role.ADMIN, Role.OWNER})
+    @RequireProjectRole({Role.OWNER})
     public ResponseEntity<ApiResponse<MemberResponseDTO>> updateMember(
             @PathVariable("idProject") String id,
             @PathVariable("idMember") String idMember,
@@ -102,7 +102,7 @@ public class MemberController {
 
     @Operation(summary = "Xóa member", description = "Cập nhật member về trạng thái đã xóa")
     @DeleteMapping("/{idProject}/members/{idMember}")
-    @RequireProjectRole({Role.ADMIN, Role.OWNER})
+    @RequireProjectRole({Role.OWNER})
     public ResponseEntity<ApiResponse<MemberResponseDTO>> deleteMember(
             @PathVariable("idProject") String id,
             @PathVariable("idMember") String idMember) {

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { https_taskflow } from "../../service/api";
 import { toast } from "sonner";
 import AvatarCircle from "../../component/Content/AvatarCircle";
+import { useProjectContext } from "../../context/ProjectContext";
 
 export default function MemberDropdown({
     open,
@@ -10,7 +11,9 @@ export default function MemberDropdown({
     onAssign,
     onClose,
 }) {
-    const [members, setMembers] = useState([]);
+
+    const { members, setMembers } = useProjectContext();
+
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {

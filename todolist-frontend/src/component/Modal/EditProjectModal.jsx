@@ -1,6 +1,7 @@
 import { Modal, Input, message } from "antd";
 import { useState, useEffect } from "react";
 import { https_taskflow } from "../../service/api";
+import {toast} from "sonner";
 
 export default function EditProjectModal({
   open,
@@ -24,9 +25,11 @@ export default function EditProjectModal({
 
       message.success("Project updated!");
       onUpdated(project.id, name);
-      onClose();
     } catch (err) {
-      message.error("Failed to update");
+      toast.error(err.response.data.message);
+    }finally {
+
+      onClose();
     }
   };
 

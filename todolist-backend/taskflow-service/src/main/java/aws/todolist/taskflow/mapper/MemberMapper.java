@@ -25,6 +25,7 @@ public interface MemberMapper {
     @Mapping(source = "account.displayName", target = "displayName")
     @Mapping(source = "account.avatar", target = "avatar")
     @Mapping(source = "account.email", target = "email")
+    @Mapping(source = "project.name", target = "projectName")
     MemberEventDto toEventDto(Member member);
 
     default MemberPayload toPayload(
@@ -37,7 +38,7 @@ public interface MemberMapper {
         payload.setProjectId(member.getProject().getId()); // rất quan trọng để route WS
         payload.setActor(actor);
         payload.setReceivers(receivers);
-        payload.setMemberEventDto(toEventDto(member));
+        payload.setMember(toEventDto(member));
 
         return payload;
     }

@@ -326,7 +326,7 @@ export default function TaskDetailModal({
                     `/v1/projects/${task.idProject}/tasks/${currentTaskId}`
                 );
 
-                console.log(response.data.data);
+                // console.log(response.data.data);
 
                 setTaskDetail(TaskHelper.normalizeTask(response.data.data));
             } catch (error) {
@@ -489,16 +489,17 @@ export default function TaskDetailModal({
                         )}
 
 
-
                         {/* Comment Box */}
-                        {/* <CommentSection
+                        {/* 
+                        <CommentSection
                             isOpenComment={isOpenComment}
                             comments={taskDetail?.comments ?? []}
-                            handleComment={handleComment}
-                            onUpdateComment={onUpdateComment}
-                            onDeleteComment={onDeleteComment}
-                            onDeleteCommentAttach={onDeleteCommentAttach}
-                        /> */}
+                            setTaskDetail={setTaskDetail}
+                            taskDetail={taskDetail}
+                        /> 
+                        */}
+
+
                     </div>
 
                     {/* RIGHT SIDEBAR */}

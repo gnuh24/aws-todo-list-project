@@ -40,7 +40,7 @@ public class TaskController {
 
     @Operation(summary = "Lấy ra chi tiết task", description = "Lấy ra thông tin chi tiết của task")
     @GetMapping("/{idProject}/tasks/{idTask}")
-    @RequireProjectRole({Role.OWNER, Role.ADMIN, Role.MEMBER, Role.VIEWER})
+    @RequireProjectRole({Role.OWNER, Role.MEMBER})
     public ResponseEntity<ApiResponse<TaskDetailResponseDTO>> getTaskByTaskId(@PathVariable("idProject") String idProject, @PathVariable("idTask") String idTask) {
 
         TaskDetailResponseDTO taskDetailResponseDTO = taskService.getTaskById(idTask);

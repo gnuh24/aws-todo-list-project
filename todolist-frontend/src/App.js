@@ -71,7 +71,7 @@ function App() {
               <Route path="today" element={<TodayPage />} />
               <Route path="filters" element={<FiltersPage />} />
 
-              <Route path="projects/:projectName/:projectId" element={<ProjectPage />} />
+              <Route path="projects/:projectId" element={<ProjectPage />} />
               <Route path="archive/:projectName/:projectId" element={<UnArchivePage />} />
               <Route path="upcoming" element={<UpcomingPage />} />
               <Route path="activity" element={<CompletedPage />} />

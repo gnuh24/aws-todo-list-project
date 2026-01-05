@@ -23,6 +23,7 @@ import aws.todolist.taskflow.repository.ProjectRepository;
 import aws.todolist.taskflow.repository.SectionRepository;
 import aws.todolist.taskflow.repository.TaskRepository;
 import aws.todolist.taskflow.service.ServiceEventKafka.ProjectEventService;
+import aws.todolist.taskflow.service.ServiceInterface.AccountService;
 import aws.todolist.taskflow.service.ServiceInterface.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -63,6 +64,9 @@ public class ProjectServiceImpl implements ProjectService {
     @Autowired
     private ProjectEventService projectEventService;
 
+    @Autowired
+    private AccountService accountService;
+
 
     @Override
     public List<ProjectResponseDTO> getAllProject() {
@@ -98,18 +102,9 @@ public class ProjectServiceImpl implements ProjectService {
 
         Account actor = RequestContext.getAccount();
 
-        Project OptProjectDefault = projectRepository.findProjectIsDefault(actor.getId());
-
-        // Kiểm tra dự án default
-        if (projectCreateRequestDTO.getIsDefault() && OptProjectDefault != null) {
-            throw new BadRequestException(SystemErrorCode.API_BAD_REQUEST, "Tài khoản đã có dự án mặc định");
-        }
-
-
         Project project = Project.builder()
                 .name(projectCreateRequestDTO.getName())
                 .isArchived(projectCreateRequestDTO.getIsArchived() != null ? projectCreateRequestDTO.getIsArchived() : false)
-                .isDefault(projectCreateRequestDTO.getIsDefault() != null ? projectCreateRequestDTO.getIsDefault() : false)
                 .build();
 
 
@@ -151,6 +146,9 @@ public class ProjectServiceImpl implements ProjectService {
             throw new ResourceNotFoundException(BusinessErrorCode.TASKFLOW_NOT_FOUND, "Dự án không tồn tại hoặc đã bị xóa.");
         }
 
+        // 🔹 lưu trạng thái archive cũ
+        Boolean oldArchived = project.getIsArchived();
+
         if (projectUpdateRequestDTO.getName() != null) {
             project.setName(projectUpdateRequestDTO.getName());
         }
@@ -159,12 +157,22 @@ public class ProjectServiceImpl implements ProjectService {
             project.setIsArchived(projectUpdateRequestDTO.getIsArchived());
         }
 
-        Project saved_project = projectRepository.saveAndFlush(project);
+        Project savedProject = projectRepository.saveAndFlush(project);
 
         // Gửi event kafka cho websocket
-        projectEventService.publishProjectUpdated(saved_project);
 
-        return projectMapper.toResponse(saved_project);
+        // 🔔 publish event theo NGỮ NGHĨA
+        if (oldArchived != savedProject.getIsArchived()) {
+
+            // 👉 archive
+            projectEventService.publishProjectArchived(savedProject);
+
+        } else {
+            // 👉 update thường
+            projectEventService.publishProjectUpdated(savedProject);
+        }
+
+        return projectMapper.toResponse(savedProject);
     }
 
     @Transactional
@@ -191,7 +199,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         Account actor = RequestContext.getAccount();
 
-        Project defaultProject = projectRepository.findProjectIsDefault(actor.getId());
+        Project defaultProject = projectRepository.findProjectDefault(actor.getId());
 
         if (defaultProject == null) {
             throw new ResourceNotFoundException(BusinessErrorCode.TASKFLOW_NOT_FOUND, "Account không có project mặc định");
@@ -225,5 +233,49 @@ public class ProjectServiceImpl implements ProjectService {
 
 
         return projectMapper.toResponse(saved);
+    }
+
+    @Override
+    public void addProjectDefault(String idAccount) {
+        Account actor = accountService.getAccountById(idAccount);
+
+        Project project = Project.builder()
+                .name("Inbox")
+                .isArchived(false)
+                .isDefault(true)
+                .build();
+
+
+        Project saved_project = projectRepository.saveAndFlush(project);
+
+        Member member = Member.builder().account(actor).project(saved_project).role(Role.OWNER).status(StatusMember.ACCEPTED).build();
+
+        Section section = Section.builder().project(saved_project).name("Section default").position(1).build();
+
+        memberRepository.save(member);
+
+        sectionRepository.save(section);
+
+        saved_project.getMembers().add(member);
+
+        saved_project.getSections().add(section);
+
+        System.err.println("tạo project default");
+
+        // ------------------------------------------
+        // Gửi event kafka cho websocket
+        // ------------------------------------------
+
+        projectEventService.publishProjectCreated(saved_project);
+    }
+
+    @Override
+    public ProjectDetailResponseDTO getProjectDefault() {
+
+        Account actor = RequestContext.getAccount();
+
+        Project projectDefault = projectRepository.findProjectDefault(actor.getId());
+
+        return projectMapper.toDetailResponse(projectDefault);
     }
 }

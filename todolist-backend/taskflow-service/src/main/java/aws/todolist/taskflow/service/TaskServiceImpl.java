@@ -5,7 +5,6 @@ import aws.todolist.taskflow.context.RequestContext;
 import aws.todolist.taskflow.dto.task.*;
 import aws.todolist.taskflow.entity.*;
 import aws.todolist.taskflow.enums.Priority;
-import aws.todolist.taskflow.enums.Role;
 import aws.todolist.taskflow.enums.Status;
 import aws.todolist.taskflow.enums.StatusMember;
 import aws.todolist.taskflow.exceptions.ProjectException.BadRequestException;
@@ -136,12 +135,6 @@ public class TaskServiceImpl implements TaskService {
             if (member.getStatus() != StatusMember.ACCEPTED) {
                 throw new ForbiddenException(BusinessErrorCode.TASKFLOW_ACCESS_DENIED, "Tài khoản này chưa chấp nhận là thành viên của dự án");
             }
-
-            // Kiểm tra quyền của accountLogging
-            if (member.getRole() == Role.ADMIN || member.getRole() == Role.VIEWER) {
-                throw new ForbiddenException(BusinessErrorCode.TASKFLOW_ACCESS_DENIED, "Tài khoản này không có quyền hoàn thành task");
-            }
-
         }
 
         Task task = Task.builder()
@@ -326,9 +319,8 @@ public class TaskServiceImpl implements TaskService {
 
         // ====== Lấy task ======
         Task task = this.getTaskAndCheck(idTask);
-		
-		
-		
+
+
         // ====== Kiểm tra membership ======
         Member member = memberRepository
                 .findFirstByAccountIdAndProjectIdAndIsDeletedFalse(requestDTO.getIdAccount(), idProject)
@@ -337,11 +329,6 @@ public class TaskServiceImpl implements TaskService {
                         "Tài khoản này không phải là thành viên của dự án"
                 ));
 
-        // ====== Kiểm tra quyền ======
-        if (member.getRole() == Role.ADMIN || member.getRole() == Role.VIEWER) {
-            throw new ForbiddenException(BusinessErrorCode.TASKFLOW_ACCESS_DENIED,
-                    "Tài khoản này không có quyền hoàn thành task");
-        }
 
         // Kiểm tra phân công có bị trùng ko
         if (task.getAccountAssign() == member.getAccount()) {

@@ -1,28 +1,40 @@
 import React, { useEffect, useState } from "react";
-import { Share2, LayoutList, MessageSquare } from "lucide-react";
 import AddTaskModal from "../../component/Modal/AddTaskModal";
-import MainLayout from "../../layout/MainLayout";
 import ProjectHeader from "../../component/Header/ProjectHeader";
 import InlineAddSection from "../../component/Modal/InlineAddSection";
 import SectionItem from "../../component/Section/SectionItem";
-import { useParams } from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import { https_taskflow } from "../../service/api";
 import { message } from "antd";
 import { toast } from "sonner";
+import {useProjectContext} from "../../context/ProjectContext";
 
 export default function ProjectPage() {
   const [showModal, setShowModal] = useState(false);
   const [currentSection, setCurrentSection] = useState(null);
-  const [sections, setSections] = useState([]);
   const [isAddingSection, setIsAddingSection] = useState(false);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [newSectionName, setNewSectionName] = useState("");
-  const { projectName, projectId } = useParams();
+  const { projectId } = useParams();
   const [selectedProject, setSelectedProject] = useState(null);
   const [selectedSection, setSelectedSection] = useState(null);
 
+  const navigate = useNavigate();
+
   // ✅ Thêm Task vào section cụ thể
+
+  const { activeProject, sections, setSections } = useProjectContext();
+
+
+
+  useEffect(() => {
+    if (activeProject === null) {
+      navigate("/app/archive");
+    }
+  }, [activeProject]);
+
+
 
   useEffect(() => {
     const fetchSections = async () => {
@@ -36,7 +48,7 @@ export default function ProjectPage() {
         if (res.data?.status === 200 && Array.isArray(res.data.data)) {
           setSections(res.data.data);
 
-          console.log("sections: ", sections);
+          // console.log("sections: ", sections);
         } else {
           console.warn("API không trả về mảng hợp lệ:", res.data);
           setSections([]); // fallback để tránh lỗi .map
@@ -135,23 +147,15 @@ export default function ProjectPage() {
 
     try {
       // ✅ Gọi API POST tới /v1/projects/:id/sections
-      const res = await https_taskflow.post(
+      await https_taskflow.post(
         `/v1/projects/${projectId}/sections`,
         {
           name: newSectionName, // payload gửi lên backend
         }
       );
 
-      if (res.data?.status === 200 || res.status === 200) {
-        const newSection = res.data.data; // lấy section mới từ API response
+      toast.success("Section added");
 
-        // ✅ Cập nhật lại danh sách section trong UI
-        setSections((prev) => [...prev, newSection]);
-
-        toast.success("Section added");
-      } else {
-        console.warn("⚠️ API không trả về thành công:", res);
-      }
     } catch (error) {
       toast.error("Lỗi khi thêm section");
     } finally {
@@ -190,40 +194,29 @@ export default function ProjectPage() {
   };
 
   const handleSaveEdit = async (sectionId, newName, projectId) => {
-    console.log("newName: ", newName);
-    console.log("projectId: ", projectId.projectId);
-    console.log("sectionId: ", sectionId);
+    // console.log("newName: ", newName);
+    // console.log("projectId: ", projectId.projectId);
+    // console.log("sectionId: ", sectionId);
 
     try {
       const res = await https_taskflow.patch(
-        `/v1/project/${projectId.projectId}/sections/${sectionId}/update-name`,
+        `/v1/projects/${projectId.projectId}/sections/${sectionId}/update-name`,
         {
           name: newName,
         }
       );
-
-      if (res.status === 200) {
-        setSections((prev) =>
-          prev.map((s) => (s.id === sectionId ? { ...s, name: newName } : s))
-        );
-      }
     } catch (err) {
       toast.error("Lỗi update section:", err);
     }
   };
   const handleDeleteSection = async (sectionId) => {
     try {
-      const res = await https_taskflow.delete(
+      await https_taskflow.delete(
         `/v1/projects/${projectId}/sections/${sectionId}`
       );
 
-      if (res.status === 200) {
-        // Xóa ngay trong UI
-        setSections((prev) => prev.filter((sec) => sec.id !== sectionId));
-        toast.success("Section deleted successfully!");
-      } else {
-        toast.error("Failed to delete section!");
-      }
+      toast.success("Section deleted successfully!");
+
     } catch (err) {
       console.error("❌ Error deleting section:", err);
       toast.error("Error deleting section!");
@@ -238,7 +231,7 @@ export default function ProjectPage() {
 
         {/* MAIN CONTENT */}
         <main className="px-10 py-6">
-          <h1 className="text-2xl font-bold mb-4">{projectName}</h1>
+          <h1 className="text-2xl font-bold mb-4">{activeProject?.name}</h1>
 
           {/* Section list */}
 
@@ -277,8 +270,8 @@ export default function ProjectPage() {
           }}
           onAdd={handleAddTask}
           onSelectProjectSection={(data) => {
-            console.log("📌 PROJECT:", data.projectId);
-            console.log("📌 SECTION:", data.sectionId);
+            // console.log("📌 PROJECT:", data.projectId);
+            // console.log("📌 SECTION:", data.sectionId);
 
             setSelectedProject(data.projectId);
             setSelectedSection(data.sectionId);

@@ -5,10 +5,11 @@ import { useNavigate } from "react-router-dom";
 import Spinner from "../../component/Spinner/Spinner";
 import NotificationItem from "../../component/Notification/NotificationItem";
 import {useAppContext} from "../../layout/MainLayout";
+import {useNotificationContext} from "../../context/NotificationContext";
 
 
 export default function NotificationsPage() {
-    const { notifications, setNotifications, setCountNotificationsUnRead, countNotificationsUnRead, totalPagesNotification, setTotalPagesNotification, pageSizeNotification, pageNumberNotification, setPageNumberNotification } = useAppContext();
+    const { notifications, setNotifications, setCountNotificationsUnRead, countNotificationsUnRead, totalPagesNotification, setTotalPagesNotification, pageSizeNotification, pageNumberNotification, setPageNumberNotification } = useNotificationContext();
     const [tab, setTab] = useState("All"); // default là Unread
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();

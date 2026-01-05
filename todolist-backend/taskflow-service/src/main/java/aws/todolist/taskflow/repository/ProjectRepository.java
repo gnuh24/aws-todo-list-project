@@ -36,7 +36,7 @@ public interface ProjectRepository extends JpaRepository<Project, String>, JpaSp
                   AND p.isDefault = true
                   AND m.status = ACCEPTED  
             """)
-    Project findProjectIsDefault(@Param("accountId") String accountId);
+    Project findProjectDefault(@Param("accountId") String accountId);
 
 
 }

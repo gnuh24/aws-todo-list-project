@@ -43,10 +43,22 @@ public class ProjectController {
 
     }
 
+    @Operation(summary = "Lấy project default", description = "Lấy danh sách các project theo id của người dùng")
+    @GetMapping("/project-default")
+    public ResponseEntity<ApiResponse<ProjectDetailResponseDTO>> GetProjectDefault() {
+
+        ProjectDetailResponseDTO Project = projectService.getProjectDefault();
+
+        ApiResponse<ProjectDetailResponseDTO> response = new ApiResponse<>(200, "Dự án mặc định được lấy thành công", Project);
+
+        return ResponseEntity.ok(response);
+
+    }
+
 
     @Operation(summary = "Lấy thông tin chi tiết của project", description = "Lấy toàn bộ thông tin chi tiết của project")
     @GetMapping("/projects/{id}")
-    @RequireProjectRole({Role.OWNER, Role.ADMIN, Role.MEMBER, Role.VIEWER})
+    @RequireProjectRole({Role.OWNER, Role.MEMBER})
     public ResponseEntity<ApiResponse<ProjectDetailResponseDTO>> GetProjectByID(@PathVariable("id") String projectID) {
 
         ProjectDetailResponseDTO project = projectService.getProjectById(projectID);
