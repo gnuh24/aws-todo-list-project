@@ -22,7 +22,7 @@ public class CommentAttachController {
 
     @Operation(summary = "Xóa comment attach", description = "Xóa comment attach")
     @DeleteMapping("/{idProject}/deleteCommentAttach")
-    @RequireProjectRole({Role.OWNER, Role.MEMBER, Role.ADMIN, Role.VIEWER})
+    @RequireProjectRole({Role.OWNER, Role.MEMBER})
     public ResponseEntity<ApiResponse<CommentAttachResponse>> addNewComment(@PathVariable("idProject") String idProject, @RequestParam("fileUrl") String fileUrl) {
 
         CommentAttachResponse commentAttachResponse = commentAttachService.deleteCommentAttach(fileUrl);

@@ -276,9 +276,12 @@ export default function CommentSection({ isOpenComment, comments, setTaskDetail,
                                 <div className="flex-1">
                                     {showEditForm !== c.id ? (
                                         <div
-                                            className="relative rounded-lg px-5 pb-4 shadow-sm bg-white group"
+                                            className={`relative rounded-lg px-5 pb-4 shadow-sm group
+                                                ${isMe ? "bg-blue-50" : "bg-white"}
+                                            `}
                                         >
-                                            <div className="text-sm font-semibold text-gray-600 mb-1">{c.authorName}</div>
+
+                                        <div className="text-sm font-semibold text-gray-600 mb-1">{c.authorName}</div>
                                             <div className="text-xs text-gray-600 mb-1">{dayjs(c.updatedAt).format(formatToDisplay)}</div>
                                             <div className="text-sm text-gray-700 whitespace-pre-line pt-3">{c.comment}</div>
                                             {!!c.commentAttach?.length && <CommentAttachItem commentAttach={c.commentAttach} onDeleteCommentAttach={deleteCommentAttach} />}
@@ -364,7 +367,7 @@ export default function CommentSection({ isOpenComment, comments, setTaskDetail,
                 {!isExpanded && (
                     <div className="w-full flex items-center gap-2">
 
-                        <AvatarCircle avatar={auth.avatar} name={auth.name} size={36} />
+                        <AvatarCircle avatar={auth.avatar} name={auth.displayName} size={36} />
 
                         <div className="flex-1 flex items-center gap-2 border rounded-full px-3 py-2 hover:bg-gray-100" onClick={() => {
                             setIsExpanded(true)

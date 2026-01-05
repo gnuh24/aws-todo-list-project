@@ -69,7 +69,7 @@ CREATE TABLE `member` (
     `id`                CHAR(36) PRIMARY KEY,
     `project_id`        CHAR(36) NOT NULL,
     `account_id`        CHAR(36) NOT NULL,
-    `role`              ENUM('OWNER', 'ADMIN', 'MEMBER', 'VIEWER') NOT NULL,
+    `role`              ENUM('OWNER', 'MEMBER') NOT NULL,
 
     `created_at`        TIMESTAMP NOT NULL,
     `updated_at`        TIMESTAMP NOT NULL,

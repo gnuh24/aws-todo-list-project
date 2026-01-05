@@ -38,7 +38,7 @@ public interface MemberMapper {
         payload.setProjectId(member.getProject().getId()); // rất quan trọng để route WS
         payload.setActor(actor);
         payload.setReceivers(receivers);
-        payload.setMemberEventDto(toEventDto(member));
+        payload.setMember(toEventDto(member));
 
         return payload;
     }

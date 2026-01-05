@@ -58,7 +58,7 @@ public class ProjectController {
 
     @Operation(summary = "Lấy thông tin chi tiết của project", description = "Lấy toàn bộ thông tin chi tiết của project")
     @GetMapping("/projects/{id}")
-    @RequireProjectRole({Role.OWNER, Role.ADMIN, Role.MEMBER, Role.VIEWER})
+    @RequireProjectRole({Role.OWNER, Role.MEMBER})
     public ResponseEntity<ApiResponse<ProjectDetailResponseDTO>> GetProjectByID(@PathVariable("id") String projectID) {
 
         ProjectDetailResponseDTO project = projectService.getProjectById(projectID);

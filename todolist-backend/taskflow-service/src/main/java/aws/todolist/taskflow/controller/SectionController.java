@@ -30,7 +30,7 @@ public class SectionController {
 
     @Operation(summary = "Lấy danh sách section của project", description = "Dùng id client cung cấp để lấy danh sách section")
     @GetMapping("/{idProject}/sections")
-    @RequireProjectRole({Role.OWNER, Role.ADMIN, Role.MEMBER, Role.VIEWER})
+    @RequireProjectRole({Role.OWNER, Role.MEMBER})
     public ResponseEntity<ApiResponse<List<SectionResponseDTO>>> getSectionByIdProject(@PathVariable("idProject") String id) {
         List<SectionResponseDTO> sections = sectionService.getAllSection(id);
 
