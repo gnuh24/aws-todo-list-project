@@ -1,133 +1,226 @@
 import React, { useState } from "react";
-import { Modal, Input, Button, Dropdown } from "antd";
-import {CalendarOutlined, BellOutlined, ClockCircleOutlined} from "@ant-design/icons";
+import {
+    Modal,
+    Input,
+    Button,
+    Dropdown,
+    Switch,
+    Tag,
+} from "antd";
+import {
+    CalendarOutlined,
+    ClockCircleOutlined,
+    PushpinOutlined,
+    UserOutlined,
+    LinkOutlined,
+} from "@ant-design/icons";
+import dayjs from "dayjs";
 
 import DatePickerDropdown from "../Dropdown/DatePickerDropdown";
 import PriorityDropdown from "../Dropdown/PriorityDropdown";
 import MoreOptionsDropdown from "../Dropdown/MoreOptionsDropdown";
 import ProjectSelectDropdown from "../Dropdown/ProjectSelectDropdown";
+import MemberDropdown from "../Dropdown/MemberDropdown";
 
 export default function AddTaskModal({
-  onSelectProjectSection,
-  open,
-  onCancel,
-  onAdd,
+    open,
+    onCancel,
+    onAdd,
+    onSelectProjectSection,
+    parentTask, // ✅ NEW (optional)
 }) {
-  const [taskName, setTaskName] = useState("");
-  const [description, setDescription] = useState("");
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [priority, setPriority] = useState("LOW");
-  const [selectedStartTime, setSelectedStartTime] = useState(null);
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
 
-  // -------------------------
-  // NEW: selected lưu cả object
-  // -------------------------
-  const [selectedProject, setSelectedProject] = useState({
-    projectId: null,
-    projectName: "Inbox",
-    sectionId: null,
-    sectionName: null,
-  });
+    const [priority, setPriority] = useState("LOW");
+    const [startTime, setStartTime] = useState(null);
+    const [deadline, setDeadline] = useState(null);
 
-  return (
-    <Modal
-      open={open}
-      onCancel={onCancel}
-      footer={null}
-      centered
-      width={550}
-      className="rounded-xl"
-    >
-      <div className="flex flex-col gap-3">
-        {/* Task title */}
-        <Input
-          placeholder="Practice math problems daily at 4pm"
-          value={taskName}
-          onChange={(e) => setTaskName(e.target.value)}
-          className="border-none text-[15px] font-medium focus:shadow-none"
-        />
+    const [isPinned, setIsPinned] = useState(false);
+    const [isArchived, setIsArchived] = useState(false);
 
-        {/* Description */}
-        <Input.TextArea
-          placeholder="Description"
-          autoSize={{ minRows: 1, maxRows: 3 }}
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          className="border-none text-[13px] text-gray-500 focus:shadow-none"
-        />
+    const [assigneeId, setAssigneeId] = useState(null);
+    const [openMemberDropdown, setOpenMemberDropdown] = useState(false);
 
-          {selectedDate && (
-              <div className="text-[13px] text-gray-600 mb-2 flex items-center gap-1">
-                  <ClockCircleOutlined className="text-orange-500" />
-                  <span className="text-orange-500">Deadline: {selectedDate ? selectedDate.format("DD/MM/YYYY") : ""}</span>
-              </div>
-          )}
+    const [selectedProject, setSelectedProject] = useState({
+        projectId: null,
+        projectName: "Inbox",
+        sectionId: null,
+        sectionName: null,
+    });
 
-        {/* Buttons row */}
-        <div className="flex items-center gap-2">
-          <Dropdown
-            trigger={["click"]}
-            dropdownRender={() => (
-              <DatePickerDropdown
-                onSelect={(value) => setSelectedStartTime(value)}
-              />
-            )}
-          >
-            <Button icon={<CalendarOutlined />} size="small">
-              {selectedStartTime? selectedStartTime.format("DD/MM/YYYY") : "Start time"}
-            </Button>
-          </Dropdown>
+    const resetForm = () => {
+        setTitle("");
+        setDescription("");
+        setPriority("LOW");
+        setStartTime(null);
+        setDeadline(null);
+        setIsPinned(false);
+        setIsArchived(false);
+        setAssigneeId(null);
+    };
 
-          <PriorityDropdown
-              priority={priority}
-            onSelect={setPriority}
-          />
+    const handleSubmit = () => {
+        const newTask = {
+            title: title.trim(),
+            description: description || "",
+            priority,
+            startTime: startTime ? dayjs(startTime).toISOString() : null,
+            deadline: deadline ? dayjs(deadline).toISOString() : null,
+            idAccountAssign: assigneeId,
+            taskFatherId: parentTask?.id || null, // ✅ IMPORTANT
+            isPinned,
+            isArchived,
+        };
 
-          <MoreOptionsDropdown
-            setSelectedDateline={setSelectedDate} onSelect={(action) => console.log("Chọn:", action)}
-          />
-        </div>
+        onAdd(newTask);
+        resetForm();
+    };
 
-        <hr />
+    return (
+        <Modal
+            open={open}
+            onCancel={onCancel}
+            footer={null}
+            centered
+            width={600}
+        >
+            <div className="flex flex-col gap-3">
 
-        {/* Bottom section */}
-        <div className="flex justify-between items-center">
-          <ProjectSelectDropdown
-            selected={selectedProject}
-            onSelect={(data) => {
-              // data = { projectId, projectName, sectionId, sectionName }
-              setSelectedProject(data);
-              onSelectProjectSection?.(data);
-            }}
-          />
+                {/* Parent Task display */}
+                {parentTask && (
+                    <div className="text-xs text-gray-600 flex items-center gap-2">
+                        <LinkOutlined />
+                        <span className="font-medium">Parent task:</span>
+                        <Tag color="blue">{parentTask.title}</Tag>
+                    </div>
+                )}
 
-          <div className="flex gap-2">
-            <Button onClick={onCancel}>Cancel</Button>
-            <Button
-              type="primary"
-              danger
-              disabled={!taskName.trim()}
-              onClick={() => {
-                onAdd({
-                  title: taskName,
-                  description,
-                  deadline: selectedDate,
-                  project: selectedProject,
-                    priority: priority,
-                    startTime: selectedStartTime,
-                });
-console.log("Selected:", selectedDate);
+                {/* Title */}
+                <Input
+                    placeholder="Task title"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className="border-none text-[15px] font-medium"
+                />
 
-                setTaskName("");
-                setDescription("");
-                setSelectedDate(null);
-              }}
-            >
-              Add task
-            </Button>
-          </div>
-        </div>
-      </div>
-    </Modal>
-  );
+                {/* Description */}
+                <Input.TextArea
+                    placeholder="Description"
+                    autoSize={{ minRows: 2, maxRows: 4 }}
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                />
+
+                {/* Time preview */}
+                {(startTime || deadline) && (
+                    <div className="text-[13px] text-gray-600 flex gap-4">
+                        {startTime && (
+                            <span>
+                                ⏱ Start: {dayjs(startTime).format("DD/MM/YYYY HH:mm")}
+                            </span>
+                        )}
+                        {deadline && (
+                            <span className="text-orange-500">
+                                ⏰ Deadline: {dayjs(deadline).format("DD/MM/YYYY HH:mm")}
+                            </span>
+                        )}
+                    </div>
+                )}
+
+                {/* Actions */}
+                <div className="flex items-center gap-2 flex-wrap relative">
+                    <Dropdown
+                        trigger={["click"]}
+                        dropdownRender={() => (
+                            <DatePickerDropdown onSelect={setStartTime} />
+                        )}
+                    >
+                        <Button icon={<CalendarOutlined />}>Start time</Button>
+                    </Dropdown>
+
+
+                    <Dropdown
+                        trigger={["click"]}
+                        dropdownRender={() => (
+                            <DatePickerDropdown onSelect={setDeadline} />
+                        )}
+                    >
+                        <Button icon={<CalendarOutlined />}>Deadline</Button>
+                    </Dropdown>
+
+                    <PriorityDropdown
+                        priority={priority}
+                        onSelect={setPriority}
+                    />
+
+                    <Button
+                        icon={<PushpinOutlined />}
+                        type={isPinned ? "primary" : "default"}
+                        onClick={() => setIsPinned(!isPinned)}
+                    >
+                        Pin
+                    </Button>
+
+                    {/* Assignee */}
+                    <div className="relative">
+                        <Button
+                            icon={<UserOutlined />}
+                            onClick={() => setOpenMemberDropdown(prev => !prev)}
+                        >
+                            Assign
+                        </Button>
+
+                        <MemberDropdown
+                            open={openMemberDropdown}
+                            taskDetail={{
+                                idProject: selectedProject.projectId,
+                                accountAssign: assigneeId
+                                    ? { id: assigneeId }
+                                    : null,
+                            }}
+                            onAssign={setAssigneeId}
+                            onClose={() => setOpenMemberDropdown(false)}
+                        />
+                    </div>
+                </div>
+
+                <hr />
+
+                {/* Bottom */}
+                <div className="flex justify-between items-center">
+                    {/* ✅ Hide when parentTask exists */}
+                    {!parentTask && (
+                        <ProjectSelectDropdown
+                            selected={selectedProject}
+                            onSelect={(data) => {
+                                setSelectedProject(data);
+                                onSelectProjectSection?.(data);
+                            }}
+                        />
+                    )}
+
+                    <div className="flex items-center gap-3 ml-auto">
+                        <span className="text-xs">Archive</span>
+                        <Switch
+                            checked={isArchived}
+                            onChange={setIsArchived}
+                        />
+
+                        <Button onClick={onCancel}>Cancel</Button>
+                        <Button
+                            type="primary"
+                            danger
+                            disabled={!title.trim()}
+                            onClick={handleSubmit}
+                        >
+                            Add task
+                        </Button>
+                    </div>
+                </div>
+
+
+            </div>
+        </Modal>
+    );
 }

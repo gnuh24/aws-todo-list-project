@@ -1,7 +1,7 @@
 import {
     LockOutlined
 } from "@ant-design/icons";
-import { Modal } from "antd";
+import { Modal, Button } from "antd";
 import { useState, useEffect } from "react";
 import { https_taskflow } from "../../service/api";
 import CommentSection from "../TaskComment/CommentSection";
@@ -16,6 +16,8 @@ import { EditOutlined } from "@ant-design/icons";
 import DateHelper from "../../helpers/DateHelper";
 import TaskHelper from "../../helpers/TaskHelper";
 import AvatarCircle from "../Content/AvatarCircle";
+import { PlusOutlined } from "@ant-design/icons";
+import AddTaskModal from "./AddTaskModal"; // adjust path if needed
 
 export default function TaskDetailModal({
     isOpenComment,
@@ -45,6 +47,9 @@ export default function TaskDetailModal({
     const [memberDropdownOpen, setMemberDropdownOpen] = useState(false);
     const [projectDropdownOpen, setProjectDropdownOpen] = useState(false);
 
+    const [showAddChildModal, setShowAddChildModal] = useState(false);
+    const [parentTask, setParentTask] = useState(null);
+
 
     // ╔══════════════════════════════════════╗
     // ║           🔄 Task Navigation         ║
@@ -62,127 +67,6 @@ export default function TaskDetailModal({
         setTaskStack(stack => stack.slice(0, -1));
         setCurrentTaskId(prev.id); // 🔥 trigger API again
     };
-
-
-
-
-    // ╔══════════════════════════════════════╗
-    // ║        📝 Comment Update Helpers     ║
-    // ╚══════════════════════════════════════╝
-
-
-    const handleComment = async (newComment, attachments) => {
-        try {
-            const response = await https_taskflow.post(`/v1/projects/${task.idProject}/tasks/${task.id}/comments`, {
-                comment: newComment,
-                urls: attachments
-            })
-
-            if (response.status === 200) {
-                const taskDetailNew = { ...taskDetail, comments: [...taskDetail.comments, response.data.data] };
-                setTaskDetail(taskDetailNew);
-            }
-
-
-        } catch (err) {
-            // Kiểm tra xem server có trả lỗi dạng JSON không
-            if (err.response && err.response.data) {
-                const msg = err.response.data.message || err.response.data.detailMessage || "Đã xảy ra lỗi không xác định";
-                toast.error(msg);
-            } else {
-                toast.info("Không thể kết nối đến server. Vui lòng thử lại.");
-            }
-        }
-    };
-
-    const onUpdateComment = async (newComment, idComment) => {
-        if (!newComment.trim()) return;
-        try {
-            const res = await https_taskflow.patch(
-                `/v1/projects/${task.idProject}/tasks/comments/${idComment}`,
-                { comment: newComment }
-            );
-
-            if (res.status === 200) {
-                const commentUpdated = res.data.data;
-                const updatedComments = taskDetail.comments.map(comment =>
-                    comment.id === commentUpdated.id ? commentUpdated : comment
-                );
-                setTaskDetail(prev => ({ ...prev, comments: updatedComments }));
-            }
-        } catch (err) {
-            // Kiểm tra xem server có trả lỗi dạng JSON không
-            if (err.response && err.response.data) {
-                const msg = err.response.data.message || err.response.data.detailMessage || "Đã xảy ra lỗi không xác định";
-                toast.error(msg);
-            } else {
-                toast.info("Không thể kết nối đến server. Vui lòng thử lại.");
-            }
-        }
-    };
-
-
-    const onDeleteComment = async (idComment) => {
-        try {
-            const res = await https_taskflow.delete(
-                `/v1/projects/${task.idProject}/tasks/comments/${idComment}`
-            );
-
-            if (res.status === 200) {
-                const commentDeleted = res.data.data;
-                const updatedComments = (taskDetail.comments || []).filter(
-                    comment => comment.id !== commentDeleted.id
-                );
-                setTaskDetail(prev => ({ ...prev, comments: updatedComments }));
-            }
-        } catch (err) {
-            // Kiểm tra xem server có trả lỗi dạng JSON không
-            if (err.response && err.response.data) {
-                const msg = err.response.data.message || err.response.data.detailMessage || "Đã xảy ra lỗi không xác định";
-                toast.error(msg);
-            } else {
-                toast.info("Không thể kết nối đến server. Vui lòng thử lại.");
-            }
-        }
-    }
-
-    const onDeleteCommentAttach = async (url) => {
-        try {
-            const res = await https_taskflow.delete(
-                `/v1/projects/${task.idProject}/deleteCommentAttach`, {
-                params: {
-                    fileUrl: url
-                }
-            }
-            );
-
-            if (res.status === 200) {
-                const commentAttachDeleted = res.data.data;
-                const updatedComments = (taskDetail.comments || []).map(comment => {
-                    // nếu đây là comment chứa attachment vừa xóa
-                    if (comment.id === commentAttachDeleted.taskCommentId) {
-                        return {
-                            ...comment,
-                            commentAttach: (comment.commentAttach || []).filter(
-                                att => att.id !== commentAttachDeleted.id
-                            )
-                        };
-                    }
-                    return comment;
-                });
-                setTaskDetail(prev => ({ ...prev, comments: updatedComments }));
-            }
-        } catch (err) {
-            // Kiểm tra xem server có trả lỗi dạng JSON không
-            if (err.response && err.response.data) {
-                const msg = err.response.data.message || err.response.data.detailMessage || "Đã xảy ra lỗi không xác định";
-                toast.error(msg);
-            } else {
-                toast.info("Không thể kết nối đến server. Vui lòng thử lại.");
-            }
-        }
-    }
-
 
 
     // ╔══════════════════════════════════════╗
@@ -310,6 +194,36 @@ export default function TaskDetailModal({
             );
         }
     };
+
+    const handleAddTask = async (newTask) => {
+        try {
+            const res = await https_taskflow.post(
+                `/v1/projects/${taskDetail.idProject}/tasks`,
+                {
+                    ...newTask,
+                    sectionId: taskDetail.idSection, // ✅ inherit parent section
+                }
+            );
+
+            if (res.status === 200 && res.data?.data) {
+                const createdTask = res.data.data;
+
+                // 🔥 Append child task immediately
+                setTaskDetail(prev => ({
+                    ...prev,
+                    taskChild: [...(prev.taskChild || []), createdTask],
+                }));
+
+                toast.success("Subtask created successfully");
+            }
+        } catch (err) {
+            toast.error("Failed to create subtask");
+        } finally {
+            setShowAddChildModal(false);
+            setParentTask(null);
+        }
+    };
+
 
 
 
@@ -488,16 +402,38 @@ export default function TaskDetailModal({
                             </div>
                         )}
 
+                        <Button
+                            type="dashed"
+                            icon={<PlusOutlined />}
+                            onClick={() => {
+                                setParentTask(taskDetail);
+                                setShowAddChildModal(true);
+                            }}
+                        >
+                            Add Children Task
+                        </Button>
+
+                        <AddTaskModal
+                            open={showAddChildModal}
+                            parentTask={parentTask}
+                            onCancel={() => {
+                                setShowAddChildModal(false);
+                                setParentTask(null);
+                            }}
+                            onAdd={handleAddTask}
+                        />
+
+
 
                         {/* Comment Box */}
-                        {/* 
+
                         <CommentSection
                             isOpenComment={isOpenComment}
                             comments={taskDetail?.comments ?? []}
                             setTaskDetail={setTaskDetail}
                             taskDetail={taskDetail}
-                        /> 
-                        */}
+                        />
+
 
 
                     </div>
@@ -716,19 +652,6 @@ export default function TaskDetailModal({
                         {/* Labels with dropdown */}
                         <LabelsSection taskDetail={taskDetail}></LabelsSection>
 
-                        {/*/!* Reminders *!/*/}
-                        {/*<SidebarItem*/}
-                        {/*    label="Reminders"*/}
-                        {/*    value="+"*/}
-                        {/*    onClick={() => console.log("Reminders")}*/}
-                        {/*/>*/}
-
-                        {/*/!* Location *!/*/}
-                        {/*<SidebarItem*/}
-                        {/*    label="Location"*/}
-                        {/*    icon={<LockOutlined />}*/}
-                        {/*    onClick={() => console.log("Location locked")}*/}
-                        {/*/>*/}
                     </div>
                 </div>
             )
