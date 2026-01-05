@@ -10,10 +10,11 @@ import {handleProjectEvent} from "./handlers/project.handler";
 import {handleMemberEvent} from "./handlers/member.handler";
 import {useNavigate} from "react-router-dom";
 import {handleSectionEvent} from "./handlers/section.handler";
+import {handleTaskEvent} from "./handlers/task.handler";
 
 export function WebSocketClient() {
 
-    const { setProjects, activeProject, setActiveProject, setMembers, setSections } = useProjectContext();
+    const { setProjects, activeProject, setActiveProject, setMembers, setSections, taskDetail, setTaskDetail } = useProjectContext();
 
 
     const navigate = useNavigate();
@@ -28,6 +29,8 @@ export function WebSocketClient() {
     } = useNotificationContext();
 
     const token = JSON.parse(localStorage.getItem("USER_INFO"))?.token;
+
+    const actorId = JSON.parse(localStorage.getItem("USER_INFO"))?.id;
 
     const stompClientRef = useRef(null);
     const projectSubscriptionsRef = useRef([]);
@@ -97,9 +100,11 @@ export function WebSocketClient() {
                     leaveProject();
                 }
             }),
-            client.subscribe(`/topic/project/${activeProject.id}/task`, (m) =>
+            client.subscribe(`/topic/project/${activeProject.id}/task`, (m) => {
                 console.log("📌 task", m.body)
-            ),
+
+                handleTaskEvent(JSON.parse(m.body), {activeProject, setSections, taskDetail, setTaskDetail, actorId});
+            }),
             client.subscribe(`/topic/project/${activeProject.id}/section`, (m) => {
                 // console.log("📌 section", m.body)
 

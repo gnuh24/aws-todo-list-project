@@ -5,15 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5bf172b3-cf86-483d-8669-161bc88dbf13" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../notification-service/src/main/java/aws/todolist/notification/dto/eventTaskflow/payload/MemberPayload.java" beforeDir="false" afterPath="$PROJECT_DIR$/../notification-service/src/main/java/aws/todolist/notification/dto/eventTaskflow/payload/MemberPayload.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../notification-service/src/main/java/aws/todolist/notification/dto/eventTaskflow/dto/TaskEventDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/../notification-service/src/main/java/aws/todolist/notification/dto/eventTaskflow/dto/TaskEventDto.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../taskflow-service/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/dto/event/payload/MemberPayload.java" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/dto/event/payload/MemberPayload.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/mapper/TaskMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/mapper/TaskMapper.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/dto/taskflow/payload/MemberPayload.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/dto/taskflow/payload/MemberPayload.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/component/Section/SectionItem.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/component/Section/SectionItem.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/context/ProjectContext.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/context/ProjectContext.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/pages/AppPage/ProjectPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/pages/AppPage/ProjectPage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/pages/AppPage/UnArchivePgae.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/pages/AppPage/UnArchivePgae.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/dto/taskflow/dto/TaskEventDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/dto/taskflow/dto/TaskEventDto.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/websocket/WebSocketClient.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/websocket/WebSocketClient.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -37,8 +33,9 @@
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
     &quot;Application.WebSocketServiceApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Application.websocket.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;kiên&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;developer&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;D:/Worker/FCJ/To-doList/aws-todo-list-project/todolist-backend/websocket-service&quot;
   }

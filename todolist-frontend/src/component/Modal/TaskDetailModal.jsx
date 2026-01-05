@@ -16,22 +16,26 @@ import { EditOutlined } from "@ant-design/icons";
 import DateHelper from "../../helpers/DateHelper";
 import TaskHelper from "../../helpers/TaskHelper";
 import AvatarCircle from "../Content/AvatarCircle";
+import {useProjectContext} from "../../context/ProjectContext";
+import SpinnerForSettings from "../Spinner/SpinnerLoading";
 
-export default function TaskDetailModal({
-    isOpenComment,
-    openTask,
-    onClose,
-    task,
-    onUpdateStatus,
-}) {
+export default function TaskDetailModal() {
 
+    const {
+        activeTaskId,
+        setActiveTaskId,
+        taskDetail,
+        setTaskDetail,
+        activeProject,
+        taskStack,
+        setTaskStack
+    } = useProjectContext();
 
     // ╔══════════════════════════════════════╗
     // ║             💾 Component State       ║
     // ╚══════════════════════════════════════╝
-    const [taskDetail, setTaskDetail] = useState({});
-    const [taskStack, setTaskStack] = useState([]);
-    const [currentTaskId, setCurrentTaskId] = useState(task?.id);
+
+    const [loading, setLoading] = useState(false);
 
     const [editingTitle, setEditingTitle] = useState(false);
     const [titleDraft, setTitleDraft] = useState(taskDetail.title);
@@ -52,7 +56,7 @@ export default function TaskDetailModal({
 
     const openChildTask = (childTask) => {
         setTaskStack(prev => [...prev, taskDetail]);
-        setCurrentTaskId(childTask.id); // 🔥 trigger API
+        setActiveTaskId(childTask.id); // 🔥 trigger API
     };
 
     const backToParentTask = () => {
@@ -60,128 +64,9 @@ export default function TaskDetailModal({
         if (!prev) return;
 
         setTaskStack(stack => stack.slice(0, -1));
-        setCurrentTaskId(prev.id); // 🔥 trigger API again
+        setActiveTaskId(prev.id);
     };
 
-
-
-
-    // ╔══════════════════════════════════════╗
-    // ║        📝 Comment Update Helpers     ║
-    // ╚══════════════════════════════════════╝
-
-
-    const handleComment = async (newComment, attachments) => {
-        try {
-            const response = await https_taskflow.post(`/v1/projects/${task.idProject}/tasks/${task.id}/comments`, {
-                comment: newComment,
-                urls: attachments
-            })
-
-            if (response.status === 200) {
-                const taskDetailNew = { ...taskDetail, comments: [...taskDetail.comments, response.data.data] };
-                setTaskDetail(taskDetailNew);
-            }
-
-
-        } catch (err) {
-            // Kiểm tra xem server có trả lỗi dạng JSON không
-            if (err.response && err.response.data) {
-                const msg = err.response.data.message || err.response.data.detailMessage || "Đã xảy ra lỗi không xác định";
-                toast.error(msg);
-            } else {
-                toast.info("Không thể kết nối đến server. Vui lòng thử lại.");
-            }
-        }
-    };
-
-    const onUpdateComment = async (newComment, idComment) => {
-        if (!newComment.trim()) return;
-        try {
-            const res = await https_taskflow.patch(
-                `/v1/projects/${task.idProject}/tasks/comments/${idComment}`,
-                { comment: newComment }
-            );
-
-            if (res.status === 200) {
-                const commentUpdated = res.data.data;
-                const updatedComments = taskDetail.comments.map(comment =>
-                    comment.id === commentUpdated.id ? commentUpdated : comment
-                );
-                setTaskDetail(prev => ({ ...prev, comments: updatedComments }));
-            }
-        } catch (err) {
-            // Kiểm tra xem server có trả lỗi dạng JSON không
-            if (err.response && err.response.data) {
-                const msg = err.response.data.message || err.response.data.detailMessage || "Đã xảy ra lỗi không xác định";
-                toast.error(msg);
-            } else {
-                toast.info("Không thể kết nối đến server. Vui lòng thử lại.");
-            }
-        }
-    };
-
-
-    const onDeleteComment = async (idComment) => {
-        try {
-            const res = await https_taskflow.delete(
-                `/v1/projects/${task.idProject}/tasks/comments/${idComment}`
-            );
-
-            if (res.status === 200) {
-                const commentDeleted = res.data.data;
-                const updatedComments = (taskDetail.comments || []).filter(
-                    comment => comment.id !== commentDeleted.id
-                );
-                setTaskDetail(prev => ({ ...prev, comments: updatedComments }));
-            }
-        } catch (err) {
-            // Kiểm tra xem server có trả lỗi dạng JSON không
-            if (err.response && err.response.data) {
-                const msg = err.response.data.message || err.response.data.detailMessage || "Đã xảy ra lỗi không xác định";
-                toast.error(msg);
-            } else {
-                toast.info("Không thể kết nối đến server. Vui lòng thử lại.");
-            }
-        }
-    }
-
-    const onDeleteCommentAttach = async (url) => {
-        try {
-            const res = await https_taskflow.delete(
-                `/v1/projects/${task.idProject}/deleteCommentAttach`, {
-                params: {
-                    fileUrl: url
-                }
-            }
-            );
-
-            if (res.status === 200) {
-                const commentAttachDeleted = res.data.data;
-                const updatedComments = (taskDetail.comments || []).map(comment => {
-                    // nếu đây là comment chứa attachment vừa xóa
-                    if (comment.id === commentAttachDeleted.taskCommentId) {
-                        return {
-                            ...comment,
-                            commentAttach: (comment.commentAttach || []).filter(
-                                att => att.id !== commentAttachDeleted.id
-                            )
-                        };
-                    }
-                    return comment;
-                });
-                setTaskDetail(prev => ({ ...prev, comments: updatedComments }));
-            }
-        } catch (err) {
-            // Kiểm tra xem server có trả lỗi dạng JSON không
-            if (err.response && err.response.data) {
-                const msg = err.response.data.message || err.response.data.detailMessage || "Đã xảy ra lỗi không xác định";
-                toast.error(msg);
-            } else {
-                toast.info("Không thể kết nối đến server. Vui lòng thử lại.");
-            }
-        }
-    }
 
 
 
@@ -205,7 +90,7 @@ export default function TaskDetailModal({
     const onUpdatePriority = async (newPriority) => {
         try {
             const res = await https_taskflow.patch(
-                `/v1/projects/${task.idProject}/tasks/${task.id}/update-priority`, {
+                `/v1/projects/${activeProject.id}/tasks/${activeTaskId}/update-priority`, {
                 priority: newPriority
             }
             );
@@ -248,7 +133,7 @@ export default function TaskDetailModal({
         try {
 
             const res = await https_taskflow.patch(
-                `/v1/projects/${projectId}/tasks/${task.id}/update-section`,
+                `/v1/projects/${projectId}/tasks/${activeTaskId}/update-section`,
                 { idSection: sectionId }
             );
 
@@ -311,6 +196,28 @@ export default function TaskDetailModal({
         }
     };
 
+    const onUpdateStatus = async (newStatus) => {
+        try {
+            const res = await https_taskflow.patch(
+                `/v1/projects/${activeProject.id}/tasks/${activeTaskId}/update-status`,
+                { status: newStatus }
+            );
+
+            if (res.status === 200) {
+                setTaskDetail(prev => ({
+                    ...prev,
+                    status: newStatus
+                }));
+                return true;
+            }
+            return false;
+        } catch (err) {
+            toast.error("Failed to update task status");
+            return false;
+        }
+    };
+
+
 
 
     // ╔══════════════════════════════════════╗
@@ -318,25 +225,45 @@ export default function TaskDetailModal({
     // ╚══════════════════════════════════════╝
 
     useEffect(() => {
-        if (!currentTaskId) return;
+        if (!activeTaskId || !activeProject) return;
+
+        let cancelled = false;
 
         const getDetails = async () => {
-            try {
-                const response = await https_taskflow.get(
-                    `/v1/projects/${task.idProject}/tasks/${currentTaskId}`
-                );
 
-                // console.log(response.data.data);
+            const start = Date.now();
+
+            try {
+                setLoading(true);
+                setTaskDetail({});
+
+
+                const response = await https_taskflow.get(
+                    `/v1/projects/${activeProject.id}/tasks/${activeTaskId}`
+                );
 
                 setTaskDetail(TaskHelper.normalizeTask(response.data.data));
             } catch (error) {
                 console.log(error);
                 toast.error("Failed to load task detail");
+            } finally {
+                const elapsed = Date.now() - start;
+                const MIN_LOADING_TIME = 200;
+
+                const remaining = MIN_LOADING_TIME - elapsed;
+
+                if (remaining > 0) {
+                    setTimeout(() => {
+                        if (!cancelled) setLoading(false);
+                    }, remaining);
+                } else {
+                    if (!cancelled) setLoading(false);
+                }
             }
         };
 
         getDetails();
-    }, [currentTaskId]);
+    }, [activeTaskId, activeProject]);
 
 
 
@@ -349,35 +276,30 @@ export default function TaskDetailModal({
         }
     }, [taskDetail.title, taskDetail.description]);
 
-
-
-    useEffect(() => {
-        if (task?.id) {
-            setCurrentTaskId(task.id);
-            setTaskStack([]); // reset navigation stack when opening new task
-        }
-    }, [task?.id]);
-
-
-
-
-
-
-
     return (
 
 
         <Modal
-            open={!!openTask}
-            onCancel={onClose}
+            open={!!activeTaskId}
+            onCancel={() => {
+                console.log("Cancelled");
+                setActiveTaskId(null);
+                setTaskDetail({});
+                setTaskStack([]);
+            }}
             footer={null}
             width={1000}
             high={800}
             centered
             styles={{ body: { padding: 15, borderRadius: 10 } }}
         >
+            {loading && (
+                <div className="flex items-center justify-center h-[400px]">
+                    <SpinnerForSettings />
+                </div>
+            )}
 
-            {taskStack.length > 0 && (
+            {!loading && taskStack.length > 0 && (
                 <div
                     className="text-sm text-blue-600 cursor-pointer hover:underline mb-2"
                     onClick={backToParentTask}
@@ -386,7 +308,7 @@ export default function TaskDetailModal({
                 </div>
             )}
 
-            {Object.keys(taskDetail).length > 0 && (
+            {!loading && Object.keys(taskDetail).length > 0 && (
                 <div className="flex">
                     {/* LEFT CONTENT */}
                     <div className="flex-1 p-6 border-r">
@@ -492,7 +414,7 @@ export default function TaskDetailModal({
 
                         {/* Comment Box */}
                         <CommentSection
-                            isOpenComment={isOpenComment}
+                            isOpenComment={true}
                             comments={taskDetail?.comments ?? []}
                             setTaskDetail={setTaskDetail}
                             taskDetail={taskDetail}

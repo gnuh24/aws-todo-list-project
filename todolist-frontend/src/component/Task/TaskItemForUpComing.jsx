@@ -12,22 +12,21 @@ import {
 } from "lucide-react";
 import { https_taskflow } from "../../service/api";
 import dayjs from "dayjs";
-import TaskDetailModal from "../Modal/TaskDetailModal";
 import {toast} from "sonner";
 import TaskEditFormUpComing from "./TaskEditFormUpComing";
 import DatePickerDropdownForUpComing from "../Dropdown/DatePickerDropdownForUpComing";
-import PriorityDropdown from "../Dropdown/PriorityDropdown";
+import {useProjectContext} from "../../context/ProjectContext";
 
 export default function TaskItemForUpComing({
-                                                sectionId,
                                                 projectId,
                                                 task,
                                                 onDeleteTaskUpComing,
                                                 onUpdateTaskUpComing,
                                             }) {
+
+    const { setActiveTaskId } = useProjectContext();
+
     const [isEditing, setIsEditing] = useState(false);
-    const [isOpenComment, setIsOpenComment] = useState(false);
-    const [openTaskDetailModal, setOpenTaskDetailModal] = useState(false);
     const [newStatus, setNewStatus] = useState(task.status);
     const [menuOpen, setMenuOpen] = useState(false);
     const menuRef = useRef(null);
@@ -166,8 +165,7 @@ export default function TaskItemForUpComing({
         <div className="group relative flex flex-col border-b hover:bg-gray-50 transition-colors px-2 py-2 rounded-md"
              onClick={(e) => {
                  e.stopPropagation();
-                 setIsOpenComment(false)
-                 setOpenTaskDetailModal(true)
+                 setActiveTaskId(task.id);
              }}>
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -229,8 +227,7 @@ export default function TaskItemForUpComing({
 
                     <button className="p-1 hover:text-gray-900 text-gray-500" onClick={(e) => {
                         e.stopPropagation();
-                        setIsOpenComment(true)
-                        setOpenTaskDetailModal(true)
+                        setActiveTaskId(task.id);
                     }}>
                         <MessageSquare size={14} />
                     </button>
@@ -293,18 +290,6 @@ export default function TaskItemForUpComing({
                     )}
                 </div>
             )}
-
-            <TaskDetailModal
-                isOpenComment={isOpenComment}
-                openTask={openTaskDetailModal}       // boolean
-                task={task}                      // dữ liệu task
-                onClose={(e) => {
-                    e.stopPropagation();
-                    setOpenTaskDetailModal(false)
-                    setIsOpenComment(false)
-                }}   // hàm đóng
-                onUpdateStatus={handleUpdateStatus}
-            />
         </div>
 
 

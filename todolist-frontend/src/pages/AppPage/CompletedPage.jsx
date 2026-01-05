@@ -3,13 +3,14 @@ import {useEffect, useState} from "react";
 import { LockOutlined } from "@ant-design/icons";
 import ActivityHeader from "../../component/Header/ActivityHeader";
 import TaskDetailModal from "../../component/Modal/TaskDetailModal";
-import SpinnerForSettings from "../../component/Spinner/SpinnerForSettings";
+import SpinnerForSettings from "../../component/Spinner/SpinnerLoading";
 import {BASE_URL, https_notification, https_taskflow} from "../../service/api";
 import {useNavigate} from "react-router-dom";
 import {notificationFilterMap} from "../../data/ActivityFilter";
 import { toast } from "sonner";
 import MainLayout from "../../layout/MainLayout";
 import AvatarCircle from "../../component/Content/AvatarCircle";
+import {useProjectContext} from "../../context/ProjectContext";
 
 function formatDateHeader(dateStr) {
   const date = new Date(dateStr);
@@ -27,8 +28,11 @@ function formatDateHeader(dateStr) {
 
 
 export default function CompletedPage() {
+
+  const { setActiveTaskId } = useProjectContext();
+
+
   const navigate = useNavigate();
-  const [openTask, setOpenTask] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [currentTask, setCurrentTask] = useState({});
 
@@ -39,29 +43,6 @@ export default function CompletedPage() {
   const [activityData, setActivityData] = useState([]);
   const [projectData, setProjectData] = useState([]);
 
-  const handleOpenTask = (task) => {
-    if (task.id !== null) {
-      setCurrentTask(task)
-      setOpenTask(true)
-    }
-  };
-  const handleClose = () => {
-    setOpenTask(false)
-  };
-
-  const handleUpdateStatus = async (updatedStatus) => {
-    try {
-      const res = await https_taskflow.patch(
-          `/v1/projects/${currentTask.idProject}/tasks/${currentTask.id}/update-status`,
-          {
-            status: updatedStatus,
-          }
-      );
-
-    } catch (err) {
-      toast.error(err?.response?.data?.message || "Cập nhật thất bại, vui lòng thử lại!");
-    }
-  }
 
   useEffect(() => {
     const getActivityData = async () => {
@@ -143,14 +124,14 @@ export default function CompletedPage() {
 
                                 {/* Nội dung */}
                                 <div>
-                                  <p className="text-sm" onClick={() =>  handleOpenTask({id: item.taskId, idProject: item.projectId})}>
+                                  <p className="text-sm">
                                     <span className="font-semibold">{item.displayName}</span>
                                   </p>
 
 
                                   <p
                                       className={`text-gray-400 ${item.taskId ? 'cursor-pointer hover:text-[#E52424]' : ''}`}
-                                      onClick={() =>  handleOpenTask({ id: item.taskId, idProject: item.projectId })}
+                                      onClick={() => setActiveTaskId(item.taskId) }
                                   >
                                     <span className="text-xs mt-1 font-semibold">
                                       {item.content}
@@ -212,15 +193,7 @@ export default function CompletedPage() {
                   </div>
 
 
-                  {openTask && (
-                      <TaskDetailModal
-                          openTask={openTask}
-                          task={currentTask}
-                          onClose={handleClose}
-                          onUpdateStatus={handleUpdateStatus}
-                      />
-                  )}
-
+                  <TaskDetailModal />
                 </>
             )}
           </div>

@@ -1,7 +1,7 @@
 import {Menu, Input, Empty, Checkbox, Button, message} from "antd";
 import { useState, useMemo } from "react";
 import {https_taskflow} from "../../service/api";
-import SpinnerForSettings from "../Spinner/SpinnerForSettings";
+import SpinnerForSettings from "../Spinner/SpinnerLoading";
 
 export function DropdownMenu({ selectedLabels, personalLabels, sharedLabels: projectLabels, onAddNew, onSelect, handleAISuggestion }) {
     const [search, setSearch] = useState("");

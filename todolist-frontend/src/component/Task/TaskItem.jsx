@@ -17,8 +17,8 @@ import TaskEditForm from "../Task/TaskEditForm";
 import { https_taskflow } from "../../service/api";
 import dayjs from "dayjs";
 import DatePickerDropdown from "../Dropdown/DatePickerDropdown";
-import TaskDetailModal from "../Modal/TaskDetailModal";
 import {toast} from "sonner";
+import {useProjectContext} from "../../context/ProjectContext";
 
 export default function TaskItem({
   onDeleteTask,
@@ -27,15 +27,16 @@ export default function TaskItem({
   task,
   onUpdate
 }) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [isOpenComment, setIsOpenComment] = useState(false);
-  const [openTaskDetailModal, setOpenTaskDetailModal] = useState(false);
-  const [newStatus, setNewStatus] = useState(task.status);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const menuRef = useRef(null);
-  const formatToDisplay = "HH:mm DD/MM/YYYY";
-  const formatToSend = "YYYY-MM-DDTHH:mm:ss";
-  const [showFormDatePicker, setShowFormDatePicker] = useState(false);
+
+    const { setActiveTaskId } = useProjectContext();
+
+    const [isEditing, setIsEditing] = useState(false);
+    const [newStatus, setNewStatus] = useState(task.status);
+    const [menuOpen, setMenuOpen] = useState(false);
+    const menuRef = useRef(null);
+    const formatToDisplay = "HH:mm DD/MM/YYYY";
+    const formatToSend = "YYYY-MM-DDTHH:mm:ss";
+    const [showFormDatePicker, setShowFormDatePicker] = useState(false);
 
 
   // Đóng menu khi click ra ngoài
@@ -145,8 +146,7 @@ export default function TaskItem({
     <div className="group relative flex flex-col border-b hover:bg-gray-50 transition-colors px-2 py-2 rounded-md"
          onClick={(e) => {
            e.stopPropagation();
-           setIsOpenComment(false)
-           setOpenTaskDetailModal(true)
+           setActiveTaskId(task.id);
          }}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -207,8 +207,7 @@ export default function TaskItem({
 
           <button className="p-1 hover:text-gray-900 text-gray-500" onClick={(e) => {
             e.stopPropagation();
-            setIsOpenComment(true)
-            setOpenTaskDetailModal(true)
+              setActiveTaskId(task.id);
           }}>
             <MessageSquare size={14} />
           </button>
@@ -266,18 +265,6 @@ export default function TaskItem({
           )}
         </div>
       )}
-
-      <TaskDetailModal
-          isOpenComment={isOpenComment}
-          openTask={openTaskDetailModal}       // boolean
-          task={task}                      // dữ liệu task
-          onClose={(e) => {
-            e.stopPropagation();
-            setOpenTaskDetailModal(false)
-            setIsOpenComment(false)
-          }}   // hàm đóng
-          onUpdateStatus={handleUpdateStatus}
-      />
     </div>
 
 

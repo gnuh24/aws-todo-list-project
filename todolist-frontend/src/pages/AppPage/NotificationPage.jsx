@@ -93,7 +93,7 @@ export default function NotificationsPage() {
             if (!isRead) {
                 await handleUpdateStatus(true, idNotification);
             }
-    
+
             // Điều hướng
             navigate(`/app/projects/${idProject}`);
         } catch (error) {

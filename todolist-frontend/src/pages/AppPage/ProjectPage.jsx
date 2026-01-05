@@ -8,6 +8,7 @@ import { https_taskflow } from "../../service/api";
 import { message } from "antd";
 import { toast } from "sonner";
 import {useProjectContext} from "../../context/ProjectContext";
+import TaskDetailModal from "../../component/Modal/TaskDetailModal";
 
 export default function ProjectPage() {
   const [showModal, setShowModal] = useState(false);
@@ -277,6 +278,9 @@ export default function ProjectPage() {
             setSelectedSection(data.sectionId);
           }}
         />
+
+        {/*Pop up chi tiết task*/}
+        <TaskDetailModal/>
       </div>
     </>
   );

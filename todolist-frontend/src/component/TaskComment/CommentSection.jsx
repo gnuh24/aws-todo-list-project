@@ -9,7 +9,7 @@ import dayjs from "dayjs";
 import {BASE_URL, https_media, https_taskflow} from "../../service/api";
 import { CommentAttachItem } from "../CommentAttach/CommentAttachItem";
 import { CommentAttachItemAdd } from "../CommentAttach/CommentAttachItemAdd";
-import SpinnerForSettings from "../Spinner/SpinnerForSettings";
+import SpinnerForSettings from "../Spinner/SpinnerLoading";
 import { toast } from "sonner";
 import AvatarCircle from "../Content/AvatarCircle";
 

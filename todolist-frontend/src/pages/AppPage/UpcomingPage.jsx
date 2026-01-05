@@ -8,6 +8,7 @@ import { https_taskflow } from "../../service/api";
 import TaskItemForUpComing from "../../component/Task/TaskItemForUpComing";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
+import TaskDetailModal from "../../component/Modal/TaskDetailModal";
 
 export default function UpcomingPage() {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -289,7 +290,10 @@ export default function UpcomingPage() {
                       {tasksByDate[d.date.toDateString()]?.map((task, idx) => (
                         <div
                           key={idx}
-                          onClick={() => setShowAddTaskIndex(null)}
+                          onClick={() => {
+                            setShowAddTaskIndex(null)
+
+                          }}
                         >
                           <TaskItemForUpComing
                             task={task}
@@ -380,6 +384,10 @@ export default function UpcomingPage() {
           </div>
         </div>
       </div>
-         </>
+
+      {/* render 1 lần duy nhất */}
+      <TaskDetailModal />
+
+    </>
   );
 }
