@@ -4,24 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5bf172b3-cf86-483d-8669-161bc88dbf13" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../notification-service/src/main/java/aws/todolist/notification/dto/eventTaskflow/TaskLabels/TaskLabelResponseDTO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../notification-service/src/main/java/aws/todolist/notification/dto/eventTaskflow/member/MemberDTO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../api-gateway/src/main/resources/application-dev.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../api-gateway/src/main/resources/application-dev.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../notification-service/src/main/java/aws/todolist/notification/dto/eventTaskflow/dto/TaskEventDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/../notification-service/src/main/java/aws/todolist/notification/dto/eventTaskflow/dto/TaskEventDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../taskflow-service/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/dto/event/dto/TaskEventDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/dto/event/dto/TaskEventDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/mapper/TaskMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/mapper/TaskMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/quartzScheduler/TaskEventReminder.java" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/quartzScheduler/TaskEventReminder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/repository/TaskRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/repository/TaskRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/service/LabelService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/service/LabelService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/dto/taskflow/dto/TaskEventDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/dto/taskflow/dto/TaskEventDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/component/Modal/TaskDetailModal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/component/Modal/TaskDetailModal.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/component/Section/LabelsSection.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/component/Section/LabelsSection.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/websocket/WebSocketClient.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/websocket/WebSocketClient.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/websocket/handlers/task.handler.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/websocket/handlers/task.handler.js" afterDir="false" />
-    </list>
+    <list default="true" id="5bf172b3-cf86-483d-8669-161bc88dbf13" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />

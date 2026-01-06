@@ -141,7 +141,7 @@ export function WebSocketClient() {
 
             }),
             client.subscribe(`/topic/project/${activeProject.id}/comment`, (m) => {
-                console.log("📌 comment", m.body)
+                // console.log("📌 comment", m.body)
 
 
                 handleCommentEvent(JSON.parse(m.body), {

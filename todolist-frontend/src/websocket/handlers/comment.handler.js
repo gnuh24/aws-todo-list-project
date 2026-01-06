@@ -15,24 +15,17 @@ export function handleCommentEvent(
 
     if (!activeProject || !comment) return;
 
-    console.log(taskId, activeTaskId);
-
     // chỉ xử lý comment của task đang mở
     if (taskId !== activeTaskId) return;
 
-    console.log("<UNK> comment", comment);
-
     // 👉 chính mình thao tác → bỏ qua websocket
     if (payload?.actor?.id === actorId) return;
-
-    console.log("<UNK> comment", comment);
 
     switch (eventType) {
         /* =====================================================
          * 💬 CREATE
          * ===================================================== */
         case EVENT.COMMENT_CREATED:
-            console.log("COMMENT_CREATED", event);
             setTaskDetail(prev => {
                 if (!prev) return prev;
                 if (prev.comments?.some(c => c.id === comment.id)) return prev;

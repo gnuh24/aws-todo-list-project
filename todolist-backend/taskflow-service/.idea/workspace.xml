@@ -5,16 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="aafb8b93-6ddf-44d9-bc7c-02d1e2b5b281" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/../media-service/.idea/uiDesigner.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../api-gateway/src/main/resources/application-dev.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../api-gateway/src/main/resources/application-dev.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../media-service/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../media-service/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../media-service/src/main/resources/application-dev.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../media-service/src/main/resources/application-dev.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../notification-service/src/main/java/aws/todolist/notification/dto/eventTaskflow/dto/CommentEventDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/../notification-service/src/main/java/aws/todolist/notification/dto/eventTaskflow/dto/CommentEventDto.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/dto/event/dto/CommentEventDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/dto/event/dto/CommentEventDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/enums/EventType.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/enums/EventType.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/mapper/TaskCommentMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/mapper/TaskCommentMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/messaging/kafka/producer/GenericEventPublisher.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/messaging/kafka/producer/GenericEventPublisher.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/messaging/kafka/producer/GenericEventPublisherImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/messaging/kafka/producer/GenericEventPublisherImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/CommentAttachImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/CommentAttachImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application-dev.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application-dev.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application-prod.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application-prod.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/websocket/WebSocketClient.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/websocket/WebSocketClient.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/Listener/TaskUpdatedEventListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/Listener/TaskUpdatedEventListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/ServiceEventKafka/CommentEventService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/ServiceEventKafka/CommentEventService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../websocket-service/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../websocket-service/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/component/CommentAttach/CommentAttachItemAdd.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/component/CommentAttach/CommentAttachItemAdd.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

@@ -19,12 +19,7 @@ public class TaskUpdatedEventListener {
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handle(TaskUpdatedEvent event) {
-
-        System.err.println(event);
-
         Task task = taskRepository.findByIdAndIsDeletedFalse(event.taskId());
-
-        System.err.println(task.getId());
 
         taskEventService.publishTaskUpdated(task);
     }

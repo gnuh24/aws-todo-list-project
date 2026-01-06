@@ -7,6 +7,7 @@ import aws.todolist.taskflow.entity.Task;
 import aws.todolist.taskflow.entity.TaskComment;
 import aws.todolist.taskflow.enums.EventType;
 import aws.todolist.taskflow.mapper.ActorMapper;
+import aws.todolist.taskflow.mapper.CommentAttachMapper;
 import aws.todolist.taskflow.mapper.TaskCommentMapper;
 import aws.todolist.taskflow.messaging.kafka.producer.GenericEventPublisher;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,9 @@ import java.util.Set;
 @Component
 @RequiredArgsConstructor
 public class CommentEventService {
+
+    @Autowired
+    private CommentAttachMapper commentAttachMapper;
 
     @Autowired
     private TaskCommentMapper taskCommentMapper;
@@ -82,7 +86,6 @@ public class CommentEventService {
                 eventType
         );
     }
-
     // ===== RECEIVER RULE =====
 
     private List<String> receiversFromTask(Task task, Account actor) {

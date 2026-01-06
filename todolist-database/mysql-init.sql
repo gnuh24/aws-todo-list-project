@@ -418,12 +418,6 @@ VALUES
 ('77777777-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '44444444-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', 'Database is set up. Please check.', NOW(), NOW(), NULL, FALSE),
 ('88888888-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '66666666-cccc-cccc-cccc-cccccccccccc', '22222222-2222-2222-2222-222222222222', 'API is under development. Needs further testing.', NOW(), NOW(), NULL, FALSE);
 
--- 8. Dữ liệu mẫu cho bảng `comment_attachment`
-INSERT INTO `comment_attachment` (`id`, `task_comment_id`, `attachment_url`, `created_at`)
-VALUES
-('99999999-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '77777777-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'https://example.com/db_schema.png', NOW()),
-('aaaaaaaa-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '88888888-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'https://example.com/api_test.json', NOW());
-
 -- =====================================================
 -- Seed data for table `task_comment` (50 comments)
 -- =====================================================
