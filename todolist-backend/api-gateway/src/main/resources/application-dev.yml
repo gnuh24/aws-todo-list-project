@@ -45,8 +45,8 @@ spring:
                         - Path=/api/user/**
 
                 -   id: taskflow-service
-                    uri: ${TASKFLOW_SERVICE_URL:http://localhost:8082}
-#                    uri: http://localhost:8082
+#                    uri: ${TASKFLOW_SERVICE_URL:http://localhost:8082}
+                    uri: http://localhost:8082
                     predicates:
                         - Path=/api/taskflow/**
 

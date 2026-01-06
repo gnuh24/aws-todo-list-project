@@ -7,13 +7,7 @@ import { EVENT } from "../../event/EventType";
  */
 export function handleTaskEvent(
     event,
-    {
-        activeProject,
-        setSections,
-        taskDetail,
-        setTaskDetail,
-        actorId
-    }
+    { activeProject, setSections, activeTaskId, setTaskDetail, actorId }
 ) {
     const { eventType, payload } = event;
     const task = payload?.task;
@@ -24,131 +18,96 @@ export function handleTaskEvent(
     // 👉 chính mình thao tác → bỏ qua websocket
     if (payload?.actor?.id === actorId) return;
 
-    /* =====================================================
-     * 📌 CREATE / RESTORE
-     * ===================================================== */
-    if (
-        eventType === EVENT.TASK_CREATED ||
-        eventType === EVENT.TASK_RESTORED
-    ) {
-        setSections(prev =>
-            prev.map(section => {
-                if (section.id !== task.idSection) return section;
+    switch (eventType) {
+        /* =====================================================
+         * 📌 CREATE / RESTORE
+         * ===================================================== */
+        case EVENT.TASK_CREATED:
+        case EVENT.TASK_RESTORED:
+            setSections(prev =>
+                prev.map(section => {
+                    if (section.id !== task.idSection) return section;
+                    if (section.tasks?.some(t => t.id === task.id)) return section; // tránh add trùng
+                    return { ...section, tasks: [...(section.tasks || []), task] };
+                })
+            );
+            break;
 
-                // tránh add trùng
-                if (section.tasks?.some(t => t.id === task.id)) {
-                    return section;
-                }
+        /* =====================================================
+         * 📌 UPDATE (content / status / priority / assignee…)
+         * ===================================================== */
+        case EVENT.TASK_UPDATED:
+        case EVENT.TASK_STATUS_UPDATED:
+        case EVENT.TASK_PRIORITY_UPDATED:
+        case EVENT.TASK_RELATIONSHIP_UPDATED:
+        case EVENT.TASK_ASSIGNED:
+        case EVENT.TASK_UNASSIGNED:
+            setSections(prev =>
+                prev.map(section => {
+                    if (!section.tasks?.some(t => t.id === task.id)) return section;
+                    return {
+                        ...section,
+                        tasks: section.tasks.map(t => (t.id === task.id ? { ...t, ...task} : t))
+                    };
+                })
+            );
 
-                return {
-                    ...section,
-                    tasks: [...(section.tasks || []), task]
-                };
-            })
-        );
-        return;
-    }
+            if (activeTaskId === task.id) {
+                setTaskDetail(prev => ({ ...prev, ...task }));
+            }
+            break;
 
-    /* =====================================================
-     * 📌 UPDATE (content / status / priority / assignee…)
-     * ===================================================== */
-    if (
-        eventType === EVENT.TASK_UPDATED ||
-        eventType === EVENT.TASK_STATUS_UPDATED ||
-        eventType === EVENT.TASK_PRIORITY_UPDATED ||
-        eventType === EVENT.TASK_RELATIONSHIP_UPDATED ||
-        eventType === EVENT.TASK_ASSIGNED ||
-        eventType === EVENT.TASK_UNASSIGNED
-    ) {
-        // update sections
-        setSections(prev =>
-            prev.map(section => {
-                if (!section.tasks?.some(t => t.id === task.id)) {
-                    return section;
-                }
+        /* =====================================================
+         * 📌 MOVE SECTION
+         * ===================================================== */
+        case EVENT.TASK_SECTION_UPDATED:
+            setSections(prev => {
+                let movedTask = null;
 
-                return {
-                    ...section,
-                    tasks: section.tasks.map(t =>
-                        t.id === task.id ? { ...t, ...task } : t
-                    )
-                };
-            })
-        );
-
-        // update task detail nếu đang mở
-        if (taskDetail?.id === task.id) {
-            setTaskDetail(prev => ({
-                ...prev,
-                ...task
-            }));
-        }
-        return;
-    }
-
-    /* =====================================================
-     * 📌 MOVE SECTION
-     * ===================================================== */
-    if (eventType === EVENT.TASK_SECTION_UPDATED) {
-        setSections(prev => {
-            let movedTask = null;
-
-            // 1️⃣ remove task khỏi section cũ
-            const removed = prev.map(section => {
-                if (!section.tasks?.some(t => t.id === task.id)) return section;
-
-                const newTasks = section.tasks.filter(t => {
-                    if (t.id === task.id) {
-                        movedTask = { ...t, ...task };
-                        return false;
-                    }
-                    return true;
+                // remove task khỏi section cũ
+                const removed = prev.map(section => {
+                    if (!section.tasks?.some(t => t.id === task.id)) return section;
+                    const newTasks = section.tasks.filter(t => {
+                        if (t.id === task.id) {
+                            movedTask = { ...t, ...task };
+                            return false;
+                        }
+                        return true;
+                    });
+                    return { ...section, tasks: newTasks };
                 });
 
-                return { ...section, tasks: newTasks };
+                // add task vào section mới
+                return removed.map(section => {
+                    if (section.id !== task.idSection) return section;
+                    return { ...section, tasks: [...(section.tasks || []), movedTask || task] };
+                });
             });
 
-            // 2️⃣ add task vào section mới
-            return removed.map(section => {
-                if (section.id !== task.idSection) return section;
+            if (activeTaskId === task.id) {
+                setTaskDetail(prev => ({ ...prev, ...task }));
+            }
+            break;
 
-                return {
+        /* =====================================================
+         * 📌 DELETE / ARCHIVE
+         * ===================================================== */
+        case EVENT.TASK_DELETED:
+        case EVENT.TASK_ARCHIVED:
+            const taskId = task.id;
+            setSections(prev =>
+                prev.map(section => ({
                     ...section,
-                    tasks: [...(section.tasks || []), movedTask || task]
-                };
-            });
-        });
+                    tasks: (section.tasks || []).filter(t => t.id !== taskId)
+                }))
+            );
 
-        // update task detail nếu đang mở
-        if (taskDetail?.id === task.id) {
-            setTaskDetail(prev => ({
-                ...prev,
-                ...task
-            }));
-        }
-        return;
-    }
+            if (activeTaskId === taskId) {
+                setTaskDetail(null);
+            }
+            break;
 
-    /* =====================================================
-     * 📌 DELETE / ARCHIVE
-     * ===================================================== */
-    if (
-        eventType === EVENT.TASK_DELETED ||
-        eventType === EVENT.TASK_ARCHIVED
-    ) {
-        const taskId = task.id;
-
-        setSections(prev =>
-            prev.map(section => ({
-                ...section,
-                tasks: (section.tasks || []).filter(t => t.id !== taskId)
-            }))
-        );
-
-        // nếu task đang mở → đóng
-        if (taskDetail?.id === taskId) {
-            setTaskDetail(null);
-        }
-        return;
+        default:
+            break;
     }
 }

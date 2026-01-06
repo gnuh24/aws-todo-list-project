@@ -14,8 +14,9 @@ import {handleTaskEvent} from "./handlers/task.handler";
 
 export function WebSocketClient() {
 
-    const { setProjects, activeProject, setActiveProject, setMembers, setSections, taskDetail, setTaskDetail } = useProjectContext();
+    const { setProjects, activeProject, setActiveProject, setMembers, setSections, setTaskDetail, activeTaskId } = useProjectContext();
 
+    const activeTaskIdRef = useRef(activeTaskId);
 
     const navigate = useNavigate();
 
@@ -36,6 +37,12 @@ export function WebSocketClient() {
     const projectSubscriptionsRef = useRef([]);
 
     /* ================= CONNECT SOCKET ================= */
+
+    // update ref khi state thay đổi
+    useEffect(() => {
+        activeTaskIdRef.current = activeTaskId;
+    }, [activeTaskId]);
+
     useEffect(() => {
         if (!token) return;
 
@@ -46,7 +53,7 @@ export function WebSocketClient() {
             connectHeaders: {
                 Authorization: `Bearer ${token}`,
             },
-            // debug: (str) => console.log("[STOMP]", str),
+            debug: (str) => console.log("[STOMP]", str),
 
             onConnect: () => {
                 console.log("✅ WebSocket connected");
@@ -101,9 +108,16 @@ export function WebSocketClient() {
                 }
             }),
             client.subscribe(`/topic/project/${activeProject.id}/task`, (m) => {
-                console.log("📌 task", m.body)
 
-                handleTaskEvent(JSON.parse(m.body), {activeProject, setSections, taskDetail, setTaskDetail, actorId});
+                // console.log("📌 task", m.body)
+
+                handleTaskEvent(JSON.parse(m.body), {
+                    activeProject,
+                    setSections,
+                    activeTaskId: activeTaskIdRef.current, // luôn lấy giá trị mới
+                    setTaskDetail,
+                    actorId
+                });
             }),
             client.subscribe(`/topic/project/${activeProject.id}/section`, (m) => {
                 // console.log("📌 section", m.body)

@@ -13,6 +13,17 @@ public interface TaskRepository extends JpaRepository<Task, String>, JpaSpecific
 
     Task findByIdAndIsDeletedFalse(String id);
 
+    @Query("""
+                select distinct t
+                from Task t
+                left join fetch t.taskLabels tl
+                left join fetch tl.projectLabel pl
+                where t.id = :id
+                  and t.isDeleted = false
+            """)
+    Task findByIdWithLabels(@Param("id") String id);
+
+
     Task findByIdAndIsDeletedTrue(String id);
 
     @Query("SELECT t FROM Task t " +

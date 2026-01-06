@@ -12,7 +12,7 @@ import org.mapstruct.factory.Mappers;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {TaskLabelMapper.class})
 public interface TaskMapper {
 
     // Map Task → TaskResponseDTO (task cha)
@@ -66,11 +66,19 @@ public interface TaskMapper {
     }
 
     @Mapping(target = "idTaskCha", source = "taskFather.id")
-    @Mapping(target = "idAccountCreate", source = "createdByAccount.id")
-    @Mapping(target = "idAccountAssigned", source = "accountAssign.id")
     @Mapping(target = "idSection", source = "section.id")
     @Mapping(target = "idProject", source = "section.project.id")
+    @Mapping(target = "sectionName", source = "section.name")
+    @Mapping(target = "projectName", source = "section.project.name")
+    @Mapping(target = "labels", source = "taskLabels")
     TaskEventDto toEventDto(Task task);
+
+//    @AfterMapping
+//    default void handleAfterMappingEvent(Task task, @MappingTarget TaskEventDto dto, TaskLabelMapper taskLabelMapper) {
+//        if (task.getTaskLabels() != null) {
+//            dto.setLabels(taskLabelMapper.toResponseList(task.getTaskLabels()));
+//        }
+//    }
 
     default TaskPayload toPayload(
             Task task,

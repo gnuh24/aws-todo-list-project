@@ -80,12 +80,20 @@ export default function TaskDetailModal() {
                 `/v1/projects/${taskDetail.idProject}/tasks/${taskDetail.id}`,
                 payload
             );
-            return res.status === 200;
+
+            toast.success(res.data?.message || "Cập nhật task thành công");
+            return true;
+
         } catch (err) {
-            toast.error("Failed to update task");
+            const message =
+                err?.response?.data?.message ||
+                "Cập nhật task thất bại";
+
+            toast.error(message);
             return false;
         }
     };
+
 
     const onUpdatePriority = async (newPriority) => {
         try {
@@ -149,8 +157,12 @@ export default function TaskDetailModal() {
                 toast.success("Task moved successfully");
                 setProjectDropdownOpen(false);
             }
-        } catch {
-            toast.error("Failed to update task section");
+        } catch (err) {
+            const message =
+                err?.response?.data?.message ||
+                "Cập nhật task thất bại";
+
+            toast.error(message);
         }
     };
 
@@ -188,11 +200,11 @@ export default function TaskDetailModal() {
                 setMemberDropdownOpen(false);
             }
         } catch (err) {
-            toast.error(
-                accountId === null
-                    ? "Failed to unassign task"
-                    : "Failed to assign task"
-            );
+            const message =
+                err?.response?.data?.message ||
+                "Cập nhật task thất bại";
+
+            toast.error(message);
         }
     };
 
@@ -212,7 +224,11 @@ export default function TaskDetailModal() {
             }
             return false;
         } catch (err) {
-            toast.error("Failed to update task status");
+            const message =
+                err?.response?.data?.message ||
+                "Cập nhật task thất bại";
+
+            toast.error(message);
             return false;
         }
     };
@@ -282,7 +298,6 @@ export default function TaskDetailModal() {
         <Modal
             open={!!activeTaskId}
             onCancel={() => {
-                console.log("Cancelled");
                 setActiveTaskId(null);
                 setTaskDetail({});
                 setTaskStack([]);
