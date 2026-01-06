@@ -19,6 +19,7 @@ import dayjs from "dayjs";
 import DatePickerDropdown from "../Dropdown/DatePickerDropdown";
 import {toast} from "sonner";
 import {useProjectContext} from "../../context/ProjectContext";
+import {useUIContext} from "../../context/UIContext";
 
 export default function TaskItem({
   onDeleteTask,
@@ -29,6 +30,10 @@ export default function TaskItem({
 }) {
 
     const { setActiveTaskId } = useProjectContext();
+
+    const {
+        setIsOpenComment
+    } = useUIContext();
 
     const [isEditing, setIsEditing] = useState(false);
     const [newStatus, setNewStatus] = useState(task.status);
@@ -206,8 +211,9 @@ export default function TaskItem({
           </Dropdown>
 
           <button className="p-1 hover:text-gray-900 text-gray-500" onClick={(e) => {
-            e.stopPropagation();
+              e.stopPropagation();
               setActiveTaskId(task.id);
+              setIsOpenComment(true);
           }}>
             <MessageSquare size={14} />
           </button>

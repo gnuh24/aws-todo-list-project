@@ -11,6 +11,7 @@ import {handleMemberEvent} from "./handlers/member.handler";
 import {useNavigate} from "react-router-dom";
 import {handleSectionEvent} from "./handlers/section.handler";
 import {handleTaskEvent} from "./handlers/task.handler";
+import {handleCommentEvent} from "./handlers/comment.handler";
 
 export function WebSocketClient() {
 
@@ -139,9 +140,17 @@ export function WebSocketClient() {
 
 
             }),
-            client.subscribe(`/topic/project/${activeProject.id}/comment`, (m) =>
+            client.subscribe(`/topic/project/${activeProject.id}/comment`, (m) => {
                 console.log("📌 comment", m.body)
-            )
+
+
+                handleCommentEvent(JSON.parse(m.body), {
+                    activeProject,
+                    activeTaskId: activeTaskIdRef.current,
+                    setTaskDetail,
+                    actorId
+                })
+            })
         );
 
         console.log("➡️ Entered project", activeProject.id);

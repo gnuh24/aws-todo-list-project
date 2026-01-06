@@ -4,9 +4,11 @@ import aws.todolist.taskflow.dto.commentAttach.CommentAttachResponse;
 import aws.todolist.taskflow.entity.Account;
 import aws.todolist.taskflow.entity.CommentAttach;
 import aws.todolist.taskflow.entity.TaskComment;
+import aws.todolist.taskflow.enums.EventType;
 import aws.todolist.taskflow.exceptions.ProjectException.ResourceNotFoundException;
 import aws.todolist.taskflow.exceptions.errorCode.BusinessErrorCode;
 import aws.todolist.taskflow.mapper.CommentAttachMapper;
+import aws.todolist.taskflow.messaging.kafka.producer.GenericEventPublisher;
 import aws.todolist.taskflow.repository.CommentAttachRepository;
 import aws.todolist.taskflow.service.ServiceInterface.CommentAttachService;
 import aws.todolist.taskflow.utils.TaskCommentUtils;
@@ -30,6 +32,9 @@ public class CommentAttachImpl implements CommentAttachService {
 
     @Autowired
     private CommentAttachMapper commentAttachMapper;
+
+    @Autowired
+    private GenericEventPublisher genericEventPublisher;
 
 
     @Override
@@ -55,7 +60,11 @@ public class CommentAttachImpl implements CommentAttachService {
 
         commentAttachRepository.delete(commentAttach);
 
-        return commentAttachMapper.toResponse(commentAttach);
+        CommentAttachResponse commentAttachResponse = commentAttachMapper.toResponse(commentAttach);
+
+        genericEventPublisher.publishCommentAttachEvent(commentAttach.getId(), commentAttachResponse, EventType.COMMENT_ATTACH_DELETED);
+
+        return commentAttachResponse;
     }
 
     @Override

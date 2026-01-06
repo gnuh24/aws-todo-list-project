@@ -58,5 +58,11 @@ public enum EventType {
     // =========================
     COMMENT_CREATED,
     COMMENT_UPDATED,
-    COMMENT_DELETED
+    COMMENT_DELETED,
+
+    // =========================
+    // 💬 COMMENT ATTACH EVENTS
+    // =========================
+    COMMENT_ATTACH_DELETED
+
 }

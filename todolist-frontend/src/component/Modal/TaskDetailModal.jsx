@@ -18,6 +18,7 @@ import TaskHelper from "../../helpers/TaskHelper";
 import AvatarCircle from "../Content/AvatarCircle";
 import {useProjectContext} from "../../context/ProjectContext";
 import SpinnerForSettings from "../Spinner/SpinnerLoading";
+import {useUIContext} from "../../context/UIContext";
 
 export default function TaskDetailModal() {
 
@@ -30,6 +31,10 @@ export default function TaskDetailModal() {
         taskStack,
         setTaskStack
     } = useProjectContext();
+
+    const {
+        isOpenComment, setIsOpenComment
+    } = useUIContext();
 
     // ╔══════════════════════════════════════╗
     // ║             💾 Component State       ║
@@ -301,6 +306,7 @@ export default function TaskDetailModal() {
                 setActiveTaskId(null);
                 setTaskDetail({});
                 setTaskStack([]);
+                setIsOpenComment(false);
             }}
             footer={null}
             width={1000}
@@ -429,7 +435,7 @@ export default function TaskDetailModal() {
 
                         {/* Comment Box */}
                         <CommentSection
-                            isOpenComment={true}
+                            isOpenComment={isOpenComment}
                             comments={taskDetail?.comments ?? []}
                             setTaskDetail={setTaskDetail}
                             taskDetail={taskDetail}

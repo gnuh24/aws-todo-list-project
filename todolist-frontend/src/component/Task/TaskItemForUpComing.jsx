@@ -16,6 +16,7 @@ import {toast} from "sonner";
 import TaskEditFormUpComing from "./TaskEditFormUpComing";
 import DatePickerDropdownForUpComing from "../Dropdown/DatePickerDropdownForUpComing";
 import {useProjectContext} from "../../context/ProjectContext";
+import {useUIContext} from "../../context/UIContext";
 
 export default function TaskItemForUpComing({
                                                 projectId,
@@ -25,6 +26,10 @@ export default function TaskItemForUpComing({
                                             }) {
 
     const { setActiveTaskId } = useProjectContext();
+
+    const {
+        setIsOpenComment
+    } = useUIContext();
 
     const [isEditing, setIsEditing] = useState(false);
     const [newStatus, setNewStatus] = useState(task.status);
@@ -228,6 +233,7 @@ export default function TaskItemForUpComing({
                     <button className="p-1 hover:text-gray-900 text-gray-500" onClick={(e) => {
                         e.stopPropagation();
                         setActiveTaskId(task.id);
+                        setIsOpenComment(true);
                     }}>
                         <MessageSquare size={14} />
                     </button>
