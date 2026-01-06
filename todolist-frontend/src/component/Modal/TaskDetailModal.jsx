@@ -108,6 +108,23 @@ export default function TaskDetailModal({
         }
     };
 
+    const onClearStartTime = async () => {
+        const ok = await patchTask({ startTime: null });
+        if (ok) {
+            setTaskDetail(prev => ({ ...prev, startTime: null }));
+            toast.success("Start date removed");
+        }
+    };
+
+    const onClearDeadline = async () => {
+        const ok = await patchTask({ deadline: null });
+        if (ok) {
+            setTaskDetail(prev => ({ ...prev, deadline: null }));
+            toast.success("Deadline removed");
+        }
+    };
+
+
     const onUpdateStartTime = async (date) => {
         const ok = await patchTask({
             startTime: date   // LocalDateTime (ISO)
@@ -531,6 +548,7 @@ export default function TaskDetailModal({
 
 
                         {/* Date */}
+                        {/* Start Date */}
                         <SidebarItem
                             label="Date"
                             onClick={() => setOpenStartPicker(true)}
@@ -547,26 +565,40 @@ export default function TaskDetailModal({
                                             await onUpdateStartTime(value.toISOString());
                                             setOpenStartPicker(false);
                                         }}
-                                        onOpenChange={(open) => {
-                                            if (!open) setOpenStartPicker(false);
-                                        }}
+                                        onOpenChange={(open) => !open && setOpenStartPicker(false)}
                                     />
                                 </div>
                             ) : (
                                 <EditableValue>
-                                    <span
-                                        className={`text-sm ${taskDetail.startTime
-                                            ? "text-gray-800"
-                                            : "text-gray-400 italic"
-                                            }`}
-                                    >
-                                        {taskDetail.startTime
-                                            ? DateHelper.formatDate(taskDetail.startTime)
-                                            : "Set start date"}
-                                    </span>
+                                    <div className="flex items-center gap-2">
+                                        <span
+                                            className={`text-sm ${taskDetail.startTime
+                                                ? "text-gray-800"
+                                                : "text-gray-400 italic"
+                                                }`}
+                                        >
+                                            {taskDetail.startTime
+                                                ? DateHelper.formatDate(taskDetail.startTime)
+                                                : "Set start date"}
+                                        </span>
+
+                                        {/* ❌ Cancel button */}
+                                        {taskDetail.startTime && (
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    onClearStartTime();
+                                                }}
+                                                className="text-xs text-red-500 hover:underline"
+                                            >
+                                                Cancel
+                                            </button>
+                                        )}
+                                    </div>
                                 </EditableValue>
                             )}
                         </SidebarItem>
+
 
 
 
@@ -596,12 +628,35 @@ export default function TaskDetailModal({
                                 </div>
                             ) : (
                                 <EditableValue>
-                                    <span className="text-sm">
-                                        {taskDetail.deadline ? DateHelper.formatDate(taskDetail.deadline) : "+"}
-                                    </span>
+                                    <div className="flex items-center gap-2">
+                                        <span
+                                            className={`text-sm ${taskDetail.deadline
+                                                    ? "text-gray-800"
+                                                    : "text-gray-400 italic"
+                                                }`}
+                                        >
+                                            {taskDetail.deadline
+                                                ? DateHelper.formatDate(taskDetail.deadline)
+                                                : "Set deadline"}
+                                        </span>
+
+                                        {/* ❌ Cancel button */}
+                                        {taskDetail.deadline && (
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    onClearDeadline();
+                                                }}
+                                                className="text-xs text-red-500 hover:underline"
+                                            >
+                                                Cancel
+                                            </button>
+                                        )}
+                                    </div>
                                 </EditableValue>
                             )}
                         </SidebarItem>
+
 
 
 
