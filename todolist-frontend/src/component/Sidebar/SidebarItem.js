@@ -1,6 +1,7 @@
 import { MoreOutlined } from "@ant-design/icons";
 import { Dropdown, Menu } from "antd";
-import { useState } from "react";
+import {useEffect, useState} from "react";
+import {https_taskflow} from "../../service/api";
 
 export default function SidebarItem({
   icon,
@@ -17,6 +18,38 @@ export default function SidebarItem({
   countClass = "",
 }) {
   const [hovered, setHovered] = useState(false);
+
+  const [isOwner, setIsOwner] = useState(false);
+
+  const authId =  JSON.parse(localStorage.getItem("USER_INFO"))?.id
+
+  useEffect(() => {
+    if (!project?.id) return;
+
+    const fetchMembers = async () => {
+        try {
+            const res = await https_taskflow.get(
+                `/v1/projects/${project.id}/members`
+            );
+
+            console.log(res);
+
+            const members = res.data.data;
+
+            const owner = members.find(
+                (m) => m.accountId === authId && m.role === "OWNER"
+            );
+
+            setIsOwner(!!owner);
+        } catch (err) {
+            console.error("Failed to fetch project members", err);
+            setIsOwner(false);
+        }
+    };
+
+    fetchMembers();
+  }, [project?.id]);
+
 
   // MENU DROPDOWN CHO PROJECT
   const projectMenu = (
@@ -77,7 +110,7 @@ export default function SidebarItem({
       {/* COUNT */}
       {count && <span className={`text-xs ${countClass}`}>{count}</span>}
 
-      {isProject && (
+      {isOwner && isProject && (
         <Dropdown overlay={projectMenu} trigger={["click"]}>
           <MoreOutlined
             className={`
