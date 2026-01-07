@@ -1,6 +1,7 @@
 package aws.todolist.notification.service;
 
 
+import aws.todolist.notification.entity.NotificationSetting;
 import aws.todolist.notification.logging.AppLogger;
 import aws.todolist.notification.entity.Account;
 import aws.todolist.notification.entity.Notification;
@@ -36,6 +37,9 @@ public class NotificationServiceImpl implements NotificationService {
 
 	@Autowired
 	private PublishEventService publishEventService;
+
+	@Autowired
+	private NotificationSettingService notificationSettingService;
 
 
 	
@@ -73,7 +77,14 @@ public class NotificationServiceImpl implements NotificationService {
 		try {
 			// Tìm actor và receiver trong DB
 			Account receiver = accountService.getAccountByEmail(msg.getReceiverEmail());
+
 			Account actor = accountService.getAccountById(msg.getActorId());
+
+			NotificationSetting notificationSetting = notificationSettingService.getByAccountIdAndType(receiver, msg.getType());
+
+			if (!notificationSetting.isEnableWeb()){
+				return;
+			}
 
 			Notification notification = Notification.builder()
 			    .id(UUID.randomUUID().toString())
@@ -96,12 +107,11 @@ public class NotificationServiceImpl implements NotificationService {
 
 
 //			// Kiểm tra xem người dùng có muốn gửi thông báo đến email hay không
-			if(receiver.isReceiveEmail()){
+			if (notificationSetting.isEnableEmail()){
 				emailService.sendNotification(notification);
 			}
 
 			// send event to websocket
-
 			publishEventService.publish(notification);
 
 

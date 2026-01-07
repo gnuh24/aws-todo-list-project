@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import {Switch, Button, Spin, message, ConfigProvider} from "antd";
+import {Switch, Button, message, ConfigProvider} from "antd";
 import { https_user } from "../../service/api";
 import SpinnerLoading from "../Spinner/SpinnerLoading"; // chỉnh theo api của bạn
 

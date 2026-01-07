@@ -47,6 +47,7 @@ spring:
 
                 -   id: taskflow-service
                     uri: ${TASKFLOW_SERVICE_URL:http://localhost:8082}
+#                    uri: http://localhost:8082
                     predicates:
                         - Path=/api/taskflow/**
 
@@ -58,6 +59,7 @@ spring:
 
                 -   id: notification-rest
                     uri: ${NOTIFICATION_SERVICE_URL:http://localhost:9998}
+#                    uri: http://localhost:9998
                     predicates:
                         - Path=/api/notification/**
 

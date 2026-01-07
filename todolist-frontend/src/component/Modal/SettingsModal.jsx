@@ -22,7 +22,14 @@ export default function SettingsModal({ open, onClose }) {
     const [refreshKey, setRefreshKey] = useState(0);
 
     return (
-        <Modal open={open} onCancel={onClose} footer={null} width={1000}  bodyStyle={{ top: "0px", padding: "20px 0 0 0" }}>
+        <Modal open={open}
+               onCancel={() => {
+                    setPage(SETTINGS_PAGE.ACCOUNT);
+                    onClose();
+                }}
+               footer={null}
+               width={1000}
+               bodyStyle={{ top: "0px", padding: "20px 0 0 0" }}>
             <div className="flex h-[750px]">
                 <SettingsSidebar page={page} setPage={setPage} />
 

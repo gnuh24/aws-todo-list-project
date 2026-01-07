@@ -32,8 +32,6 @@ export default function SidebarItem({
                 `/v1/projects/${project.id}/members`
             );
 
-            console.log(res);
-
             const members = res.data.data;
 
             const owner = members.find(

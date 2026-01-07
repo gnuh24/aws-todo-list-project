@@ -18,7 +18,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.net.URISyntaxException;
 import java.util.List;
 
 
@@ -44,7 +43,7 @@ public class CommentAttachImpl implements CommentAttachService {
 
     @Override
     @Transactional
-    public CommentAttach addNewCommentAttach(String url, String idComment, Account account) throws URISyntaxException {
+    public CommentAttach addNewCommentAttach(String url, String idComment, Account account) {
 
         TaskComment taskComment = taskCommentUtils.getCommentAndCheck(idComment, account);
 

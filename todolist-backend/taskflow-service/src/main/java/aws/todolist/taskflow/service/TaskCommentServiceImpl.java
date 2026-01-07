@@ -4,6 +4,7 @@ import aws.todolist.taskflow.context.RequestContext;
 import aws.todolist.taskflow.dto.taskComment.TaskCommentRequestDTO;
 import aws.todolist.taskflow.dto.taskComment.TaskCommentResponseDTO;
 import aws.todolist.taskflow.entity.Account;
+import aws.todolist.taskflow.entity.CommentAttach;
 import aws.todolist.taskflow.entity.Task;
 import aws.todolist.taskflow.entity.TaskComment;
 import aws.todolist.taskflow.exceptions.ProjectException.ResourceNotFoundException;
@@ -19,7 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class TaskCommentServiceImpl implements TaskCommentService {
@@ -47,33 +49,35 @@ public class TaskCommentServiceImpl implements TaskCommentService {
     @Override
     @Transactional
     public TaskCommentResponseDTO addNewComment(TaskCommentRequestDTO requestDTO, String idTask) {
-
         Task task = getTaskAndCheck(idTask);
-
         Account actor = RequestContext.getAccount();
 
-        TaskComment taskComment = TaskComment.builder().task(task).account(actor).comment(requestDTO.getComment()).build();
+        // 1️⃣ Tạo comment chính
+        TaskComment taskComment = TaskComment.builder()
+                .task(task)
+                .account(actor)
+                .comment(requestDTO.getComment())
+                .build();
+        taskComment = taskCommentRepository.save(taskComment);
 
-        taskComment = taskCommentRepository.saveAndFlush(taskComment);
-
-        // Chạy service thêm mới comment attach
+        // 2️⃣ Tạo CommentAttach riêng, không trực tiếp thêm vào collection managed
+        List<CommentAttach> attachList = new ArrayList<>();
         if (requestDTO.getUrls() != null) {
             for (String url : requestDTO.getUrls()) {
-                try {
-                    taskComment.getCommentAttaches().add(commentAttachService.addNewCommentAttach(url, taskComment.getId(), actor));
-                } catch (URISyntaxException e) {
-                    throw new RuntimeException(e);
-                }
+                CommentAttach attach = commentAttachService.addNewCommentAttach(url, taskComment.getId(), actor);
+                attachList.add(attach);
             }
         }
 
-        // Gửi event
+        // 3️⃣ Gán list attach mới vào taskComment
+        taskComment.setCommentAttaches(attachList);
 
+        // 4️⃣ Gửi event sau khi tất cả entity đã save
         commentEventService.publishCommentCreated(taskComment);
-
 
         return taskCommentMapper.toResponse(taskComment);
     }
+
 
     @Override
     @Transactional
@@ -85,18 +89,6 @@ public class TaskCommentServiceImpl implements TaskCommentService {
 
         if (requestDTO.getComment() != null) {
             taskComment.setComment(requestDTO.getComment());
-        }
-
-
-        // Chạy service thêm mới comment attach
-        if (requestDTO.getUrls() != null) {
-            for (String url : requestDTO.getUrls()) {
-                try {
-                    taskComment.getCommentAttaches().add(commentAttachService.addNewCommentAttach(url, taskComment.getId(), actor));
-                } catch (URISyntaxException e) {
-                    throw new RuntimeException(e);
-                }
-            }
         }
 
         taskComment = taskCommentRepository.saveAndFlush(taskComment);
