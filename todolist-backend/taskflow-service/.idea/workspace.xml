@@ -5,17 +5,37 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="aafb8b93-6ddf-44d9-bc7c-02d1e2b5b281" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../media-service/.idea/uiDesigner.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../auth-service/src/main/java/aws/todolist/auth/entity/NotificationSetting.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../auth-service/src/main/java/aws/todolist/auth/enums/NotificationType.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../auth-service/src/main/java/aws/todolist/auth/repository/NotificationSettingRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../auth-service/src/main/java/aws/todolist/auth/service/NotificationSettingService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../auth-service/src/main/java/aws/todolist/auth/service/NotificationSettingServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../user-service/src/main/java/aws/todolist/user/context/RequestContext.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../user-service/src/main/java/aws/todolist/user/controller/NotificationSettingController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../user-service/src/main/java/aws/todolist/user/dto/notificationSetting/NotificationSettingBulkUpdateRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../user-service/src/main/java/aws/todolist/user/dto/notificationSetting/NotificationSettingResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../user-service/src/main/java/aws/todolist/user/entity/NotificationSetting.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../user-service/src/main/java/aws/todolist/user/enums/NotificationType.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../user-service/src/main/java/aws/todolist/user/filter/AccountContextFilter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../user-service/src/main/java/aws/todolist/user/mapper/NotificationSettingMapper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../user-service/src/main/java/aws/todolist/user/repository/NotificationSettingRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../user-service/src/main/java/aws/todolist/user/service/NotificationSettingService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../user-service/src/main/java/aws/todolist/user/service/NotificationSettingServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../api-gateway/src/main/resources/application-dev.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../api-gateway/src/main/resources/application-dev.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../media-service/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../media-service/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../media-service/src/main/resources/application-dev.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../media-service/src/main/resources/application-dev.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../notification-service/src/main/java/aws/todolist/notification/dto/eventTaskflow/dto/CommentEventDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/../notification-service/src/main/java/aws/todolist/notification/dto/eventTaskflow/dto/CommentEventDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/src/main/java/aws/todolist/auth/entity/Account.java" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/src/main/java/aws/todolist/auth/entity/Account.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/src/main/java/aws/todolist/auth/service/AccountServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/src/main/java/aws/todolist/auth/service/AccountServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../notification-service/src/main/java/aws/todolist/notification/entity/Account.java" beforeDir="false" afterPath="$PROJECT_DIR$/../notification-service/src/main/java/aws/todolist/notification/entity/Account.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/CommentAttachImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/CommentAttachImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/Listener/TaskUpdatedEventListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/Listener/TaskUpdatedEventListener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/ServiceEventKafka/CommentEventService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/ServiceEventKafka/CommentEventService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../websocket-service/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../websocket-service/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/component/CommentAttach/CommentAttachItemAdd.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/component/CommentAttach/CommentAttachItemAdd.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user-service/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user-service/src/main/java/aws/todolist/user/entity/Account.java" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/src/main/java/aws/todolist/user/entity/Account.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user-service/src/main/java/aws/todolist/user/service/AccountServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/src/main/java/aws/todolist/user/service/AccountServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../todolist-database/mysql-init.sql" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-database/mysql-init.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/component/Content/AccountSettings.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/component/Content/AccountSettings.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/component/Content/AvatarCircle.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/component/Content/AvatarCircle.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/helpers/ImageHelper.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/helpers/ImageHelper.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/pages/AppPage/UpcomingPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/pages/AppPage/UpcomingPage.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

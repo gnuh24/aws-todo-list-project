@@ -1,0 +1,20 @@
+package aws.todolist.auth.enums;
+
+public enum NotificationType {
+
+    PROJECT_MEMBER_ADDED,
+    PROJECT_MEMBER_ROLE_UPDATED,
+
+    TASK_ASSIGNED,
+    TASK_COMMENTED,
+    TASK_UPDATED,
+    TASK_COMPLETED,
+    TASK_REOPENED,
+    TASK_DUE_SOON,
+    TASK_OVERDUE,
+
+    REQUEST_ACCEPTED,
+    REQUEST_DECLINED,
+
+    PROJECT_DELETED
+}

@@ -41,6 +41,7 @@ spring:
 
                 -   id: user-service
                     uri: ${USER_SERVICE_URL:http://localhost:8081}
+#                    uri: http://localhost:8081
                     predicates:
                         - Path=/api/user/**
 

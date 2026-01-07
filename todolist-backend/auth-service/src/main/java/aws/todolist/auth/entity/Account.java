@@ -59,9 +59,6 @@ public class Account implements Serializable, UserDetails {
 	@Column(name = "is_deleted", nullable = false)
 	private boolean isDeleted;
 	
-	@Column(name = "receive_email", nullable = false)
-	private boolean receiveEmail;
-	
 	@Column(name = "two_factor_enabled", nullable = false)
 	private boolean twoFactorEnabled;
 	
@@ -130,7 +127,6 @@ public class Account implements Serializable, UserDetails {
 		
 		twoFactorEnabled = false;
 		isDeleted = false;
-		receiveEmail = false;
 	}
 	
 	@PreUpdate

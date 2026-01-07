@@ -62,9 +62,6 @@ public class Account implements Serializable, UserDetails {
 	@Column(name = "is_deleted", nullable = false)
 	private boolean isDeleted = false;
 
-	@Column(name = "receive_email", nullable = false)
-	private boolean receiveEmail = false;
-	
 	@Column(name = "two_factor_enabled", nullable = false)
 	private boolean twoFactorEnabled;
 	

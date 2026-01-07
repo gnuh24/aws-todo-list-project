@@ -56,11 +56,6 @@ public class AccountServiceImpl implements AccountService {
 		if (form.getDisplayName() != null && !form.getDisplayName().isBlank()) {
 			account.setDisplayName(form.getDisplayName());
 		}
-
-		// Cập nhật receiveEmail
-		if (form.getReceiveEmail() != null){
-			account.setReceiveEmail(form.getReceiveEmail());
-		}
 		
 		return accountRepository.save(account);
 	}

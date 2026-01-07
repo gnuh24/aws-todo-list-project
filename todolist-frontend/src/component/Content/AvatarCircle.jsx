@@ -20,7 +20,7 @@ export default function AvatarCircle({ avatar, name, size = 24 }) {
                     src={avatarUrl}
                     alt="avatar"
                     className="w-full h-full object-cover rounded-full"
-                    onError={(e) => (e.currentTarget.src = "/default-avatar.png")}
+                    // onError={(e) => (e.currentTarget.src = "/default-avatar.png")}
                 />
             ) : (
                 name?.[0]?.toUpperCase() || "U"

@@ -23,6 +23,9 @@ public class AccountServiceImpl implements AccountService {
 	
 	@Autowired
 	private AuthMapper authMapper;
+
+	@Autowired
+	private NotificationSettingService notificationSettingService;
 	
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -54,12 +57,27 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	public Account saveAccount(AccountCreateForm form) {
 		Account account = authMapper.toAccount(form);
-		return accountRepository.save(account);
+
+		// 🔥 PHẢI save trước
+		account = accountRepository.save(account);
+
+		// sau đó mới tạo notification setting
+		notificationSettingService
+				.createDefaultForAccount(account);
+
+		return account;
 	}
 	
 	@Override
 	public Account saveAccount(Account account) {
-		return accountRepository.save(account);
+		// 🔥 PHẢI save trước
+		account = accountRepository.save(account);
+
+		// sau đó mới tạo notification setting
+		notificationSettingService
+				.createDefaultForAccount(account);
+
+		return account;
 	}
 	
 	

@@ -11,14 +11,13 @@ export default function AccountSettings({
     refreshKey
 }) {
     const dataUser = JSON.parse(localStorage.getItem("USER_INFO")) || {};
-    const { displayName, email, avatar, twoFactorEnabled, receiveEmail } = dataUser;
+    const { displayName, email, avatar, twoFactorEnabled } = dataUser;
 
     /* ================= STATE ================= */
     const [name, setName] = useState(displayName || "");
     const [tempName, setTempName] = useState(displayName || "");
     const [editing, setEditing] = useState(false);
 
-    const [isNotificationEmail, setIsNotificationEmail] = useState(receiveEmail || false);
     const [isTwoFactorEnabled, setIsTwoFactorEnabled] = useState(twoFactorEnabled || false);
 
     const [disable2FAModalOpen, setDisable2FAModalOpen] = useState(false);
@@ -94,17 +93,6 @@ export default function AccountSettings({
         }
     };
 
-    const handleUpdateNotificationEmail = async (value) => {
-        try {
-            await https_user.patch("/v1/accounts/me", {
-                receiveEmail: value
-            });
-            setIsNotificationEmail(value);
-        } catch {
-            message.error("Update failed");
-        }
-    };
-
     const handleUpdateTwoFactorEnabled = async (value) => {
         if (value) {
             onGotoEnable2FA();
@@ -160,7 +148,6 @@ export default function AccountSettings({
     const fetchUser = async () => {
         try {
             const res = await https_user.get("/v1/accounts/me");
-            setIsNotificationEmail(res.data.data.receiveEmail);
             setIsTwoFactorEnabled(res.data.data.twoFactorEnabled);
         } catch (e) {
             console.error(e);
@@ -306,16 +293,6 @@ export default function AccountSettings({
                     />
                 </div>
             </Modal>
-
-            {/* EMAIL NOTI */}
-            <div className="mb-8">
-                <h3 className="text-sm text-gray-500 mb-1">Email notifications</h3>
-                <Switch checked={isNotificationEmail} onChange={handleUpdateNotificationEmail} />
-            </div>
-
-            <Button danger onClick={onGotoDeleteAccount}>
-                Xóa tài khoản
-            </Button>
         </div>
     );
 }

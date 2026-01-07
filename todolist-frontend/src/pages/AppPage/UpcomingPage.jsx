@@ -51,7 +51,7 @@ export default function UpcomingPage() {
 
     // Chuyển hướng sang /app/inbox (hoặc /home)
     setTimeout(() => {
-      navigate("/app/coming");
+      navigate("/app/upcoming");
     }, 800);
   }, [params, navigate]);
 
