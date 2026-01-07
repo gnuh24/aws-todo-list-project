@@ -9,6 +9,7 @@ import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 public class TaskEventReminder implements Job {
 
@@ -19,6 +20,7 @@ public class TaskEventReminder implements Job {
     private TaskEventService taskEventService;
 
     @Override
+    @Transactional
     public void execute(JobExecutionContext context) throws JobExecutionException {
 
         String taskId = context.getMergedJobDataMap().getString("taskId");
@@ -27,7 +29,7 @@ public class TaskEventReminder implements Job {
         String typeStr = dataMap.getString("type");
         EventType type = EventType.valueOf(typeStr);
 
-        Task task = taskRepository.findByIdAndIsDeletedFalse(taskId);
+        Task task = taskRepository.findByIdWithLabels(taskId);
 
         if (task == null) {
             System.err.printf("Task %s không tồn tại", taskId);

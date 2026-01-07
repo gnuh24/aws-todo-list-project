@@ -43,10 +43,19 @@ public interface TaskCommentMapper {
                 .collect(Collectors.toList());
     }
 
-    @Mapping(source = "task.id", target = "taskId")
-    @Mapping(source = "account.id", target = "authorId")
-    @Mapping(source = "account.displayName", target = "authorName")
+    @Mapping(target = "taskId", source = "task.id")
+    @Mapping(target = "accountId", source = "account.id")
+    @Mapping(target = "authorName", source = "account.displayName")
+    @Mapping(target = "authorAvatar", source = "account.avatar")
     CommentEventDto toEventDto(TaskComment comment);
+
+    @AfterMapping
+    default void handleAfterMappingEvent(TaskComment comment, @MappingTarget CommentEventDto dto) {
+        if (comment.getCommentAttaches() != null) {
+            CommentAttachMapper mapper = Mappers.getMapper(CommentAttachMapper.class);
+            dto.setCommentAttach(mapper.toResponseList(comment.getCommentAttaches()));
+        }
+    }
 
     default CommentPayload toPayload(
             TaskComment comment,

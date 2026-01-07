@@ -8,6 +8,7 @@ import { https_taskflow } from "../../service/api";
 import { message } from "antd";
 import { toast } from "sonner";
 import { useProjectContext } from "../../context/ProjectContext";
+import TaskDetailModal from "../../component/Modal/TaskDetailModal";
 
 export default function ProjectPage() {
     const [showModal, setShowModal] = useState(false);
@@ -230,24 +231,25 @@ export default function ProjectPage() {
         <>
             <div className="min-h-screen bg-white">
                 {/* HEADER */}
-                <ProjectHeader></ProjectHeader>
+                <ProjectHeader />
 
                 {/* MAIN CONTENT */}
                 <main className="px-10 py-6">
-                    <h1 className="text-2xl font-bold mb-4">{activeProject?.name}</h1>
+                    <h1 className="text-2xl font-bold mb-4">
+                        {activeProject?.name}
+                    </h1>
 
                     {/* Section list */}
-
                     <div className="space-y-4">
                         {sections.map((section) => (
                             <SectionItem
+                                key={section.id}
+                                section={section}
+                                projectId={projectId}
                                 handleSaveEdit={handleSaveEdit}
                                 handleDeleteSection={handleDeleteSection}
                                 handleDeleteTask={handleDeleteTask}
-                                projectId={projectId}
                                 handleUpdateTask={handleUpdateTask}
-                                key={section.id}
-                                section={section}
                                 onAddTaskClick={(id) => {
                                     setCurrentSection(id);
                                     setShowModal(true);
@@ -261,7 +263,7 @@ export default function ProjectPage() {
                         setNewSectionName={setNewSectionName}
                         handleAddSection={handleAddSection}
                         setIsAddingSection={setIsAddingSection}
-                    ></InlineAddSection>
+                    />
                 </main>
 
                 {/* MODAL ADD TASK */}
@@ -273,14 +275,15 @@ export default function ProjectPage() {
                     }}
                     onAdd={handleAddTask}
                     onSelectProjectSection={(data) => {
-                        // console.log("📌 PROJECT:", data.projectId);
-                        // console.log("📌 SECTION:", data.sectionId);
-
                         setSelectedProject(data.projectId);
                         setSelectedSection(data.sectionId);
                     }}
                 />
+
+                {/* 🔥 POPUP CHI TIẾT TASK (từ developer) */}
+                <TaskDetailModal />
             </div>
         </>
     );
+
 }

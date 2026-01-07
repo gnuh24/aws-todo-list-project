@@ -6,9 +6,18 @@ import {SidebarItem} from "../Modal/TaskDetailModal";
 import {https_model, https_taskflow} from "../../service/api";
 
 export function LabelsSection({taskDetail}) {
-    const [selectedLabels, setSelectedLabels] = useState(taskDetail.labels);
+    const [selectedLabels, setSelectedLabels] = useState([]);
     const [projectLabels, setProjectLabels] = useState([]);
     const [personalLabels, setPersonalLabels] = useState([]);
+
+
+
+    useEffect(() => {
+        if (taskDetail?.labels) {
+            setSelectedLabels(taskDetail.labels);
+        }
+    }, [taskDetail?.labels]);
+
 
     useEffect(() => {
         const fetchData = async () => {

@@ -1,5 +1,8 @@
 package aws.todoist.websocket.dto.taskflow.dto;
 
+
+import aws.todoist.websocket.dto.TaskLabels.TaskLabelResponseDTO;
+import aws.todoist.websocket.dto.member.MemberDTO;
 import aws.todoist.websocket.enums.eventDto.Priority;
 import aws.todoist.websocket.enums.eventDto.Status;
 import lombok.AllArgsConstructor;
@@ -8,23 +11,46 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class TaskEventDto {
 
+    // ===== Core =====
     private String id;
     private String title;
+    private String description;
+
+    private Boolean isArchived;
+    private Boolean isPinned;
 
     private Status status;
     private Priority priority;
 
-    private Boolean isPinned;
-    private LocalDateTime deadline;
+    // ===== Time =====
     private LocalDateTime startTime;
+    private LocalDateTime deadline;
+    private LocalDateTime completedAt;
 
-    private String sectionId;
-    private String assigneeId;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    // ===== Relation (Object) =====
+    private MemberDTO createdByAccount;
+    private MemberDTO accountAssign;
+
+    // ===== Relation (ID) =====
+    private String idTaskCha;
+    private String idSection;
+    private String idProject;
+
+    // ===== Extra for FE =====
+    private String sectionName;
+    private String projectName;
+
+    // ===== Label (light) =====
+    private List<TaskLabelResponseDTO> labels;
 }

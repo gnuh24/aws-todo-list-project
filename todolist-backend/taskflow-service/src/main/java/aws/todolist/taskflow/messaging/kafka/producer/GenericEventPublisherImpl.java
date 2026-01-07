@@ -1,5 +1,6 @@
 package aws.todolist.taskflow.messaging.kafka.producer;
 
+import aws.todolist.taskflow.dto.commentAttach.CommentAttachResponse;
 import aws.todolist.taskflow.dto.event.EventEnvelope;
 import aws.todolist.taskflow.dto.event.payload.*;
 import aws.todolist.taskflow.enums.EventType;
@@ -42,6 +43,10 @@ public class GenericEventPublisherImpl implements GenericEventPublisher {
     @Value("${app.kafka.topic.member-events}")     // taskflow.member-events.v1
     private String memberEventsTopic;
 
+    @Value("${app.kafka.topic.comment-attach-events}")
+    private String commentAttachEventsTopic;
+
+
     @Override
     @Transactional
     public void publishProjectEvent(String projectId, ProjectPayload payload, EventType eventType) {
@@ -78,6 +83,13 @@ public class GenericEventPublisherImpl implements GenericEventPublisher {
         String eventJson = createEvent(payload, eventType);
         kafkaTemplate.send(memberEventsTopic, projectId, eventJson);
         log.info("Published {} for member {}", eventType, projectId);
+    }
+
+    @Override
+    public void publishCommentAttachEvent(String key, CommentAttachResponse attach, EventType eventType) {
+        String eventJson = createEvent(attach, eventType);
+        kafkaTemplate.send(commentAttachEventsTopic, key, eventJson);
+        log.info("📎 Published {} for commentAttach {}", eventType, attach.getId());
     }
 
     private <T> String createEvent(T payload, EventType eventType) {

@@ -9,7 +9,7 @@ import dayjs from "dayjs";
 import {BASE_URL, https_media, https_taskflow} from "../../service/api";
 import { CommentAttachItem } from "../CommentAttach/CommentAttachItem";
 import { CommentAttachItemAdd } from "../CommentAttach/CommentAttachItemAdd";
-import SpinnerForSettings from "../Spinner/SpinnerForSettings";
+import SpinnerForSettings from "../Spinner/SpinnerLoading";
 import { toast } from "sonner";
 import AvatarCircle from "../Content/AvatarCircle";
 
@@ -281,7 +281,7 @@ export default function CommentSection({ isOpenComment, comments, setTaskDetail,
                                             `}
                                         >
 
-                                        <div className="text-sm font-semibold text-gray-600 mb-1">{c.authorName}</div>
+                                        <div className="py-2 text-sm font-semibold text-gray-600 mb-1">{c.authorName}</div>
                                             <div className="text-xs text-gray-600 mb-1">{dayjs(c.updatedAt).format(formatToDisplay)}</div>
                                             <div className="text-sm text-gray-700 whitespace-pre-line pt-3">{c.comment}</div>
                                             {!!c.commentAttach?.length && <CommentAttachItem commentAttach={c.commentAttach} onDeleteCommentAttach={deleteCommentAttach} />}

@@ -20,7 +20,7 @@ export function handleMemberEvent(
 
         /* ================= ADD ================= */
         case EVENT.PROJECT_MEMBER_ADDED: {
-            const member = payload?.memberEventDto;
+            const member = payload?.member;
             if (!member) return;
 
             setMembers(prev => {
@@ -32,7 +32,7 @@ export function handleMemberEvent(
 
         /* ================= ACCEPT ================= */
         case EVENT.PROJECT_MEMBER_ACCEPTED: {
-            const member = payload?.memberEventDto;
+            const member = payload?.member;
             if (!member) return;
 
             setMembers(prev =>
@@ -48,7 +48,7 @@ export function handleMemberEvent(
         /* ================= REMOVE / DECLINED ================= */
         case EVENT.PROJECT_MEMBER_REMOVED:
         case EVENT.PROJECT_MEMBER_DECLINED: {
-            const member = payload?.memberEventDto;
+            const member = payload?.member;
             if (!member) return;
 
             // ❗ nếu chính user hiện tại bị kick / declined
@@ -65,7 +65,7 @@ export function handleMemberEvent(
 
         /* ================= ROLE UPDATE ================= */
         case EVENT.PROJECT_MEMBER_ROLE_UPDATED: {
-            const member = payload?.memberEventDto;
+            const member = payload?.member;
             if (!member) return;
 
             setMembers(prev =>

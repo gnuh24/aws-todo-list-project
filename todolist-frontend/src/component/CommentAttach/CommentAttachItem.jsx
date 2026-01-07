@@ -1,5 +1,5 @@
 import { DeleteOutlined } from "@ant-design/icons";
-import { BASE_URL, https_taskflow } from "../../service/api";
+import { BASE_URL } from "../../service/api";
 import { FaDownload } from "react-icons/fa";
 import { Modal } from "antd";
 import { useState } from "react";
@@ -86,19 +86,20 @@ export function CommentAttachItem({ commentAttach, isEditing, onDeleteCommentAtt
                 open={!!previewUrl}
                 footer={null}
                 onCancel={() => setPreviewUrl(null)}
-                width={800}
+                width={900}
+                closable={false}   // ❌ tắt nút mặc định
+                centered
             >
                 <img
                     src={previewUrl}
                     alt=""
-                    className="w-full max-h-[70vh] object-contain"
+                    className="w-full max-h-[70vh] object-contain bg-black"
                 />
+
 
                 <div className="flex justify-end mt-3">
                     <button
-                        onClick={() =>
-                            downloadDirect(previewUrl)
-                        }
+                        onClick={() => downloadDirect(previewUrl)}
                         className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
                     >
                         Download

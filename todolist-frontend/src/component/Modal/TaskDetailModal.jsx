@@ -18,22 +18,31 @@ import TaskHelper from "../../helpers/TaskHelper";
 import AvatarCircle from "../Content/AvatarCircle";
 import { PlusOutlined } from "@ant-design/icons";
 import AddTaskModal from "./AddTaskModal"; // adjust path if needed
+import { useProjectContext } from "../../context/ProjectContext";
+import SpinnerForSettings from "../Spinner/SpinnerLoading";
+import { useUIContext } from "../../context/UIContext";
 
-export default function TaskDetailModal({
-    isOpenComment,
-    openTask,
-    onClose,
-    task,
-    onUpdateStatus,
-}) {
+export default function TaskDetailModal() {
 
+    const {
+        activeTaskId,
+        setActiveTaskId,
+        taskDetail,
+        setTaskDetail,
+        activeProject,
+        taskStack,
+        setTaskStack
+    } = useProjectContext();
+
+    const {
+        isOpenComment, setIsOpenComment
+    } = useUIContext();
 
     // ╔══════════════════════════════════════╗
     // ║             💾 Component State       ║
     // ╚══════════════════════════════════════╝
-    const [taskDetail, setTaskDetail] = useState({});
-    const [taskStack, setTaskStack] = useState([]);
-    const [currentTaskId, setCurrentTaskId] = useState(task?.id);
+
+    const [loading, setLoading] = useState(false);
 
     const [editingTitle, setEditingTitle] = useState(false);
     const [titleDraft, setTitleDraft] = useState(taskDetail.title);
@@ -57,7 +66,7 @@ export default function TaskDetailModal({
 
     const openChildTask = (childTask) => {
         setTaskStack(prev => [...prev, taskDetail]);
-        setCurrentTaskId(childTask.id); // 🔥 trigger API
+        setActiveTaskId(childTask.id); // 🔥 trigger API
     };
 
     const backToParentTask = () => {
@@ -65,7 +74,7 @@ export default function TaskDetailModal({
         if (!prev) return;
 
         setTaskStack(stack => stack.slice(0, -1));
-        setCurrentTaskId(prev.id); // 🔥 trigger API again
+        setActiveTaskId(prev.id);
     };
 
 
@@ -79,17 +88,25 @@ export default function TaskDetailModal({
                 `/v1/projects/${taskDetail.idProject}/tasks/${taskDetail.id}`,
                 payload
             );
-            return res.status === 200;
+
+            toast.success(res.data?.message || "Cập nhật task thành công");
+            return true;
+
         } catch (err) {
-            toast.error("Failed to update task");
+            const message =
+                err?.response?.data?.message ||
+                "Cập nhật task thất bại";
+
+            toast.error(message);
             return false;
         }
     };
 
+
     const onUpdatePriority = async (newPriority) => {
         try {
             const res = await https_taskflow.patch(
-                `/v1/projects/${task.idProject}/tasks/${task.id}/update-priority`, {
+                `/v1/projects/${activeProject.id}/tasks/${activeTaskId}/update-priority`, {
                 priority: newPriority
             }
             );
@@ -149,7 +166,7 @@ export default function TaskDetailModal({
         try {
 
             const res = await https_taskflow.patch(
-                `/v1/projects/${projectId}/tasks/${task.id}/update-section`,
+                `/v1/projects/${projectId}/tasks/${activeTaskId}/update-section`,
                 { idSection: sectionId }
             );
 
@@ -165,8 +182,12 @@ export default function TaskDetailModal({
                 toast.success("Task moved successfully");
                 setProjectDropdownOpen(false);
             }
-        } catch {
-            toast.error("Failed to update task section");
+        } catch (err) {
+            const message =
+                err?.response?.data?.message ||
+                "Cập nhật task thất bại";
+
+            toast.error(message);
         }
     };
 
@@ -204,11 +225,11 @@ export default function TaskDetailModal({
                 setMemberDropdownOpen(false);
             }
         } catch (err) {
-            toast.error(
-                accountId === null
-                    ? "Failed to unassign task"
-                    : "Failed to assign task"
-            );
+            const message =
+                err?.response?.data?.message ||
+                "Cập nhật task thất bại";
+
+            toast.error(message);
         }
     };
 
@@ -239,6 +260,33 @@ export default function TaskDetailModal({
             setShowAddChildModal(false);
             setParentTask(null);
         }
+    }
+
+
+
+    const onUpdateStatus = async (newStatus) => {
+        try {
+            const res = await https_taskflow.patch(
+                `/v1/projects/${activeProject.id}/tasks/${activeTaskId}/update-status`,
+                { status: newStatus }
+            );
+
+            if (res.status === 200) {
+                setTaskDetail(prev => ({
+                    ...prev,
+                    status: newStatus
+                }));
+                return true;
+            }
+            return false;
+        } catch (err) {
+            const message =
+                err?.response?.data?.message ||
+                "Cập nhật task thất bại";
+
+            toast.error(message);
+            return false;
+        }
     };
 
 
@@ -249,25 +297,45 @@ export default function TaskDetailModal({
     // ╚══════════════════════════════════════╝
 
     useEffect(() => {
-        if (!currentTaskId) return;
+        if (!activeTaskId || !activeProject) return;
+
+        let cancelled = false;
 
         const getDetails = async () => {
-            try {
-                const response = await https_taskflow.get(
-                    `/v1/projects/${task.idProject}/tasks/${currentTaskId}`
-                );
 
-                // console.log(response.data.data);
+            const start = Date.now();
+
+            try {
+                setLoading(true);
+                setTaskDetail({});
+
+
+                const response = await https_taskflow.get(
+                    `/v1/projects/${activeProject.id}/tasks/${activeTaskId}`
+                );
 
                 setTaskDetail(TaskHelper.normalizeTask(response.data.data));
             } catch (error) {
                 console.log(error);
                 toast.error("Failed to load task detail");
+            } finally {
+                const elapsed = Date.now() - start;
+                const MIN_LOADING_TIME = 200;
+
+                const remaining = MIN_LOADING_TIME - elapsed;
+
+                if (remaining > 0) {
+                    setTimeout(() => {
+                        if (!cancelled) setLoading(false);
+                    }, remaining);
+                } else {
+                    if (!cancelled) setLoading(false);
+                }
             }
         };
 
         getDetails();
-    }, [currentTaskId]);
+    }, [activeTaskId, activeProject]);
 
 
 
@@ -280,35 +348,30 @@ export default function TaskDetailModal({
         }
     }, [taskDetail.title, taskDetail.description]);
 
-
-
-    useEffect(() => {
-        if (task?.id) {
-            setCurrentTaskId(task.id);
-            setTaskStack([]); // reset navigation stack when opening new task
-        }
-    }, [task?.id]);
-
-
-
-
-
-
-
     return (
 
 
         <Modal
-            open={!!openTask}
-            onCancel={onClose}
+            open={!!activeTaskId}
+            onCancel={() => {
+                setActiveTaskId(null);
+                setTaskDetail({});
+                setTaskStack([]);
+                setIsOpenComment(false);
+            }}
             footer={null}
             width={1000}
             high={800}
             centered
             styles={{ body: { padding: 15, borderRadius: 10 } }}
         >
+            {loading && (
+                <div className="flex items-center justify-center h-[400px]">
+                    <SpinnerForSettings />
+                </div>
+            )}
 
-            {taskStack.length > 0 && (
+            {!loading && taskStack.length > 0 && (
                 <div
                     className="text-sm text-blue-600 cursor-pointer hover:underline mb-2"
                     onClick={backToParentTask}
@@ -317,7 +380,7 @@ export default function TaskDetailModal({
                 </div>
             )}
 
-            {Object.keys(taskDetail).length > 0 && (
+            {!loading && Object.keys(taskDetail).length > 0 && (
                 <div className="flex">
                     {/* LEFT CONTENT */}
                     <div className="flex-1 p-6 border-r">
@@ -631,8 +694,8 @@ export default function TaskDetailModal({
                                     <div className="flex items-center gap-2">
                                         <span
                                             className={`text-sm ${taskDetail.deadline
-                                                    ? "text-gray-800"
-                                                    : "text-gray-400 italic"
+                                                ? "text-gray-800"
+                                                : "text-gray-400 italic"
                                                 }`}
                                         >
                                             {taskDetail.deadline
