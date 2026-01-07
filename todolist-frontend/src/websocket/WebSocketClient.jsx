@@ -54,7 +54,7 @@ export function WebSocketClient() {
             connectHeaders: {
                 Authorization: `Bearer ${token}`,
             },
-            debug: (str) => console.log("[STOMP]", str),
+            // debug: (str) => console.log("[STOMP]", str),
 
             onConnect: () => {
                 console.log("✅ WebSocket connected");
