@@ -27,6 +27,12 @@ class DateHelper {
         if (!date) return "+";
         return dayjs(date).format("HH:mm:ss");
     }
+
+    static formatForServer(date){
+        if (!date) return "+";
+        return dayjs(date).format("YYYY-MM-DDTHH:mm:ss");
+
+    }
 }
 
 export default DateHelper;

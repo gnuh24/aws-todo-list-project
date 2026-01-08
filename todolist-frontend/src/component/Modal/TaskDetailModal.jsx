@@ -548,7 +548,7 @@ export default function TaskDetailModal() {
                                         value={taskDetail.startTime ? dayjs(taskDetail.startTime) : null}
                                         onChange={async (value) => {
                                             if (!value) return;
-                                            await onUpdateStartTime(value.toISOString());
+                                            await onUpdateStartTime(DateHelper.formatForServer(value));
                                             setOpenStartPicker(false);
                                         }}
                                         onOpenChange={(open) => {
@@ -592,7 +592,7 @@ export default function TaskDetailModal() {
                                         value={taskDetail.deadline ? dayjs(taskDetail.deadline) : null}
                                         onChange={async (value) => {
                                             if (!value) return;
-                                            await onUpdateDeadline(value.toISOString());
+                                            await onUpdateDeadline(DateHelper.formatForServer(value));
                                             setOpenDeadlinePicker(false);
                                         }}
                                         onOpenChange={(open) => !open && setOpenDeadlinePicker(false)}

@@ -29,17 +29,6 @@ export function ProjectProvider({ children }) {
     const [taskStack, setTaskStack] = useState([]);
 
 
-
-    useEffect(() => {
-        if (!projectId) return;
-
-        setActiveProject(prev => ({
-            ...prev,
-            id: projectId
-        }));
-    }, []);
-
-
     return (
         <ProjectContext.Provider
             value={{ projects, setProjects, activeProject, setActiveProject, members, setMembers, sections, setSections, taskDetail,
