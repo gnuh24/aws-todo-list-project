@@ -1,5 +1,5 @@
 import axios from "axios";
-import { store } from "..";
+import {CLIENT_ID} from "./clientId";
 
 export const BASE_URL = "http://localhost:8080/api";
 
@@ -18,7 +18,8 @@ export let https_taskflow = axios.create({
   baseURL: BASE_URL+"/taskflow",
   headers: {
     Authorization:
-      "Bearer " + JSON.parse(localStorage.getItem("USER_INFO"))?.token
+      "Bearer " + JSON.parse(localStorage.getItem("USER_INFO"))?.token,
+    "X-Client-Id": CLIENT_ID,
   },
 });
 

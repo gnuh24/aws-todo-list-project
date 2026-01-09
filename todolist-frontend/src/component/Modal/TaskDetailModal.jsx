@@ -298,8 +298,6 @@ export default function TaskDetailModal() {
     }, [taskDetail.title, taskDetail.description]);
 
     return (
-
-
         <Modal
             open={!!activeTaskId}
             onCancel={() => {

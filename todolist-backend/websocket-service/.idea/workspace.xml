@@ -4,7 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5bf172b3-cf86-483d-8669-161bc88dbf13" name="Changes" comment="" />
+    <list default="true" id="5bf172b3-cf86-483d-8669-161bc88dbf13" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../taskflow-service/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/context/RequestContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/context/RequestContext.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/dto/event/ActorDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/dto/event/ActorDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/filter/AccountContextFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/filter/AccountContextFilter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/mapper/ActorMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/../taskflow-service/src/main/java/aws/todolist/taskflow/mapper/ActorMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/dto/taskflow/ActorDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todoist/websocket/dto/taskflow/ActorDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/component/Modal/TaskDetailModal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/component/Modal/TaskDetailModal.jsx" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -23,16 +31,16 @@
     <option name="showLibraryContents" value="true" />
     <option name="showModules" value="false" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.WebSocketServiceApplication.executor&quot;: &quot;Run&quot;,
-    &quot;Application.websocket.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;kiên&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/Worker/FCJ/To-doList/aws-todo-list-project/todolist-backend/websocket-service&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.WebSocketServiceApplication.executor": "Run",
+    "Application.websocket.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "developer",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "D:/Worker/FCJ/To-doList/aws-todo-list-project/todolist-backend/websocket-service"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyClassDialog.RECENTS_KEY">
       <recent name="aws.todoist.websocket.dto.TaskLabels" />

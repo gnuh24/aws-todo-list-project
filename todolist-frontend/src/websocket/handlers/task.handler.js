@@ -1,4 +1,5 @@
 import { EVENT } from "../../event/EventType";
+import {CLIENT_ID} from "../../service/clientId";
 
 /**
  * Handle realtime TASK events
@@ -16,7 +17,7 @@ export function handleTaskEvent(
     if (task.idProject !== activeProject.id) return;
 
     // 👉 chính mình thao tác → bỏ qua websocket
-    if (payload?.actor?.id === actorId) return;
+    if (payload?.actor?.clientId === CLIENT_ID) return;
 
     switch (eventType) {
         /* =====================================================

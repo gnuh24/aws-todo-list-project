@@ -26,14 +26,21 @@ public class AccountContextFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
 
         try {
+            // ===== Account =====
             String accountId = request.getHeader("X-User-Id");
-
             if (accountId != null && !accountId.isBlank()) {
                 Account account = accountService.getAccountById(accountId);
                 RequestContext.setAccount(account);
             }
 
+            // ===== Client Id =====
+            String clientId = request.getHeader("X-Client-Id");
+            if (clientId != null && !clientId.isBlank()) {
+                RequestContext.setClientId(clientId);
+            }
+
             filterChain.doFilter(request, response);
+
         } finally {
             RequestContext.clear(); // 🚨 BẮT BUỘC
         }
