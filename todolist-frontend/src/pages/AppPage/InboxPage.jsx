@@ -1,142 +1,171 @@
 import { useEffect, useState } from "react";
-import { Button, Typography, Input } from "antd";
-import InboxHeader from "../../component/Header/InboxHeader";
-import { PlusOutlined } from "@ant-design/icons";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { Spin } from "antd";
 import { toast } from "sonner";
 
-
-const { Title, Paragraph } = Typography;
+import InboxHeader from "../../component/Header/InboxHeader";
+import SectionItem from "../../component/Section/SectionItem";
+import AddTaskModal from "../../component/Modal/AddTaskModal";
+import { https_taskflow } from "../../service/api";
 
 export default function InboxPage() {
-  const [showAddTask, setShowAddTask] = useState(false);
-  const [taskName, setTaskName] = useState("");
-  const [params] = useSearchParams();
-  const navigate = useNavigate();
+    const [project, setProject] = useState(null);
+    const [sections, setSections] = useState([]);
+    const [loading, setLoading] = useState(false);
 
-  // ============================
-  // 🔥 XỬ LÝ GOOGLE LOGIN CALLBACK
-  // ============================
-  useEffect(() => {
-    const id = params.get("id");
-    const email = params.get("email");
-    const displayName = params.get("displayName");
-    const avatar = params.get("avatar");
-    const role = params.get("role");
-    const token = params.get("token");
-    const refreshToken = params.get("refreshToken");
+    const [showModal, setShowModal] = useState(false);
+    const [currentSection, setCurrentSection] = useState(null);
 
-    if (!token) return; // Không phải callback OAuth → bỏ qua
+    // ============================
+    // 📥 FETCH DEFAULT PROJECT (INBOX)
+    // ============================
+    useEffect(() => {
+        fetchDefaultProject();
+    }, []);
 
-    const userData = {
-      id,
-      email,
-      displayName,
-      avatar,
-      role,
-      token,
-      refreshToken,
+    const fetchDefaultProject = async () => {
+        try {
+            setLoading(true);
+
+            const res = await https_taskflow.get("/v1/project-default");
+
+            if (res.data?.status === 200) {
+                const projectData = res.data.data;
+                setProject(projectData);
+                setSections(projectData.sections || []);
+            }
+        } catch (err) {
+            console.error(err);
+            toast.error("Không thể tải Inbox");
+        } finally {
+            setLoading(false);
+        }
     };
 
-    // Lưu vào localStorage
-    localStorage.setItem("USER_INFO", JSON.stringify(userData));
-    localStorage.setItem("accessToken", token);
-    localStorage.setItem("refreshToken", refreshToken);
+    // ============================
+    // ➕ ADD TASK (GIỐNG PROJECT PAGE)
+    // ============================
+    const handleAddTask = async (newTask) => {
+        if (!currentSection) {
+            toast.warning("Vui lòng chọn section");
+            return;
+        }
 
-    toast.success("Đăng nhập thành công!");
+        try {
+            const res = await https_taskflow.post(
+                `/v1/projects/${project.id}/tasks`,
+                {
+                    title: newTask.title,
+                    description: newTask.description || "",
+                    sectionId: currentSection,
+                    deadline: newTask.deadline || null,
+                    startTime: newTask.startTime || null,
+                    priority: newTask.priority || "MEDIUM",
+                }
+            );
 
-    // Chuyển hướng sang /app/inbox (hoặc /home)
-    setTimeout(() => {
-      navigate("/app/inbox");
-    }, 800);
-  }, [params, navigate]);
+            if (res.status === 200 && res.data?.data) {
+                const createdTask = res.data.data;
 
-  // ============================
-  // ADD TASK
-  // ============================
-  const handleAddTask = () => {
-    if (!taskName.trim()) return;
+                setSections((prev) =>
+                    prev.map((section) =>
+                        section.id === currentSection
+                            ? { ...section, tasks: [...section.tasks, createdTask] }
+                            : section
+                    )
+                );
 
-    console.log("New task:", taskName);
+                toast.success("Thêm task thành công!");
+            }
+        } catch (err) {
+            toast.error("Lỗi khi thêm task");
+        } finally {
+            setShowModal(false);
+            setCurrentSection(null);
+        }
+    };
 
-    setTaskName("");
-    setShowAddTask(false);
-  };
+    // ============================
+    // 🗑 DELETE TASK
+    // ============================
+    const handleDeleteTask = (sectionId, taskId) => {
+        setSections((prev) =>
+            prev.map((section) =>
+                section.id === sectionId
+                    ? {
+                        ...section,
+                        tasks: section.tasks.filter((t) => t.id !== taskId),
+                    }
+                    : section
+            )
+        );
+    };
 
-  return (
-    <>
-      <InboxHeader />
+    // ============================
+    // ✏ UPDATE TASK
+    // ============================
+    const handleUpdateTask = (sectionId, updatedTask) => {
+        setSections((prev) =>
+            prev.map((section) =>
+                section.id === sectionId
+                    ? {
+                        ...section,
+                        tasks: section.tasks.map((t) =>
+                            t.id === updatedTask.id ? updatedTask : t
+                        ),
+                    }
+                    : section
+            )
+        );
+    };
 
-      <div className="flex-1 flex flex-col bg p-8">
-        {showAddTask ? (
-          <div className="max-w-xl mx-auto w-full border rounded-xl shadow-sm p-5 bg-white">
-            <Title level={4} className="mb-3">
-              Inbox
-            </Title>
+    if (loading) {
+        return (
+            <>
+                <InboxHeader />
+                <div className="flex justify-center mt-20">
+                    <Spin />
+                </div>
+            </>
+        );
+    }
 
-            <Input
-              value={taskName}
-              onChange={(e) => setTaskName(e.target.value)}
-              placeholder="Send price list by Wed at 2pm"
-              className="mb-2 py-2"
-            />
-            <p className="text-gray-500 text-xs mb-3">Description</p>
+    return (
+        <>
+            {/* <InboxHeader /> */}
 
-            <div className="flex items-center gap-2 mb-4">
-              <Button size="small">📅 Date</Button>
-              <Button size="small">⚑ Priority</Button>
-              <Button size="small">⏰ Reminders</Button>
-              <Button size="small">⋯</Button>
+            <div className="min-h-screen bg-white px-10 py-6">
+                {/* TITLE */}
+                <h1 className="text-2xl font-bold mb-4">
+                    {project?.name || "Inbox"}
+                </h1>
+
+                {/* SECTION LIST */}
+                <div className="space-y-4">
+                    {sections.map((section) => (
+                        <SectionItem
+                            key={section.id}
+                            section={section}
+                            projectId={project?.id}
+                            handleDeleteTask={handleDeleteTask}
+                            handleUpdateTask={handleUpdateTask}
+                            onAddTaskClick={(sectionId) => {
+                                setCurrentSection(sectionId);
+                                setShowModal(true);
+                            }}
+                        />
+                    ))}
+                </div>
             </div>
 
-            <div className="flex justify-between items-center">
-              <Button type="text" icon={<i className="far fa-inbox"></i>}>
-                Inbox
-              </Button>
-
-              <div className="flex gap-2">
-                <Button onClick={() => setShowAddTask(false)}>Cancel</Button>
-                <Button
-                  type="primary"
-                  danger
-                  onClick={handleAddTask}
-                  disabled={!taskName.trim()}
-                >
-                  Add task
-                </Button>
-              </div>
-            </div>
-          </div>
-        ) : (
-          // EMPTY STATE
-          <div className="flex flex-col items-center justify-center mt-24 text-center">
-            <img
-              src="https://cdn-icons-png.flaticon.com/512/4072/4072353.png"
-              alt="empty inbox"
-              className="w-40 h-40 mb-4"
+            {/* ADD TASK MODAL */}
+            <AddTaskModal
+                open={showModal}
+                onCancel={() => {
+                    setShowModal(false);
+                    setCurrentSection(null);
+                }}
+                onAdd={handleAddTask}
             />
-
-            <Title level={5} className="font-medium">
-              Capture now, plan later
-            </Title>
-
-            <Paragraph className="text-gray-500 max-w-sm text-sm leading-relaxed">
-              Inbox is your go-to spot for quick task entry. Clear your mind
-              now, organize when you’re ready.
-            </Paragraph>
-
-            <Button
-              type="primary"
-              danger
-              className="mt-3 rounded-md"
-              icon={<PlusOutlined />}
-              onClick={() => setShowAddTask(true)}
-            >
-              Add task
-            </Button>
-          </div>
-        )}
-      </div>
-    </>
-  );
+        </>
+    );
 }

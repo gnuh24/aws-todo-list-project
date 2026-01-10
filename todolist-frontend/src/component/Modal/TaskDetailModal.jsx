@@ -1,7 +1,7 @@
 import {
     LockOutlined
 } from "@ant-design/icons";
-import { Modal } from "antd";
+import { Modal, Button } from "antd";
 import { useState, useEffect } from "react";
 import { https_taskflow } from "../../service/api";
 import CommentSection from "../TaskComment/CommentSection";
@@ -16,9 +16,11 @@ import { EditOutlined } from "@ant-design/icons";
 import DateHelper from "../../helpers/DateHelper";
 import TaskHelper from "../../helpers/TaskHelper";
 import AvatarCircle from "../Content/AvatarCircle";
-import {useProjectContext} from "../../context/ProjectContext";
+import { PlusOutlined } from "@ant-design/icons";
+import AddTaskModal from "./AddTaskModal"; // adjust path if needed
+import { useProjectContext } from "../../context/ProjectContext";
 import SpinnerForSettings from "../Spinner/SpinnerLoading";
-import {useUIContext} from "../../context/UIContext";
+import { useUIContext } from "../../context/UIContext";
 
 export default function TaskDetailModal() {
 
@@ -54,6 +56,9 @@ export default function TaskDetailModal() {
     const [memberDropdownOpen, setMemberDropdownOpen] = useState(false);
     const [projectDropdownOpen, setProjectDropdownOpen] = useState(false);
 
+    const [showAddChildModal, setShowAddChildModal] = useState(false);
+    const [parentTask, setParentTask] = useState(null);
+
 
     // ╔══════════════════════════════════════╗
     // ║           🔄 Task Navigation         ║
@@ -71,8 +76,6 @@ export default function TaskDetailModal() {
         setTaskStack(stack => stack.slice(0, -1));
         setActiveTaskId(prev.id);
     };
-
-
 
 
     // ╔══════════════════════════════════════╗
@@ -121,6 +124,23 @@ export default function TaskDetailModal() {
             }
         }
     };
+
+    const onClearStartTime = async () => {
+        const ok = await patchTask({ startTime: null });
+        if (ok) {
+            setTaskDetail(prev => ({ ...prev, startTime: null }));
+            toast.success("Start date removed");
+        }
+    };
+
+    const onClearDeadline = async () => {
+        const ok = await patchTask({ deadline: null });
+        if (ok) {
+            setTaskDetail(prev => ({ ...prev, deadline: null }));
+            toast.success("Deadline removed");
+        }
+    };
+
 
     const onUpdateStartTime = async (date) => {
         const ok = await patchTask({
@@ -212,6 +232,37 @@ export default function TaskDetailModal() {
             toast.error(message);
         }
     };
+
+    const handleAddTask = async (newTask) => {
+        try {
+            const res = await https_taskflow.post(
+                `/v1/projects/${taskDetail.idProject}/tasks`,
+                {
+                    ...newTask,
+                    sectionId: taskDetail.idSection, // ✅ inherit parent section
+                }
+            );
+
+            if (res.status === 200 && res.data?.data) {
+                const createdTask = res.data.data;
+
+                // 🔥 Append child task immediately
+                setTaskDetail(prev => ({
+                    ...prev,
+                    taskChild: [...(prev.taskChild || []), createdTask],
+                }));
+
+                toast.success("Subtask created successfully");
+            }
+        } catch (err) {
+            toast.error("Failed to create subtask");
+        } finally {
+            setShowAddChildModal(false);
+            setParentTask(null);
+        }
+    }
+
+
 
     const onUpdateStatus = async (newStatus) => {
         try {
@@ -429,15 +480,40 @@ export default function TaskDetailModal() {
                             </div>
                         )}
 
+                        <Button
+                            type="dashed"
+                            icon={<PlusOutlined />}
+                            onClick={() => {
+                                setParentTask(taskDetail);
+                                setShowAddChildModal(true);
+                            }}
+                        >
+                            Add Children Task
+                        </Button>
+
+                        <AddTaskModal
+                            open={showAddChildModal}
+                            parentTask={parentTask}
+                            onCancel={() => {
+                                setShowAddChildModal(false);
+                                setParentTask(null);
+                            }}
+                            onAdd={handleAddTask}
+                        />
+
 
 
                         {/* Comment Box */}
+
                         <CommentSection
                             isOpenComment={isOpenComment}
                             comments={taskDetail?.comments ?? []}
                             setTaskDetail={setTaskDetail}
                             taskDetail={taskDetail}
                         />
+
+
+
                     </div>
 
                     {/* RIGHT SIDEBAR */}
@@ -533,6 +609,7 @@ export default function TaskDetailModal() {
 
 
                         {/* Date */}
+                        {/* Start Date */}
                         <SidebarItem
                             label="Date"
                             onClick={() => setOpenStartPicker(true)}
@@ -549,26 +626,40 @@ export default function TaskDetailModal() {
                                             await onUpdateStartTime(DateHelper.formatForServer(value));
                                             setOpenStartPicker(false);
                                         }}
-                                        onOpenChange={(open) => {
-                                            if (!open) setOpenStartPicker(false);
-                                        }}
+                                        onOpenChange={(open) => !open && setOpenStartPicker(false)}
                                     />
                                 </div>
                             ) : (
                                 <EditableValue>
-                                    <span
-                                        className={`text-sm ${taskDetail.startTime
-                                            ? "text-gray-800"
-                                            : "text-gray-400 italic"
-                                            }`}
-                                    >
-                                        {taskDetail.startTime
-                                            ? DateHelper.formatDate(taskDetail.startTime)
-                                            : "Set start date"}
-                                    </span>
+                                    <div className="flex items-center gap-2">
+                                        <span
+                                            className={`text-sm ${taskDetail.startTime
+                                                ? "text-gray-800"
+                                                : "text-gray-400 italic"
+                                                }`}
+                                        >
+                                            {taskDetail.startTime
+                                                ? DateHelper.formatDate(taskDetail.startTime)
+                                                : "Set start date"}
+                                        </span>
+
+                                        {/* ❌ Cancel button */}
+                                        {taskDetail.startTime && (
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    onClearStartTime();
+                                                }}
+                                                className="text-xs text-red-500 hover:underline"
+                                            >
+                                                Cancel
+                                            </button>
+                                        )}
+                                    </div>
                                 </EditableValue>
                             )}
                         </SidebarItem>
+
 
 
 
@@ -598,12 +689,35 @@ export default function TaskDetailModal() {
                                 </div>
                             ) : (
                                 <EditableValue>
-                                    <span className="text-sm">
-                                        {taskDetail.deadline ? DateHelper.formatDate(taskDetail.deadline) : "+"}
-                                    </span>
+                                    <div className="flex items-center gap-2">
+                                        <span
+                                            className={`text-sm ${taskDetail.deadline
+                                                ? "text-gray-800"
+                                                : "text-gray-400 italic"
+                                                }`}
+                                        >
+                                            {taskDetail.deadline
+                                                ? DateHelper.formatDate(taskDetail.deadline)
+                                                : "Set deadline"}
+                                        </span>
+
+                                        {/* ❌ Cancel button */}
+                                        {taskDetail.deadline && (
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    onClearDeadline();
+                                                }}
+                                                className="text-xs text-red-500 hover:underline"
+                                            >
+                                                Cancel
+                                            </button>
+                                        )}
+                                    </div>
                                 </EditableValue>
                             )}
                         </SidebarItem>
+
 
 
 
@@ -654,19 +768,6 @@ export default function TaskDetailModal() {
                         {/* Labels with dropdown */}
                         <LabelsSection taskDetail={taskDetail}></LabelsSection>
 
-                        {/*/!* Reminders *!/*/}
-                        {/*<SidebarItem*/}
-                        {/*    label="Reminders"*/}
-                        {/*    value="+"*/}
-                        {/*    onClick={() => console.log("Reminders")}*/}
-                        {/*/>*/}
-
-                        {/*/!* Location *!/*/}
-                        {/*<SidebarItem*/}
-                        {/*    label="Location"*/}
-                        {/*    icon={<LockOutlined />}*/}
-                        {/*    onClick={() => console.log("Location locked")}*/}
-                        {/*/>*/}
                     </div>
                 </div>
             )

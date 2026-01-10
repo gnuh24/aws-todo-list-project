@@ -4,7 +4,7 @@ import { https_taskflow, https_user } from "../../service/api";
 import { useParams } from "react-router-dom";
 import { toast } from "sonner";
 import AvatarCircle from "../Content/AvatarCircle";
-import {useProjectContext} from "../../context/ProjectContext";
+import { useProjectContext } from "../../context/ProjectContext";
 
 export default function ShareSettings({ onClose }) {
     const { projectId } = useParams();
@@ -36,7 +36,6 @@ export default function ShareSettings({ onClose }) {
 
         fetchMembers();
     }, [projectId]);
-
     const handleCopyLink = () => {
         const url = window.location.href; // hoặc custom link nếu bạn muốn
         navigator.clipboard.writeText(url);
@@ -153,7 +152,7 @@ export default function ShareSettings({ onClose }) {
                 {userFound && !loading && (
                     <div
                         className="mt-3 p-3 bg-gray-50 rounded-xl border cursor-pointer hover:bg-gray-100"
-                        onClick={()=>handleInviteUser()}
+                        onClick={() => handleInviteUser()}
                     >
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 bg-gray-200 rounded-full"></div>

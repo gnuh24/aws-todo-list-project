@@ -117,9 +117,6 @@ services:
       # ==== Kafka ====
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka_broker:29092
 
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-
     networks:
       - default
 
@@ -150,13 +147,6 @@ services:
 
       # ==== Kafka ====
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka_broker:29092
-
-    # ==== Optional custom env ====
-    # GATEWAY_URL: http://api_gateway:8080
-    # SERVER_PORT: 8081
-
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
 
     networks:
       - default
@@ -221,13 +211,6 @@ services:
       # ==== Kafka ====
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka_broker:29092
 
-    # ==== Optional custom env ====
-    # GATEWAY_URL: http://api_gateway:8080
-    # SERVER_PORT: 8082
-
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-
     networks:
       - default
 
@@ -259,10 +242,6 @@ services:
       # ==== Kafka ====
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka_broker:29092
 
-
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-
     networks:
       - default
 
@@ -286,17 +265,11 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql_db:3306/aws_todolist_database?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD:
-      
       # ==== Redis ====
       SPRING_DATA_REDIS_HOST: redis_cache
       SPRING_DATA_REDIS_PORT: 6379
-
       # ==== Kafka ====
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka_broker:29092
-
-
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
 
     networks:
       - default
@@ -348,10 +321,6 @@ services:
       NOTIFICATION_SERVICE_URL: http://notification-service:9998
       AI_MODEL_SERVICE: http://ai-model-service:9997
       MEDIA_SERVICE: http://media-service:9996
-
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-
     networks:
       - default
 

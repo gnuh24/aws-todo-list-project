@@ -21,7 +21,7 @@ import {
     DeleteOutlined,
 } from "@ant-design/icons";
 import { Button, Dropdown, Menu } from "antd";
-import {useState, useEffect, useContext} from "react";
+import { useState, useEffect, useContext } from "react";
 
 import { useLocation, useNavigate } from "react-router-dom";
 import { https_taskflow } from "../../service/api";
@@ -35,8 +35,8 @@ import SidebarItem from "./SidebarItem";
 import { message } from "antd";
 import { toast } from "sonner";
 import AppContext from "antd/es/app/context";
-import {useAppContext} from "../../layout/MainLayout";
-import {useProjectContext} from "../../context/ProjectContext";
+import { useAppContext } from "../../layout/MainLayout";
+import { useProjectContext } from "../../context/ProjectContext";
 export default function Sidebar() {
     const location = useLocation();
     const [selectedSection, setSelectedSection] = useState(null);
@@ -303,11 +303,11 @@ export default function Sidebar() {
                             onClose={() => setOpenSearch(false)}
                         />
                         {/* <SidebarItem
-              onClick={() => navigate("/app/inbox")}
-              icon={<InboxOutlined />}
-              label="Inbox"
-              active={isActive("/app/inbox")}
-            /> */}
+                            onClick={() => navigate("/app/inbox")}
+                            icon={<InboxOutlined />}
+                            label="Inbox"
+                            active={isActive("/app/inbox")}
+                        /> */}
                         <SidebarItem
                             onClick={() => navigate("/app/today")}
                             icon={<CalendarOutlined />}
@@ -343,9 +343,9 @@ export default function Sidebar() {
                             flex items-center justify-between mb-1 px-3 py-2 rounded-md cursor-pointer
                             transition-colors duration-150 select-none
                             ${isActive("/app/archive")
-                                                            ? "bg-red-50 text-red-600 font-medium"
-                                                            : "text-gray-500 hover:bg-gray-50"
-                                                        }
+                                    ? "bg-red-50 text-red-600 font-medium"
+                                    : "text-gray-500 hover:bg-gray-50"
+                                }
                           `}
                             onClick={() => navigate("/app/archive")}
                         >
