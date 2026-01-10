@@ -25,7 +25,7 @@ export default function TaskItemForUpComing({
                                                 onUpdateTaskUpComing,
                                             }) {
 
-    const { setActiveTaskId } = useProjectContext();
+    const { setActiveTaskId, setActiveProject } = useProjectContext();
 
     const {
         setIsOpenComment
@@ -170,7 +170,9 @@ export default function TaskItemForUpComing({
         <div className="group relative flex flex-col border-b hover:bg-gray-50 transition-colors px-2 py-2 rounded-md"
              onClick={(e) => {
                  e.stopPropagation();
+                 setActiveProject({id: projectId});
                  setActiveTaskId(task.id);
+                 console.log(projectId);
              }}>
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -234,6 +236,7 @@ export default function TaskItemForUpComing({
                         e.stopPropagation();
                         setActiveTaskId(task.id);
                         setIsOpenComment(true);
+                        setActiveProject({id: projectId});
                     }}>
                         <MessageSquare size={14} />
                     </button>

@@ -174,15 +174,15 @@ export default function TaskItem({
                 </div>
 
                 <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button
-                        className="p-1 hover:text-gray-900 text-gray-500"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            setIsEditing(true)
-                        }}
-                    >
-                        <Edit2 size={14} />
-                    </button>
+                    {/*<button*/}
+                    {/*    className="p-1 hover:text-gray-900 text-gray-500"*/}
+                    {/*    onClick={(e) => {*/}
+                    {/*        e.stopPropagation();*/}
+                    {/*        setIsEditing(true)*/}
+                    {/*    }}*/}
+                    {/*>*/}
+                    {/*    <Edit2 size={14} />*/}
+                    {/*</button>*/}
 
                     <Dropdown
                         trigger={["click"]}

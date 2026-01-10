@@ -83,7 +83,7 @@ export default function NotificationSettings() {
         <ConfigProvider theme={theme}>
             <div className="relative h-full overflow-hidden">
                 {/* Scrollable content */}
-                <div className="h-full overflow-y-auto px-6 pb-40">
+                <div className="h-full overflow-y-auto px-6 pb-20">
                     <h1 className="text-xl font-semibold mb-6">
                         Notifications
                     </h1>

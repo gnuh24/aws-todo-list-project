@@ -3,76 +3,58 @@ import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import { ChevronDown } from "lucide-react";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
-import InlineAddTaskFormUpComing from "../../component/Modal/InlineAddTaskFormUpComing";
 import { https_taskflow } from "../../service/api";
 import TaskItemForUpComing from "../../component/Task/TaskItemForUpComing";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import TaskDetailModal from "../../component/Modal/TaskDetailModal";
+import AddTaskModal from "../../component/Modal/AddTaskModal";
 
 export default function UpcomingPage() {
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [showAddTaskIndex, setShowAddTaskIndex] = useState(null);
+  const [openAddTaskDate, setOpenAddTaskDate] = useState(null);
   const [showCalendar, setShowCalendar] = useState(false);
   const [tasksByDate, setTasksByDate] = useState({});
   const [params] = useSearchParams();
   const navigate = useNavigate();
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [selectedSection, setSelectedSection] = useState(null);
+
+
+
 
   // ============================
-  // 🔥 XỬ LÝ GOOGLE LOGIN CALLBACK
+  // GOOGLE LOGIN CALLBACK
   // ============================
   useEffect(() => {
-    const id = params.get("id");
-    const email = params.get("email");
-    const displayName = params.get("displayName");
-    const avatar = params.get("avatar");
-    const role = params.get("role");
     const token = params.get("token");
-    const refreshToken = params.get("refreshToken");
+    if (!token) return;
 
-    if (!token) return; // Không phải callback OAuth → bỏ qua
-
-    const userData = {
-      id,
-      email,
-      displayName,
-      avatar,
-      role,
-      token,
-      refreshToken,
-    };
-
-    // Lưu vào localStorage
-    localStorage.setItem("USER_INFO", JSON.stringify(userData));
     localStorage.setItem("accessToken", token);
-    localStorage.setItem("refreshToken", refreshToken);
+    localStorage.setItem("refreshToken", params.get("refreshToken"));
 
     toast.success("Đăng nhập thành công!");
-
-    // Chuyển hướng sang /app/inbox (hoặc /home)
-    setTimeout(() => {
-      navigate("/app/upcoming");
-    }, 800);
+    setTimeout(() => navigate("/app/upcoming"), 800);
   }, [params, navigate]);
 
-  // Lấy ra ngày chủ nhật của tuần hiện tại
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const startOfWeekCurrent = new Date(today);
-  startOfWeekCurrent.setDate(today.getDate() - today.getDay()); // Chủ Nhật đầu tuần của hiện tại
 
-  // Lấy ra ngày chủ nhật của tuần đang được chọn
+  const startOfWeekCurrent = new Date(today);
+  startOfWeekCurrent.setDate(today.getDate() - today.getDay());
+
   const startOfSelectedWeek = new Date(selectedDate);
   startOfSelectedWeek.setDate(selectedDate.getDate() - selectedDate.getDay());
   startOfSelectedWeek.setHours(0, 0, 0, 0);
 
-  // Tạo danh sách 7 ngày cho tuần tiếp theo tính từ tuần hiện tại
   const days = Array.from({ length: 7 }, (_, i) => {
     const date = new Date(startOfSelectedWeek);
-    date.setDate(startOfSelectedWeek.getDate() + i); // +0 → CN, +1 → T2, ...
-    const weekday = date.toLocaleDateString("en-US", { weekday: "short" });
-    const day = date.getDate();
-    return { day, weekday, date };
+    date.setDate(startOfSelectedWeek.getDate() + i);
+    return {
+      day: date.getDate(),
+      weekday: date.toLocaleDateString("en-US", { weekday: "short" }),
+      date,
+    };
   });
 
   // Tuần sẽ lùi tới nếu click prev
@@ -82,73 +64,81 @@ export default function UpcomingPage() {
   // Disable nếu tuần sẽ lùi qua tuần hiện tại
   const isPrevDisabled = newStartWeek < startOfWeekCurrent;
 
-  // Chuyển tuần trước
   const prevWeek = () => {
-    const newDate = new Date(selectedDate);
-    newDate.setDate(selectedDate.getDate() - 7);
-    setSelectedDate(newDate);
+    const d = new Date(selectedDate);
+    d.setDate(d.getDate() - 7);
+    setSelectedDate(d);
+    setOpenAddTaskDate(null);
   };
 
-  // Chuyển tuần sau
   const nextWeek = () => {
-    const newDate = new Date(selectedDate);
-    newDate.setDate(selectedDate.getDate() + 7);
-    setSelectedDate(newDate);
+    const d = new Date(selectedDate);
+    d.setDate(d.getDate() + 7);
+    setSelectedDate(d);
+    setOpenAddTaskDate(null);
   };
 
-  // Lưu ref cho từng ngày
   const dayRefs = useRef({});
 
-  // Khi chọn ngày, cuộn đến đúng ref
   useEffect(() => {
-    if (selectedDate) {
-      const dateKey = selectedDate.toDateString();
-      const targetElement = dayRefs.current[dateKey];
+    const key = selectedDate.toDateString();
+    const el = dayRefs.current[key];
+    if (!el) return;
 
-      if (targetElement) {
-        // Lấy chiều cao của phần header ghim
-        const headerOffset = 400; // ←←← CẦN CHỈNH CHO PHÙ HỢP
-
-        const elementPosition = targetElement.getBoundingClientRect().top;
-        const offsetPosition = window.scrollY + elementPosition - headerOffset;
-
-        window.scrollTo({
-          top: offsetPosition,
-          behavior: "smooth",
-        });
-      }
-    }
+    const offset = el.getBoundingClientRect().top + window.scrollY - 400;
+    window.scrollTo({ top: offset, behavior: "smooth" });
   }, [selectedDate]);
 
-  // Fetch api để lấy danh sách các task sắp đến của user
   useEffect(() => {
-    const groupTasksByDate = (tasks) => {
-      return tasks.reduce((acc, task) => {
-        const dateKey = new Date(task.startTime).toDateString(); // "Tue Nov 05 2025"
-        if (!acc[dateKey]) {
-          acc[dateKey] = [];
-        }
-        acc[dateKey].push(task);
-        return acc;
-      }, {});
-    };
+    const groupByDate = (tasks) =>
+        tasks.reduce((acc, t) => {
+          const key = new Date(t.startTime).toDateString();
+          acc[key] = [...(acc[key] || []), t];
+          return acc;
+        }, {});
 
-    const fetchTasks = async () => {
-      try {
-        const response = await https_taskflow.get("/v1/projects/taskUpComing");
-        // kiểm tra status
-        if (response.status !== 200) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        // response.data là danh sách task
-        setTasksByDate(groupTasksByDate(response.data.data));
-      } catch (err) {
-        console.error("Error fetching tasks:", err);
-      }
-    };
-
-    fetchTasks();
+    https_taskflow.get("/v1/projects/taskUpComing").then((res) => {
+      setTasksByDate(groupByDate(res.data.data));
+      console.log(res.data);
+    });
   }, []);
+
+  const handleAddTask = async (newTask) => {
+    try {
+      if (!selectedProject || !selectedSection) {
+        toast.warning("Vui lòng chọn Project & Section!");
+        return;
+      }
+
+      const res = await https_taskflow.post(
+          `/v1/projects/${selectedProject}/tasks`,
+          {
+            title: newTask.title,
+            description: newTask.description || "",
+            sectionId: selectedSection,
+            startTime: newTask.startTime,
+            deadline: newTask.deadline || null,
+            priority: newTask.priority || "MEDIUM",
+            idAccountAssign: newTask.idAccountAssign,
+          }
+      );
+
+      const task = res.data.data;
+
+      const key = new Date(task.startTime).toDateString();
+
+      setTasksByDate((prev) => ({
+        ...prev,
+        [key]: [...(prev[key] || []), task],
+      }));
+
+      toast.success("Thêm task thành công!");
+    } finally {
+      setSelectedProject(null);
+      setSelectedSection(null);
+      setOpenAddTaskDate(null);
+    }
+  };
 
   return (
     <>
@@ -262,128 +252,124 @@ export default function UpcomingPage() {
           </div>
         </div>
 
-        {/* Phần nội dung cuộn được */}
+        {/* ================= CONTENT ================= */}
         <div className="flex-1 overflow-y-auto">
           <div className="space-y-8">
             {days
-              .filter((d) => d.date >= today)
-              .map((d, i) => (
-                <div
-                  key={i}
-                  ref={(el) => (dayRefs.current[d.date.toDateString()] = el)}
-                  className="pb-6"
-                >
-                  <div className="flex flex-col gap-2 pb-6">
-                    <div className="flex items-center justify-between border-b pb-3">
-                      <div className="flex items-center gap-2">
-                        <div className="font-bold px-1 py-1 rounded">
-                          {d.day}
+                .filter((d) => d.date >= today)
+                .map((d) => {
+                  const dateKey = d.date.toDateString();
+
+                  return (
+                      <div
+                          key={dateKey}
+                          ref={(el) => (dayRefs.current[dateKey] = el)}
+                          className="pb-6"
+                      >
+
+                        <div className="flex flex-col gap-2 pb-6">
+                          <div className="flex items-center justify-between border-b pb-3">
+                            <div className="flex items-center gap-2">
+                              <div className="font-bold px-1 py-1 rounded">
+                                {d.day}
+                              </div>
+                              <div className="text-gray-700 font-medium">
+                                {d.date.toLocaleString("en-US", { month: "short" })} ·{" "}
+                                {d.weekday}
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                        <div className="text-gray-700 font-medium">
-                          {d.date.toLocaleString("en-US", { month: "short" })} ·{" "}
-                          {d.weekday}
-                        </div>
-                      </div>
-                    </div>
 
-                    <div className="ml-4 flex flex-col gap-2">
-                      {tasksByDate[d.date.toDateString()]?.map((task, idx) => (
-                        <div
-                          key={idx}
-                          onClick={() => {
-                            setShowAddTaskIndex(null)
+                        <div className="ml-4 flex flex-col gap-2">
+                          {tasksByDate[dateKey]?.map((task) => (
+                              <div
+                                  key={task.id}
+                                  onClick={() => setOpenAddTaskDate(null)}
+                              >
+                                <TaskItemForUpComing
+                                    task={task}
+                                    projectId={task.idProject}
+                                    onDeleteTaskUpComing={(taskDelete) => {
+                                      const dateKey = new Date(
+                                          taskDelete.startTime
+                                      ).toDateString();
 
-                          }}
-                        >
-                          <TaskItemForUpComing
-                            task={task}
-                            projectId={task.idProject}
-                            sectionId={task.idSection}
-                            onDeleteTaskUpComing={(taskDelete) => {
-                              const dateKey = new Date(
-                                taskDelete.startTime
-                              ).toDateString();
+                                      setTasksByDate((prev) => ({
+                                        ...prev,
+                                        [dateKey]: (prev[dateKey] || []).filter(
+                                            (task) => task.id !== taskDelete.id
+                                        ),
+                                      }));
+                                    }}
+                                    onUpdateTaskUpComing={(taskUpdate) => {
+                                      const dateKey = new Date(
+                                          task.startTime
+                                      ).toDateString();
+                                      const newDateKey = new Date(
+                                          taskUpdate.startTime
+                                      ).toDateString();
 
-                              setTasksByDate((prev) => ({
-                                ...prev,
-                                [dateKey]: (prev[dateKey] || []).filter(
-                                  (task) => task.id !== taskDelete.id
-                                ),
-                              }));
-                            }}
-                            onUpdateTaskUpComing={(taskUpdate) => {
-                              const dateKey = new Date(
-                                task.startTime
-                              ).toDateString();
-                              const newDateKey = new Date(
-                                taskUpdate.startTime
-                              ).toDateString();
+                                      // Nếu vị trí cũ và mới trùng nhau thì cũng sẽ xóa vị trí cũ và thêm phần tử mới vào đúng chỗ đó
 
-                              // Nếu vị trí cũ và mới trùng nhau thì cũng sẽ xóa vị trí cũ và thêm phần tử mới vào đúng chỗ đó
+                                      setTasksByDate((prev) => {
+                                        // Xóa task cũ ở dateKey
+                                        const oldTasks = (prev[dateKey] || []).filter(
+                                            (task) => task.id !== taskUpdate.id
+                                        );
 
-                              setTasksByDate((prev) => {
-                                // Xóa task cũ ở dateKey
-                                const oldTasks = (prev[dateKey] || []).filter(
-                                  (task) => task.id !== taskUpdate.id
-                                );
+                                        // Thêm taskUpdate vào newDateKey
+                                        const newTasks =
+                                            newDateKey === dateKey
+                                                ? [...oldTasks, taskUpdate] // nếu date không đổi, thêm vào mảng đã filter
+                                                : [...(prev[newDateKey] || []), taskUpdate]; // nếu date thay đổi, thêm vào mảng mới
 
-                                // Thêm taskUpdate vào newDateKey
-                                const newTasks =
-                                  newDateKey === dateKey
-                                    ? [...oldTasks, taskUpdate] // nếu date không đổi, thêm vào mảng đã filter
-                                    : [...(prev[newDateKey] || []), taskUpdate]; // nếu date thay đổi, thêm vào mảng mới
+                                        return {
+                                          ...prev,
+                                          [dateKey]: oldTasks,
+                                          [newDateKey]: newTasks,
+                                        };
+                                      });
+                                    }}
+                                />
+                              </div>
+                          ))}
 
-                                return {
-                                  ...prev,
-                                  [dateKey]: oldTasks,
-                                  [newDateKey]: newTasks,
-                                };
-                              });
-                            }}
-                            isOpenFormAddTaskUpComing={showAddTaskIndex}
-                          />
-                        </div>
-                      ))}
-
-                      {showAddTaskIndex !== i && (
-                        <button
-                          onClick={() => setShowAddTaskIndex(i)}
-                          className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-red-500 transition duration-200 ease-in-out group focus:outline-none"
-                        >
-                          <span className="flex items-center justify-center text-red-500 group-hover:bg-red-500 group-hover:text-white w-6 h-6 rounded-full transition duration-200 ease-in-out">
+                          {openAddTaskDate !== dateKey && (
+                              <button
+                                  onClick={() => setOpenAddTaskDate(dateKey)}
+                                  className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-red-500 group"
+                              >
+                          <span className="flex items-center justify-center text-red-500 group-hover:bg-red-500 group-hover:text-white w-6 h-6 rounded-full">
                             ＋
                           </span>
-                          <span>Add task</span>
-                        </button>
-                      )}
-                    </div>
+                                <span>Add task</span>
+                              </button>
+                          )}
+                        </div>
 
-                    {showAddTaskIndex === i && (
-                      <div className="ml-4 mt-2">
-                        <InlineAddTaskFormUpComing
-                          initialDate={d.date}
-                          onCancel={() => {
-                            setShowAddTaskIndex(null);
-                          }}
-                          onAdd={(content) => {
-                            const dateKey = new Date(
-                              content.startTime
-                            ).toDateString();
-                            setTasksByDate((prev) => ({
-                              ...prev,
-                              [dateKey]: [...(prev[dateKey] || []), content],
-                            }));
-                            setShowAddTaskIndex(null);
-                          }}
-                        />
+                        {openAddTaskDate === dateKey && (
+                            <div className="ml-4 mt-2">
+                              <AddTaskModal
+                                  open = {openAddTaskDate}
+                                  initialDate={d.date}
+                                  onCancel={() => setOpenAddTaskDate(null)}
+                                  onAdd={handleAddTask}
+                                  onSelectProjectSection={(data) => {
+                                    setSelectedProject(data.projectId);
+                                    setSelectedSection(data.sectionId);
+                                  }}
+                              />
+                            </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                </div>
-              ))}
+                  );
+                })}
           </div>
         </div>
       </div>
+
+
 
       {/* render 1 lần duy nhất */}
       <TaskDetailModal />

@@ -9,7 +9,6 @@ import {
 } from "antd";
 import {
     CalendarOutlined,
-    ClockCircleOutlined,
     PushpinOutlined,
     UserOutlined,
     LinkOutlined,
@@ -18,9 +17,9 @@ import dayjs from "dayjs";
 
 import DatePickerDropdown from "../Dropdown/DatePickerDropdown";
 import PriorityDropdown from "../Dropdown/PriorityDropdown";
-import MoreOptionsDropdown from "../Dropdown/MoreOptionsDropdown";
 import ProjectSelectDropdown from "../Dropdown/ProjectSelectDropdown";
 import MemberDropdown from "../Dropdown/MemberDropdown";
+import DateHelper from "../../helpers/DateHelper";
 
 export default function AddTaskModal({
     open,
@@ -28,12 +27,13 @@ export default function AddTaskModal({
     onAdd,
     onSelectProjectSection,
     parentTask, // ✅ NEW (optional)
+    initialDate
 }) {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
 
     const [priority, setPriority] = useState("LOW");
-    const [startTime, setStartTime] = useState(null);
+    const [startTime, setStartTime] = useState(initialDate !== undefined ? initialDate : null);
     const [deadline, setDeadline] = useState(null);
 
     const [isPinned, setIsPinned] = useState(false);
@@ -65,16 +65,15 @@ export default function AddTaskModal({
             title: title.trim(),
             description: description || "",
             priority,
-            startTime: startTime ? dayjs(startTime).toISOString() : null,
-            deadline: deadline ? dayjs(deadline).toISOString() : null,
+            startTime: startTime ? DateHelper.formatForServer(startTime) : null,
+            deadline: deadline ? DateHelper.formatForServer(deadline) : null,
             idAccountAssign: assigneeId,
             taskFatherId: parentTask?.id || null, // ✅ IMPORTANT
             isPinned,
             isArchived,
         };
-
-        onAdd(newTask);
-        resetForm();
+        const success = onAdd(newTask);
+        if (success) resetForm();
     };
 
     return (
