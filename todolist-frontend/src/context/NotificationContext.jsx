@@ -13,6 +13,7 @@ export function NotificationProvider({ children }) {
     const [pageSizeNotification] = useState(PAGE_SIZE);
     const [pageNumberNotification, setPageNumberNotification] = useState(1); // trang hiện tại const [totalPagesNotification, setTotalPagesNotification] = useState(0); const [pageNotification, setPageNotification] = useState(1); // trang hiện tại
     const [newNotificationFromWebsocket, setNewNotificationFromWebsocket] = useState(null);
+    const [totalPageNotification,setTotalPagesNotification] = useState(null);
 
     return (
         <NotificationContext.Provider
@@ -22,7 +23,8 @@ export function NotificationProvider({ children }) {
                 countNotificationsUnRead, setCountNotificationsUnRead,
                 pageSizeNotification,
                 pageNumberNotification, setPageNumberNotification,
-                newNotificationFromWebsocket, setNewNotificationFromWebsocket
+                newNotificationFromWebsocket, setNewNotificationFromWebsocket,
+                totalPageNotification,setTotalPagesNotification
             }}
         >
             {children}

@@ -36,13 +36,23 @@ export default function ShareSettings({ onClose }) {
 
         fetchMembers();
     }, [projectId]);
-    const handleCopyLink = () => {
-        const url = window.location.href; // hoặc custom link nếu bạn muốn
-        navigator.clipboard.writeText(url);
 
-        toast.success("Copied project link!");
+
+    const handleCopyLink = async () => {
+        try {
+            const res = await  https_taskflow.post(`/v1/projects/${projectId}/invites`);
+
+            const inviteLink = res.data.data.inviteUrl;
+
+            console.error(inviteLink);
+
+            await navigator.clipboard.writeText(inviteLink);
+
+            toast.success("Đã copy link mời vào project 🔗");
+        } catch (err) {
+            toast.error("Không thể tạo link mời");
+        }
     };
-
 
     // -----------------------------------
     // SEARCH USER WHEN TYPING EMAIL

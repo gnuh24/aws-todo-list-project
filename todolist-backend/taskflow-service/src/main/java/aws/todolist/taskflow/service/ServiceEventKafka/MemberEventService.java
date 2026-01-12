@@ -88,6 +88,14 @@ public class MemberEventService {
 
         List<String> receivers = memberRepository.findEmailsInProject(member.getProject().getId());
 
+        // 🚫 Remove actor khỏi receivers
+        if (actor != null) {
+            receivers.removeIf(email ->
+                    email.equalsIgnoreCase(actor.getEmail())
+            );
+        }
+
+
         MemberPayload payload = memberMapper.toPayload(
                 member,
                 actor != null ? actorMapper.toActorDto(actor) : null,

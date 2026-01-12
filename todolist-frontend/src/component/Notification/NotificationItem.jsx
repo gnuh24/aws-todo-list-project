@@ -1,8 +1,10 @@
-import {BASE_URL, https_taskflow} from "../../service/api";
+import { https_taskflow} from "../../service/api";
 import {toast} from "sonner";
 import AvatarCircle from "../Content/AvatarCircle";
 
 export default function NotificationItem({ notification, handleClickOnNotification, handleUpdateStatus }) {
+
+    const UserIdLogin = JSON.parse(localStorage.getItem("USER_INFO"))?.id;
 
     const typeNotificationAddMember = "PROJECT_MEMBER_ADDED"
     const statusForReponse = {
@@ -76,7 +78,13 @@ export default function NotificationItem({ notification, handleClickOnNotificati
                                 </span>
                                 ) : (
                                 <span className="font-base text-gray-800">
-                                    {notification.title} bởi <b>{notification.displayName}</b>
+                                    {notification.title}
+
+                                    {UserIdLogin !== notification.actorId && (
+                                        <>
+                                            {" "}bởi <b>{notification.displayName}</b>
+                                        </>
+                                    )}
                                 </span>
                             )}
 

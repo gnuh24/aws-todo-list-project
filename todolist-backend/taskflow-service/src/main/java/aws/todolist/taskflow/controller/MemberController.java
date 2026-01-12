@@ -43,7 +43,7 @@ public class MemberController {
 
     @Operation(summary = "Thêm thành viên mới vào dự án", description = "Thêm một member mới vào dự án")
     @PostMapping("/{idProject}/members")
-    @RequireProjectRole({Role.OWNER})
+    @RequireProjectRole({Role.OWNER, Role.MEMBER})
     public ResponseEntity<ApiResponse<MemberResponseDTO>> addNewMember(
             @PathVariable("idProject") String projectId,
             @RequestBody @Valid MemberCreateRequestDTO request) {
@@ -61,7 +61,7 @@ public class MemberController {
 
     @Operation(summary = "Thay đổi vai trò", description = "Thay đổi vai trò của member")
     @PatchMapping("/{idProject}/members/{idMember}")
-    @RequireProjectRole({Role.OWNER})
+    @RequireProjectRole({Role.OWNER, Role.MEMBER})
     public ResponseEntity<ApiResponse<MemberResponseDTO>> updateMember(
             @PathVariable("idProject") String id,
             @PathVariable("idMember") String idMember,

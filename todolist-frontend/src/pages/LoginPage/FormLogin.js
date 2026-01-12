@@ -8,6 +8,7 @@ import FacebookLoginButton from "./FacebookLoginButton";
 import GoogleLoginButton from "./GoogleLoginButton";
 import { https_auth } from "../../service/api";
 import { toast } from "sonner";
+import {verifyInvite} from "../AppPage/InvitePage";
 export default function FormLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,6 +31,20 @@ export default function FormLogin() {
         localStorage.setItem("USER_INFO", JSON.stringify(userData));
 
         toast.success("Đăng nhập thành công!");
+
+        // 2️⃣ Check invite
+        const inviteToken = localStorage.getItem("invite_token");
+
+        if (inviteToken) {
+          try {
+            await verifyInvite(inviteToken);
+            toast.success("Bạn đã được mời vào project 🎉");
+            localStorage.removeItem("invite_token");
+          } catch {
+            toast.error("Link mời không hợp lệ hoặc đã hết hạn");
+            localStorage.removeItem("invite_token");
+          }
+        }
 
         window.location.href = "/app/upcoming";
       }

@@ -5,13 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="aafb8b93-6ddf-44d9-bc7c-02d1e2b5b281" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../api-gateway/src/main/resources/application-dev.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../api-gateway/src/main/resources/application-dev.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/context/RequestContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/context/RequestContext.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/dto/event/ActorDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/dto/event/ActorDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/filter/AccountContextFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/filter/AccountContextFilter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/mapper/ActorMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/mapper/ActorMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/dto/taskflow/ActorDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/../websocket-service/src/main/java/aws/todoist/websocket/dto/taskflow/ActorDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/component/Modal/TaskDetailModal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/component/Modal/TaskDetailModal.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/controller/MemberController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/controller/MemberController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/ServiceEventKafka/MemberEventService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/aws/todolist/taskflow/service/ServiceEventKafka/MemberEventService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/component/Modal/ShareSettingsModal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/component/Modal/ShareSettingsModal.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../todolist-frontend/src/context/NotificationContext.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../todolist-frontend/src/context/NotificationContext.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,21 +48,21 @@
     <option name="showLibraryContents" value="true" />
     <option name="showModules" value="false" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.TaskService.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "code.cleanup.on.save": "true",
-    "git-widget-placeholder": "developer",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/Worker/FCJ/To-doList/aws-todo-list-project/todolist-backend/websocket-service",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2",
-    "rearrange.code.on.save": "true",
-    "settings.editor.selected.configurable": "editor.preferences.fonts.default"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.TaskService.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;code.cleanup.on.save&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;developer&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Worker/FCJ/To-doList/aws-todo-list-project/todolist-backend/websocket-service&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;rearrange.code.on.save&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.fonts.default&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\Worker\FCJ\To-doList\aws-todo-list-project\todolist-backend\taskflow-service\src\main\java\aws\todolist\taskflow\dto" />

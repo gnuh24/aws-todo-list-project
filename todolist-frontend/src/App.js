@@ -27,6 +27,7 @@ import UnArchivePage from "./pages/AppPage/UnArchivePgae";
 import NotificationsPage from "./pages/AppPage/NotificationPage";
 import MainLayout from "./layout/MainLayout";
 import NotFound from "./pages/AppPage/NotFound";
+import InvitePage from "./pages/AppPage/InvitePage";
 function App() {
   return (
     <>
@@ -59,6 +60,9 @@ function App() {
               element={<ResetPassword></ResetPassword>}
             ></Route>
             <Route path="/auth/verify-account" element={<VerifyAccount />} />
+
+            <Route path="/invite/:token" element={<InvitePage />} />
+
             <Route
                 path="/app"
                 element={
